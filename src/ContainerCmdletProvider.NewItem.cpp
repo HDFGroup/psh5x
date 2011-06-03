@@ -639,6 +639,41 @@ namespace PSH5X
 #pragma endregion
 
         }
+        else if (itemTypeName->ToUpper() == "DIMENSIONSCALE")
+        {
+            ErrorRecord^ error = gcnew ErrorRecord(
+                gcnew NotImplementedException(),
+                "InvalidData", ErrorCategory::InvalidData, nullptr);
+            ThrowTerminatingError(error);
+        }
+        else if (itemTypeName->ToUpper() == "IMAGE")
+        {
+            ErrorRecord^ error = gcnew ErrorRecord(
+                gcnew NotImplementedException(),
+                "InvalidData", ErrorCategory::InvalidData, nullptr);
+            ThrowTerminatingError(error);
+        }
+        else if (itemTypeName->ToUpper() == "PALETTE")
+        {
+            ErrorRecord^ error = gcnew ErrorRecord(
+                gcnew NotImplementedException(),
+                "InvalidData", ErrorCategory::InvalidData, nullptr);
+            ThrowTerminatingError(error);
+        }
+        else if (itemTypeName->ToUpper() == "PACKETTABLE")
+        {
+            ErrorRecord^ error = gcnew ErrorRecord(
+                gcnew NotImplementedException(),
+                "InvalidData", ErrorCategory::InvalidData, nullptr);
+            ThrowTerminatingError(error);
+        }
+        else if (itemTypeName->ToUpper() == "TABLE")
+        {
+            ErrorRecord^ error = gcnew ErrorRecord(
+                gcnew NotImplementedException(),
+                "InvalidData", ErrorCategory::InvalidData, nullptr);
+            ThrowTerminatingError(error);
+        }
         else
         {
             WriteWarning("Unknown item type!");
