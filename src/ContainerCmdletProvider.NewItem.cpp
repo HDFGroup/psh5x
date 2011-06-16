@@ -20,6 +20,8 @@ using namespace System;
 using namespace System::Collections;
 using namespace System::Collections::Generic;
 using namespace System::Collections::ObjectModel;
+using namespace System::Drawing;
+using namespace System::Drawing::Imaging;
 using namespace System::Management::Automation;
 using namespace System::Management::Automation::Provider;
 using namespace System::Runtime::InteropServices;
@@ -657,25 +659,65 @@ namespace PSH5X
 
             try
             {
+                unsigned bits = 0;
+
+                array<hsize_t,1>^ wxh = {0, 0};
+
+                unsigned char* rgbValues = NULL;
+
+                String^ interlace = "INTERLACE_PIXEL";
+
+                hsize_t width, height;
+
                 RuntimeDefinedParameterDictionary^ dynamicParameters =
                     (RuntimeDefinedParameterDictionary^) DynamicParameters;
 
-                // TODO: check for value argument and parse (String, FileInfo, Array)
-
-                Object^ value = nullptr;
-
-                if (value != nullptr)
+                if (newValue != nullptr)
                 {
+                    String^ file = nullptr;
+
+                    if (ProviderUtils::TryGetValue(newValue, file))
+                    {
+                        Bitmap^ bmp = gcnew Bitmap(file);
+                        wxh[0] = safe_cast<hsize_t>(bmp->Width);
+                        wxh[1] = safe_cast<hsize_t>(bmp->Height);
+
+                        PixelFormat pfmt = bmp->PixelFormat;
+                        if (pfmt == PixelFormat::Format8bppIndexed) {
+                            bits = 8;
+                        }
+                        else if (pfmt == PixelFormat::Format24bppRgb) {
+                            bits = 24;
+                        }
+                        else {
+                            throw gcnew ArgumentException("Only 8- or 24-bit images are supported!");
+                        }
+
+                        Rectangle rect = Rectangle(0, 0, bmp->Width, bmp->Height);
+                        BitmapData^ bmpData = bmp->LockBits(rect, ImageLockMode::ReadOnly, bmp->PixelFormat);
+                        IntPtr ptr = bmpData->Scan0;
+
+                        int bytes = Math::Abs(bmpData->Stride) * bmp->Height;
+                        array<Byte>^ a = gcnew array<Byte>(bytes);
+                        Marshal::Copy(ptr, a, 0, bytes);
+                        bmp->UnlockBits(bmpData);
+                        rgbValues = new unsigned char [bytes];
+                        Marshal::Copy(a, 0, IntPtr((void*) rgbValues), bytes);
+
+                        width = wxh[0]; height = wxh[1];
+                    }
+                    else {
+                        throw gcnew
+                            ArgumentException("Cannot convert -Value argument to file name!");
+                    }
                 }
                 else
                 {
-                    unsigned bits = 0;
                     if (dynamicParameters["Bits"]->Value != nullptr)
                     {
                         bits = (unsigned) dynamicParameters["Bits"]->Value;
                         if (bits != 8 && bits != 24) {
-                            throw gcnew
-                                ArgumentException("Only 8- or 24-bit images are supported!");
+                            throw gcnew ArgumentException("Only 8- or 24-bit images are supported!");
                         }
                     }
                     else {
@@ -683,8 +725,6 @@ namespace PSH5X
                             ArgumentException("Specify bits per pixel with -Bits [8,24] !");
                     }
 
-
-                    array<hsize_t,1>^ wxh = nullptr;
                     if (dynamicParameters["WxH"]->Value != nullptr)
                     {
                         wxh = (array<hsize_t,1>^) dynamicParameters["WxH"]->Value;
@@ -697,59 +737,61 @@ namespace PSH5X
                             ArgumentException("Specify image dimensions with -WxH Width,Height!");
                     }
 
-                    hsize_t width = wxh[0], height = wxh[1];
-                    unsigned char* buffer = NULL;
+                    width = wxh[0]; height = wxh[1];
 
-                    if (bits == 24)
-                    {
-                        buffer = new unsigned char [3*width*height];
-
-                        String^ interlace = "INTERLACE_PIXEL";
-                        if (dynamicParameters["InterlaceMode"]->Value != nullptr)
-                        {
-                            String^ s = ((String^) dynamicParameters["InterlaceMode"]->Value)->Trim()->ToUpper();
-
-                            if (s == "PLANE") {
-                                interlace = "INTERLACE_PLANE";
-                            }
-                        }
-
-                        if (this->ShouldProcess(h5path,
-                            String::Format("HDF5 image '{0}' does not exist, create it", linkName)))
-                        {
-                            char* mode = (char*)(Marshal::StringToHGlobalAnsi(interlace)).ToPointer();
-                            
-                            if (H5IMmake_image_24bit(drive->FileHandle, name, width, height, mode, buffer) < 0)
-                            {
-                                delete [] buffer;
-                                throw gcnew ArgumentException("H5IMmake_image_24bit failed!");
-                            }
-                        }
+                    if (bits == 24) {
+                        rgbValues = new unsigned char [3*width*height];
                     }
-                    else
-                    {
-                        buffer = new unsigned char [width*height];
-
-                        if (this->ShouldProcess(h5path,
-                            String::Format("HDF5 image '{0}' does not exist, create it", linkName)))
-                        {
-                            if (H5IMmake_image_8bit(drive->FileHandle, name, width, height, buffer) < 0)
-                            {
-                                delete [] buffer;
-                                throw gcnew ArgumentException("H5IMmake_image_8bit failed!");
-                            }
-                        }
+                    else {
+                        rgbValues = new unsigned char [width*height];
                     }
-
-                    delete [] buffer;
-
-                    if (H5Fflush(drive->FileHandle, H5F_SCOPE_LOCAL) < 0) {
-                        WriteWarning("H5Fflush failed!");
-                    }
-
-                    h5set = H5Dopen2(drive->FileHandle, name, H5P_DEFAULT);
-                    WriteItemObject(gcnew DatasetInfo(h5set), path, false);
                 }
+
+                if (bits == 24)
+                {
+                    if (dynamicParameters["InterlaceMode"]->Value != nullptr)
+                    {
+                        String^ s = ((String^) dynamicParameters["InterlaceMode"]->Value)->Trim()->ToUpper();
+
+                        if (s == "PLANE") {
+                            interlace = "INTERLACE_PLANE";
+                        }
+                    }
+
+                    if (this->ShouldProcess(h5path,
+                        String::Format("HDF5 image '{0}' does not exist, create it", linkName)))
+                    {
+                        char* mode = (char*)(Marshal::StringToHGlobalAnsi(interlace)).ToPointer();
+
+                        if (H5IMmake_image_24bit(drive->FileHandle, name, width, height, mode, rgbValues) < 0)
+                        {
+                            delete [] rgbValues;
+                            throw gcnew ArgumentException("H5IMmake_image_24bit failed!");
+                        }
+                    }
+                }
+                else
+                {
+                    if (this->ShouldProcess(h5path,
+                        String::Format("HDF5 image '{0}' does not exist, create it", linkName)))
+                    {
+                        if (H5IMmake_image_8bit(drive->FileHandle, name, width, height, rgbValues) < 0)
+                        {
+                            delete [] rgbValues;
+                            throw gcnew ArgumentException("H5IMmake_image_8bit failed!");
+                        }
+                    }
+                }
+
+                delete [] rgbValues;
+
+                if (H5Fflush(drive->FileHandle, H5F_SCOPE_LOCAL) < 0) {
+                    WriteWarning("H5Fflush failed!");
+                }
+
+                h5set = H5Dopen2(drive->FileHandle, name, H5P_DEFAULT);
+                WriteItemObject(gcnew DatasetInfo(h5set), path, false);
+
             }
             catch (Exception^ ex)
             {
