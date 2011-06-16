@@ -10,7 +10,9 @@
 
 extern "C" {
 #include "H5Gpublic.h"
+#include "H5IMpublic.h"
 #include "H5Ppublic.h"
+#include "H5PTpublic.h"
 #include "H5Spublic.h"
 }
 
@@ -648,10 +650,123 @@ namespace PSH5X
         }
         else if (itemTypeName->ToUpper() == "IMAGE")
         {
-            ErrorRecord^ error = gcnew ErrorRecord(
-                gcnew NotImplementedException(),
-                "InvalidData", ErrorCategory::InvalidData, nullptr);
-            ThrowTerminatingError(error);
+
+#pragma region HDF5 image
+
+            hid_t h5set = -1;
+
+            try
+            {
+                RuntimeDefinedParameterDictionary^ dynamicParameters =
+                    (RuntimeDefinedParameterDictionary^) DynamicParameters;
+
+                // TODO: check for value argument and parse (String, FileInfo, Array)
+
+                Object^ value = nullptr;
+
+                if (value != nullptr)
+                {
+                }
+                else
+                {
+                    unsigned bits = 0;
+                    if (dynamicParameters["Bits"]->Value != nullptr)
+                    {
+                        bits = (unsigned) dynamicParameters["Bits"]->Value;
+                        if (bits != 8 && bits != 24) {
+                            throw gcnew
+                                ArgumentException("Only 8- or 24-bit images are supported!");
+                        }
+                    }
+                    else {
+                        throw gcnew
+                            ArgumentException("Specify bits per pixel with -Bits [8,24] !");
+                    }
+
+
+                    array<hsize_t,1>^ wxh = nullptr;
+                    if (dynamicParameters["WxH"]->Value != nullptr)
+                    {
+                        wxh = (array<hsize_t,1>^) dynamicParameters["WxH"]->Value;
+                        if (wxh->Length < 2) {
+                            ArgumentException("The image dimensions must be specified as an array of length 2!");
+                        }
+                    }
+                    else {
+                        throw gcnew
+                            ArgumentException("Specify image dimensions with -WxH Width,Height!");
+                    }
+
+                    hsize_t width = wxh[0], height = wxh[1];
+                    unsigned char* buffer = NULL;
+
+                    if (bits == 24)
+                    {
+                        buffer = new unsigned char [3*width*height];
+
+                        String^ interlace = "INTERLACE_PIXEL";
+                        if (dynamicParameters["InterlaceMode"]->Value != nullptr)
+                        {
+                            String^ s = ((String^) dynamicParameters["InterlaceMode"]->Value)->Trim()->ToUpper();
+
+                            if (s == "PLANE") {
+                                interlace = "INTERLACE_PLANE";
+                            }
+                        }
+
+                        if (this->ShouldProcess(h5path,
+                            String::Format("HDF5 image '{0}' does not exist, create it", linkName)))
+                        {
+                            char* mode = (char*)(Marshal::StringToHGlobalAnsi(interlace)).ToPointer();
+                            
+                            if (H5IMmake_image_24bit(drive->FileHandle, name, width, height, mode, buffer) < 0)
+                            {
+                                delete [] buffer;
+                                throw gcnew ArgumentException("H5IMmake_image_24bit failed!");
+                            }
+                        }
+                    }
+                    else
+                    {
+                        buffer = new unsigned char [width*height];
+
+                        if (this->ShouldProcess(h5path,
+                            String::Format("HDF5 image '{0}' does not exist, create it", linkName)))
+                        {
+                            if (H5IMmake_image_8bit(drive->FileHandle, name, width, height, buffer) < 0)
+                            {
+                                delete [] buffer;
+                                throw gcnew ArgumentException("H5IMmake_image_8bit failed!");
+                            }
+                        }
+                    }
+
+                    delete [] buffer;
+
+                    if (H5Fflush(drive->FileHandle, H5F_SCOPE_LOCAL) < 0) {
+                        WriteWarning("H5Fflush failed!");
+                    }
+
+                    h5set = H5Dopen2(drive->FileHandle, name, H5P_DEFAULT);
+                    WriteItemObject(gcnew DatasetInfo(h5set), path, false);
+                }
+            }
+            catch (Exception^ ex)
+            {
+                ErrorRecord^ error = gcnew ErrorRecord(ex, "InvalidData", ErrorCategory::InvalidData, nullptr);
+                ThrowTerminatingError(error);
+            }
+            finally
+            {
+                if (h5set >= 0) {
+                    if (H5Dclose(h5set) < 0) {
+                        WriteWarning("H5Dclose failed.");
+                    }
+                }
+            }
+
+#pragma endregion
+
         }
         else if (itemTypeName->ToUpper() == "PALETTE")
         {
@@ -662,10 +777,124 @@ namespace PSH5X
         }
         else if (itemTypeName->ToUpper() == "PACKETTABLE")
         {
-            ErrorRecord^ error = gcnew ErrorRecord(
-                gcnew NotImplementedException(),
-                "InvalidData", ErrorCategory::InvalidData, nullptr);
-            ThrowTerminatingError(error);
+
+#pragma region HDF5 packet table
+
+            hid_t h5type = -1, h5set = -1;
+
+            try
+            {
+                RuntimeDefinedParameterDictionary^ dynamicParameters =
+                    (RuntimeDefinedParameterDictionary^) DynamicParameters;
+
+                // mandatory parameters -PacketType and -ChunkByteSize
+
+                Object^ packetType = dynamicParameters["PacketType"]->Value;
+
+                Hashtable^ ht = nullptr;
+                String^ typeOrPath = nullptr;
+
+                if (ProviderUtils::TryGetValue(packetType, ht)) {
+                    h5type = ProviderUtils::ParseH5Type(ht);
+                    if (h5type < 0) {
+                        throw gcnew ArgumentException("Invalid HDF5 datatype specified!");
+                    }
+                }
+                else if (ProviderUtils::TryGetValue(packetType, typeOrPath))
+                {
+                    if (typeOrPath->StartsWith("/")) {
+                        if (ProviderUtils::IsH5DatatypeObject(drive->FileHandle, typeOrPath))
+                        {
+                            char* path = (char*)(Marshal::StringToHGlobalAnsi(typeOrPath)).ToPointer();
+                            h5type = H5Topen2(drive->FileHandle, path, H5P_DEFAULT);
+                        }
+                        else {
+                            throw gcnew
+                                ArgumentException("The HDF5 path name specified does not refer to an datatype object.");
+                        }
+                    }
+                    else
+                    {
+                        h5type = ProviderUtils::H5Type(typeOrPath);
+                        if (h5type < 0) {
+                            throw gcnew ArgumentException("Invalid HDF5 datatype specified!");
+                        }
+                    }
+                }
+                else {
+                    throw gcnew ArgumentException("Unrecognized type: must be string or hashtable.");
+                }
+
+                hsize_t chunk_size = (hsize_t) dynamicParameters["ChunkByteSize"]->Value;
+                if (chunk_size == 0)
+                {
+                    throw gcnew ArgumentException("Chunk size (bytes) must be positive.");
+                }
+
+                int compression = 5;
+                if (dynamicParameters["Gzip"]->Value != nullptr)
+                {
+                    compression = (int) dynamicParameters["Gzip"]->Value;
+                    if (compression < 0) {
+                        compression = -1;
+                    }
+                    else {
+                        if (compression > 9) {
+                            throw gcnew ArgumentException("Compression must be in [-1,9].");
+                        }
+                    }
+                }
+
+                if (this->ShouldProcess(h5path,
+                    String::Format("HDF5 packet table '{0}' does not exist, create it", linkName)))
+                {
+
+                    h5set = H5PTcreate_fl(drive->FileHandle, name, h5type, chunk_size, compression);
+                    if (h5set >= 0)
+                    {
+                        if (h5set >= 0) {
+                            if (H5PTclose(h5set) < 0) {
+                                WriteWarning("H5PTclose failed.");
+                            }
+                        }
+
+                        // We can't call H5Fflush on a packet table...
+                        if (H5Fflush(drive->FileHandle, H5F_SCOPE_LOCAL) < 0) {
+                            WriteWarning("H5Fflush failed!");
+                        }
+
+                        h5set = H5Dopen2(drive->FileHandle, name, H5P_DEFAULT);
+
+                        WriteItemObject(gcnew DatasetInfo(h5set), path, false);
+                        
+                        if (h5set >= 0) {
+                            if (H5Dclose(h5set) < 0) {
+                                WriteWarning("H5Dclose failed.");
+                            }
+                        }
+                    }
+                    else {
+                        throw gcnew InvalidOperationException("H5PTcreate_fl failed!");
+                    }
+                }
+            }
+            catch (Exception^ ex)
+            {
+                ErrorRecord^ error = gcnew ErrorRecord(ex, "InvalidData", ErrorCategory::InvalidData, nullptr);
+                ThrowTerminatingError(error);
+            }
+            finally
+            {
+                if (h5type >= 0)
+                {
+                    if (H5Tclose(h5type) < 0) {
+                        WriteWarning("H5Tclose failed.");
+                    }
+                }
+            }
+
+#pragma endregion
+
         }
         else if (itemTypeName->ToUpper() == "TABLE")
         {

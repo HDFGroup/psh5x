@@ -133,7 +133,7 @@ namespace PSH5X
 #pragma region Image
 
             ParameterAttribute^ attr1 = gcnew ParameterAttribute();
-            attr1->Mandatory = true;
+            attr1->Mandatory = false;
             attr1->ValueFromPipeline = false;
 
             RuntimeDefinedParameter^ paramBits = gcnew RuntimeDefinedParameter();
@@ -144,15 +144,15 @@ namespace PSH5X
             dict->Add("Bits", paramBits);
 
             ParameterAttribute^ attr2 = gcnew ParameterAttribute();
-            attr2->Mandatory = true;
+            attr2->Mandatory = false;
             attr2->ValueFromPipeline = false;
 
             RuntimeDefinedParameter^ paramWxH = gcnew RuntimeDefinedParameter();
             paramWxH->Name = "WxH";
-            paramWxH->ParameterType = array<hsize_t>::typeid;
+            paramWxH->ParameterType = array<hsize_t,1>::typeid;
             paramWxH->Attributes->Add(attr2);
 
-            dict->Add("Dimensions", paramWxH);
+            dict->Add("WxH", paramWxH);
 
             ParameterAttribute^ attr3 = gcnew ParameterAttribute();
             attr3->Mandatory = false;
@@ -182,7 +182,7 @@ namespace PSH5X
 
             dict->Add("Dimensions", paramDimensions);
         }
-        else if (itemTypeName->ToUpper() == "PAKETTABLE")
+        else if (itemTypeName->ToUpper() == "PACKETTABLE")
         {
 #pragma region Packet Table
 
@@ -193,7 +193,7 @@ namespace PSH5X
 
             RuntimeDefinedParameter^ paramPacketType = gcnew RuntimeDefinedParameter();
             paramPacketType->Name = "PacketType";
-            paramPacketType->ParameterType = Hashtable::typeid;
+            paramPacketType->ParameterType = Object::typeid;
             paramPacketType->Attributes->Add(attr1);
 
             dict->Add("PacketType", paramPacketType);
@@ -203,19 +203,19 @@ namespace PSH5X
             attr4->ValueFromPipeline = false;
 
             RuntimeDefinedParameter^ paramChunkSize = gcnew RuntimeDefinedParameter();
-            paramChunkSize->Name = "ChunkSize";
+            paramChunkSize->Name = "ChunkByteSize";
             paramChunkSize->ParameterType = hsize_t::typeid;
             paramChunkSize->Attributes->Add(attr4);
 
-            dict->Add("ChunkSize", paramChunkSize);
+            dict->Add("ChunkByteSize", paramChunkSize);
 
             ParameterAttribute^ attr6 = gcnew ParameterAttribute();
-            attr6->Mandatory = true;
+            attr6->Mandatory = false;
             attr6->ValueFromPipeline = false;
 
             RuntimeDefinedParameter^ paramGzip = gcnew RuntimeDefinedParameter();
             paramGzip->Name = "Gzip";
-            paramGzip->ParameterType = UInt32::typeid;
+            paramGzip->ParameterType = Int32::typeid;
             paramGzip->Attributes->Add(attr6);
 
             dict->Add("Gzip", paramGzip);
