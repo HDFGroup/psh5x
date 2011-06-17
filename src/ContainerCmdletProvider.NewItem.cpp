@@ -656,6 +656,9 @@ namespace PSH5X
 #pragma region HDF5 image
 
             hid_t h5set = -1;
+            
+            unsigned char* rgbValues = NULL;
+            unsigned char* rgbPal = NULL;
 
             try
             {
@@ -663,13 +666,11 @@ namespace PSH5X
 
                 array<hsize_t,1>^ wxh = {0, 0};
 
-                unsigned char* rgbValues = NULL;
-
-                unsigned char* rgbPal = NULL;
-
                 String^ interlace = "INTERLACE_PIXEL";
 
                 hsize_t width, height;
+
+                bool link_pal = false;
 
                 RuntimeDefinedParameterDictionary^ dynamicParameters =
                     (RuntimeDefinedParameterDictionary^) DynamicParameters;
@@ -731,6 +732,27 @@ namespace PSH5X
 
                             src_offset += bmpData->Stride;
                             dst_offset += bytes;
+                        }
+
+                        // get palette data
+
+                        if (bits == 8)
+                        {
+                            array<Color>^ pal_entries = bmp->Palette->Entries;
+
+                            if (pal_entries->Length != 256) {
+                                 throw gcnew ArgumentException("Palette length <> 256!");
+                            }
+
+                            rgbPal = new unsigned char [3*pal_entries->Length];
+                            for (int i = 0; i < pal_entries->Length; ++i)
+                            {
+                                rgbPal[3*i]   = pal_entries[i].R;
+                                rgbPal[3*i+1] = pal_entries[i].G;
+                                rgbPal[3*i+2] = pal_entries[i].B;
+                            }
+
+                            link_pal = true;
                         }
                     }
                     else {
@@ -798,9 +820,7 @@ namespace PSH5X
                     {
                         char* mode = (char*)(Marshal::StringToHGlobalAnsi(interlace)).ToPointer();
 
-                        if (H5IMmake_image_24bit(drive->FileHandle, name, width, height, mode, rgbValues) < 0)
-                        {
-                            delete [] rgbValues;
+                        if (H5IMmake_image_24bit(drive->FileHandle, name, width, height, mode, rgbValues) < 0) {
                             throw gcnew ArgumentException("H5IMmake_image_24bit failed!");
                         }
                     }
@@ -810,15 +830,26 @@ namespace PSH5X
                     if (this->ShouldProcess(h5path,
                         String::Format("HDF5 image '{0}' does not exist, create it", linkName)))
                     {
-                        if (H5IMmake_image_8bit(drive->FileHandle, name, width, height, rgbValues) < 0)
-                        {
-                            delete [] rgbValues;
+                        if (H5IMmake_image_8bit(drive->FileHandle, name, width, height, rgbValues) < 0) {
                             throw gcnew ArgumentException("H5IMmake_image_8bit failed!");
+                        }
+
+                        if (link_pal)
+                        {
+                            Guid guid = Guid::NewGuid();
+
+                            char* pal_name = (char*)(Marshal::StringToHGlobalAnsi(guid.ToString())).ToPointer();
+                            hsize_t pal_dims[2] = {256, 3};
+
+                            if (H5IMmake_palette(drive->FileHandle, pal_name, pal_dims, rgbPal) < 0) {
+                                throw gcnew ArgumentException("H5IMmake_palette failed!");
+                            }
+                            if (H5IMlink_palette(drive->FileHandle, name, pal_name) < 0) {
+                                throw gcnew ArgumentException("H5IMlink_palette failed!");
+                            }
                         }
                     }
                 }
-
-                delete [] rgbValues;
 
                 if (H5Fflush(drive->FileHandle, H5F_SCOPE_LOCAL) < 0) {
                     WriteWarning("H5Fflush failed!");
@@ -826,7 +857,7 @@ namespace PSH5X
 
                 h5set = H5Dopen2(drive->FileHandle, name, H5P_DEFAULT);
                 WriteItemObject(gcnew DatasetInfo(h5set), path, false);
-
+            
             }
             catch (Exception^ ex)
             {
@@ -835,6 +866,9 @@ namespace PSH5X
             }
             finally
             {
+                delete [] rgbValues;
+                delete [] rgbPal;
+
                 if (h5set >= 0) {
                     if (H5Dclose(h5set) < 0) {
                         WriteWarning("H5Dclose failed.");
