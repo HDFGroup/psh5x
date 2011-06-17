@@ -665,6 +665,8 @@ namespace PSH5X
 
                 unsigned char* rgbValues = NULL;
 
+                unsigned char* rgbPal = NULL;
+
                 String^ interlace = "INTERLACE_PIXEL";
 
                 hsize_t width, height;
@@ -696,15 +698,27 @@ namespace PSH5X
                         Rectangle rect = Rectangle(0, 0, bmp->Width, bmp->Height);
                         BitmapData^ bmpData = bmp->LockBits(rect, ImageLockMode::ReadOnly, bmp->PixelFormat);
                         IntPtr ptr = bmpData->Scan0;
-
                         int bytes = Math::Abs(bmpData->Stride) * bmp->Height;
                         array<Byte>^ a = gcnew array<Byte>(bytes);
                         Marshal::Copy(ptr, a, 0, bytes);
                         bmp->UnlockBits(bmpData);
+                        bytes = bmp->Width * bmp->Height;
+                        if (bits == 24) {
+                            bytes *= 3;
+                        }
                         rgbValues = new unsigned char [bytes];
-                        Marshal::Copy(a, 0, IntPtr((void*) rgbValues), bytes);
+                        
+                        // scan lines start at 4-byte aligned addresses
+                        // and we can't just copy the byte array
+                        // have to do it row by row
 
-                        width = wxh[0]; height = wxh[1];
+                        bytes = (bits == 24) ? 3*bmp->Width : bmp->Width;
+                        int src_offset = 0, dst_offset = 0;
+                        for (int row = 0; row < bmp->Height; ++row) {
+                            Marshal::Copy(a, src_offset, IntPtr((void*) (rgbValues+dst_offset)), bytes);
+                            src_offset += bmpData->Stride;
+                            dst_offset += bytes;
+                        }
                     }
                     else {
                         throw gcnew
@@ -737,15 +751,23 @@ namespace PSH5X
                             ArgumentException("Specify image dimensions with -WxH Width,Height!");
                     }
 
-                    width = wxh[0]; height = wxh[1];
+                    array<unsigned char,1>^ rand_bytes = nullptr;
 
                     if (bits == 24) {
-                        rgbValues = new unsigned char [3*width*height];
+                        rgbValues = new unsigned char [3*wxh[0]*wxh[1]];
+                        rand_bytes = gcnew array<unsigned char>(3*wxh[0]*wxh[1]);
                     }
                     else {
-                        rgbValues = new unsigned char [width*height];
+                        rgbValues = new unsigned char [wxh[0]*wxh[1]];
+                        rand_bytes = gcnew array<unsigned char>(wxh[0]*wxh[1]);
                     }
+
+                    Random^ random = gcnew Random();
+                    random->NextBytes(rand_bytes);
+                    Marshal::Copy(rand_bytes, 0, IntPtr((void*) rgbValues), rand_bytes->Length);
                 }
+
+                width = wxh[0]; height = wxh[1];
 
                 if (bits == 24)
                 {
@@ -770,7 +792,7 @@ namespace PSH5X
                         }
                     }
                 }
-                else
+                else // 8-bit indexed GIF, TIFF
                 {
                     if (this->ShouldProcess(h5path,
                         String::Format("HDF5 image '{0}' does not exist, create it", linkName)))
