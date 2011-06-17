@@ -714,8 +714,21 @@ namespace PSH5X
 
                         bytes = (bits == 24) ? 3*bmp->Width : bmp->Width;
                         int src_offset = 0, dst_offset = 0;
-                        for (int row = 0; row < bmp->Height; ++row) {
-                            Marshal::Copy(a, src_offset, IntPtr((void*) (rgbValues+dst_offset)), bytes);
+                        for (int row = 0; row < bmp->Height; ++row)
+                        {
+                            unsigned char* p = (rgbValues+dst_offset);
+                            Marshal::Copy(a, src_offset, IntPtr((void*) p), bytes);
+
+                            // RGB -> BGR
+                            unsigned char swap;
+                            if (bits == 24) {
+                                for (int i = 0; i < bytes; i += 3) {
+                                    swap = p[i+2];
+                                    p[i+2] = p[i];
+                                    p[i] = swap;
+                                }
+                            }
+
                             src_offset += bmpData->Stride;
                             dst_offset += bytes;
                         }
