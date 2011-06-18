@@ -378,7 +378,7 @@ namespace PSH5X
                 RuntimeDefinedParameterDictionary^ dynamicParameters =
                     (RuntimeDefinedParameterDictionary^) DynamicParameters;
 
-                // mandatory parameter -TypeDefintion
+                // mandatory parameter -Defintion
 
                 Object^ typeDef = dynamicParameters["Definition"]->Value;
 
