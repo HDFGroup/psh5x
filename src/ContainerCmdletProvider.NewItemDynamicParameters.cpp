@@ -1,5 +1,6 @@
 
 #include "Provider.h"
+#include "ProviderUtils.h"
 
 extern "C" {
 #include "H5public.h"
@@ -19,6 +20,21 @@ namespace PSH5X
     {
         WriteVerbose(String::Format("HDF5Provider::NewItemDynamicParameters(Path = '{0}', ItemTypeName = '{1}')",
             path, itemTypeName));
+
+
+        if (itemTypeName == nullptr || itemTypeName->Trim() == "") {
+            ErrorRecord^ error = gcnew ErrorRecord(
+                gcnew ArgumentException("Item type must not be empty. Use -ItemType to specify!"),
+                "InvalidData", ErrorCategory::InvalidData, nullptr);
+            ThrowTerminatingError(error);
+        }
+
+        if (!ProviderUtils::ResolveItemType(itemTypeName, itemTypeName)) {
+            ErrorRecord^ error = gcnew ErrorRecord(
+                gcnew ArgumentException("Invalid item type"),
+                "InvalidData", ErrorCategory::InvalidData, nullptr);
+            ThrowTerminatingError(error);
+        }
 
         RuntimeDefinedParameterDictionary^ dict = gcnew RuntimeDefinedParameterDictionary();
 

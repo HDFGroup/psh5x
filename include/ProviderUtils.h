@@ -145,6 +145,8 @@ namespace PSH5X
 
 #pragma region General Utilities
 
+        static bool ResolveItemType(System::String^ str, System::String^% itemType);
+
         static bool TryGetValue(System::Object^ obj, int& i);
 
         static bool TryGetValue(System::Object^ obj, size_t& size);
@@ -191,6 +193,8 @@ namespace PSH5X
         //static System::Collections::Hashtable^ m_sysdef_types;
 
         static System::Collections::Hashtable^ m_known_types;
+
+        static System::Collections::Hashtable^ m_item_types;
 
     };
 }

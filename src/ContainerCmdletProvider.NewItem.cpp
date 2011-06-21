@@ -52,6 +52,13 @@ namespace PSH5X
             ThrowTerminatingError(error);
         }
 
+        if (!ProviderUtils::ResolveItemType(itemTypeName, itemTypeName)) {
+            ErrorRecord^ error = gcnew ErrorRecord(
+                gcnew ArgumentException("Invalid item type"),
+                "InvalidData", ErrorCategory::InvalidData, nullptr);
+            ThrowTerminatingError(error);
+        }
+
 #pragma region structural check
 
         // check if we should automatically create intermediate groups
@@ -838,7 +845,7 @@ namespace PSH5X
                         {
                             Guid guid = Guid::NewGuid();
 
-                            char* pal_name = (char*)(Marshal::StringToHGlobalAnsi(guid.ToString())).ToPointer();
+                            char* pal_name = (char*)(Marshal::StringToHGlobalAnsi("PALETTE-" + guid.ToString())).ToPointer();
                             hsize_t pal_dims[2] = {256, 3};
 
                             if (H5IMmake_palette(drive->FileHandle, pal_name, pal_dims, rgbPal) < 0) {

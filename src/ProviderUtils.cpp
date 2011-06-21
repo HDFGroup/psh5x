@@ -717,6 +717,18 @@ namespace PSH5X
 
 #pragma endregion
 
+
+    bool ProviderUtils::ResolveItemType(String^ str, String^% itemType)
+    {
+        if (m_item_types->ContainsKey(str->Trim()->ToUpper())) {
+            itemType = gcnew String((String^) m_item_types[str->Trim()->ToUpper()]);
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
     static ProviderUtils::ProviderUtils()
     {
         m_hdf5_path_sep = "/";
@@ -982,8 +994,9 @@ namespace PSH5X
             m_standard_types[s] = m_predefined_types[s];
         }
 
-
 #pragma endregion
+
+#pragma region HDF5 known types
 
         m_known_types = gcnew Hashtable();
 
@@ -1097,5 +1110,50 @@ namespace PSH5X
         m_known_types["H5T_NATIVE_ULONG"] = H5T_NATIVE_ULONG;
         m_known_types["USHORT"] = H5T_NATIVE_USHORT;
         m_known_types["H5T_NATIVE_USHORT"] = H5T_NATIVE_USHORT;
+
+#pragma endregion
+
+        m_item_types = gcnew Hashtable();
+
+        m_item_types["DATASET"] = "DATASET";
+        m_item_types["DSET"] = "DATASET";
+        m_item_types["SET"] = "DATASET";
+        m_item_types["D"] = "DATASET";
+
+        m_item_types["DATATYPE"] = "DATATYPE";
+        m_item_types["DTYPE"] = "DATATYPE";
+        m_item_types["TYPE"] = "DATATYPE";
+        m_item_types["T"] = "DATATYPE";
+
+        m_item_types["EXTLINK"] = "EXTLINK";
+        m_item_types["EXTERNALLINK"] = "EXTLINK";
+        m_item_types["EXTERNAL"] = "EXTLINK";
+        m_item_types["ELINK"] = "EXTLINK";
+        m_item_types["EXT"] = "EXTLINK";
+
+
+        m_item_types["GROUP"] = "GROUP";
+        m_item_types["GRP"] = "GROUP";
+        m_item_types["GR"] = "GROUP";
+        m_item_types["G"] = "GROUP";
+
+        m_item_types["HARDLINK"] = "HARDLINK";
+        m_item_types["HLINK"] = "HARDLINK";
+        m_item_types["HARD"] = "HARDLINK";
+
+        m_item_types["IMAGE"] = "IMAGE";
+        m_item_types["IMG"] = "IMAGE";
+        m_item_types["IM"] = "IMAGE";
+
+        m_item_types["PACKETTABLE"] = "PACKETTABLE";
+        m_item_types["PTABLE"] = "PACKETTABLE";
+        m_item_types["PACKET"] = "PACKETTABLE";
+        m_item_types["PACK"] = "PACKETTABLE";
+        m_item_types["PT"] = "PACKETTABLE";
+
+        m_item_types["SOFTLINK"] = "SOFTLINK";
+        m_item_types["SLINK"] = "SOFTLINK";
+        m_item_types["SOFT"] = "SOFTLINK";
+
     }
 }
