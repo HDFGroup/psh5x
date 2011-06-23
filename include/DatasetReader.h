@@ -41,7 +41,9 @@ namespace PSH5X
         
         System::Collections::Hashtable^ m_type;
 
-        array<long long>^ m_array;
+        array<System::Management::Automation::PSObject^>^ m_array;
+
+        bool m_isCompound;
 
         long long m_position;
         

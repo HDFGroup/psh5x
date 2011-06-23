@@ -17,7 +17,7 @@ using namespace System::Runtime::InteropServices;
 namespace PSH5X
 {
     DatasetReader::DatasetReader(hid_t h5file, String^ h5path)
-        : m_h5file(h5file), m_h5path(h5path), m_position(0)
+        : m_h5file(h5file), m_h5path(h5path), m_isCompound(false), m_array(nullptr), m_position(0)
     {
         if (ProviderUtils::IsH5Dataset(h5file, h5path))
         {
@@ -37,6 +37,9 @@ namespace PSH5X
             }
 
             m_type = ProviderUtils::ParseH5Type(mem_type);
+            if (((String^)m_type["Class"]) == "COMPOUND") {
+                m_isCompound = true;
+            }
 
             size_t size = H5Tget_size(mem_type);
 
@@ -61,15 +64,29 @@ namespace PSH5X
 
                 delete [] buf;
 
-                m_array = gcnew array<long long>(dims[0]);
-                for (long long i = 0; i < m_array->LongLength; ++i)
+                m_array = gcnew array<PSObject^>(dims[0]);
+                if (m_isCompound)
                 {
-                    m_array[i] = i;
+                    for (long long i = 0; i < m_array->LongLength; ++i)
+                    {
+                        m_array[i] = gcnew PSObject();
+                        for each (String^ key in ((Hashtable^)m_type["Members"])->Keys)
+                        {
+                            m_array[i]->Properties->Add(gcnew PSNoteProperty(key,i));
+                        }
+                    }
+                }
+                else
+                {
+                    for (long long i = 0; i < m_array->LongLength; ++i)
+                    {
+                        m_array[i] = gcnew PSObject(i);
+                    }
                 }
             }
             else
             {
-                m_array = gcnew array<long long>(0);
+                m_array = gcnew array<PSObject^>(0);
             }
 
             if (H5Sclose(file_space) < 0) { // TODO
@@ -80,7 +97,6 @@ namespace PSH5X
             }
             if (H5Dclose(dset) < 0) { // TODO
             }
-
         }
         else {
             throw gcnew ArgumentException(
@@ -91,19 +107,19 @@ namespace PSH5X
     DatasetReader::DatasetReader(hid_t h5file, String^ h5path,
         array<hsize_t>^ start, array<hsize_t>^ stride,
         array<hsize_t>^ count, array<hsize_t>^ block)
-        : m_h5file(h5file), m_h5path(h5path), m_position(0)
+        : m_h5file(h5file), m_h5path(h5path), m_isCompound(false), m_array(nullptr), m_position(0)
     {
     }
 
     DatasetReader::DatasetReader(hid_t h5file, String^ h5path, array<hsize_t>^ coord)
-        : m_h5file(h5file), m_h5path(h5path), m_position(0)
+        : m_h5file(h5file), m_h5path(h5path), m_isCompound(false), m_array(nullptr), m_position(0)
     {
     }
 
 
     IList^ DatasetReader::Read(long long readCount)
     {
-        array<long long>^ result = {};
+        array<PSObject^>^ result = nullptr;
 
         long long remaining = m_array->LongLength - m_position;
         if (remaining > 0)
@@ -112,9 +128,13 @@ namespace PSH5X
             if (readCount > remaining) { length = remaining; }
             else { length = readCount; }
 
-            result = gcnew array<long long>(length);
-
-            Array::Copy((Array^) m_array, m_position, (Array^) result, (long long) 0, length);
+            result = gcnew array<PSObject^>(length);
+    
+            long long pos = m_position;
+            for (long long i = 0; i < length; ++i)
+            {
+                result[i] = m_array[pos++];
+            }
 
             m_position += length;
         }

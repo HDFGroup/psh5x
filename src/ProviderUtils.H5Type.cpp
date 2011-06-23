@@ -1431,4 +1431,22 @@ namespace PSH5X
 
         return result;
     }
+
+    hid_t ProviderUtils::DotNetType2H5Native(Type^ ntype, bool isBitfield)
+    {
+        hid_t result = -1;
+
+        if      (ntype == SByte::typeid)  { result = H5T_NATIVE_CHAR;   }
+        else if (ntype == Int16::typeid)  { result = H5T_NATIVE_SHORT;  }
+        else if (ntype == Int32::typeid)  { result = H5T_NATIVE_INT;    }
+        else if (ntype == Int64::typeid)  { result = H5T_NATIVE_LLONG;  }
+        else if (ntype == Byte::typeid)   { result = (isBitfield) ? H5T_NATIVE_B8 : H5T_NATIVE_UCHAR;  }
+        else if (ntype == UInt16::typeid) { result = (isBitfield) ? H5T_NATIVE_B16: H5T_NATIVE_USHORT; }
+        else if (ntype == UInt32::typeid) { result = (isBitfield) ? H5T_NATIVE_B32: H5T_NATIVE_UINT;   }
+        else if (ntype == UInt64::typeid) { result = (isBitfield) ? H5T_NATIVE_B64: H5T_NATIVE_ULLONG; }
+        else if (ntype == Single::typeid) { result = H5T_NATIVE_FLOAT;  }
+        else if (ntype == Double::typeid) { result = H5T_NATIVE_DOUBLE; }
+        
+        return result;
+    }
 }
