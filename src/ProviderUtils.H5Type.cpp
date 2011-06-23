@@ -1411,23 +1411,42 @@ namespace PSH5X
     {
         Type^ result = nullptr;
 
-        if      (H5Tequal(ntype, H5T_NATIVE_CHAR) > 0)    { result = SByte::typeid;  }
-        else if (H5Tequal(ntype, H5T_NATIVE_SHORT) > 0)   { result = Int16::typeid;  }
-        else if (H5Tequal(ntype, H5T_NATIVE_INT) > 0)     { result = Int32::typeid;  }
-        else if (H5Tequal(ntype, H5T_NATIVE_LONG) > 0)    { result = Int32::typeid;  }
-        else if (H5Tequal(ntype, H5T_NATIVE_LLONG) > 0)   { result = Int64::typeid;  }
-        else if (H5Tequal(ntype, H5T_NATIVE_UCHAR) > 0)   { result = Byte::typeid;   }
-        else if (H5Tequal(ntype, H5T_NATIVE_USHORT) > 0)  { result = UInt16::typeid; }
-        else if (H5Tequal(ntype, H5T_NATIVE_UINT) > 0)    { result = UInt32::typeid; }
-        else if (H5Tequal(ntype, H5T_NATIVE_ULONG) > 0)   { result = UInt32::typeid; }
-        else if (H5Tequal(ntype, H5T_NATIVE_ULLONG) > 0)  { result = UInt64::typeid; }
-        else if (H5Tequal(ntype, H5T_NATIVE_FLOAT) > 0)   { result = Single::typeid; }
-        else if (H5Tequal(ntype, H5T_NATIVE_DOUBLE) > 0)  { result = Double::typeid; }
-        else if (H5Tequal(ntype, H5T_NATIVE_LDOUBLE) > 0) { result = Double::typeid; }
-        else if (H5Tequal(ntype, H5T_NATIVE_B8) > 0)      { result = Byte::typeid;   }
-        else if (H5Tequal(ntype, H5T_NATIVE_B16) > 0)     { result = UInt16::typeid; }
-        else if (H5Tequal(ntype, H5T_NATIVE_B32) > 0)     { result = UInt32::typeid; }
-        else if (H5Tequal(ntype, H5T_NATIVE_B64) > 0)     { result = UInt64::typeid; }
+        H5T_class_t cls = H5Tget_class(ntype);
+
+        if (cls == H5T_INTEGER)
+        {
+            if      (H5Tequal(ntype, H5T_NATIVE_CHAR)   > 0) { result = SByte::typeid;  }
+            else if (H5Tequal(ntype, H5T_NATIVE_SHORT)  > 0) { result = Int16::typeid;  }
+            else if (H5Tequal(ntype, H5T_NATIVE_INT)    > 0) { result = Int32::typeid;  }
+            else if (H5Tequal(ntype, H5T_NATIVE_LONG)   > 0) { result = Int32::typeid;  }
+            else if (H5Tequal(ntype, H5T_NATIVE_LLONG)  > 0) { result = Int64::typeid;  }
+            else if (H5Tequal(ntype, H5T_NATIVE_UCHAR)  > 0) { result = Byte::typeid;   }
+            else if (H5Tequal(ntype, H5T_NATIVE_USHORT) > 0) { result = UInt16::typeid; }
+            else if (H5Tequal(ntype, H5T_NATIVE_UINT)   > 0) { result = UInt32::typeid; }
+            else if (H5Tequal(ntype, H5T_NATIVE_ULONG)  > 0) { result = UInt32::typeid; }
+            else if (H5Tequal(ntype, H5T_NATIVE_ULLONG) > 0) { result = UInt64::typeid; }
+        }
+        else if (cls == H5T_FLOAT)
+        {
+            if      (H5Tequal(ntype, H5T_NATIVE_FLOAT) > 0)   { result = Single::typeid; }
+            else if (H5Tequal(ntype, H5T_NATIVE_DOUBLE) > 0)  { result = Double::typeid; }
+            else if (H5Tequal(ntype, H5T_NATIVE_LDOUBLE) > 0) { result = Double::typeid; }
+
+        }
+        else if (cls == H5T_STRING) {
+            result = String::typeid;
+        }
+        else if (cls == H5T_BITFIELD)
+        {
+            if      (H5Tequal(ntype, H5T_NATIVE_B8) > 0)  { result = Byte::typeid;   }
+            else if (H5Tequal(ntype, H5T_NATIVE_B16) > 0) { result = UInt16::typeid; }
+            else if (H5Tequal(ntype, H5T_NATIVE_B32) > 0) { result = UInt32::typeid; }
+            else if (H5Tequal(ntype, H5T_NATIVE_B64) > 0) { result = UInt64::typeid; }
+        }
+        else if (cls == H5T_OPAQUE) {
+            result = array<Byte>::typeid;
+        }
+
 
         return result;
     }

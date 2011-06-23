@@ -17,7 +17,7 @@ using namespace System::Runtime::InteropServices;
 namespace PSH5X
 {
     DatasetReader::DatasetReader(hid_t h5file, String^ h5path)
-        : m_h5file(h5file), m_h5path(h5path), m_isCompound(false), m_array(nullptr), m_position(0)
+        : m_array(nullptr), m_position(0)
     {
         if (ProviderUtils::IsH5Dataset(h5file, h5path))
         {
@@ -36,9 +36,10 @@ namespace PSH5X
                 throw gcnew ArgumentException("H5Tget_native_type failed!");
             }
 
-            m_type = ProviderUtils::ParseH5Type(mem_type);
-            if (((String^)m_type["Class"]) == "COMPOUND") {
-                m_isCompound = true;
+            Hashtable^ type = ProviderUtils::ParseH5Type(mem_type);
+            bool isCompound = false;
+            if (((String^)type["Class"]) == "COMPOUND") {
+                isCompound = true;
             }
 
             size_t size = H5Tget_size(mem_type);
@@ -47,6 +48,7 @@ namespace PSH5X
             if (file_space < 0) {
                 throw gcnew ArgumentException("H5Dget_space failed!");
             }
+
             hssize_t npoints = H5Sget_simple_extent_npoints(file_space);
             if (npoints > 0)
             {
@@ -65,12 +67,12 @@ namespace PSH5X
                 delete [] buf;
 
                 m_array = gcnew array<PSObject^>(dims[0]);
-                if (m_isCompound)
+                if (isCompound)
                 {
                     for (long long i = 0; i < m_array->LongLength; ++i)
                     {
                         m_array[i] = gcnew PSObject();
-                        for each (String^ key in ((Hashtable^)m_type["Members"])->Keys)
+                        for each (String^ key in ((Hashtable^)type["Members"])->Keys)
                         {
                             m_array[i]->Properties->Add(gcnew PSNoteProperty(key,i));
                         }
@@ -107,12 +109,12 @@ namespace PSH5X
     DatasetReader::DatasetReader(hid_t h5file, String^ h5path,
         array<hsize_t>^ start, array<hsize_t>^ stride,
         array<hsize_t>^ count, array<hsize_t>^ block)
-        : m_h5file(h5file), m_h5path(h5path), m_isCompound(false), m_array(nullptr), m_position(0)
+        : m_array(nullptr), m_position(0)
     {
     }
 
     DatasetReader::DatasetReader(hid_t h5file, String^ h5path, array<hsize_t>^ coord)
-        : m_h5file(h5file), m_h5path(h5path), m_isCompound(false), m_array(nullptr), m_position(0)
+        : m_array(nullptr), m_position(0)
     {
     }
 

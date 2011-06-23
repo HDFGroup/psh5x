@@ -35,15 +35,7 @@ namespace PSH5X
 
     private:
 
-        hid_t m_h5file;
-
-        System::String^ m_h5path;
-        
-        System::Collections::Hashtable^ m_type;
-
         array<System::Management::Automation::PSObject^>^ m_array;
-
-        bool m_isCompound;
 
         long long m_position;
         
