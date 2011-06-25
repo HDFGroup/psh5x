@@ -34,7 +34,6 @@ namespace PSH5X
         H5T_pad_t lsb, msb;
         size_t spos, epos, esize, mpos, msize;
         
-
         switch (H5Tget_class(type))
         {
         case H5T_COMPOUND:
@@ -72,6 +71,7 @@ namespace PSH5X
         case H5T_VLEN:
 
             result["Class"] = "VLEN";
+
             unwnd = H5Tget_super(type);
             if (unwnd >= 0)
             {
@@ -439,8 +439,7 @@ namespace PSH5X
             result["Class"] = "OPAQUE";
             name = H5Tget_tag(type);
             result["Tag"] = gcnew String(name);
-            free(name);
-
+            
             switch (H5Tget_order(type))
             {
             case H5T_ORDER_LE:
