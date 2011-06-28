@@ -41,9 +41,15 @@ namespace PSH5X
             }
 
             Hashtable^ type = ProviderUtils::ParseH5Type(mem_type);
-            bool isCompound = false;
+            bool isCompound = false, isArray = false, isVlen = false;
             if (((String^)type["Class"]) == "COMPOUND") {
                 isCompound = true;
+            }
+            else if (((String^)type["Class"]) == "ARRAY") {
+                isArray = true;
+            }
+            else if (((String^)type["Class"]) == "VLEN") {
+                isVlen = true;
             }
 
             size_t size = H5Tget_size(mem_type);
@@ -71,6 +77,9 @@ namespace PSH5X
                 }
 
                 m_array = gcnew array<PSObject^>(dims[0]);
+
+                array<unsigned char>^ row = gcnew array<unsigned char>(size);
+
                 if (isCompound)
                 {   
                     int mcount = H5Tget_nmembers(mem_type);
@@ -88,53 +97,9 @@ namespace PSH5X
                         mname[i] = gcnew String(name);
                         hid_t mtype = H5Tget_member_type(mem_type, safe_cast<unsigned>(i));
                         msize[i] = safe_cast<int>(H5Tget_size(mtype));
-                        
-                        H5T_class_t cls = H5Tget_class(mtype);
-                        switch (cls)
-                        {
-                        case H5T_INTEGER:
-                            if (ProviderUtils::H5NativeType2DotNet(mtype) == Int32::typeid) {
-                                minfo[i] = magicType->GetMethod("ToInt32");
-                            }
-                            else if (ProviderUtils::H5NativeType2DotNet(mtype) == Int64::typeid) {
-                                minfo[i] = magicType->GetMethod("ToInt64");
-                            }
-                            else if (ProviderUtils::H5NativeType2DotNet(mtype) == Int16::typeid) {
-                                minfo[i] = magicType->GetMethod("ToInt16");
-                            }
-                            if (ProviderUtils::H5NativeType2DotNet(mtype) == UInt32::typeid) {
-                                minfo[i] = magicType->GetMethod("ToUInt32");
-                            }
-                            else if (ProviderUtils::H5NativeType2DotNet(mtype) == UInt64::typeid) {
-                                minfo[i] = magicType->GetMethod("ToUInt64");
-                            }
-                            else if (ProviderUtils::H5NativeType2DotNet(mtype) == UInt16::typeid) {
-                                minfo[i] = magicType->GetMethod("ToUInt16");
-                            }
-                            else {
-                                minfo[i] = nullptr;
-                            }
-                            break;
-                        case H5T_FLOAT:
-                            if (ProviderUtils::H5NativeType2DotNet(mtype) == Double::typeid) {
-                                minfo[i] = magicType->GetMethod("ToDouble");
-                            }
-                            else if (ProviderUtils::H5NativeType2DotNet(mtype) == Single::typeid) {
-                                minfo[i] = magicType->GetMethod("ToSingle");
-                            }
-                            else {
-                                minfo[i] = nullptr;
-                            }
-                            break;
-                        default:
-                            minfo[i] = nullptr;
-                            break;
-                        }
-
+                        minfo[i] = ProviderUtils::BitConverterMethod(mtype);
                         H5Tclose(mtype);
                     }
-
-                    array<unsigned char>^ row = gcnew array<unsigned char>(size); 
 
                     for (long long i = 0; i < m_array->LongLength; ++i)
                     {
@@ -159,9 +124,41 @@ namespace PSH5X
                         }
                     }
                 }
+                else if (isArray)
+                {
+                    hid_t base_type = H5Tget_super(mem_type);
+                    if (ProviderUtils::H5NativeType2DotNet(base_type) != nullptr)
+                    {
+                        int rank = H5Tget_array_ndims(mem_type);
+                        hsize_t* dims = new hsize_t [rank];
+                        rank = H5Tget_array_dims2(mem_type, dims);
+
+
+                        delete [] dims;
+                    }
+                    else {
+                        throw gcnew ArgumentException("Unsupported base datatype for ARRAY!");
+                    }
+                }
+                else if (isVlen)
+                {
+                    hid_t base_type = H5Tget_super(mem_type);
+                    if (ProviderUtils::H5NativeType2DotNet(base_type) != nullptr)
+                    {
+                    }
+                    else {
+                        throw gcnew ArgumentException("Unsupported base datatype for VLEN!");
+                    }
+                }
                 else
                 {
-                    array<unsigned char>^ row = gcnew array<unsigned char>(size);
+                    hid_t base_type = H5Tget_super(mem_type);
+                    if (ProviderUtils::H5NativeType2DotNet(base_type) != nullptr)
+                    {
+                    }
+                    else {
+                        throw gcnew ArgumentException("Unsupported datatype!");
+                    }
 
                     for (long long i = 0; i < m_array->LongLength; ++i)
                     {    

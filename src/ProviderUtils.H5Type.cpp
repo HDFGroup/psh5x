@@ -11,6 +11,7 @@ extern "C" {
 using namespace System;
 using namespace System::Collections;
 using namespace System::Management::Automation;
+using namespace System::Reflection;
 using namespace System::Runtime::InteropServices;
 
 namespace PSH5X
@@ -1466,5 +1467,53 @@ namespace PSH5X
         else if (ntype == Double::typeid) { result = H5T_NATIVE_DOUBLE; }
         
         return result;
+    }
+
+    MethodInfo^ ProviderUtils::BitConverterMethod(hid_t type_id)
+    {
+        MethodInfo^ minfo = nullptr;
+
+        Type^ magicType = System::BitConverter::typeid;
+
+        H5T_class_t cls = H5Tget_class(type_id);
+        switch (cls)
+        {
+        case H5T_INTEGER:
+
+            if (ProviderUtils::H5NativeType2DotNet(type_id) == Int32::typeid) {
+                minfo = magicType->GetMethod("ToInt32");
+            }
+            else if (ProviderUtils::H5NativeType2DotNet(type_id) == Int64::typeid) {
+                minfo = magicType->GetMethod("ToInt64");
+            }
+            else if (ProviderUtils::H5NativeType2DotNet(type_id) == Int16::typeid) {
+                minfo = magicType->GetMethod("ToInt16");
+            }
+            if (ProviderUtils::H5NativeType2DotNet(type_id) == UInt32::typeid) {
+                minfo = magicType->GetMethod("ToUInt32");
+            }
+            else if (ProviderUtils::H5NativeType2DotNet(type_id) == UInt64::typeid) {
+                minfo = magicType->GetMethod("ToUInt64");
+            }
+            else if (ProviderUtils::H5NativeType2DotNet(type_id) == UInt16::typeid) {
+                minfo = magicType->GetMethod("ToUInt16");
+            }
+            break;
+
+        case H5T_FLOAT:
+
+            if (ProviderUtils::H5NativeType2DotNet(type_id) == Double::typeid) {
+                minfo = magicType->GetMethod("ToDouble");
+            }
+            else if (ProviderUtils::H5NativeType2DotNet(type_id) == Single::typeid) {
+                minfo = magicType->GetMethod("ToSingle");
+            }
+            break;
+
+        default:
+            break;
+        }
+
+        return minfo;
     }
 }

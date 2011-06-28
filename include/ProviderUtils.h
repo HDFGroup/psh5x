@@ -137,6 +137,8 @@ namespace PSH5X
 
         static hid_t ProviderUtils::DotNetType2H5Native(System::Type^ ntype, bool isBitfield);
 
+        static System::Reflection::MethodInfo^ BitConverterMethod(hid_t type_id);
+
 #pragma endregion
 
 #pragma region HDF5 Attribute
