@@ -45,7 +45,7 @@
     <pubdate>May 18, 2011</pubdate>
   </biblioentry>
 
-  <biblioentry xml:id="PSProgBook">
+  <biblioentry xml:id="PSProgramming">
     <title>Windows PowerShell Programming</title>
     <subtitle>Snap-ins, Cmdlets, Hosts, and Providers</subtitle>
     <authorgroup>

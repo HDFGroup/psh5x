@@ -8,22 +8,50 @@
   
   <sect1>
     <title>Registering the PSH5X PowerShell Snap-in</title>
-    <para></para>
+    <figure xml:id="install_snapin">
+      <title>Registering the PSH5X Snap-in</title>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="figs/install.png"></imagedata>
+        </imageobject>
+      </mediaobject>
+    </figure>
   </sect1>
 
   <sect1>
     <title>Loading the PSH5X PowerShell Snap-in to a Running Shell</title>
-    <para></para>
+    <figure xml:id="add_pssnapin">
+      <title>Adding the PSH5X Snap-in</title>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="figs/Add-PSSnapin.png"></imagedata>
+        </imageobject>
+      </mediaobject>
+    </figure>
   </sect1>
   
   <sect1>
     <title>Removing the PSH5X PowerShell Snap-in from a Running Shell</title>
-    <para></para>
+    <figure xml:id="remove_pssnapin">
+      <title>Removing the PSH5X Snap-in</title>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="figs/Remove-PSSnapin.png"></imagedata>
+        </imageobject>
+      </mediaobject>
+    </figure>
   </sect1>
   
   <sect1>
     <title>Unregistering the PSH5X PowerShell Snap-in</title>
-    <para></para>
+    <figure xml:id="uninstall_snapin">
+      <title>Registering the PSH5X Snap-in</title>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="figs/uninstall.png"></imagedata>
+        </imageobject>
+      </mediaobject>
+    </figure>
   </sect1>
   
 </preface>

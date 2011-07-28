@@ -11,6 +11,18 @@
     </personname>
 
     <email>gheber@hdfgroup.org</email>
+    
+    <affiliation>
+      <jobtitle>Applications Architect</jobtitle>
+      <orgname>The HDF Group</orgname>
+      <address>
+        <street>1800 South Oak Street, Suite 203</street>
+        <city>Champaign</city>
+        <state>Illinois</state>
+        <postcode>61820</postcode>
+        <country>USA</country>
+      </address>
+    </affiliation>
   </author>
 
 </info>
