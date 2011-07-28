@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://www.oasis-open.org/docbook/xml/5.0/rng/docbookxi.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<info xmlns="http://docbook.org/ns/docbook" version="5.0">
+  
+  <edition>1</edition>
+
+  <author>
+    <personname>
+      <firstname>Gerd</firstname>
+      <surname>Heber</surname>
+    </personname>
+
+    <email>gheber@hdfgroup.org</email>
+  </author>
+
+</info>

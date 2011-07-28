@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://www.oasis-open.org/docbook/xml/5.0/rng/docbookxi.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<chapter xml:id="psh5x_layers" xmlns="http://docbook.org/ns/docbook"
+  xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0">
+  <title>PSH5X Provider Layers</title>
+  
+  <para/>
+  
+  <sect1 xml:id="cmdlet_provider">
+    <title>CmdletProvider</title>
+    <para/>
+  </sect1>
+  
+  <sect1 xml:id="drive_cmdlet_provider">
+    <title>DriveCmdletProvider</title>
+    <para/>
+    
+    <sect2 xml:id="new_psdrive">
+      <title>New-PSDrive</title>
+      <para/>
+    </sect2>
+    
+    <sect2 xml:id="remove_psdrive">
+      <title>Remove-PSDrive</title>
+      <para/>
+    </sect2>
+    
+  </sect1>
+  
+  <sect1 xml:id="item_cmdlet_provider">
+    <title>ItemCmdletProvider</title>
+    <para/>
+    
+    <sect2 xml:id="get_item">
+      <title>Get-Item</title>
+      <para/>
+    </sect2>
+    
+    <sect2 xml:id="clear_item">
+      <title>Clear-Item</title>
+      <para/>
+    </sect2>
+    
+    <sect2 xml:id="set_item">
+      <title>Set-Item</title>
+      <para/>
+    </sect2>
+    
+    <sect2 xml:id="invoke_item">
+      <title>Invoke-Item</title>
+      <para/>
+    </sect2>
+    
+  </sect1>
+  
+  <sect1 xml:id="container_cmdlet_provider">
+    <title>ContainerCmdletProvider</title>
+    <para/>
+    
+    <sect2 xml:id="copy_item">
+      <title>Copy-Item</title>
+      <para/>
+    </sect2>
+    
+    <sect2 xml:id="get_child_item">
+      <title>Get-ChildItem</title>
+      <para/>
+    </sect2>
+    
+    <sect2 xml:id="new_item">
+      <title>New-Item</title>
+      <para/>
+    </sect2>
+    
+    <sect2 xml:id="remove_item">
+      <title>Remove-Item</title>
+      <para/>
+    </sect2>
+    
+    <sect2 xml:id="rename_item">
+      <title>Rename-Item</title>
+      <para/>
+    </sect2>
+    
+    <sect2 xml:id="set_location">
+      <title>Set-Location</title>
+      <para/>
+    </sect2>
+    
+    <sect2 xml:id="pop_location">
+      <title>Pop-Location</title>
+      <para/>
+    </sect2>
+    
+    <sect2 xml:id="push_location">
+      <title>Push-Location</title>
+      <para/>
+    </sect2>
+    
+    <sect2 xml:id="get_location">
+      <title>Get-Location</title>
+      <para/>
+    </sect2>
+    
+    <sect2 xml:id="resolve_path">
+      <title>Resolve-Path</title>
+      <para/>
+    </sect2>
+    
+    <sect2 xml:id="test_path">
+      <title>Test-Path</title>
+      <para/>
+    </sect2>
+    
+  </sect1>
+  
+  <sect1 xml:id="navigation_cmdlet_provider">
+    <title>NavigationCmdletProvider</title>
+    <para/>
+    
+    <sect2 xml:id="join_path">
+      <title>Join-Path</title>
+      <para/>
+    </sect2>
+    
+    <sect2 xml:id="move_item">
+      <title>Move-Item</title>
+      <para/>
+    </sect2>
+    
+  </sect1>
+  
+  <sect1 xml:id="icontent_cmdlet_provider">
+    <title>IContentCmdletProvider</title>
+    <para/>
+    
+    <sect2 xml:id="get_content">
+      <title>Get-Content</title>
+      <para/>
+    </sect2>
+    
+    <sect2 xml:id="set_content">
+      <title>Set-Content</title>
+      <para/>
+    </sect2>
+    
+    <sect2 xml:id="add_content">
+      <title>Add-Content</title>
+      <para/>
+    </sect2>
+    
+    <sect2 xml:id="clear_content">
+      <title>Clear-Content</title>
+      <para/>
+    </sect2>
+    
+  </sect1>
+  
+  <sect1 xml:id="iproperty_cmdlet_provider">
+    <title>IPropertyCmdletProvider</title>
+    <para/>
+    
+    <sect2 xml:id="clear_item_property">
+      <title>Clear-ItemProperty</title>
+      <para/>
+    </sect2>
+    
+    <sect2 xml:id="get_item_property">
+      <title>Get-ItemProperty</title>
+      <para/>
+    </sect2>
+    
+    <sect2 xml:id="set_item_property">
+      <title>Set-ItemProperty</title>
+      <para/>
+    </sect2>
+    
+  </sect1>
+  
+  <sect1 xml:id="idynamic_property_cmdlet_provider">
+    <title>IDynamicPropertyCmdletProvider</title>
+    <para/>
+    
+    <sect2 xml:id="copy_item_property">
+      <title>Copy-ItemProperty</title>
+      <para/>
+    </sect2>
+    
+    <sect2 xml:id="move_item_property">
+      <title>Move-ItemProperty</title>
+      <para/>
+    </sect2>
+    
+    <sect2 xml:id="new_item_property">
+      <title>New-ItemProperty</title>
+      <para/>
+    </sect2>
+    
+    <sect2 xml:id="remove_item_property">
+      <title>Remove-ItemProperty</title>
+      <para/>
+    </sect2>
+    
+    <sect2 xml:id="rename_item_property">
+      <title>Rename-ItemProperty</title>
+      <para/>
+    </sect2>
+    
+  </sect1>
+  
+</chapter>

@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://www.oasis-open.org/docbook/xml/5.0/rng/docbookxi.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
+
+<bibliography xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink"
+  version="5.0">
+
+  <biblioentry xml:id="HDF5_UG">
+    <title><link xlink:href="http://www.hdfgroup.org/HDF5/doc/UG/index.html">HDF5 User's
+        Guide</link></title>
+    <subtitle>HDF5 Release 1.8.7 </subtitle>
+    <publisher>
+      <publishername>The HDF Group</publishername>
+      <address>
+      <email>help@hdfgroup.org</email>
+    </address>
+    </publisher>
+    <pubdate>May 2011</pubdate>
+  </biblioentry>
+
+  <biblioentry xml:id="HDF_RM">
+    <title><link xlink:href="http://www.hdfgroup.org/HDF5/doc/RM/RM_H5Front.html">HDF5: API
+        Specification</link></title>
+    <subtitle>Reference Manual</subtitle>
+    <publisher>
+      <publishername>The HDF Group</publishername>
+      <address>
+      <email>help@hdfgroup.org</email>
+    </address>
+    </publisher>
+    <pubdate>May 2011</pubdate>
+  </biblioentry>
+
+  <biblioentry xml:id="PSBible">
+    <title>Windows Powershell in Action</title>
+    <edition>Second Edition</edition>
+    <author>
+      <personname>
+        <firstname>Bruce</firstname>
+        <surname>Payette</surname>
+      </personname>
+    </author>
+    <publisher>
+      <publishername>Manning Publications</publishername>
+    </publisher>
+    <pubdate>May 18, 2011</pubdate>
+  </biblioentry>
+
+  <biblioentry xml:id="PSProgBook">
+    <title>Windows PowerShell Programming</title>
+    <subtitle>Snap-ins, Cmdlets, Hosts, and Providers</subtitle>
+    <authorgroup>
+      <author>
+        <personname>
+          <firstname>Arul</firstname>
+          <surname>Kumaravel</surname>
+        </personname>
+      </author>
+      <author>
+        <personname>
+          <firstname>Jon</firstname>
+          <surname>White</surname>
+        </personname>
+      </author>
+      <author>
+        <personname>
+          <firstname>Naixin</firstname>
+          <surname>Li</surname>
+        </personname>
+      </author>
+      <author>
+        <personname>
+          <firstname>Scott</firstname>
+          <surname>Happell</surname>
+        </personname>
+      </author>
+      <author>
+        <personname>
+          <firstname>Guohui</firstname>
+          <surname>Xie</surname>
+        </personname>
+      </author>
+      <author>
+        <personname>
+          <firstname>Krishna</firstname>
+          <othername>C.</othername>
+          <surname>Vutukuri</surname>
+        </personname>
+      </author>
+    </authorgroup>
+    <publisher>
+      <publishername>Wiley Publishing, Inc</publishername>
+    </publisher>
+    <pubdate> 2008 </pubdate>
+  </biblioentry>
+
+  <biblioentry xml:id="PSPractices">
+    <title>Windows PowerShell 2.0</title>
+    <subtitle>Best Practices</subtitle>
+    <authorgroup>
+      <author>
+        <personname>
+          <firstname>Ed</firstname>
+          <surname>Wilson</surname>
+        </personname>
+      </author>
+      <author>
+        <personname> Windows PowerShell Teams </personname>
+      </author>
+    </authorgroup>
+    <publisher>
+      <publishername>Microsoft Press</publishername>
+    </publisher>
+    <pubdate>2010</pubdate>
+  </biblioentry>
+
+</bibliography>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://www.oasis-open.org/docbook/xml/5.0/rng/docbookxi.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<preface xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0">
+  
+  <title>Getting Started</title>
+  
+  <para></para>
+  
+  <sect1>
+    <title>Registering the PSH5X PowerShell Snap-in</title>
+    <para></para>
+  </sect1>
+
+  <sect1>
+    <title>Loading the PSH5X PowerShell Snap-in to a Running Shell</title>
+    <para></para>
+  </sect1>
+  
+  <sect1>
+    <title>Removing the PSH5X PowerShell Snap-in from a Running Shell</title>
+    <para></para>
+  </sect1>
+  
+  <sect1>
+    <title>Unregistering the PSH5X PowerShell Snap-in</title>
+    <para></para>
+  </sect1>
+  
+</preface>

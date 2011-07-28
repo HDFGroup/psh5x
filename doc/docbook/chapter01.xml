@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://www.oasis-open.org/docbook/xml/5.0/rng/docbookxi.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<chapter xml:id="what_is_psh5x" xmlns="http://docbook.org/ns/docbook"
+  xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0">
+  <title>What is PSH5X?</title>
+
+  <sect1 xml:id="windows_powershell_providers">
+    <title>A Windows PowerShell Provider</title>
+    <para/>
+  </sect1>
+
+  <sect1>
+    <title>A Collection of Windows PowerShell Cmdlets</title>
+
+    <para/>
+  </sect1>
+</chapter>
