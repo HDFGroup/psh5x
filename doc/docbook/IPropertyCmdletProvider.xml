@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://www.oasis-open.org/docbook/xml/5.0/rng/docbookxi.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<sect1 xml:id="iproperty_cmdlet_provider" xmlns="http://docbook.org/ns/docbook"
+    xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xlink="http://www.w3.org/1999/xlink"
+    version="5.0">
+
+    <title>IPropertyCmdletProvider</title>
+    <para/>
+
+    <sect2 xml:id="clear_item_property">
+        <title>Clear-ItemProperty</title>
+        <para/>
+    </sect2>
+
+    <sect2 xml:id="get_item_property">
+        <title>Get-ItemProperty</title>
+        <para/>
+    </sect2>
+
+    <sect2 xml:id="set_item_property">
+        <title>Set-ItemProperty</title>
+        <para/>
+    </sect2>
+
+</sect1>

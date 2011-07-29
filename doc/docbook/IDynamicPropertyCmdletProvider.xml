@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://www.oasis-open.org/docbook/xml/5.0/rng/docbookxi.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<sect1 xml:id="idynamic_property_cmdlet_provider" xmlns="http://docbook.org/ns/docbook"
+    xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xlink="http://www.w3.org/1999/xlink"
+    version="5.0">
+
+    <title>IDynamicPropertyCmdletProvider</title>
+    <para/>
+
+    <sect2 xml:id="copy_item_property">
+        <title>Copy-ItemProperty</title>
+        <para/>
+    </sect2>
+
+    <sect2 xml:id="move_item_property">
+        <title>Move-ItemProperty</title>
+        <para/>
+    </sect2>
+
+    <sect2 xml:id="new_item_property">
+        <title>New-ItemProperty</title>
+        <para/>
+    </sect2>
+
+    <sect2 xml:id="remove_item_property">
+        <title>Remove-ItemProperty</title>
+        <para/>
+    </sect2>
+
+    <sect2 xml:id="rename_item_property">
+        <title>Rename-ItemProperty</title>
+        <para/>
+    </sect2>
+
+</sect1>

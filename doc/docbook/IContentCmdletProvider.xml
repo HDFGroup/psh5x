@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://www.oasis-open.org/docbook/xml/5.0/rng/docbookxi.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<sect1 xml:id="icontent_cmdlet_provider" xmlns="http://docbook.org/ns/docbook"
+    xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xlink="http://www.w3.org/1999/xlink"
+    version="5.0">
+
+    <title>IContentCmdletProvider</title>
+    <para/>
+
+    <sect2 xml:id="get_content">
+        <title>Get-Content</title>
+        <para/>
+    </sect2>
+
+    <sect2 xml:id="set_content">
+        <title>Set-Content</title>
+        <para/>
+    </sect2>
+
+    <sect2 xml:id="add_content">
+        <title>Add-Content</title>
+        <para/>
+    </sect2>
+
+    <sect2 xml:id="clear_content">
+        <title>Clear-Content</title>
+        <para/>
+    </sect2>
+
+</sect1>

@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://www.oasis-open.org/docbook/xml/5.0/rng/docbookxi.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<sect1 xml:id="drive_cmdlet_provider" xmlns="http://docbook.org/ns/docbook"
+    xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xlink="http://www.w3.org/1999/xlink"
+    version="5.0">
+    <title>DriveCmdletProvider</title>
+    <para>The <literal>DriveCmdletProvider</literal> class serves as a base class for providers that
+        access a data store through Windows PowerShell drives. </para>
+    <note>
+        <para>PSH5X treats HDF5 files as PowerShell drives.</para>
+    </note>
+    <para>The list of exisiting PowerShell drives can be displayed via the
+            <literal>Get-PSDrive</literal> cmdlet.</para>
+    <screen>
+<prompt>PS:1 ></prompt> <command>Get-PSDrive</command>
+Name      Used (GB)   Free (GB) Provider      Root
+----      ---------   --------- --------      ----
+Alias                           Alias
+C         112.80         185.19 FileSystem    C:\
+cert                            Certificate   \
+D            .23            .51 FileSystem    D:\
+Env                             Environment
+Function                        Function
+h5tmp                           HDF5          h5tmp:\
+HKCU                            Registry      HKEY_CURRENT_USER
+HKLM                            Registry      HKEY_LOCAL_MACHINE
+Variable                        Variable
+WSMan                           WSMan
+    </screen>
+    <para>As part of its initialization, the <literal>DriveCmdletProvider</literal> creates an empty
+        HDF5 file and maps it as a PowerShell drive called <literal>h5tmp</literal> with read/write
+        access. This drive is intended as a sandbox environment.</para>
+    <note>
+        <para>The PSH5X <literal>h5tmp</literal> drive is specific to a PowerShell session and the
+            HDF5 files backing the <literal>h5tmp</literal> drives in different sessions are
+                <emphasis role="bold">not</emphasis> the same. The full path to the HDF5 file behind
+                <literal>h5tmp</literal> is stored in the <literal>PSH5XTmpFile</literal>
+            environment variable. The file is not deleted when the session is closed so that it can
+            be recovered. For example:</para>
+        <screen>
+<prompt>PS:1 ></prompt> <command>$Env:PSH5XTmpFile</command>
+C:\Users\gheber\AppData\Local\Temp\tmpC798.tmp
+      </screen>
+    </note>
+    <para>PSH5X implements the <literal>NewDrive()</literal> and <literal>RemoveDrive()</literal>
+        methods that let users map exisiting HDF5 files as PowerShell drives or to remove such
+        drives (and close the underlying HDF5 files).</para>
+
+    <sect2 xml:id="new_psdrive">
+        <title><literal>New-PSDrive</literal></title>
+        <cmdsynopsis>
+            <command>New-PSDrive</command>
+            <arg choice="req">-Name <replaceable>string</replaceable></arg>
+            <arg choice="req">-PSProvider <phrase>HDF5</phrase>
+            </arg>
+            <arg choice="req">-Path <replaceable>string</replaceable></arg>
+            <arg choice="req">-Root <replaceable>string</replaceable></arg>
+            <sbr/>
+            <arg choice="opt">-Mode <group>
+                    <option>RO,</option>
+                    <option>RW</option>
+                </group></arg>
+        </cmdsynopsis>
+        <para>The <literal>New-PSDrive</literal> cmdlet creates a Windows PowerShell drive in the
+            current session. The name of the new drive is provided via the <literal>-Name</literal>
+            argument and the name of the HDF5 file backing the new drive is specified via the
+                <literal>-Path</literal> argument. The file access mode is controlled via the
+                <literal>-Mode</literal> argument and can be set to read-only (default) or
+            read/write. Typically, the directory hierarchy of the new drive begins at the HDF5
+            file's HDF5 root group. This behavior can be changed by providing an HDF5 path name to
+            an HDF5 group in the file via the <literal>-Root</literal> argument. </para>
+        <note>
+            <itemizedlist>
+                <listitem>
+                    <para>The default mode is read-only.</para>
+                </listitem>
+                <listitem>
+                    <para>Windows PowerShell drive names are <emphasis>case
+                        sensitive</emphasis>.</para>
+                </listitem>
+                <listitem>
+                    <para>As a side effect, the creation of a new HDF5 file can be forced by adding
+                        the <literal>-Force</literal> switch. This will <emphasis role="bold"
+                            >not</emphasis> overwrite any existing files and create an error if a
+                        file already exists at the location specified in the
+                            <literal>-Path</literal> argument. </para>
+                </listitem>
+            </itemizedlist>
+        </note>
+        <example>
+            <title>Creating a new PowerShell drive from an HDF5 file</title>
+            <screen>
+<prompt>PS:1 ></prompt> <command>New-PSDrive -Name h5new -PSProvider HDF5 -Path E:\HDF5\h5\sample.h5
+  -Root h5new:\</command>
+Name       Used (GB)     Free (GB) Provider      Root
+----       ---------     --------- --------      ----
+h5new                              HDF5          h5new:\
+      </screen>
+        </example>
+        <example>
+            <title>Creating a new PowerShell drive with a different root and read/write
+                access</title>
+            <screen>
+<prompt>PS:1 ></prompt> <command>New-PSDrive -Name h5new -PSProvider HDF5 -Path E:\HDF5\h5\sample.h5
+  -Root h5new:\A\B -Mode RW</command>
+Name       Used (GB)     Free (GB) Provider      Root
+----       ---------     --------- --------      ----
+h5new                              HDF5          h5new:\A\B
+      </screen>
+        </example>
+        <para>A PowerShell drive is represented as a PowerShell object. See <xref
+                linkend="drive_object"/> for a detailed description of its properties.</para>
+
+    </sect2>
+
+    <sect2 xml:id="remove_psdrive">
+        <title><literal>Remove-PSDrive</literal></title>
+        <cmdsynopsis>
+            <command>Remove-PSDrive</command>
+            <arg choice="req">-LiteralName <replaceable>string[]</replaceable></arg>
+        </cmdsynopsis>
+        <para>The <literal>Remove-PSDrive</literal> cmdlet deletes Windows PowerShell drives that
+            have been created by using <literal>New-PSDrive</literal>.</para>
+        <example>
+            <title>Removing two PowerShell drives</title>
+            <screen>
+<prompt>PS:1 ></prompt> <command>Remove-PSDrive h5new,h51</command>
+      </screen>
+        </example>
+    </sect2>
+
+</sect1>
