@@ -68,8 +68,9 @@ namespace PSH5X
                 throw gcnew ArgumentException(msg);
             }
         }
-        else
-            throw gcnew Exception("File not found");
+        else {
+            throw gcnew Exception(String::Format("File '{0}' not found", path));
+        }
     }
 
     Hashtable^ DriveInfo::CreationProperties::get()
