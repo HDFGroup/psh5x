@@ -30,9 +30,14 @@ namespace PSH5X
         if (File::Exists(m_path))
         {
            char* name = (char*)(Marshal::StringToHGlobalAnsi(m_path)).ToPointer();
+           if (H5Fis_hdf5(name) <= 0) {
+               String^ msg = String::Format(
+                   "File '{0}' is not an HDF5 file", path);
+               throw gcnew ArgumentException(msg);
+           }
+
            m_handle = H5Fopen(name, flags, H5P_DEFAULT);
-           if (m_handle < 0)
-           {
+           if (m_handle < 0) {
                String^ msg = String::Format(
                    "H5Fopen failed with status {0} for name {1}", m_handle, path);
                throw gcnew ArgumentException(msg);
