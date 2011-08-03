@@ -5,26 +5,180 @@
     version="5.0">
 
     <title>ItemCmdletProvider</title>
-    <para/>
+    <para>The <literal>ItemCmdletProvider</literal> supports items referred to by path names. This
+        provider does not distinguish between container-like items (HDF5 groups) and leaf items. It
+        also has no concept of navigation. Items can retrieved, cleared, or invoked, i.e., a default
+        action performed.</para>
+    <para>The following HDF5 entities are treated as PowerShell items by
+        <literal>PSH5X</literal>:</para>
+    <simplelist>
+        <member>HDF5 group</member>
+        <member>HDF5 dataset</member>
+        <member>HDF5 named datatypes</member>
+        <member>HDF5 hard and symbolic links</member>
+    </simplelist>
 
     <sect2 xml:id="get_item">
-        <title>Get-Item</title>
-        <para/>
+        <title><literal>Get-Item</literal></title>
+        <cmdsynopsis>
+            <command>Get-Item</command>
+            <arg choice="req">-Path <replaceable>string[]</replaceable></arg>
+            <arg choice="opt">-Detailed</arg>
+        </cmdsynopsis>
+        <para>The <literal>Get-Item</literal> cmdlet gets the item at the specified location. It
+            does support multiple path names and the wildcard character '*' to retrieve all matching
+            items. This cmdlet does not retrieve the content of an item, such as the value of an
+            HDF5 dataset.</para>
+        <para>The <literal>-Detailed</literal> switch can be used to retrieve additional information
+            about an item.</para>
+        <example>
+            <title>Retrieving the root group of the HDF5 scratch PSDrive</title>
+            <screen>
+<prompt>PS:1 ></prompt> <command>Get-Item h5tmp:\ | Format-List</command>
+
+PSPath         : HDF5\HDF5::h5tmp:\
+PSParentPath   :
+PSChildName    : h5tmp:
+PSDrive        : h5tmp
+PSProvider     : HDF5\HDF5
+PSIsContainer  : True
+LinkCount      : 7
+Timestamps     : {ModificationTime, AccessTime, ChangeTime, BirthTime}
+AttributeNames : {attr1}
+AttributeCount : 1
+ItemType       : Group
+      </screen>
+        </example>
+        <example>
+            <title>Retrieving more details about the root group of the HDF5 scratch PSDrive</title>
+            <screen>
+<prompt>PS:1 ></prompt> <command>Get-Item h5tmp:\ -Detailed | Format-List</command>
+
+PSPath               : HDF5\HDF5::h5tmp:\
+PSParentPath         :
+PSChildName          : h5tmp:
+PSDrive              : h5tmp
+PSProvider           : HDF5\HDF5
+PSIsContainer        : True
+Mounted              : False
+MaxCreationOrder     : 0
+LinkCount            : 7
+StorageType          : SymbolTable
+ReferenceCount       : 1
+ObjectID             : 33554432
+AdditionalMetadata   : {ForAttributes, ForObjects}
+Header               : {Version, Space, ObjectHeaderMessageCount,
+                        ObjectHeaderStatus...}
+FileNo               : 4
+CreationPropertyList : {Estimates, LinkCreationOrder, ObjectTimeIsTracked,
+                        AttributeStoragePhaseChangeThresholds...}
+Address              : 96
+Timestamps           : {ModificationTime, AccessTime, ChangeTime, BirthTime}
+AttributeNames       : {attr1}
+AttributeCount       : 1
+ItemType             : Group
+      </screen>
+        </example>
+        <example>
+            <title>Use a wildcard to retrieve all group members</title>
+            <screen>
+<prompt>PS:1 ></prompt> <command>Get-Item h5tmp:\*</command>
+
+   PSParentPath: HDF5\HDF5::h5tmp:
+
+LinkName                 ItemType   LastWriteTime          #Attr.
+--------                 --------   -------------          ------
+dset1                    Dataset    8/3/2011 8:10:55 PM    0
+dset2                    Dataset    8/3/2011 8:10:55 PM    0
+dset3                    Dataset    8/3/2011 8:10:55 PM    0
+group1                   Group      1/1/1970 12:00:00 AM   0
+group2                   Group      1/1/1970 12:00:00 AM   0
+slink1                   SoftLink
+type1                    Datatype   1/1/1970 12:00:00 AM   0
+      </screen>
+        </example>
+        <example>
+            <title>Compare the addresses of two items</title>
+            <screen>
+<prompt>PS:1 ></prompt> <command>(Get-Item h5tmp:\group1\dset3 -Detailed).Address -eq
+    (Get-Item h5tmp:\group2\dset3 -Detailed).Address</command>
+True
+      </screen>
+        </example>
+
     </sect2>
 
     <sect2 xml:id="clear_item">
         <title>Clear-Item</title>
-        <para/>
+        <para>The Clear-Item cmdlet deletes the value of an item, but it does not delete the
+            item.</para>
+        <note>
+            <para>Not implemented.</para>
+        </note>
     </sect2>
 
     <sect2 xml:id="set_item">
-        <title>Set-Item</title>
-        <para/>
+
+        <title><literal>Set-Item</literal></title>
+        <cmdsynopsis>
+            <command>Set-Item</command>
+            <arg choice="req">-Path <replaceable>string[]</replaceable></arg>
+            <arg choice="opt">-Value <replaceable>Object</replaceable></arg>
+            <arg choice="opt">-Shape <replaceable>long[]</replaceable></arg>
+            <arg choice="opt">-Force</arg>
+        </cmdsynopsis>
+        <para>Changes the value of an item to the value specified in the command. The behavior of
+            the cmdlet depends on the type of the item referred to by <literal>-Path</literal>.
+            Currently, the following kinds of items are supported:</para>
+        <variablelist>
+            <varlistentry>
+                <term>HDF5 dataset</term>
+                <listitem>
+                    <para>If present, the <literal>-Value</literal> argument must be a .NET array of
+                        a type that can be converted into the dataset's HDF5 datatype. </para>
+                    <para> If the dataset is not extendible, the shape of the array provided in
+                            <literal>-Value</literal> must match the shape of the dataset (rank and
+                        extent). The <literal>-Shape</literal> argument would have no effect in this
+                        case and will generate an error.</para>
+                    <para> If the dataset is extendible, its value and/or shape will be changed if,
+                        and only if, either of the <literal>-Force</literal> switch or the
+                            <literal>-Shape</literal> argument, but <emphasis role="bold"
+                            >not</emphasis> both, are present. With the <literal>-Force</literal>
+                        switch present, the cmdlet will infer the new shape of the dataset from the
+                            <literal>-Value</literal> argument. If the <literal>-Shape</literal>
+                        argument is specified, the <literal>-Value</literal> argument must either be
+                        absent, in which case only the shape of the dataset will be updated, or it
+                        must be a one-dimensional .NET array.</para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>HDF5 soft link</term>
+                <listitem>
+                    <para>The <literal>-Value</literal> argument must be convertible to a string.
+                        The <literal>-Shape</literal> argument has no effect in this case and will
+                        generate a warning.</para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>HDF5 external link</term>
+                <listitem>
+                    <para>The <literal>-Value</literal> argument must be convertible into a string
+                        array of length 2. The first element is used to initialize the external
+                        link's file name and the second argument used as the HDF5 path name. The
+                            <literal>-Shape</literal> argument has no effect in this case and will
+                        generate a warning.</para>
+                </listitem>
+            </varlistentry>
+        </variablelist>
+
     </sect2>
 
     <sect2 xml:id="invoke_item">
         <title>Invoke-Item</title>
-        <para/>
+        <para>The Invoke-Item cmdlet performs the default action on the specified item.</para>
+        <note>
+            <para>Not implemented.</para>
+        </note>
     </sect2>
 
 </sect1>
