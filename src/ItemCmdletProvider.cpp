@@ -69,6 +69,8 @@ namespace PSH5X
             detailed = dynamicParameters["Detailed"]->IsSet;
         }
 
+#pragma region root group
+
         if (ProviderUtils::IsH5RootPathName(h5path)) // root group
         {
             String^ rootName = "/";
@@ -94,6 +96,8 @@ namespace PSH5X
 
             return;
         }
+
+#pragma endregion
 
         String^ groupPath = ProviderUtils::ParentPath(h5path);
         char* group_path = (char*)(Marshal::StringToHGlobalAnsi(groupPath)).ToPointer();
@@ -124,22 +128,18 @@ namespace PSH5X
                                 switch (oinfo.type)
                                 {
                                 case H5O_TYPE_GROUP:
-                                    if (!detailed)
-                                    {
+                                    if (!detailed) {
                                         WriteItemObject(gcnew GroupInfoLite(obj_id), path, true);
                                     }
-                                    else
-                                    {
+                                    else {
                                         WriteItemObject(gcnew GroupInfo(obj_id), path, true);
                                     }
                                     break;
                                 case H5O_TYPE_DATASET:
-                                    if (!detailed)
-                                    {
+                                    if (!detailed) {
                                         WriteItemObject(gcnew DatasetInfoLite(obj_id), path, false);
                                     }
-                                    else
-                                    {
+                                    else {
                                         WriteItemObject(gcnew DatasetInfo(obj_id), path, false);
                                     }
                                     break;
@@ -277,10 +277,10 @@ namespace PSH5X
             ThrowTerminatingError(error);
         }
 
-#pragma region HDF5 dataset -> call H5Dset_extent
-
         if (ProviderUtils::IsH5Dataset(drive->FileHandle, h5path))
         {
+#pragma region HDF5 dataset
+
             hid_t h5set = -1, h5space = -1, plist = -1;
 
             try
@@ -383,10 +383,16 @@ namespace PSH5X
                     }
                 }
             }
-        }
 
 #pragma endregion
-        
+        }
+        else if (ProviderUtils::IsH5SymLink(drive->FileHandle, h5path))
+        {
+#pragma region HDF5 symbolic link
+
+#pragma endregion
+        }
+
         return;
     }
 
@@ -396,18 +402,54 @@ namespace PSH5X
             String::Format("HDF5Provider::SetItemDynamicParameters(Path = '{0}', Value = '{1}')",
             path, value->ToString()));
 
+        DriveInfo^ drive = nullptr;
+        String^ h5path = nullptr;
+        if (!ProviderUtils::TryGetDriveEtH5Path(path, ProviderInfo, drive, h5path))
+        {
+            ErrorRecord^ error = gcnew ErrorRecord(
+                gcnew ArgumentException("Ill-formed HDF5 path name and/or unable to obtain drive name!"),
+                "InvalidData", ErrorCategory::InvalidData, nullptr);
+            ThrowTerminatingError(error);
+        }
+
         RuntimeDefinedParameterDictionary^ dict = gcnew RuntimeDefinedParameterDictionary();
 
-        ParameterAttribute^ attr2 = gcnew ParameterAttribute();
-        attr2->Mandatory = true;
-        attr2->ValueFromPipeline = false;
 
-        RuntimeDefinedParameter^ paramDimensions = gcnew RuntimeDefinedParameter();
-        paramDimensions->Name = "Dimensions";
-        paramDimensions->ParameterType = array<hsize_t>::typeid;
-        paramDimensions->Attributes->Add(attr2);
+        if (ProviderUtils::IsH5Dataset(drive->FileHandle, h5path))
+        {
+            ParameterAttribute^ attr2 = gcnew ParameterAttribute();
+            attr2->Mandatory = false;
+            attr2->ValueFromPipeline = false;
 
-        dict->Add("Dimensions", paramDimensions);
+            RuntimeDefinedParameter^ paramDimensions = gcnew RuntimeDefinedParameter();
+            paramDimensions->Name = "Dimensions";
+            paramDimensions->ParameterType = array<hsize_t>::typeid;
+            paramDimensions->Attributes->Add(attr2);
+
+            dict->Add("Dimensions", paramDimensions);
+
+            ParameterAttribute^ attr3 = gcnew ParameterAttribute();
+            attr3->Mandatory = false;
+            attr3->ValueFromPipeline = false;
+
+            RuntimeDefinedParameter^ paramHyperslab = gcnew RuntimeDefinedParameter();
+            paramHyperslab->Name = "Hyperslab";
+            paramHyperslab->ParameterType = array<hsize_t>::typeid;
+            paramHyperslab->Attributes->Add(attr3);
+
+            dict->Add("Hyperslab", paramHyperslab);
+
+            ParameterAttribute^ attr4 = gcnew ParameterAttribute();
+            attr3->Mandatory = false;
+            attr3->ValueFromPipeline = false;
+
+            RuntimeDefinedParameter^ paramPointSet = gcnew RuntimeDefinedParameter();
+            paramPointSet->Name = "PointSet";
+            paramPointSet->ParameterType = array<hsize_t,2>::typeid;
+            paramPointSet->Attributes->Add(attr4);
+
+            dict->Add("PointSet", paramPointSet);
+        }
 
         return dict;
     }

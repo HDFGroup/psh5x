@@ -135,4 +135,26 @@ namespace PSH5X
 
         return result;
     }
+
+    bool ProviderUtils::IsH5SymLink(hid_t file, String^ h5path)
+    {
+        bool result = false;
+
+        if (ProviderUtils::IsValidH5Path(file, h5path))
+        {
+            char* name = (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
+            H5L_info_t info;
+            if (H5Lget_info(file, name, &info, H5P_DEFAULT) >= 0)
+            {
+                result = (info.type == H5L_TYPE_SOFT || info.type == H5L_TYPE_EXTERNAL);
+            }
+            else { // TODO
+            }
+        }
+        else {
+            result = false;
+        }
+
+        return result;
+    }
 }
