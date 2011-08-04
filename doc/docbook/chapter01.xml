@@ -6,7 +6,7 @@
 
   <sect1 xml:id="windows_powershell_providers">
     <title>A Windows PowerShell Provider</title>
-    <para>The PowerShell provider architecture distinguishes three kinds of entities.</para>
+    <para>The PowerShell provider architecture distinguishes between three kinds of entities.</para>
     <variablelist>
       <varlistentry>
         <term>Items</term>

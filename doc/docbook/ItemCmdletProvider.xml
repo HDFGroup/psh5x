@@ -109,8 +109,8 @@ True
     </sect2>
 
     <sect2 xml:id="clear_item">
-        <title>Clear-Item</title>
-        <para>The Clear-Item cmdlet deletes the value of an item, but it does not delete the
+        <title><literal>Clear-Item</literal></title>
+        <para>The <literal>Clear-Item</literal> cmdlet deletes the value of an item, but it does not delete the
             item.</para>
         <note>
             <para>Not implemented.</para>
@@ -124,7 +124,10 @@ True
             <command>Set-Item</command>
             <arg choice="req">-Path <replaceable>string[]</replaceable></arg>
             <arg choice="opt">-Value <replaceable>Object</replaceable></arg>
-            <arg choice="opt">-Shape <replaceable>long[]</replaceable></arg>
+            <arg choice="opt">-Dimensions <replaceable>long[]</replaceable></arg>
+            <sbr/>
+            <arg choice="opt">-Hyperslab <replaceable>long[4]</replaceable></arg>
+            <arg choice="opt">-PointSet <replaceable>long[,]</replaceable></arg>
             <arg choice="opt">-Force</arg>
         </cmdsynopsis>
         <para>Changes the value of an item to the value specified in the command. The behavior of
@@ -138,25 +141,26 @@ True
                         a type that can be converted into the dataset's HDF5 datatype. </para>
                     <para> If the dataset is not extendible, the shape of the array provided in
                             <literal>-Value</literal> must match the shape of the dataset (rank and
-                        extent). The <literal>-Shape</literal> argument would have no effect in this
-                        case and will generate an error.</para>
+                        extent). The <literal>-Dimensions</literal> argument would have no effect in
+                        this case and will generate an error.</para>
                     <para> If the dataset is extendible, its value and/or shape will be changed if,
                         and only if, either of the <literal>-Force</literal> switch or the
-                            <literal>-Shape</literal> argument, but <emphasis role="bold"
+                            <literal>-Dimensions</literal> argument, but <emphasis role="bold"
                             >not</emphasis> both, are present. With the <literal>-Force</literal>
                         switch present, the cmdlet will infer the new shape of the dataset from the
-                            <literal>-Value</literal> argument. If the <literal>-Shape</literal>
-                        argument is specified, the <literal>-Value</literal> argument must either be
-                        absent, in which case only the shape of the dataset will be updated, or it
-                        must be a one-dimensional .NET array.</para>
+                            <literal>-Value</literal> argument. If the
+                            <literal>-Dimensions</literal> argument is specified, the
+                            <literal>-Value</literal> argument must either be absent, in which case
+                        only the shape of the dataset will be updated, or it must be a
+                        one-dimensional .NET array.</para>
                 </listitem>
             </varlistentry>
             <varlistentry>
                 <term>HDF5 soft link</term>
                 <listitem>
                     <para>The <literal>-Value</literal> argument must be convertible to a string.
-                        The <literal>-Shape</literal> argument has no effect in this case and will
-                        generate a warning.</para>
+                        The <literal>-Dimensions</literal> argument has no effect in this case and
+                        will generate a warning.</para>
                 </listitem>
             </varlistentry>
             <varlistentry>
@@ -165,17 +169,36 @@ True
                     <para>The <literal>-Value</literal> argument must be convertible into a string
                         array of length 2. The first element is used to initialize the external
                         link's file name and the second argument used as the HDF5 path name. The
-                            <literal>-Shape</literal> argument has no effect in this case and will
-                        generate a warning.</para>
+                            <literal>-Dimensions</literal> argument has no effect in this case and
+                        will generate a warning.</para>
                 </listitem>
             </varlistentry>
         </variablelist>
+        <example>
+            <title>Adjusting the shape of an extendible dataset</title>
+            <screen>
+<prompt>PS:1 ></prompt> <command>Set-Item h5tmp:\group1\dset3 -Dimensions 44,55,66</command>
+      </screen>
+        </example>
+        <example>
+            <title>Assigning a new value to a dataset</title>
+            <screen>
+<prompt>PS:1 ></prompt> <command>Set-Item h5tmp:\dset1 -Value (New-Object 'double[,,]' 512,512,512)</command>
+      </screen>
+        </example>
+        <example>
+            <title>Assigning a new value to a soft link</title>
+            <screen>
+<prompt>PS:1 ></prompt> <command>Set-Item h5tmp:\slink1 -Value '/new/destination'</command>
+      </screen>
+        </example>
 
     </sect2>
 
     <sect2 xml:id="invoke_item">
-        <title>Invoke-Item</title>
-        <para>The Invoke-Item cmdlet performs the default action on the specified item.</para>
+        <title><literal>Invoke-Item</literal></title>
+        <para>The <literal>Invoke-Item</literal> cmdlet performs the default action on the specified item. For example,
+            for and HDF5 image this cmdlet may invoke an image viewer.</para>
         <note>
             <para>Not implemented.</para>
         </note>

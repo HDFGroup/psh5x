@@ -396,6 +396,19 @@ namespace PSH5X
             String::Format("HDF5Provider::SetItemDynamicParameters(Path = '{0}', Value = '{1}')",
             path, value->ToString()));
 
-        return nullptr;
+        RuntimeDefinedParameterDictionary^ dict = gcnew RuntimeDefinedParameterDictionary();
+
+        ParameterAttribute^ attr2 = gcnew ParameterAttribute();
+        attr2->Mandatory = true;
+        attr2->ValueFromPipeline = false;
+
+        RuntimeDefinedParameter^ paramDimensions = gcnew RuntimeDefinedParameter();
+        paramDimensions->Name = "Dimensions";
+        paramDimensions->ParameterType = array<hsize_t>::typeid;
+        paramDimensions->Attributes->Add(attr2);
+
+        dict->Add("Dimensions", paramDimensions);
+
+        return dict;
     }
 }
