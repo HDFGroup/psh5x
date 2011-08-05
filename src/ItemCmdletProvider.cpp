@@ -277,11 +277,21 @@ namespace PSH5X
             ThrowTerminatingError(error);
         }
 
+        RuntimeDefinedParameterDictionary^ dynamicParameters =
+                    (RuntimeDefinedParameterDictionary^) DynamicParameters;
+
         if (ProviderUtils::IsH5Dataset(drive->FileHandle, h5path))
         {
 #pragma region HDF5 dataset
 
-            hid_t h5set = -1, h5space = -1, plist = -1;
+            bool hasValue = (value != nullptr);
+            bool hasDims = (dynamicParameters["Dimensions"]->Value != nullptr);
+            bool hasHyper = (dynamicParameters["Hyperslab"]->Value != nullptr);
+            bool hasPtSet = (dynamicParameters["PointSet"]->Value != nullptr);
+            bool isForce = Force.IsPresent;
+            bool isChunked = ProviderUtils::IsH5ChunkedDataset(drive->FileHandle, h5path);
+                
+            hid_t h5set = -1, h5space = -1;
 
             try
             {
@@ -290,10 +300,10 @@ namespace PSH5X
                 {
                     char* name = (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
                     h5set = H5Dopen2(drive->FileHandle, name, H5P_DEFAULT);
-                    if (h5set < 0) { throw gcnew ArgumentException("H5Dopen failed."); }
-                    plist = H5Dget_create_plist(h5set);
-                    if (plist < 0) { throw gcnew ArgumentException("H5Dget_create_plist failed."); }
-                    if (H5Pget_layout(plist) == H5D_CHUNKED)
+                    if (h5set < 0) {
+                        throw gcnew ArgumentException("H5Dopen failed."); }
+
+                    if (isChunked)
                     {
                         h5space = H5Dget_space(h5set);
                         if (h5space >= 0)
@@ -369,18 +379,11 @@ namespace PSH5X
             finally
             {
                 if (h5space >= 0) {
-                    if (H5Sclose(h5space) < 0) { // TODO
-                    }
-                }
-
-                if (plist >= 0) {
-                    if (H5Pclose(plist) < 0) { // TODO
-                    }
+                    H5Sclose(h5space);
                 }
 
                 if (h5set >= 0) {
-                    if (H5Dclose(h5set) < 0) { // TODO
-                    }
+                    H5Dclose(h5set);
                 }
             }
 
@@ -522,7 +525,7 @@ namespace PSH5X
         RuntimeDefinedParameterDictionary^ dict = gcnew RuntimeDefinedParameterDictionary();
 
 
-        //if (ProviderUtils::IsH5Dataset(drive->FileHandle, h5path))
+        if (ProviderUtils::IsH5Dataset(drive->FileHandle, h5path))
         {
             ParameterAttribute^ attr2 = gcnew ParameterAttribute();
             attr2->Mandatory = false;

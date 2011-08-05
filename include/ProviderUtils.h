@@ -115,6 +115,8 @@ namespace PSH5X
 
         static bool IsH5Dataset(hid_t file, System::String^ h5path);
 
+        static bool IsH5ChunkedDataset(hid_t file, System::String^ h5path);
+
         static bool IsH5DatatypeObject(hid_t file, System::String^ h5path);
 
         static bool IsH5SymLink(hid_t file, System::String^ h5path);

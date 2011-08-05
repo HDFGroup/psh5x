@@ -2,8 +2,10 @@
 #include "ProviderUtils.h"
 
 extern "C" {
+#include "H5Dpublic.h"
 #include "H5Gpublic.h"
 #include "H5Lpublic.h"
+#include "H5Ppublic.h"
 }
 
 #include <string>
@@ -43,9 +45,6 @@ namespace PSH5X
             }
             else { // TODO
             }
-        }
-        else {
-            result = false;
         }
 
         return result;
@@ -102,8 +101,29 @@ namespace PSH5X
             else { // TODO
             }
         }
-        else {
-            result = false;
+
+        return result;
+    }
+
+    bool ProviderUtils::IsH5ChunkedDataset(hid_t file, String^ h5path)
+    {
+        bool result = false;
+
+        if (ProviderUtils::IsH5Dataset(file, h5path))
+        {
+            char* name = (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
+            hid_t dset = H5Dopen2(file, name, H5P_DEFAULT);
+            if (dset >= 0)
+            {
+                hid_t plist = H5Dget_create_plist(dset);
+                if (plist >= 0)
+                {
+                    result = (H5Pget_layout(plist) == H5D_CHUNKED);
+                    H5Pclose(plist);
+                }
+
+                H5Dclose(dset);
+            }
         }
 
         return result;
@@ -123,17 +143,9 @@ namespace PSH5X
                 if (H5Oget_info(obj_id, &info) >= 0) {
                     result = (info.type == H5O_TYPE_NAMED_DATATYPE);
                 }
-                else { // TODO
-                }
 
-                if (H5Oclose(obj_id) < 0) { // TODO
-                }
+                H5Oclose(obj_id);
             }
-            else { // TODO
-            }
-        }
-        else {
-            result = false;
         }
 
         return result;
@@ -153,11 +165,6 @@ namespace PSH5X
             {
                 result = (info.type == H5L_TYPE_SOFT || info.type == H5L_TYPE_EXTERNAL);
             }
-            else { // TODO
-            }
-        }
-        else {
-            result = false;
         }
 
         return result;
@@ -175,11 +182,6 @@ namespace PSH5X
             {
                 result = (info.type == H5L_TYPE_SOFT);
             }
-            else { // TODO
-            }
-        }
-        else {
-            result = false;
         }
 
         return result;
@@ -197,11 +199,6 @@ namespace PSH5X
             {
                 result = (info.type == H5L_TYPE_EXTERNAL);
             }
-            else { // TODO
-            }
-        }
-        else {
-            result = false;
         }
 
         return result;
