@@ -119,6 +119,10 @@ namespace PSH5X
 
         static bool IsH5SymLink(hid_t file, System::String^ h5path);
 
+        static bool IsH5SoftLink(hid_t file, System::String^ h5path);
+
+        static bool IsH5ExternalLink(hid_t file, System::String^ h5path);
+
         static array<System::String^>^ GetObjectAttributeNames(hid_t obj_id);
 
         static array<System::String^>^ GetGroupLinkNames(hid_t group_id, bool recurse);

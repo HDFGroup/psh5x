@@ -388,9 +388,116 @@ namespace PSH5X
         }
         else if (ProviderUtils::IsH5SymLink(drive->FileHandle, h5path))
         {
-#pragma region HDF5 symbolic link
+            // The HDF5 C API does not have a call for setting the value
+            // of s symbolic link. We gotta delete it and create a new one...
+
+            if (ProviderUtils::IsH5SoftLink(drive->FileHandle, h5path))
+            {
+#pragma region HDF5 soft link
+
+                if (value != nullptr)
+                {
+                    String^ dest = nullptr;
+                    if (ProviderUtils::TryGetValue(value, dest))
+                    {
+                        // delete the old one first
+
+                        char* name = (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
+
+                        if (this->ShouldProcess(h5path,
+                            String::Format("HDF5 soft link '{0}' exists, delete it", h5path)))
+                        {
+                            if (H5Ldelete(drive->FileHandle, name, H5P_DEFAULT) < 0) {
+                                throw gcnew ArgumentException("H5Ldelete failed!");
+                            }
+                        }
+
+                        char* soft = (char*)(Marshal::StringToHGlobalAnsi(dest)).ToPointer();
+
+                        if (this->ShouldProcess(h5path,
+                            String::Format("HDF5 soft link '{0}' does not exist, create it", dest)))
+                        {
+                            if (H5Lcreate_soft(soft, drive->FileHandle, name, H5P_DEFAULT, H5P_DEFAULT) < 0) {
+                                throw gcnew InvalidOperationException("H5Lcreate_soft failed!");
+                            }
+
+                            if (H5Fflush(drive->FileHandle, H5F_SCOPE_LOCAL) < 0) {
+                                WriteWarning("H5Fflush failed!");
+                            }
+
+                            WriteItemObject(gcnew LinkInfo(drive->FileHandle, h5path, "SoftLink"), path, false);
+                        }
+                    }
+                    else {
+                        throw gcnew ArgumentException("Cannot convert value argument (object) to link destination (string).");
+                    }
+                }
+                else {
+                    throw gcnew ArgumentException("No link destination found. Use -Value to specify!");
+                }
 
 #pragma endregion
+            }
+            else if (ProviderUtils::IsH5ExternalLink(drive->FileHandle, h5path))
+            {
+#pragma region HDF5 external link
+
+                if (value != nullptr)
+                {
+                    array<String^>^ dest = nullptr;
+                    if (ProviderUtils::TryGetValue(value, dest))
+                    {
+                        if (dest->Length != 2) {
+                            throw gcnew ArgumentException("The length of the destination array must be " +
+                                "two @(file name,path name)!");
+                        }
+
+                        // delete the old one first
+
+                        char* name = (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
+
+                        if (this->ShouldProcess(h5path,
+                            String::Format("HDF5 external link '{0}' exists, delete it", h5path)))
+                        {
+                            if (H5Ldelete(drive->FileHandle, name, H5P_DEFAULT) < 0) {
+                                throw gcnew ArgumentException("H5Ldelete failed!");
+                            }
+                        }
+
+                        char* file = (char*)(Marshal::StringToHGlobalAnsi(dest[0])).ToPointer();
+                        char* link = (char*)(Marshal::StringToHGlobalAnsi(dest[1])).ToPointer();
+
+                        if (this->ShouldProcess(h5path,
+                            String::Format("HDF5 external link '{0}' does not exist, create it", h5path)))
+                        {
+                            if (H5Lcreate_external(file, link, drive->FileHandle, name, H5P_DEFAULT, H5P_DEFAULT) < 0) {
+                                throw gcnew InvalidOperationException("H5Lcreate_external failed!");
+                            }
+
+                            if (H5Fflush(drive->FileHandle, H5F_SCOPE_LOCAL) < 0) {
+                                WriteWarning("H5Fflush failed!");
+                            }
+
+                            WriteItemObject(gcnew LinkInfo(drive->FileHandle, h5path, "ExtLink"), path, false);
+                        }
+                    }
+                    else {
+                        throw gcnew ArgumentException("Cannot convert value argument (object) to link destination string[2].");
+                    }
+                }
+                else {
+                    throw gcnew ArgumentException("No link destination found. Use -Value to specify!");
+                }
+
+#pragma endregion
+            }
+            else
+            {
+                ErrorRecord^ error = gcnew ErrorRecord(
+                    gcnew ArgumentException("What kind of symbolic link is this?"),
+                    "InvalidData", ErrorCategory::InvalidData, nullptr);
+                ThrowTerminatingError(error);
+            }
         }
 
         return;
@@ -415,7 +522,7 @@ namespace PSH5X
         RuntimeDefinedParameterDictionary^ dict = gcnew RuntimeDefinedParameterDictionary();
 
 
-        if (ProviderUtils::IsH5Dataset(drive->FileHandle, h5path))
+        //if (ProviderUtils::IsH5Dataset(drive->FileHandle, h5path))
         {
             ParameterAttribute^ attr2 = gcnew ParameterAttribute();
             attr2->Mandatory = false;

@@ -44,27 +44,7 @@ namespace PSH5X
 
         if (ProviderUtils::IsH5RootPathName(h5path)) { return true; }
 
-        bool result = false;
-
-        char* name = (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
-        H5O_info_t info;
-        hid_t obj_id = H5Oopen(drive->FileHandle, name, H5P_DEFAULT);
-        if (obj_id >= 0)
-        {
-            if (H5Oget_info(obj_id, &info) >= 0)
-            {
-                result = (info.type == H5O_TYPE_GROUP);
-            }
-            else { // TODO
-            }
-
-            if (H5Oclose(obj_id) < 0) { // TODO
-            }
-        }
-        else { // TODO
-        }
-
-        return result;
+        return ProviderUtils::IsH5Group(drive->FileHandle, h5path);
     }
 
     String^ Provider::MakePath(System::String^ parent, System::String^ child)
