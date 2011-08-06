@@ -175,6 +175,7 @@
     <ClCompile Include="src\IContentCmdletProvider.cpp" />
     <ClCompile Include="src\IDynamicPropertyCmdletProvider.cpp" />
     <ClCompile Include="src\IPropertyCmdletProvider.cpp" />
+    <ClCompile Include="src\ItemCmdletProvider.SetItem.cpp" />
     <ClCompile Include="src\LinkInfo.cpp" />
     <ClCompile Include="src\NavigationCmdletProvider.cpp" />
     <ClCompile Include="src\ObjectInfo.cpp" />

@@ -37,13 +37,8 @@ namespace PSH5X
                         info.type == H5O_TYPE_GROUP ||
                         info.type == H5O_TYPE_NAMED_DATATYPE);
                 }
-                else { // TODO
-                }
 
-                if (H5Oclose(obj_id) < 0) { // TODO
-                }
-            }
-            else { // TODO
+                H5Oclose(obj_id);
             }
         }
 
@@ -65,13 +60,8 @@ namespace PSH5X
                 {
                     result = (info.type == H5O_TYPE_GROUP);
                 }
-                else { //TODO
-                }
-
-                if (H5Oclose(obj_id) < 0) { // TODO
-                }
-            }
-            else { // TODO
+             
+                H5Oclose(obj_id);
             }
         }
 
@@ -92,13 +82,8 @@ namespace PSH5X
                 if (H5Oget_info(obj_id, &info) >= 0) {
                     result = (info.type == H5O_TYPE_DATASET);
                 }
-                else { // TODO
-                }
-
-                if (H5Oclose(obj_id) < 0) { // TODO
-                }
-            }
-            else { // TODO
+                
+                H5Oclose(obj_id);
             }
         }
 
