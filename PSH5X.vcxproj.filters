@@ -95,6 +95,9 @@
     <ClCompile Include="src\ItemCmdletProvider.SetItem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\DatasetWriter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Snapin.h">
@@ -149,6 +152,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\ShowH5TypesCommand.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\DatasetWriter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

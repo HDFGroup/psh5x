@@ -147,6 +147,7 @@
     <ClInclude Include="include\DatasetInfo.h" />
     <ClInclude Include="include\DatasetInfoLite.h" />
     <ClInclude Include="include\DatasetReader.h" />
+    <ClInclude Include="include\DatasetWriter.h" />
     <ClInclude Include="include\DataspaceInfo.h" />
     <ClInclude Include="include\DatatypeInfo.h" />
     <ClInclude Include="include\DriveInfo.h" />
@@ -169,6 +170,7 @@
     <ClCompile Include="src\DatasetInfo.cpp" />
     <ClCompile Include="src\DatasetInfoLite.cpp" />
     <ClCompile Include="src\DatasetReader.cpp" />
+    <ClCompile Include="src\DatasetWriter.cpp" />
     <ClCompile Include="src\DriveInfo.cpp" />
     <ClCompile Include="src\CmdletProvider.cpp" />
     <ClCompile Include="src\ContainerCmdletProvider.cpp" />

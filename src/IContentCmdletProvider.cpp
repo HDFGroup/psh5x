@@ -1,5 +1,6 @@
 
 #include "DatasetReader.h"
+#include "DatasetWriter.h"
 #include "DriveInfo.h"
 #include "Provider.h"
 #include "ProviderUtils.h"
@@ -20,14 +21,14 @@ namespace PSH5X
     void Provider::ClearContent(String ^ path)
     {
         WriteVerbose(String::Format("HDF5Provider::ClearContent(Path = '{0}')", path));
-        WriteWarning("The HDF5Provider::ClearContent() method has not (yet) been implemented.");
+        //WriteWarning("The HDF5Provider::ClearContent() method has not (yet) been implemented.");
         return;
     }
 
     Object^ Provider::ClearContentDynamicParameters(String^ path)
     {
         WriteVerbose(String::Format("HDF5Provider::ClearContentDynamicParameters(Path = '{0}')", path));
-        WriteWarning("The HDF5Provider::ClearContentDynamicParameters() method has not (yet) been implemented.");
+        //WriteWarning("The HDF5Provider::ClearContentDynamicParameters() method has not (yet) been implemented.");
         return nullptr;
     }
 
@@ -76,14 +77,31 @@ namespace PSH5X
     IContentWriter^ Provider::GetContentWriter(String ^ path)
     {
         WriteVerbose(String::Format("HDF5Provider::GetContentWriter(Path = '{0}')", path));
-        WriteWarning("The HDF5Provider::GetContentWriter() method has not (yet) been implemented.");
-        return nullptr;
+
+        DriveInfo^ drive = nullptr;
+        String^ h5path = nullptr;
+        if (!ProviderUtils::TryGetDriveEtH5Path(path, ProviderInfo, drive, h5path))
+        {
+            ErrorRecord^ error = gcnew ErrorRecord(
+                gcnew ArgumentException("Ill-formed HDF5 path name and/or unable to obtain drive name!"),
+                "InvalidData", ErrorCategory::InvalidData, nullptr);
+            ThrowTerminatingError(error);
+        }
+
+        if (ProviderUtils::IsH5Dataset(drive->FileHandle, h5path))
+        {
+            return gcnew DatasetWriter(drive->FileHandle, h5path);
+        }
+        else {
+            WriteWarning("Invalid path or no content available for this item.");
+            return nullptr;
+        }
     }
 
     Object^ Provider::GetContentWriterDynamicParameters(String^ path)
     {
         WriteVerbose(String::Format("HDF5Provider::GetContentWriterDynamicParameters(Path = '{0}')", path));
-        WriteWarning("The HDF5Provider::GetContentWriterDynamicParameters() method has not (yet) been implemented.");
+        //WriteWarning("The HDF5Provider::GetContentWriterDynamicParameters() method has not (yet) been implemented.");
         return nullptr;
     }
 }
