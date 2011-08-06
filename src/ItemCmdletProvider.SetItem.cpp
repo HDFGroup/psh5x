@@ -71,9 +71,54 @@ namespace PSH5X
                 }
             }
 
-            // hid_t dset = H5Dopen2(drive->FileHandle, name, H5P_DEFAULT);
+            char* name = (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
+            hid_t dset = H5Dopen2(drive->FileHandle, name, H5P_DEFAULT);
+            hid_t dtype = H5Dget_type(dset);
+            hid_t ntype = H5Tget_native_type(dtype, H5T_DIR_ASCEND);
 
+            Type^ t = ProviderUtils::H5NativeType2DotNet(ntype);
 
+            Array^ buf = nullptr;
+
+            if (t != nullptr)
+            {
+                // value might be a PSObject
+                Object^ bobj = value;
+
+                try
+                {
+                    PSObject^ pso = nullptr;
+                    pso = safe_cast<PSObject^>(value);
+                    bobj = pso->BaseObject;
+                }
+                catch (...) {}
+
+                try
+                {
+                    Array^ a = safe_cast<Array^>(bobj);
+                    array<long long>^ dims = gcnew array<long long>(a->Rank);
+                    for (int i = 0; i < a->Rank; ++i) {
+                        dims[i] = a->GetLongLength(i);
+                    }
+
+                    buf = Array::CreateInstance(t, dims);
+                    Array::Copy(a, buf, a->Length);
+                    Console::WriteLine("{0} {1}", buf->Rank, buf->Length);
+                }
+                catch (...)
+                {
+                    Console::WriteLine("Ouch!");
+                }
+
+                H5Tclose(ntype);
+                H5Tclose(dtype);
+                H5Dclose(dset);
+            }
+            else
+            {
+                Console::WriteLine("Unsupported type!");
+                return;
+            }
 
 
             /*

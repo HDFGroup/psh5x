@@ -1444,9 +1444,8 @@ namespace PSH5X
             else if (H5Tequal(ntype, H5T_NATIVE_B64) > 0) { result = UInt64::typeid; }
         }
         else if (cls == H5T_OPAQUE) {
-            result = array<Byte>::typeid;
+            result = Byte::typeid;
         }
-
 
         return result;
     }
