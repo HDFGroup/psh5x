@@ -38,10 +38,12 @@ namespace PSH5X
 
     private:
 
-        array<System::Management::Automation::PSObject^>^ m_array;
+        hid_t m_h5file;
 
-        long long m_position;
-        
+        System::String^ m_h5path;
+
+        System::Array^ m_array;
+
     };
 
 }

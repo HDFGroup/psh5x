@@ -150,10 +150,10 @@ namespace PSH5X
                         throw gcnew ArgumentException("Unsupported base datatype for VLEN!");
                     }
                 }
-                else
+                else // atomic type
                 {
-                    hid_t base_type = H5Tget_super(mem_type);
-                    if (ProviderUtils::H5NativeType2DotNet(base_type) != nullptr)
+                    // TODO: parse out types
+                    if (ProviderUtils::H5NativeType2DotNet(mem_type) != nullptr)
                     {
                     }
                     else {
