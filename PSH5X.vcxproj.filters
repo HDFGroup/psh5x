@@ -157,5 +157,11 @@
     <ClInclude Include="include\DatasetWriter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\DatasetReaderT.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\DatasetWriterT.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

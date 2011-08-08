@@ -147,6 +147,14 @@ namespace PSH5X
 
         static System::Reflection::MethodInfo^ BitConverterMethod(hid_t type_id);
 
+        static bool IsH5SimpleType(hid_t dtype);
+
+        static bool IsH5ArrayType(hid_t dtype);
+
+        static bool IsH5CompoundType(hid_t dtype);
+
+        static bool IsH5VlenType(hid_t dtype);
+
 #pragma endregion
 
 #pragma region HDF5 Attribute

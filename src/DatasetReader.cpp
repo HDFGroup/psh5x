@@ -23,170 +23,187 @@ namespace PSH5X
     DatasetReader::DatasetReader(hid_t h5file, String^ h5path)
         : m_array(nullptr), m_position(0)
     {
-        if (ProviderUtils::IsH5Dataset(h5file, h5path))
+        Exception^ ex = nullptr;
+
+        char* name = (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
+
+#pragma region HDF5 handles
+
+        hid_t dset = -1, ftype = -1, ntype = -1, fspace = -1, mspace = -1;
+
+        dset = H5Dopen2(h5file, name, H5P_DEFAULT);
+        if (dset < 0) {
+            ex = gcnew ArgumentException("H5Dopen2 failed!");
+            goto error;
+        }
+
+        ftype = H5Dget_type(dset);
+        if (ftype < 0) {
+            ex = gcnew ArgumentException("H5Dget_type failed!");
+            goto error;
+        }
+
+        ntype = H5Tget_native_type(ftype, H5T_DIR_ASCEND);
+        if (ntype < 0) {
+            ex = gcnew ArgumentException("H5Tget_native_type failed!");
+            goto error;
+        }
+
+        fspace = H5Dget_space(dset);
+        if (fspace < 0) {
+            ex = gcnew ArgumentException("H5Dget_space failed!");
+            goto error;
+        }
+
+#pragma endregion
+
+        size_t size = H5Tget_size(ntype);
+
+        hssize_t npoints = H5Sget_simple_extent_npoints(fspace);
+        if (npoints > 0)
         {
-            char* name = (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
-            hid_t dset = H5Dopen2(h5file, name, H5P_DEFAULT);
-            if (dset < 0) {
-                throw gcnew ArgumentException("H5Dopen2 failed!");
+            hsize_t dims[1];
+            dims[0] = static_cast<hsize_t>(npoints);
+            mspace = H5Screate_simple(1, dims, NULL);
+
+            array<unsigned char>^ mbuf = gcnew array<unsigned char>(npoints*size);
+
+            pin_ptr<unsigned char> p = &mbuf[0];
+            unsigned char* buf = p;
+
+            if (H5Dread(dset, ntype, mspace, H5S_ALL, H5P_DEFAULT, buf) < 0) {
+                ex = gcnew ArgumentException("H5Dread failed!");
+                goto error;
             }
 
-            hid_t file_type = H5Dget_type(dset);
-            if (file_type < 0) {
-                throw gcnew ArgumentException("H5Dget_type failed!");
-            }
-            hid_t mem_type = H5Tget_native_type(file_type, H5T_DIR_ASCEND);
-            if (mem_type < 0) {
-                throw gcnew ArgumentException("H5Tget_native_type failed!");
-            }
+            m_array = gcnew array<PSObject^>(dims[0]);
 
-            Hashtable^ type = ProviderUtils::ParseH5Type(mem_type);
-            bool isCompound = false, isArray = false, isVlen = false;
-            if (((String^)type["Class"]) == "COMPOUND") {
-                isCompound = true;
-            }
-            else if (((String^)type["Class"]) == "ARRAY") {
-                isArray = true;
-            }
-            else if (((String^)type["Class"]) == "VLEN") {
-                isVlen = true;
-            }
+            array<unsigned char>^ row = gcnew array<unsigned char>(size);
 
-            size_t size = H5Tget_size(mem_type);
-
-            hid_t file_space = H5Dget_space(dset);
-            if (file_space < 0) {
-                throw gcnew ArgumentException("H5Dget_space failed!");
-            }
-
-            hssize_t npoints = H5Sget_simple_extent_npoints(file_space);
-            if (npoints > 0)
+            if (ProviderUtils::IsH5CompoundType(ntype))
             {
-                hsize_t dims[1];
-                dims[0] = static_cast<hsize_t>(npoints);
-                hid_t mem_space = H5Screate_simple(1, dims, NULL);
-
-                array<unsigned char>^ mbuf = gcnew array<unsigned char>(npoints*size);
-
-                pin_ptr<unsigned char> p = &mbuf[0];
-                unsigned char* buf = p;
-
-                if (H5Dread(dset, mem_type, mem_space, H5S_ALL, H5P_DEFAULT, buf) < 0)
-                {
-                    throw gcnew ArgumentException("H5Dread failed!");
-                }
+#pragma region HDF5 compound type
 
                 m_array = gcnew array<PSObject^>(dims[0]);
 
-                array<unsigned char>^ row = gcnew array<unsigned char>(size);
+                int mcount = H5Tget_nmembers(ntype);
+                array<String^>^ mname = gcnew array<String^>(mcount);
+                array<int>^ msize = gcnew array<int>(mcount);
+                array<int>^ moffset = gcnew array<int>(mcount);
+                array<MethodInfo^>^ minfo = gcnew array<MethodInfo^>(mcount);
 
-                if (isCompound)
-                {   
-                    int mcount = H5Tget_nmembers(mem_type);
-                    array<String^>^ mname = gcnew array<String^>(mcount);
-                    array<int>^ msize = gcnew array<int>(mcount);
-                    array<int>^ moffset = gcnew array<int>(mcount);
-                    array<MethodInfo^>^ minfo = gcnew array<MethodInfo^>(mcount);
+                Type^ magicType = System::BitConverter::typeid;
 
-                    Type^ magicType = System::BitConverter::typeid;
+                for (int i = 0; i < mcount; ++i)
+                {
+                    moffset[i] = safe_cast<int>(H5Tget_member_offset(ntype, i));
+                    char* name = H5Tget_member_name(ntype, safe_cast<unsigned>(i));
+                    mname[i] = gcnew String(name);
 
-                    for (int i = 0; i < mcount; ++i)
+                    hid_t mtype = H5Tget_member_type(ntype, safe_cast<unsigned>(i));
+                    msize[i] = safe_cast<int>(H5Tget_size(mtype));
+                    minfo[i] = ProviderUtils::BitConverterMethod(mtype);
+                    H5Tclose(mtype);
+                }
+
+                for (long long i = 0; i < m_array->LongLength; ++i)
+                {
+                    Array::Copy(mbuf, size*i, row, 0, size);
+
+                    m_array[i] = gcnew PSObject();
+
+                    for (int m = 0; m < mcount; ++m)
                     {
-                        moffset[i] = safe_cast<int>(H5Tget_member_offset(mem_type, i));
-                        char* name = H5Tget_member_name(mem_type, safe_cast<unsigned>(i));
-                        mname[i] = gcnew String(name);
-                        hid_t mtype = H5Tget_member_type(mem_type, safe_cast<unsigned>(i));
-                        msize[i] = safe_cast<int>(H5Tget_size(mtype));
-                        minfo[i] = ProviderUtils::BitConverterMethod(mtype);
-                        H5Tclose(mtype);
-                    }
-
-                    for (long long i = 0; i < m_array->LongLength; ++i)
-                    {
-                        Array::Copy(mbuf, size*i, row, 0, size);
-
-                        m_array[i] = gcnew PSObject();
-
-                        for (int m = 0; m < mcount; ++m)
-                        {
-                            if (minfo[m] != nullptr) {
-                                m_array[i]->Properties->Add(
-                                    gcnew PSNoteProperty(mname[m],
-                                        minfo[m]->Invoke(nullptr,
-                                            gcnew array<Object^>{row, moffset[m]})));
-                            }
-                            else {
-                                m_array[i]->Properties->Add(
-                                    gcnew PSNoteProperty(mname[m],
-                                        BitConverter::ToString(row, moffset[m],
-                                            msize[m])));
-                            }
+                        if (minfo[m] != nullptr) {
+                            m_array[i]->Properties->Add(
+                                gcnew PSNoteProperty(mname[m],
+                                minfo[m]->Invoke(nullptr,
+                                gcnew array<Object^>{row, moffset[m]})));
+                        }
+                        else {
+                            m_array[i]->Properties->Add(
+                                gcnew PSNoteProperty(mname[m],
+                                BitConverter::ToString(row, moffset[m],
+                                msize[m])));
                         }
                     }
                 }
-                else if (isArray)
-                {
-                    hid_t base_type = H5Tget_super(mem_type);
-                    if (ProviderUtils::H5NativeType2DotNet(base_type) != nullptr)
-                    {
-                        int rank = H5Tget_array_ndims(mem_type);
-                        hsize_t* dims = new hsize_t [rank];
-                        rank = H5Tget_array_dims2(mem_type, dims);
 
-
-                        delete [] dims;
-                    }
-                    else {
-                        throw gcnew ArgumentException("Unsupported base datatype for ARRAY!");
-                    }
-                }
-                else if (isVlen)
-                {
-                    hid_t base_type = H5Tget_super(mem_type);
-                    if (ProviderUtils::H5NativeType2DotNet(base_type) != nullptr)
-                    {
-                    }
-                    else {
-                        throw gcnew ArgumentException("Unsupported base datatype for VLEN!");
-                    }
-                }
-                else // atomic type
-                {
-                    // TODO: parse out types
-                    if (ProviderUtils::H5NativeType2DotNet(mem_type) != nullptr)
-                    {
-                    }
-                    else {
-                        throw gcnew ArgumentException("Unsupported datatype!");
-                    }
-
-                    for (long long i = 0; i < m_array->LongLength; ++i)
-                    {    
-                        Array::Copy(mbuf, size*i, row, 0, size);
-                        m_array[i] = gcnew PSObject(BitConverter::ToString(row, 0, size));
-                    }
-                }
+#pragma endregion
             }
-            else
+            else if (ProviderUtils::IsH5ArrayType(ntype))
             {
-                m_array = gcnew array<PSObject^>(0);
-            }
+#pragma region HDF5 array type
 
-            if (H5Sclose(file_space) < 0) { // TODO
+                m_array = gcnew array<PSObject^>(dims[0]);
+
+                hid_t base_type = H5Tget_super(ntype);
+                if (ProviderUtils::H5NativeType2DotNet(base_type) != nullptr)
+                {
+                    int rank = H5Tget_array_ndims(ntype);
+                    hsize_t* dims = new hsize_t [rank];
+                    rank = H5Tget_array_dims2(ntype, dims);
+
+
+                    delete [] dims;
+                }
+                else {
+                    throw gcnew ArgumentException("Unsupported base datatype for ARRAY!");
+                }
+
+#pragma endregion
             }
-            if (H5Tclose(mem_type) < 0) { // TODO
+            else if (ProviderUtils::IsH5VlenType(ntype))
+            {
+#pragma region HDF5 variable length type
+
+                m_array = gcnew array<PSObject^>(dims[0]);
+
+                hid_t base_type = H5Tget_super(ntype);
+                if (ProviderUtils::H5NativeType2DotNet(base_type) != nullptr)
+                {
+                }
+                else {
+                    throw gcnew ArgumentException("Unsupported base datatype for VLEN!");
+                }
+
+#pragma endregion
             }
-            if (H5Tclose(file_type) < 0) { // TODO
-            }
-            if (H5Dclose(dset) < 0) { // TODO
+            else // atomic type
+            {
+                ex = gcnew ArgumentException("Unsupported datatype!");
+                goto error;
             }
         }
-        else {
-            throw gcnew ArgumentException(
-                String::Format("'{0}' is not an HDF5 dataset.", h5path));
+        else
+        {
+            m_array = gcnew array<PSObject^>(0);
+        }
+
+error:
+
+        if (mspace >= 0) {
+            H5Sclose(mspace);
+        }
+        if (fspace >= 0) {
+            H5Sclose(fspace);
+        }
+        if (ntype >= 0) {
+            H5Tclose(ntype);
+        }
+        if (ftype >= 0) {
+            H5Tclose(ftype);
+        }
+        if (dset >= 0) {
+            H5Dclose(dset);
+        }
+
+        if (ex != nullptr) {
+            throw ex;
         }
     }
 
+    /*
     DatasetReader::DatasetReader(hid_t h5file, String^ h5path,
         array<hsize_t>^ start, array<hsize_t>^ stride,
         array<hsize_t>^ count, array<hsize_t>^ block)
@@ -198,7 +215,7 @@ namespace PSH5X
         : m_array(nullptr), m_position(0)
     {
     }
-
+    */
 
     IList^ DatasetReader::Read(long long readCount)
     {

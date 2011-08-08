@@ -1329,7 +1329,6 @@ namespace PSH5X
         return result;
     }
 
-
     bool ProviderUtils::IsSupportedH5Type(String^ type)
     {
         String^ t = type->ToUpper();
@@ -1514,5 +1513,33 @@ namespace PSH5X
         }
 
         return minfo;
+    }
+
+    bool ProviderUtils::IsH5SimpleType(hid_t dtype)
+    {
+        H5T_class_t cls = H5Tget_class(dtype);
+
+        return (cls != H5T_COMPOUND && cls != H5T_VLEN && cls != H5T_ARRAY);
+    }
+
+    bool ProviderUtils::IsH5ArrayType(hid_t dtype)
+    {
+        H5T_class_t cls = H5Tget_class(dtype);
+
+        return (cls == H5T_ARRAY);
+    }
+
+    bool ProviderUtils::IsH5CompoundType(hid_t dtype)
+    {
+        H5T_class_t cls = H5Tget_class(dtype);
+
+        return (cls == H5T_COMPOUND);
+    }
+
+    bool ProviderUtils::IsH5VlenType(hid_t dtype)
+    {
+        H5T_class_t cls = H5Tget_class(dtype);
+
+        return (cls == H5T_VLEN);
     }
 }

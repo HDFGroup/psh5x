@@ -147,7 +147,9 @@
     <ClInclude Include="include\DatasetInfo.h" />
     <ClInclude Include="include\DatasetInfoLite.h" />
     <ClInclude Include="include\DatasetReader.h" />
+    <ClInclude Include="include\DatasetReaderT.h" />
     <ClInclude Include="include\DatasetWriter.h" />
+    <ClInclude Include="include\DatasetWriterT.h" />
     <ClInclude Include="include\DataspaceInfo.h" />
     <ClInclude Include="include\DatatypeInfo.h" />
     <ClInclude Include="include\DriveInfo.h" />
