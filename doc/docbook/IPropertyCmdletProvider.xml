@@ -9,7 +9,30 @@
 
     <sect2 xml:id="get_item_property">
         <title><literal>Get-ItemProperty</literal></title>
-        <para/>
+        <para>The <literal>Get-ItemProperty</literal> cmdlet gets the properties of the specified
+            items. For example, you can use <literal>Get-ItemProperty</literal> to get the value of
+            the LastAccessTime property of a file object. You can also use
+                <literal>Get-ItemProperty</literal> to view registry entries and their
+            values.</para>
+        <cmdsynopsis>
+            <command>Get-ItemProperty</command>
+            <arg choice="req">-Path <replaceable>string[]</replaceable></arg>
+            <arg choice="opt">-Name <replaceable>string[]</replaceable></arg>
+        </cmdsynopsis>
+        <variablelist>
+            <varlistentry>
+                <term><literal>-Path</literal></term>
+                <listitem>
+                    <para>Specifies the path to the item or items.</para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>-Name</term>
+                <listitem>
+                    <para>Specifies the name of the property or properties to retrieve.</para>
+                </listitem>
+            </varlistentry>
+        </variablelist>
     </sect2>
 
     <sect2 xml:id="set_item_property">

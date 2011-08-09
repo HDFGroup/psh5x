@@ -9,7 +9,7 @@
 
     <sect2 xml:id="join_path">
         <title><literal>Join-Path</literal></title>
-        <para>The Join-Path cmdlet combines a path and child-path into a single path. The provider
+        <para>The <literal>Join-Path</literal>  cmdlet combines a path and child-path into a single path. The provider
             supplies the path delimiters.</para>
         <cmdsynopsis>
             <command>Join-Path</command>

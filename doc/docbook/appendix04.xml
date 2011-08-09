@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://www.oasis-open.org/docbook/xml/5.0/rng/docbookxi.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<appendix xml:id="appdx_hdf5_sample" xmlns="http://docbook.org/ns/docbook"
+    xmlns:xi="http://www.w3.org/2001/XInclude">
+    <title>A Sample HDF5 File</title>
+    <para> Throughout the text we use a sample HDF5 file whose <command>h5dump</command> output is
+        shown below.
+        <programlisting>
+            <xi:include parse="text" href="ps1/BNF.txt"/>
+        </programlisting>
+    </para>
+    <para> Below, a PowerShell script is shown that would recreate the HDF5 objects in <filename>h5tmp:\</filename>
+        <programlisting>
+            <xi:include parse="text" href="ps1/Create-BNFSample.ps1"/>
+        </programlisting>
+    </para>
+</appendix>

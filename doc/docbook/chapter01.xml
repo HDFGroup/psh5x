@@ -81,5 +81,10 @@
     <title>Path-ology</title>
     <para>Providers use paths to locate items in a data source.</para>
   </sect1>
+  
+  <sect1>
+    <title>Conventions</title>
+    <para></para>
+  </sect1>
 
 </chapter>

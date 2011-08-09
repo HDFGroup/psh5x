@@ -35,6 +35,7 @@ namespace PSH5X
     void Provider::GetProperty(String^ path, Collection<String^>^ providerSpecificPickList)
     {
         WriteVerbose(String::Format("HDF5Provider::GetProperty(Path = '{0}')", path));
+
         String^ npath = ProviderUtils::NormalizePath(path);
         String^ h5path = ProviderUtils::PathNoDrive(npath);
         if (!ProviderUtils::IsWellFormedH5Path(h5path)) { return; }
@@ -139,13 +140,18 @@ namespace PSH5X
     void Provider::SetProperty(String^ path, PSObject^ propertyValue)
     {
         WriteVerbose(String::Format("HDF5Provider::SetProperty(Path = '{0}')", path));
-        WriteWarning("The HDF5Provider::SetProperty() method has not (yet) been implemented.");
         return;
     }
 
     Object^ Provider::SetPropertyDynamicParameters(String^ path, PSObject^ propertyValue)
     {
         WriteVerbose(String::Format("HDF5Provider::SetPropertyDynamicParameters(Path = '{0}')", path));
+
+        ErrorRecord^ error = gcnew ErrorRecord(
+            gcnew InvalidProgramException("HDF5Provider::SetPropertyDynamicParameters(...) not implemented!"),
+            "HDF5Provider", ErrorCategory::InvalidData, nullptr);
+        WriteError(error);
+        
         return nullptr;
     }
 

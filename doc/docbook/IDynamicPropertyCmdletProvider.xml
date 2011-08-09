@@ -9,17 +9,98 @@
 
     <sect2 xml:id="new_item_property">
         <title><literal>New-ItemProperty</literal></title>
-        <para/>
+        <para>The <literal>New-ItemProperty</literal> cmdlet creates a new property for a specified
+            item and sets its value. Typically, this cmdlet is used to create new registry values,
+            because registry values are properties of a registry key item.</para>
+        <cmdsynopsis>
+            <command>Get-ItemProperty</command>
+            <arg choice="req">-Path <replaceable>string[]</replaceable></arg>
+            <arg choice="req">-Name <replaceable>string[]</replaceable></arg>
+            <arg choice="opt">-Value <replaceable>Object</replaceable></arg>
+            <sbr/>
+            <arg choice="opt">-ElementType <replaceable>Object</replaceable></arg>
+            <arg choice="opt">-Simple <replaceable>Int64[]</replaceable></arg>
+            <arg choice="opt">-Null</arg>
+        </cmdsynopsis>
+        <variablelist>
+            <varlistentry>
+                <term><literal>-Path</literal></term>
+                <listitem>
+                    <para>Specifies the path to the item. This parameter identifies the item to
+                        which the new property will be added.</para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>-Name</term>
+                <listitem>
+                    <para>Specifies a name for the new property.</para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>-Value</term>
+                <listitem>
+                    <para>Specifies the property value.</para>
+                </listitem>
+            </varlistentry>
+        </variablelist>
     </sect2>
 
     <sect2 xml:id="remove_item_property">
         <title><literal>Remove-ItemProperty</literal></title>
-        <para/>
+        <para>The <literal>Remove-ItemProperty</literal> cmdlet deletes a property and its value
+            from an item.</para>
+        <cmdsynopsis>
+            <command>Remove-ItemProperty</command>
+            <arg choice="req">-Path <replaceable>string[]</replaceable></arg>
+            <arg choice="req">-Name <replaceable>string[]</replaceable></arg>
+        </cmdsynopsis>
+        <variablelist>
+            <varlistentry>
+                <term><literal>-Path</literal></term>
+                <listitem>
+                    <para>Specifies the path to the item whose properties are being removed.
+                        Wildcards are permitted.</para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>-Name</term>
+                <listitem>
+                    <para>Specifies the names of the properties to be removed.</para>
+                </listitem>
+            </varlistentry>
+        </variablelist>
     </sect2>
 
     <sect2 xml:id="rename_item_property">
         <title><literal>Rename-ItemProperty</literal></title>
-        <para/>
+        <para>The <literal>Rename-ItemProperty</literal>cmdlet changes the name of a specified item
+            property. The value of the property is not changed.</para>
+        <cmdsynopsis>
+            <command>Rename-ItemProperty</command>
+            <arg choice="req">-Path <replaceable>string</replaceable></arg>
+            <arg choice="req">-Name <replaceable>string</replaceable></arg>
+            <arg choice="req">-NewName <replaceable>string</replaceable></arg>
+        </cmdsynopsis>
+        <variablelist>
+            <varlistentry>
+                <term><literal>-Path</literal></term>
+                <listitem>
+                    <para>Specifies the path to the item whose property is to be renamed.</para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>-Name</term>
+                <listitem>
+                    <para>Specifies the current name of the property to be renamed.</para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>-NewName</term>
+                <listitem>
+                    <para>Specifies the new name for the property.</para>
+                </listitem>
+            </varlistentry>
+        </variablelist>
     </sect2>
 
     <sect2 xml:id="copy_item_property">

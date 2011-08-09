@@ -1,28 +1,55 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-model href="http://www.oasis-open.org/docbook/xml/5.0/rng/docbookxi.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
 <info xmlns="http://docbook.org/ns/docbook" version="5.0">
-  
+
   <edition>1</edition>
 
-  <author>
-    <personname>
-      <firstname>Gerd</firstname>
-      <surname>Heber</surname>
-    </personname>
 
-    <email>gheber@hdfgroup.org</email>
-    
-    <affiliation>
-      <jobtitle>Applications Architect</jobtitle>
-      <orgname>The HDF Group</orgname>
-      <address>
+  <authorgroup>
+    <author>
+      <personname>
+        <firstname>Gerd</firstname>
+        <surname>Heber</surname>
+      </personname>
+
+      <email>gheber@hdfgroup.org</email>
+
+      <affiliation>
+        <jobtitle>Applications Architect</jobtitle>
+        <orgname>The HDF Group</orgname>
+        <address>
         <street>1800 South Oak Street, Suite 203</street>
         <city>Champaign</city>
         <state>Illinois</state>
         <postcode>61820</postcode>
         <country>USA</country>
       </address>
-    </affiliation>
-  </author>
+      </affiliation>
+    </author>
+
+    <author>
+      <personname>
+        <firstname>Mike</firstname>
+        <surname>Folk</surname>
+      </personname>
+
+      <email>mfolk@hdfgroup.org</email>
+
+      <affiliation>
+        <jobtitle>President</jobtitle>
+        <orgname>The HDF Group</orgname>
+        <address>
+        <street>1800 South Oak Street, Suite 203</street>
+        <city>Champaign</city>
+        <state>Illinois</state>
+        <postcode>61820</postcode>
+        <country>USA</country>
+      </address>
+      </affiliation>
+    </author>
+
+
+  </authorgroup>
+
 
 </info>

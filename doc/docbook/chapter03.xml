@@ -7,6 +7,105 @@
   <sect1 xml:id="lookup">
     <title>Lookup Cmdlets</title>
     <para/>
+
+    <sect2>
+      <title><literal>Show-H5Types</literal></title>
+      <para>The <literal>Show-H5Types</literal> cmdlet displays all pre-defined HDF5 datatype names
+        and their defintions.</para>
+      <cmdsynopsis>
+        <command>Show-H5Types</command>
+        <arg choice="opt">-Bifield</arg>
+        <arg choice="opt">-Float</arg>
+        <arg choice="opt">-Integer</arg>
+        <arg choice="opt">-Native</arg>
+        <arg choice="opt">-Reference</arg>
+        <arg choice="opt">-Standard</arg>
+      </cmdsynopsis>
+      <variablelist>
+        <varlistentry>
+          <term><literal>-Bifield</literal></term>
+          <listitem>
+            <para>List HDF5 datatypes of class bitfield only.</para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term><literal>-Float</literal></term>
+          <listitem>
+            <para>List HDF5 datatypes of class float only.</para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term><literal>-Integer</literal></term>
+          <listitem>
+            <para>List HDF5 datatypes of class integer only.</para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term><literal>-Native</literal></term>
+          <listitem>
+            <para>List native HDF5 datatypes only.</para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term><literal>-Reference</literal></term>
+          <listitem>
+            <para>List HDF5 datatypes of class reference only.</para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term><literal>-Standard</literal></term>
+          <listitem>
+            <para>List standard HDF5 datatypes only.</para>
+          </listitem>
+        </varlistentry>
+      </variablelist>
+
+      <example>
+        <title>Show all pre-defined HDF5 float datatypes</title>
+        <screen>
+<prompt>PS:1 ></prompt> <command>Show-H5Types -Float</command>
+
+Name                           Value
+----                           -----
+H5T_IEEE_F64LE                 {SignBitPos, MantBitPos, ExpBias, ByteOrder...}
+H5T_IEEE_F64BE                 {SignBitPos, MantBitPos, ExpBias, ByteOrder...}
+H5T_IEEE_F32BE                 {SignBitPos, MantBitPos, ExpBias, ByteOrder...}
+H5T_NATIVE_DOUBLE              {SignBitPos, MantBitPos, ExpBias, ByteOrder...}
+H5T_NATIVE_LDOUBLE             {SignBitPos, MantBitPos, ExpBias, ByteOrder...}
+H5T_IEEE_F32LE                 {SignBitPos, MantBitPos, ExpBias, ByteOrder...}
+H5T_NATIVE_FLOAT               {SignBitPos, MantBitPos, ExpBias, ByteOrder...}
+
+ </screen>
+      </example>
+
+      <example>
+        <title>Show details for H5T_IEEE_F64LE</title>
+        <screen>  
+<prompt>PS:1 ></prompt> <command>(Show-H5Types).H5T_IEEE_F64LE</command>
+
+Name                           Value
+----                           -----
+SignBitPos                     63
+MantBitPos                     0
+ExpBias                        1023
+ByteOrder                      LE
+ExpBitPos                      52
+IntlBitPadding                 Zero
+BitOffset                      0
+Precision                      64
+MantNorm                       Implied
+LSBitPadding                   Zero
+Class                          FLOAT
+MSBitPadding                   Zero
+ExpBits                        11
+Size                           8
+MantBits                       52
+
+        </screen>
+      </example>
+
+    </sect2>
+
   </sect1>
 
 </chapter>
