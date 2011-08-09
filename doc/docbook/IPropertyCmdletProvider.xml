@@ -7,19 +7,23 @@
     <title>IPropertyCmdletProvider</title>
     <para/>
 
-    <sect2 xml:id="clear_item_property">
-        <title>Clear-ItemProperty</title>
-        <para/>
-    </sect2>
-
     <sect2 xml:id="get_item_property">
-        <title>Get-ItemProperty</title>
+        <title><literal>Get-ItemProperty</literal></title>
         <para/>
     </sect2>
 
     <sect2 xml:id="set_item_property">
-        <title>Set-ItemProperty</title>
-        <para/>
+        <title><literal>Set-ItemProperty</literal></title>
+        <note>
+            <para>Not implemented. (Coming soon...)</para>
+        </note>
+    </sect2>
+
+    <sect2 xml:id="clear_item_property">
+        <title><literal>Clear-ItemProperty</literal></title>
+        <note>
+            <para>Not implemented.</para>
+        </note>
     </sect2>
 
 </sect1>

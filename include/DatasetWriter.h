@@ -33,7 +33,7 @@ namespace PSH5X
 
         virtual void Seek(long long offset, System::IO::SeekOrigin origin)
         {
-            System::Console::WriteLine("DatasetWriter::Seek() not implemented!");
+            throw gcnew System::ArgumentException("DatasetWriter::Seek() not implemented!");
         }
 
     private:

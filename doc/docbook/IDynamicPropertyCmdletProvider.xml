@@ -7,29 +7,33 @@
     <title>IDynamicPropertyCmdletProvider</title>
     <para/>
 
-    <sect2 xml:id="copy_item_property">
-        <title>Copy-ItemProperty</title>
-        <para/>
-    </sect2>
-
-    <sect2 xml:id="move_item_property">
-        <title>Move-ItemProperty</title>
-        <para/>
-    </sect2>
-
     <sect2 xml:id="new_item_property">
-        <title>New-ItemProperty</title>
+        <title><literal>New-ItemProperty</literal></title>
         <para/>
     </sect2>
 
     <sect2 xml:id="remove_item_property">
-        <title>Remove-ItemProperty</title>
+        <title><literal>Remove-ItemProperty</literal></title>
         <para/>
     </sect2>
 
     <sect2 xml:id="rename_item_property">
-        <title>Rename-ItemProperty</title>
+        <title><literal>Rename-ItemProperty</literal></title>
         <para/>
+    </sect2>
+
+    <sect2 xml:id="copy_item_property">
+        <title><literal>Copy-ItemProperty</literal></title>
+        <note>
+            <para>Not implemented.</para>
+        </note>
+    </sect2>
+
+    <sect2 xml:id="move_item_property">
+        <title><literal>Move-ItemProperty</literal></title>
+        <note>
+            <para>Not implemented.</para>
+        </note>
     </sect2>
 
 </sect1>

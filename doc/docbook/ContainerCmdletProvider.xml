@@ -5,61 +5,335 @@
     version="5.0">
 
     <title>ContainerCmdletProvider</title>
-    <para/>
-
-    <sect2 xml:id="copy_item">
-        <title>Copy-Item</title>
-        <para/>
-    </sect2>
+    <para>The <literal>ContainerCmdletProvider</literal> class derives from the
+            <literal>ItemCmdletProvider</literal> class and adds the notion of a <emphasis>container
+            item</emphasis> that may contain other items. Items in a container are considerd child
+        items which gives rise to a parent-child relationship. HDF5 groups are the only container
+        items supported in PSH5X.</para>
 
     <sect2 xml:id="get_child_item">
-        <title>Get-ChildItem</title>
-        <para/>
+        <title><literal>Get-ChildItem</literal>
+        </title>
+        <cmdsynopsis>
+            <command>Get-ChildItem</command>
+            <arg choice="req">-Path <replaceable>string[]</replaceable></arg>
+            <arg choice="opt">-Recurse</arg>
+        </cmdsynopsis>
+        <para> The <literal>Get-ChildItem</literal> cmdlet gets the items in one or more specified
+            locations. If the item is a container, it gets the items inside the container, known as
+            child items. You can use the Recurse parameter to get items in all child
+            containers.</para>
+        <variablelist>
+            <varlistentry>
+                <term><literal>-Path</literal></term>
+                <listitem>
+                    <para>Specifies a path to one or more locations. Wildcards are permitted. The
+                        default location is the current directory (.).</para>
+                </listitem>
+            </varlistentry>
+        </variablelist>
+        <example>
+            <title>Getting the children of the PSDrive with root <literal>h5tmp:\</literal></title>
+            <screen>
+<prompt>PS:1 ></prompt> <command>Get-ChildItem h5tmp:\</command>
+
+   PSParentPath: HDF5\HDF5::h5tmp:
+
+LinkName                 ItemType   LastWriteTime          #Attr.
+--------                 --------   -------------          ------
+dset1                    Dataset    8/8/2011 4:07:21 PM    0
+dset2                    Dataset    8/8/2011 4:05:00 PM    0
+dset3                    Dataset    8/8/2011 4:05:00 PM    0
+group1                   Group      1/1/1970 12:00:00 AM   0
+group2                   Group      1/1/1970 12:00:00 AM   0
+slink1                   SoftLink
+type1                    Datatyp... 1/1/1970 12:00:00 AM   0
+
+<prompt>PS:2 ></prompt> <command>Get-ChildItem h5tmp:\dset*</command>
+
+   PSParentPath: HDF5\HDF5::h5tmp:
+
+LinkName                 ItemType   LastWriteTime          #Attr.
+--------                 --------   -------------          ------
+dset1                    Dataset    8/8/2011 4:07:21 PM    0
+dset2                    Dataset    8/8/2011 4:05:00 PM    0
+dset3                    Dataset    8/8/2011 4:05:00 PM    0                
+            </screen>
+        </example>
+        <example>
+            <title>Recursively getting the children of the PSDrive with root
+                    <literal>h5tmp:\</literal></title>
+            <screen>
+<prompt>PS:1 ></prompt> <command>Get-ChildItem h5tmp:\ -Recurse</command>
+
+   PSParentPath: HDF5\HDF5::h5tmp:
+
+LinkName                 ItemType   LastWriteTime          #Attr.
+--------                 --------   -------------          ------
+dset1                    Dataset    8/8/2011 4:07:21 PM    0
+dset2                    Dataset    8/8/2011 4:05:00 PM    0
+dset3                    Dataset    8/8/2011 4:05:00 PM    0
+group1                   Group      1/1/1970 12:00:00 AM   0
+
+
+   PSParentPath: HDF5\HDF5::h5tmp:\group1
+
+LinkName                 ItemType   LastWriteTime          #Attr.
+--------                 --------   -------------          ------
+dset3                    Dataset    8/8/2011 4:05:00 PM    0
+
+
+   PSParentPath: HDF5\HDF5::h5tmp:
+
+LinkName                 ItemType   LastWriteTime          #Attr.
+--------                 --------   -------------          ------
+group2                   Group      1/1/1970 12:00:00 AM   0
+slink1                   SoftLink
+type1                    Datatyp... 1/1/1970 12:00:00 AM   0
+
+            </screen>
+        </example>
     </sect2>
 
     <sect2 xml:id="new_item">
-        <title>New-Item</title>
+        <title><literal>New-Item</literal></title>
         <para/>
     </sect2>
 
     <sect2 xml:id="remove_item">
-        <title>Remove-Item</title>
-        <para/>
+        <title><literal>Remove-Item</literal></title>
+        <para> The <literal>Remove-Item</literal> cmdlet deletes one or more items. Because it is
+            supported by many providers, it can delete many different types of items. </para>
+        <cmdsynopsis>
+            <command>Remove-Item</command>
+            <arg choice="req">-Path <replaceable>string[]</replaceable></arg>
+            <arg choice="opt">-Recurse</arg>
+        </cmdsynopsis>
+        <variablelist>
+            <varlistentry>
+                <term><literal>-Path</literal></term>
+                <listitem>
+                    <para>Specifies a path to the items being removed. Wildcards are
+                        permitted.</para>
+                </listitem>
+            </varlistentry>
+        </variablelist>
+        <example>
+            <title>Remove items with a wildcard</title>
+            <screen>
+<prompt>PS:1 ></prompt> <command>Remove-Item h5tmp:\dset*</command>
+      </screen>
+        </example>
     </sect2>
 
     <sect2 xml:id="rename_item">
-        <title>Rename-Item</title>
-        <para/>
+        <title><literal>Rename-Item</literal></title>
+        <note>
+            <para>Not implemented. (Coming soon...)</para>
+        </note>
     </sect2>
 
     <sect2 xml:id="set_location">
-        <title>Set-Location</title>
-        <para/>
+        <title><literal>Set-Location</literal></title>
+        <para>The <literal>Set-Location</literal> cmdlet sets the working location to a specified
+            location. That location must be an item that corresponds to an HDF5 group.</para>
+        <cmdsynopsis>
+            <command>Set-Location</command>
+            <arg choice="req">-Path <replaceable>string</replaceable></arg>
+        </cmdsynopsis>
+        <variablelist>
+            <varlistentry>
+                <term><literal>-Path</literal></term>
+                <listitem>
+                    <para>This parameter is used to specify the path to a new working
+                        location.</para>
+                </listitem>
+            </varlistentry>
+        </variablelist>
+        <example>
+            <title>Set the working location to <literal>h5tmp:\group2</literal></title>
+            <screen>
+<prompt>PS:1 ></prompt> <command>Set-Location h5tmp:\group2; Get-ChildItem</command>
+      
+   PSParentPath: HDF5\HDF5::h5tmp:\group2
+
+LinkName                 ItemType   LastWriteTime          #Attr.
+--------                 --------   -------------          ------
+dset3                    Dataset    8/8/2011 4:05:00 PM    0    
+      </screen>
+        </example>
     </sect2>
 
     <sect2 xml:id="pop_location">
-        <title>Pop-Location</title>
-        <para/>
+        <title><literal>Pop-Location</literal></title>
+        <para> The <literal>Pop-Location</literal> cmdlet changes the current location to the
+            location most recently pushed onto the stack by using the
+                <literal>Push-Location</literal> cmdlet. You can pop a location from the default
+            stack or from a stack that you create by using a <literal>Push-Location</literal>
+            command. </para>
     </sect2>
 
     <sect2 xml:id="push_location">
-        <title>Push-Location</title>
-        <para/>
+        <title><literal>Push-Location</literal></title>
+        <para> The <literal>Push-Location</literal> cmdlet adds ("pushes") the current location to
+            the top of a list of locations, called a "stack." You can push the current location onto
+            a default stack or onto a stack that you create. If you specify a path,
+                <literal>Push-Location</literal> pushes the current location onto the stack and then
+            changes the current location to the location specified by the path. You cannot push a
+            location onto the stack unless it is the current location. </para>
     </sect2>
 
     <sect2 xml:id="get_location">
-        <title>Get-Location</title>
-        <para/>
+        <title><literal>Get-Location</literal></title>
+        <para>The <literal>Get-Location</literal> cmdlet gets an object that represents the current
+            directory, much like the pwd (print working directory) command. </para>
+        <para> When you move between Windows PowerShell drives, Windows PowerShell retains your
+            location in each drive. You can use <literal>Get-Location</literal> to find your
+            location in each drive.</para>
+        <example>
+            <title>Working with locations</title>
+            <screen>
+<prompt>PS:1 ></prompt> <command>Get-Location</command>
+
+Path
+----
+C:\
+
+<prompt>PS:2 ></prompt> <command>Set-Location h5tmp:\group1</command>
+<prompt>PS:3 ></prompt> <command>Push-Location</command>
+<prompt>PS:4 ></prompt> <command>Set-Location D:\</command>
+<prompt>PS:5 ></prompt> <command>Pop-Location</command>
+<prompt>PS:6 ></prompt> <command>Get-Location</command>
+                
+Path
+----
+h5tmp:\group1
+
+      </screen>
+        </example>
     </sect2>
 
     <sect2 xml:id="resolve_path">
-        <title>Resolve-Path</title>
-        <para/>
+        <title><literal>Resolve-Path</literal></title>
+        <para> The <literal>Resolve-Path</literal> cmdlet interprets the wildcard characters in a
+            path and displays the items and containers at the location specified by the path, such
+            as the files and folders or registry keys and subkeys.</para>
+        <cmdsynopsis>
+            <command>Resolve-Path</command>
+            <arg choice="req">-Path <replaceable>string[]</replaceable></arg>
+        </cmdsynopsis>
+        <variablelist>
+            <varlistentry>
+                <term><literal>-Path</literal></term>
+                <listitem>
+                    <para>Specifies the Windows PowerShell path to resolve. This parameter is
+                        required.</para>
+                </listitem>
+            </varlistentry>
+        </variablelist>
+        <example>
+            <title>Resolving a path</title>
+            <screen>
+<prompt>PS:1 ></prompt> <command>Resolve-Path h5tmp:\dset*</command>
+
+Path
+----
+h5tmp:\dset1
+h5tmp:\dset2
+h5tmp:\dset3
+
+        </screen>
+        </example>
     </sect2>
 
     <sect2 xml:id="test_path">
-        <title>Test-Path</title>
-        <para/>
+        <title><literal>Test-Path</literal></title>
+        <para> The <literal>Test-Path</literal> cmdlet determines whether all elements of the path
+            exist. It returns TRUE ($true) if all elements exist and FALSE ($false) if any are
+            missing. It can also tell whether the path syntax is valid and whether the path leads to
+            a container or a terminal (leaf) element.</para>
+        <cmdsynopsis>
+            <command>Test-Path</command>
+            <arg choice="req">-Path <replaceable>string[]</replaceable></arg>
+            <arg choice="opt">-IsValid</arg>
+            <arg choice="opt">-PathType <group>
+                    <option>Container,</option>
+                    <option>Leaf,</option>
+                    <option>Any</option>
+                </group>
+            </arg>
+        </cmdsynopsis>
+        <variablelist>
+            <varlistentry>
+                <term><literal>-Path</literal></term>
+                <listitem>
+                    <para>Specifies a path to be tested. Wildcards are permitted. If the path
+                        includes spaces, enclose it in quotation marks.</para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>-IsValid</term>
+                <listitem>
+                    <para> Determines whether the syntax of the path is correct, regardless of whe
+                        ther the elements of the path exist. This parameter returns TRUE if the path
+                        syntax is valid and FALSE if it is not.</para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>-PathType</term>
+                <listitem>
+                    <para> Tells whether the final element in the path is of a particular type. This
+                        parameter returns TRUE if the element is of the specified type and FALSE if
+                        it is not. </para>
+                    <para> Valid values are: <variablelist>
+                            <varlistentry>
+                                <term>Container</term>
+                                <listitem>
+                                    <para>An element that contains other elements, such as a
+                                        directory or registry key.</para>
+                                </listitem>
+                            </varlistentry>
+                            <varlistentry>
+                                <term>Leaf</term>
+                                <listitem>
+                                    <para>An element that does not contain other elements, such as a
+                                        file.</para>
+                                </listitem>
+                            </varlistentry>
+                            <varlistentry>
+                                <term>Any</term>
+                                <listitem>
+                                    <para> Either a container or a leaf. Tells whether the final
+                                        element in the path is of a particular type. Returns TRUE if
+                                        the element is of the specified type and FALSE if it is
+                                        not.</para>
+                                </listitem>
+                            </varlistentry>
+                        </variablelist>
+                    </para>
+                </listitem>
+            </varlistentry>
+        </variablelist>
+        <example>
+            <title>Testing paths</title>
+            <screen>
+<prompt>PS:1 ></prompt> <command>Test-Path h5tmp:\dset*</command>
+True
+<prompt>PS:2 ></prompt> <command>Test-Path h5tmp:\dsett*</command>
+False
+<prompt>PS:3 ></prompt> <command>Test-Path h5tmp:\dset* -IsValid</command>
+True
+<prompt>PS:3 ></prompt> <command>Test-Path h5tmp:\dset* -PathType Container</command>
+False
+        </screen>
+        </example>
+    </sect2>
+
+    <sect2 xml:id="copy_item">
+        <title><literal>Copy-Item</literal></title>
+        <note>
+            <para>Not implemented.</para>
+        </note>
     </sect2>
 
 </sect1>

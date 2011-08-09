@@ -125,7 +125,7 @@ error:
 
         virtual void Seek(long long offset, System::IO::SeekOrigin origin)
         {
-            System::Console::WriteLine("DatasetWriter->Seek()");
+            throw gcnew ArgumentException("DatasetWriter::Seek() not implemented!");
         }
 
     private:

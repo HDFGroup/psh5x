@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://www.oasis-open.org/docbook/xml/5.0/rng/docbookxi.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<appendix xml:id="appdx_psh5x_layers" xmlns="http://docbook.org/ns/docbook">
+    <title>The PSH5X Layers</title>
+    <figure xml:id="psh5x_mm">
+        <title >PSH5X Pseudo MindMap</title>
+        <mediaobject>
+            <imageobject>
+                <imagedata fileref="figs/PSH5X.rot.png" scale="31" align="center" valign="bottom"/>
+            </imageobject>
+        </mediaobject>
+    </figure>
+</appendix>

@@ -5,26 +5,130 @@
     version="5.0">
 
     <title>IContentCmdletProvider</title>
-    <para/>
+    <para> According to <xref linkend="items_et_properties_table"/>, only HDF5 datasets are
+        considered to have content. PSH5X implements the <literal>IContentCmdletProvider</literal>
+        interface providing row- or stream-oriented access to a dataset's data elements.</para>
 
     <sect2 xml:id="get_content">
-        <title>Get-Content</title>
+        <title><literal>Get-Content</literal></title>
+        <cmdsynopsis>
+            <command>Get-Content</command>
+            <arg choice="req">-Path <replaceable>string[]</replaceable></arg>
+            <arg choice="opt">-ReadCount <replaceable>Int64</replaceable></arg>
+            <arg choice="opt">-TotalCount <replaceable>Int64</replaceable></arg>
+            <sbr/>
+            <arg choice="opt">-Hyperslab <replaceable>Int64[4]</replaceable></arg>
+            <arg choice="opt">-PointSet <replaceable>Int64[,]</replaceable></arg>
+        </cmdsynopsis>
+        <variablelist>
+            <varlistentry>
+                <term><literal>-Path</literal></term>
+                <listitem>
+                    <para>An HDF5 path name referring to the HDF5 dataset whose content is to be
+                        accessed</para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term><literal>-ReadCount</literal></term>
+                <listitem>
+                    <para>Specifies how many lines of content are sent through the pipeline at a
+                        time. The default value is 1. A value of 0 (zero) sends all of the content
+                        at one time.</para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term><literal>-TotalCount</literal></term>
+                <listitem>
+                    <para> Specifies how many lines of content are retrieved. The default is -1 (all
+                        lines).</para>
+                </listitem>
+            </varlistentry>
+        </variablelist>
         <para/>
+        <example>
+            <title>Getting the first 10 elements of a dataset</title>
+            <screen>
+<prompt>PS:1 ></prompt> <command>Get-Content h5tmp:\dset1 -TotalCount 10</command>
+0
+1
+4
+9
+16
+25
+36
+49
+64
+81
+      </screen>
+        </example>
     </sect2>
 
     <sect2 xml:id="set_content">
-        <title>Set-Content</title>
-        <para/>
+        <title><literal>Set-Content</literal></title>
+        <cmdsynopsis>
+            <command>Set-Content</command>
+            <arg choice="req">-Path <replaceable>string[]</replaceable></arg>
+            <arg choice="req">-Value <replaceable>Object[]</replaceable></arg>
+            <sbr/>
+            <arg choice="opt">-Hyperslab <replaceable>Int64[4]</replaceable></arg>
+            <arg choice="opt">-PointSet <replaceable>Int64[,]</replaceable></arg>
+        </cmdsynopsis>
+        <variablelist>
+            <varlistentry>
+                <term><literal>-Path</literal></term>
+                <listitem>
+                    <para>An HDF5 path name referring to the HDF5 dataset whose content is to be
+                        accessed</para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term><literal>-Value</literal></term>
+                <listitem>
+                    <para>Specifies the new content for the item.</para>
+                </listitem>
+            </varlistentry>
+        </variablelist>
+        <example>
+            <title>Setting the content of a dataset from a one- or two-dimensional array</title>
+            <screen>
+<prompt>PS:1 ></prompt> <command>(Get-Item h5tmp:\dset1).Dimensions</command>
+10
+10
+<prompt>PS:2 ></prompt> <command>(Get-Item h5tmp:\dset1).ElementType</command>
+
+Name                           Value
+----                           -----
+SignType                       2
+BitOffset                      0
+Class                          INTEGER
+MSBitPadding                   Zero
+Precision                      32
+LSBitPadding                   Zero
+ByteOrder                      BE
+Size                           4
+
+<prompt>PS:3 ></prompt> <command>$a = New-Object 'int[]' 100</command>
+<prompt>PS:4 ></prompt> <command>for ($i = 0; $i -lt $a.Length; $i++) { $a[$i] = $i*$i }</command>
+<prompt>PS:5 ></prompt> <command>Set-Content h5tmp:\dset1 $a</command>
+<prompt>PS:6 ></prompt> <command>$b = New-Object 'int[,]' 10,10</command>
+<prompt>PS:7 ></prompt> <command>for ($i = 0; $i -lt 10; $i++) { $b[$i,$i] = $i }</command>
+<prompt>PS:8 ></prompt> <command>Set-Content h5tmp:\dset1 $b</command>
+      </screen>
+        </example>
     </sect2>
 
     <sect2 xml:id="add_content">
-        <title>Add-Content</title>
-        <para/>
+        <title><literal>Add-Content</literal></title>
+        <note>
+            <para>Not implemented.</para>
+        </note>
     </sect2>
 
     <sect2 xml:id="clear_content">
-        <title>Clear-Content</title>
-        <para/>
+        <title><literal>Clear-Content</literal></title>
+        <note>
+            <para>Not implemented.</para>
+        </note>
     </sect2>
 
 </sect1>

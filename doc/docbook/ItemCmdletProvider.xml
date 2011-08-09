@@ -108,27 +108,12 @@ True
 
     </sect2>
 
-    <sect2 xml:id="clear_item">
-        <title><literal>Clear-Item</literal></title>
-        <para>The <literal>Clear-Item</literal> cmdlet deletes the value of an item, but it does not delete the
-            item.</para>
-        <note>
-            <para>Not implemented.</para>
-        </note>
-    </sect2>
-
     <sect2 xml:id="set_item">
-
         <title><literal>Set-Item</literal></title>
         <cmdsynopsis>
             <command>Set-Item</command>
             <arg choice="req">-Path <replaceable>string[]</replaceable></arg>
-            <arg choice="opt">-Value <replaceable>Object</replaceable></arg>
-            <arg choice="opt">-Dimensions <replaceable>long[]</replaceable></arg>
-            <sbr/>
-            <arg choice="opt">-Hyperslab <replaceable>long[4]</replaceable></arg>
-            <arg choice="opt">-PointSet <replaceable>long[,]</replaceable></arg>
-            <arg choice="opt">-Force</arg>
+            <arg choice="req">-Value <replaceable>Object</replaceable></arg>
         </cmdsynopsis>
         <para>Changes the value of an item to the value specified in the command. The behavior of
             the cmdlet depends on the type of the item referred to by <literal>-Path</literal>.
@@ -137,68 +122,57 @@ True
             <varlistentry>
                 <term>HDF5 dataset</term>
                 <listitem>
-                    <para>If present, the <literal>-Value</literal> argument must be a .NET array of
-                        a type that can be converted into the dataset's HDF5 datatype. </para>
-                    <para> If the dataset is not extendible, the shape of the array provided in
-                            <literal>-Value</literal> must match the shape of the dataset (rank and
-                        extent). The <literal>-Dimensions</literal> argument would have no effect in
-                        this case and will generate an error.</para>
-                    <para> If the dataset is extendible, its value and/or shape will be changed if,
-                        and only if, either of the <literal>-Force</literal> switch or the
-                            <literal>-Dimensions</literal> argument, but <emphasis role="bold"
-                            >not</emphasis> both, are present. With the <literal>-Force</literal>
-                        switch present, the cmdlet will infer the new shape of the dataset from the
-                            <literal>-Value</literal> argument. If the
-                            <literal>-Dimensions</literal> argument is specified, the
-                            <literal>-Value</literal> argument must either be absent, in which case
-                        only the shape of the dataset will be updated, or it must be a
-                        one-dimensional .NET array.</para>
+                    <para>For chunked HDF5 datasets, <literal>Set-Item</literal> lets the user
+                        reshape a dataset within the limits of its maximum extent. The
+                            <literal>-Value</literal> must be an integer array whose length matches
+                        the rank of the dataset's HDF5 dataspace.</para>
                 </listitem>
             </varlistentry>
             <varlistentry>
                 <term>HDF5 soft link</term>
                 <listitem>
-                    <para>The <literal>-Value</literal> argument must be convertible to a string.
-                        The <literal>-Dimensions</literal> argument has no effect in this case and
-                        will generate a warning.</para>
+                    <para>Change the HDF5 path name value of an HDF5 soft link. The
+                            <literal>-Value</literal> argument must a string. </para>
                 </listitem>
             </varlistentry>
             <varlistentry>
                 <term>HDF5 external link</term>
                 <listitem>
-                    <para>The <literal>-Value</literal> argument must be convertible into a string
-                        array of length 2. The first element is used to initialize the external
-                        link's file name and the second argument used as the HDF5 path name. The
-                            <literal>-Dimensions</literal> argument has no effect in this case and
-                        will generate a warning.</para>
+                    <para> Change the file name and HDF5 path name value of an HDF5 external link.
+                        The <literal>-Value</literal> argument must be a string array of length 2.
+                        The first element is used to set the external link's file name and the
+                        second element is used as the HDF5 path name.</para>
                 </listitem>
             </varlistentry>
         </variablelist>
         <example>
             <title>Adjusting the shape of an extendible dataset</title>
             <screen>
-<prompt>PS:1 ></prompt> <command>Set-Item h5tmp:\group1\dset3 -Dimensions 44,55,66</command>
-      </screen>
-        </example>
-        <example>
-            <title>Assigning a new value to a dataset</title>
-            <screen>
-<prompt>PS:1 ></prompt> <command>Set-Item h5tmp:\dset1 -Value (New-Object 'double[,,]' 512,512,512)</command>
+<prompt>PS:1 ></prompt> <command>Set-Item h5tmp:\group1\dset3 @(44,55,66)</command>
       </screen>
         </example>
         <example>
             <title>Assigning a new value to a soft link</title>
             <screen>
-<prompt>PS:1 ></prompt> <command>Set-Item h5tmp:\slink1 -Value '/new/destination'</command>
+<prompt>PS:1 ></prompt> <command>Set-Item h5tmp:\slink1 '/new/destination'</command>
       </screen>
         </example>
 
     </sect2>
 
+    <sect2 xml:id="clear_item">
+        <title><literal>Clear-Item</literal></title>
+        <para>The <literal>Clear-Item</literal> cmdlet deletes the value of an item, but it does not
+            delete the item.</para>
+        <note>
+            <para>Not implemented.</para>
+        </note>
+    </sect2>
+
     <sect2 xml:id="invoke_item">
         <title><literal>Invoke-Item</literal></title>
-        <para>The <literal>Invoke-Item</literal> cmdlet performs the default action on the specified item. For example,
-            for and HDF5 image this cmdlet may invoke an image viewer.</para>
+        <para>The <literal>Invoke-Item</literal> cmdlet performs the default action on the specified
+            item. For example, for and HDF5 image this cmdlet may invoke an image viewer.</para>
         <note>
             <para>Not implemented.</para>
         </note>
