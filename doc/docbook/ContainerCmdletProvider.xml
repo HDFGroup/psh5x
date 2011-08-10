@@ -14,15 +14,43 @@
     <sect2 xml:id="get_child_item">
         <title><literal>Get-ChildItem</literal>
         </title>
+        <para> The <literal>Get-ChildItem</literal> cmdlet gets the items in one or more specified
+            locations. If the item is an HDF5 group, it gets the items inside the container, known
+            as child items. You can use the Recurse parameter to get items in all child
+            containers.</para>
         <cmdsynopsis>
             <command>Get-ChildItem</command>
             <arg choice="req">-Path <replaceable>string[]</replaceable></arg>
+            <arg choice="opt">-Name</arg>
             <arg choice="opt">-Recurse</arg>
         </cmdsynopsis>
-        <para> The <literal>Get-ChildItem</literal> cmdlet gets the items in one or more specified
-            locations. If the item is a container, it gets the items inside the container, known as
-            child items. You can use the Recurse parameter to get items in all child
-            containers.</para>
+        <variablelist>
+            <varlistentry>
+                <term>-Path</term>
+                <listitem>
+                    <para>Specifies a path to one or more locations. Wildcards are permitted. The
+                        default location is the current directory (.).</para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>-Name</term>
+                <listitem>
+                    <para>Retrieves only the names of the items in the locations. If you pipe the
+                        output of this command to another command, only the item names are
+                        sent.</para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>-Recurse</term>
+                <listitem>
+                    <para>Gets the items in the specified locations and in all child items of the
+                        locations.</para>
+                    <para>Recurse works only when the path points to a container that has child
+                        items, such as <literal>h5tmp:\</literal> or <literal>h5tmp:\*</literal>,
+                        and not when it points to items that do not have child items.</para>
+                </listitem>
+            </varlistentry>
+        </variablelist>
         <variablelist>
             <varlistentry>
                 <term><literal>-Path</literal></term>

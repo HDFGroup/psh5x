@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://www.oasis-open.org/docbook/xml/5.0/rng/docbookxi.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<appendix xml:id="appdx_hdf5_datatypes" xmlns="http://docbook.org/ns/docbook"
+    xmlns:xi="http://www.w3.org/2001/XInclude">
+    <title>Specifiying HDF5 Datatypes in PowerShell</title>
+
+    <para/>
+
+    <sect1>
+        <title>HDF5 Atomic Types</title>
+        <para/>
+        
+        <sect2>
+            <title>HDF5 Bitfield</title>
+            <para></para>
+        </sect2>
+        
+        <sect2>
+            <title>HDF5 Float</title>
+            <para></para>
+        </sect2>
+        
+        <sect2>
+            <title>HDF5 Integer</title>
+            <para></para>
+        </sect2>
+        
+        <sect2>
+            <title>HDF5 Opaque</title>
+            <para></para>
+        </sect2>
+        
+        <sect2>
+            <title>HDF5 Reference</title>
+            <para></para>
+        </sect2>
+        
+        <sect2>
+            <title>HDF5 String</title>
+            <para></para>
+        </sect2>
+
+    </sect1>
+
+    <sect1>
+        <title>HDF5 Array Type</title>
+        <para></para>
+    </sect1>
+
+    <sect1>
+        <title>HDF5 Compound Type</title>
+        <para></para>
+    </sect1>
+    
+    <sect1>
+        <title>HDF5 Enumeration Type</title>
+        <para></para>
+    </sect1>
+    
+    <sect1>
+        <title>HDF5 Variable Length Type</title>
+        <para></para>
+    </sect1>
+    
+</appendix>
