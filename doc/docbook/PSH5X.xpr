@@ -506,5 +506,6 @@
         <file name="chapter01.xml"/>
         <file name="chapter02.xml"/>
         <file name="chapter03.xml"/>
+        <file name="preface.xml"/>
     </projectTree>
 </project>

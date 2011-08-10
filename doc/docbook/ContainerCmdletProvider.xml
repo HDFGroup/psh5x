@@ -97,7 +97,144 @@ type1                    Datatyp... 1/1/1970 12:00:00 AM   0
 
     <sect2 xml:id="new_item">
         <title><literal>New-Item</literal></title>
-        <para/>
+        <para> The <literal>New-Item</literal> cmdlet creates a new item and sets its value (if
+            applicable). The basic syntax of <literal>New-Item</literal> is shown. It consists of
+            the new item's name, its type, and its value. Depending on the item type additional
+            options may be required and are shown separated by item type.</para>
+        <cmdsynopsis>
+            <command>New-Item</command>
+            <arg choice="req">-Path <replaceable>string[]</replaceable></arg>
+            <arg choice="req">-Name <replaceable>string</replaceable></arg>
+            <arg choice="req">-ItemType <group>
+                    <option>Dataset,</option>
+                    <option>Datatype,</option>
+                    <option>Group,</option>
+                    <sbr/>
+                    <option>ExtLink,</option>
+                    <option>HardLink,</option>
+                    <option>Image,</option>
+                    <option>PacketTable,</option>
+                    <option>SoftLink</option>
+                </group>
+            </arg>
+            <arg choice="opt">-Value <replaceable>Object</replaceable></arg>
+        </cmdsynopsis>
+        <variablelist>
+            <varlistentry>
+                <term><literal>-Name</literal></term>
+                <listitem>
+                    <para>Specifies the name of the new item. You can use this parameter to specify
+                        the name of the new item, or include the name in the value of the
+                            <literal>Path</literal> parameter.</para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>-Path</term>
+                <listitem>
+                    <para>Specifies the path to the location of the new item. Wildcards are
+                        permitted.</para>
+                    <para> You can specify the name of the new item in the <literal>Name</literal>
+                        parameter, or include it in the <literal>Path</literal> parameter.</para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>-ItemType</term>
+                <listitem>
+                    <para>Specifies the type of the new item.</para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>-Value</term>
+                <listitem>
+                    <para>Specifies the value of the new item.</para>
+                </listitem>
+            </varlistentry>
+        </variablelist>
+
+        <sect3>
+            <title>HDF5 Dataset</title>
+            <para>One or more of the following options must be specified for creating a new HDF5
+                dataset. Currently, the <literal>-Value</literal> argument has no meaning for
+                datasets.</para>
+            <cmdsynopsis>
+                <arg choice="req">-ElementType <replaceable>Object</replaceable></arg>
+                <arg choice="req">-Dimensions <replaceable>Int64[]</replaceable></arg>
+                <arg choice="opt">-MaxDimensions <replaceable>Int64[]</replaceable></arg>
+                <sbr/>
+                <arg choice="opt">-Chunked <replaceable>Int64[]</replaceable></arg>
+                <arg choice="opt">-Compact</arg>
+                <arg choice="opt">-Gzip <replaceable>[0..9]</replaceable></arg>
+            </cmdsynopsis>
+        </sect3>
+
+        <sect3>
+            <title>HDF5 Datatype</title>
+            <para>The following options must be specified for creating a new named HDF5
+                datatype.</para>
+            <cmdsynopsis>
+                <arg choice="req">-Definition <replaceable>Object</replaceable></arg>
+            </cmdsynopsis>
+        </sect3>
+
+        <sect3>
+            <title>HDF5 Group</title>
+            <para>No additional options need to be specified for creating a new HDF5 group.
+                Currently, the <literal>-Value</literal> argument has no meaning for groups.</para>
+        </sect3>
+
+        <sect3>
+            <title>HDF5 External Link</title>
+            <para>No additional options need to be specified for creating a new HDF5 external link.
+                The <literal>-Value</literal> argument must be a string array of length two. The
+                first element is used as the file name and the second must be a well-formed HDF5
+                path name.</para>
+        </sect3>
+
+        <sect3>
+            <title>HDF5 Hard Link</title>
+            <para>No additional options need to be specified for creating a new HDF5 external link.
+                The <literal>-Value</literal> argument must be a string containing a valid HDF5 path
+                name.</para>
+        </sect3>
+
+        <sect3>
+            <title>HDF5 Image</title>
+            <para>Refer to the H5Image spec. []...</para>
+            <para> If the <literal>-Value</literal> argument is specified, it is expected to be the
+                name of an image file. All of the image characteristics (bits, widht, height etc.)
+                will be inferred and no other options need to be specified. Otherwise the following
+                options must be specified for creating a new HDF5 image.</para>
+            <cmdsynopsis>
+                <arg choice="req">-Bits <replaceable>[8,24]</replaceable></arg>
+                <arg choice="req">-WxH <replaceable>Int64[2]</replaceable></arg>
+                <arg choice="req">-InterlaceMode <group>
+                        <option>Plane,</option>
+                        <option>Pixel</option>
+                    </group>
+                </arg>
+            </cmdsynopsis>
+        </sect3>
+
+        <sect3>
+            <title>HDF5 PacketTable</title>
+            <para>Refer to the HDF5 packet table spec. []...</para>
+            <para> One or more of the following options must be specified for creating a new HDF5
+                packet table. Currently, the <literal>-Value</literal> argument has no meaning for
+                packet tables. </para>
+            <cmdsynopsis>
+                <arg choice="req">-PacketType <replaceable>Object</replaceable></arg>
+                <arg choice="req">-ChunkByteSize <replaceable>Int32</replaceable></arg>
+                <arg choice="opt">-Gzip <replaceable>[0..9]</replaceable></arg>
+            </cmdsynopsis>
+        </sect3>
+
+        <sect3>
+            <title>HDF5 Soft Link</title>
+            <para>No additional options need to be specified for creating a new HDF5 soft link. The
+                    <literal>-Value</literal> argument must be a string containing a well-formed
+                HDF5 path name.</para>
+        </sect3>
+
     </sect2>
 
     <sect2 xml:id="remove_item">
