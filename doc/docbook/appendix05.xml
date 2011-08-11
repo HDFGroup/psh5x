@@ -4,62 +4,155 @@
     xmlns:xi="http://www.w3.org/2001/XInclude">
     <title>Specifiying HDF5 Datatypes in PowerShell</title>
 
-    <para/>
+    <para>Generally, in PSH5X, HDF5 Datatypes are represented as PowerShell hashtables. The
+        exception are pre-defined HDF5 datatypes such as <literal>H5T_IEEE_64BE</literal> which can
+        be passed as strings to all cmdlets with HDF5 datatype arguments. The
+            <literal>Show-H5Types</literal> cmdlet displays the detailed hashtable representation
+        for pre-defined types.</para>
+    <para>Please refer to <citation>H5RM</citation> for details on HDF5 Datatypes. </para>
+
 
     <sect1>
         <title>HDF5 Atomic Types</title>
         <para/>
-        
+
         <sect2>
             <title>HDF5 Bitfield</title>
-            <para></para>
+            <programlisting>
+@{
+    BitOffset    = 0;
+    ByteOrder    = 'BE';
+    Class        = 'BITFIELD';
+    LSBitPadding = 'Zero';
+    MSBitPadding = 'Zero';
+    Precision    = 32;
+    Size         = 4
+ }
+            </programlisting>
         </sect2>
-        
+
         <sect2>
             <title>HDF5 Float</title>
-            <para></para>
+            <programlisting>
+@{
+    BitOffset      = 0;
+    ByteOrder      = 'LE';
+    Class          = 'FLOAT';
+    ExpBias        = 127;
+    ExpBits        = 8;
+    ExpBitPos      = 23;
+    IntlBitPadding = 'Zero';
+    LSBitPadding   = 'Zero';
+    MantBits       = 23; 
+    MantBitPos     = 0;
+    MSBitPadding   = 'Zero';
+    MantNorm       = 'Implied';
+    Precision      = 32;
+    SignBitPos     = 31;
+    Size           = 4
+  }
+           </programlisting>
         </sect2>
-        
+
         <sect2>
             <title>HDF5 Integer</title>
-            <para></para>
+            <programlisting>
+@{
+    BitOffset    = 0;
+    ByteOrder    = 'LE'
+    Class        = 'INTEGER';
+    LSBitPadding = 'Zero';
+    MSBitPadding = 'Zero';
+    Precision    = '32';
+    SignType     = 2;
+    Size         = 4
+ }
+            </programlisting>
         </sect2>
-        
+
         <sect2>
             <title>HDF5 Opaque</title>
-            <para></para>
-        </sect2>
-        
-        <sect2>
-            <title>HDF5 Reference</title>
-            <para></para>
-        </sect2>
-        
-        <sect2>
-            <title>HDF5 String</title>
-            <para></para>
+            <programlisting>
+@{
+    Class     = 'OPAQUE';
+    ByteOrder = 'BE';
+    Tag       = 'foo'
+ }
+            </programlisting>
         </sect2>
 
     </sect1>
 
     <sect1>
         <title>HDF5 Array Type</title>
-        <para></para>
+        <programlisting>
+@{
+    Class = 'ARRAY';
+    
+    # &lt;type&gt; is either a type definition (hashtable) or
+    # a pre-defined HDF5 datatype (string)
+    
+    Type  = &lt;type&gt;;
+ }
+        </programlisting>
     </sect1>
 
     <sect1>
         <title>HDF5 Compound Type</title>
-        <para></para>
-    </sect1>
+        <programlisting>
+@{
+    Class = 'COMPOUND';
     
+    # the components are listed as name/type pairs
+    
+    Components = @{
+    
+        &lt;name&gt; = @{
+                Class        = &lt;name&gt;;
+                MemberOffset = &lt;int&gt;;
+                Type         = &lt;type&gt;;
+                
+                # other type attributes
+                ...
+        };
+        
+        # other components
+        ...
+    };
+    
+    # compound element size in bytes
+    
+    Size  = &lt;int&gt;;
+ }
+        </programlisting>
+    </sect1>
+
     <sect1>
         <title>HDF5 Enumeration Type</title>
-        <para></para>
+        <programlisting>
+@{
+    Class = 'ENUM';
+    Map   = @{
+        &lt;name&gt; = &lt;int&gt;;
+        ...
+    };
+    Type  = &lt;HDF5 integer type&gt;;
+ }
+        </programlisting>
     </sect1>
-    
+
     <sect1>
         <title>HDF5 Variable Length Type</title>
-        <para></para>
-    </sect1>
+        <programlisting>
+@{
+    Class = 'VLEN';
     
+    # &lt;type&gt; is either a type definition (hashtable) or
+    # a pre-defined HDF5 datatype (string)
+    
+    Type  = &lt;type&gt;;
+ }
+        </programlisting>
+    </sect1>
+
 </appendix>
