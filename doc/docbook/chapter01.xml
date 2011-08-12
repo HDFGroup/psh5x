@@ -4,10 +4,20 @@
   xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0">
   <title>What is PSH5X?</title>
 
+  <para><emphasis role="bold">P</emphasis>ower<emphasis role="bold">S</emphasis>hell <emphasis
+      role="bold">H</emphasis>DF<emphasis role="bold">5</emphasis> e<emphasis role="bold"
+      >X</emphasis>tension is a PowerShell snap-in (a .NET DLL) that contains a PowerShell provider
+    and other supporting cmdlets for accessing HDF5 files (stores). The PowerShell provider
+    architecture is the "secret sauce" behind the consistent user experience across a diverse set of
+    data stores, such as the Windows Registry, certificate stores, and Active Directory.</para>
+
   <sect1 xml:id="windows_powershell_providers">
     <title>A Windows PowerShell Provider</title>
-    <para>The PowerShell provider architecture distinguishes between two kinds of entities, items
-      and properties. Items and properties may have values and content. </para>
+    <para>The Windows PowerShell provider architecture consists of a set of core cmdlets for
+      manipulating entities that it refers to as items and properties, that may have values and/or
+      content. The actual mapping of these entities and the semantics of the core cmdlets for a
+      particular type of data store is at the discretion of the managing provider. For PSH5X the
+      mapping is as follows:</para>
     <table xml:id="items_et_properties_table">
       <title>PSH5X Items and Properties</title>
       <tgroup cols="3">
@@ -68,7 +78,20 @@
         </tbody>
       </tgroup>
     </table>
-
+    <para>For example, according to PSH5X, an HDF5 soft link is an item that has a value, but no
+      content. In turn, a cmdlet such as <literal>Set-Item</literal> can be used to set and/or
+      change that value, but a cmdlet like <literal>Get-Content</literal> will not return anything
+      for an HDF5 symbolic link.</para>
+    <para> In software, the provider architecture is represented as a hierarchy of five classes and
+      a set of four interfaces. In <xref linkend="appdx_psh5x_layers"/>, a cartoon of these classes
+      and the cmdlets they support is shown. The structure of an HDF5 store is sufficiently rich to
+      warrant an implementation of the most featureful provider base class,
+        <literal>NavigationCmdletProvider</literal>, which includes support for nested containers
+      (HDF5 groups) and navigation (HDF5 path names). PSH5X also implements both property interfaces
+      (HDF5 attributes) and the content interface (value of HDF5 datasets). Currently, there is no
+      standardized notion of Access Control Lists in HDF5, which is why the
+        <literal>ISecurityDescriptorCmdletProvider</literal> interface was not implemented in this
+      version of PSH5X.</para>
   </sect1>
 
   <sect1>
@@ -81,10 +104,10 @@
     <title>Path-ology</title>
     <para>Providers use paths to locate items in a data source.</para>
   </sect1>
-  
+
   <sect1>
     <title>Conventions</title>
-    <para></para>
+    <para/>
   </sect1>
 
 </chapter>

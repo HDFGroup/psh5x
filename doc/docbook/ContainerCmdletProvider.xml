@@ -141,7 +141,6 @@ type1                    Datatyp... 1/1/1970 12:00:00 AM   0
                     <option>ExtLink,</option>
                     <option>HardLink,</option>
                     <option>Image,</option>
-                    <option>PacketTable,</option>
                     <option>SoftLink</option>
                 </group>
             </arg>
@@ -242,20 +241,7 @@ type1                    Datatyp... 1/1/1970 12:00:00 AM   0
                 </arg>
             </cmdsynopsis>
         </sect3>
-
-        <sect3>
-            <title>HDF5 PacketTable</title>
-            <para>Refer to the HDF5 packet table spec. []...</para>
-            <para> One or more of the following options must be specified for creating a new HDF5
-                packet table. Currently, the <literal>-Value</literal> argument has no meaning for
-                packet tables. </para>
-            <cmdsynopsis>
-                <arg choice="req">-PacketType <replaceable>Object</replaceable></arg>
-                <arg choice="req">-ChunkByteSize <replaceable>Int32</replaceable></arg>
-                <arg choice="opt">-Gzip <replaceable>[0..9]</replaceable></arg>
-            </cmdsynopsis>
-        </sect3>
-
+        
         <sect3>
             <title>HDF5 Soft Link</title>
             <para>No additional options need to be specified for creating a new HDF5 soft link. The
