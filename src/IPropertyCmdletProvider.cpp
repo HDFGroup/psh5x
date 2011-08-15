@@ -36,33 +36,50 @@ namespace PSH5X
     {
         WriteVerbose(String::Format("HDF5Provider::GetProperty(Path = '{0}')", path));
 
-        String^ npath = ProviderUtils::NormalizePath(path);
-        String^ h5path = ProviderUtils::PathNoDrive(npath);
-        if (!ProviderUtils::IsWellFormedH5Path(h5path)) { return; }
-        DriveInfo^ drive = ProviderUtils::GetDriveFromPath(path, ProviderInfo);
-        if (drive == nullptr) { return; }
+        Exception^ ex = nullptr;
+
+        hid_t gid = -1, oid = -1, aid = -1;
+
+        DriveInfo^ drive = nullptr;
+        String^ h5path = nullptr;
+        if (!ProviderUtils::TryGetDriveEtH5Path(path, ProviderInfo, drive, h5path))
+        {
+            ErrorRecord^ error = gcnew ErrorRecord(
+                gcnew ArgumentException("Ill-formed HDF5 path name and/or unable to obtain drive name!"),
+                "InvalidData", ErrorCategory::InvalidData, nullptr);
+            ThrowTerminatingError(error);
+        }
 
         String^ groupPath = ProviderUtils::ParentPath(h5path);
-        Console::WriteLine(groupPath);
-
+        
         char* group_path = (char*)(Marshal::StringToHGlobalAnsi(groupPath)).ToPointer();
-        hid_t group_id = H5Gopen2(drive->FileHandle, group_path, H5P_DEFAULT);
+        
+        gid = H5Gopen2(drive->FileHandle, group_path, H5P_DEFAULT);
+        if (gid < 0) {
+            ex = gcnew Exception("H5Gopen2 failed!!!");
+            goto error;
+        }
 
         String^ linkName = ProviderUtils::ChildName(h5path);
-        Console::WriteLine(linkName);
         char* link_name = (char*)(Marshal::StringToHGlobalAnsi(linkName)).ToPointer();
 
-        if (ProviderUtils::IsH5RootPathName(groupPath) || H5Lexists(group_id, link_name, H5P_DEFAULT) > 0)
+        if (ProviderUtils::IsH5RootPathName(groupPath) || H5Lexists(gid, link_name, H5P_DEFAULT) > 0)
         {
             H5L_info_t info;
             info.type = H5L_TYPE_ERROR;
+
             if (ProviderUtils::IsH5RootPathName(groupPath) ||
-                H5Lget_info(group_id, link_name, &info, H5P_DEFAULT) >= 0)
+                H5Lget_info(gid, link_name, &info, H5P_DEFAULT) >= 0)
             {
                 if (ProviderUtils::IsH5RootPathName(groupPath) || info.type == H5L_TYPE_HARD)
                 {
                     char* ipath =  (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
-                    hid_t obj_id = H5Oopen(drive->FileHandle, ipath, H5P_DEFAULT);
+
+                    oid = H5Oopen(drive->FileHandle, ipath, H5P_DEFAULT);
+                    if (oid < 0) {
+                        ex = gcnew Exception("H5Oopen failed!!!");
+                        goto error;
+                    }
                     
                     // If more than one property is requested, we return a hashtable of hashtables
                     // keyed by property name.
@@ -73,27 +90,30 @@ namespace PSH5X
                     for each (String^ attributeName in providerSpecificPickList)
                     {
                         char* attr_name = (char*)(Marshal::StringToHGlobalAnsi(attributeName)).ToPointer();
-                        htri_t flag = H5Aexists(obj_id, attr_name);
+                        htri_t flag = H5Aexists(oid, attr_name);
+
                         if (flag > 0)
                         {
-                            hid_t attr_id = H5Aopen(obj_id, attr_name, H5P_DEFAULT);
-                            if (attr_id >= 0)
-                            {
-                                if (providerSpecificPickList->Count == 1)
-                                {
-                                    htAllAttributes =
-                                        ProviderUtils::H5Attribute(attr_id, attributeName);
-                                }
-                                else
-                                {
-                                    htAllAttributes[attributeName] =
-                                        ProviderUtils::H5Attribute(attr_id, attributeName);
-                                }
-
-                                if (H5Aclose(attr_id) < 0) { // TODO
-                                }
+                            aid = H5Aopen(oid, attr_name, H5P_DEFAULT);
+                            if (aid < 0) {
+                                ex = gcnew Exception("H5Aopen failed!!!");
+                                goto error;
                             }
-                            else { // TODO
+
+                            if (providerSpecificPickList->Count == 1)
+                            {
+                                htAllAttributes =
+                                    ProviderUtils::H5Attribute(aid, attributeName);
+                            }
+                            else
+                            {
+                                htAllAttributes[attributeName] =
+                                    ProviderUtils::H5Attribute(aid, attributeName);
+                            }
+
+                            if (H5Aclose(aid) < 0) {
+                                ex = gcnew Exception("H5Aclose failed!!!");
+                                goto error;
                             }
                         }
                         else
@@ -105,8 +125,6 @@ namespace PSH5X
                     }
 
                     WritePropertyObject(htAllAttributes, path);
-                    if (H5Oclose(obj_id) < 0) { // TODO
-                    }
                 }
                 else
                 {
@@ -123,8 +141,23 @@ namespace PSH5X
         {
             WriteWarning(String::Format("Item not found at Path = '{0}'", path));
         }
-        
-        if (H5Gclose(group_id) < 0) { // TODO
+
+error:
+
+        if (aid >= 0) {
+            H5Aclose(aid);
+        }
+
+        if (oid >= 0) {
+            H5Oclose(oid);
+        }
+
+        if (gid >= 0) {
+            H5Gclose(gid);
+        }
+
+        if (ex != nullptr) {
+            throw ex;
         }
 
         return;
