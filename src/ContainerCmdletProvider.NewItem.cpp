@@ -34,6 +34,18 @@ namespace PSH5X
         WriteVerbose(
             String::Format("HDF5Provider::NewItem(Path = '{0}', ItemTypeName = '{1}')",
             path, itemTypeName));
+
+        Exception^ ex = nullptr;
+
+        hid_t lcplist = -1, gid = -1, dtype = -1, fspace = -1, dset = -1, dcplist = -1, oid = -1;
+
+        hsize_t* current_dims = NULL;
+        hsize_t* maximum_dims = NULL;
+        hsize_t* dim = NULL;
+
+        unsigned char* rgbValues = NULL;
+        unsigned char* rgbPal = NULL;
+
         
         DriveInfo^ drive = nullptr;
         String^ h5path = nullptr;
@@ -93,16 +105,16 @@ namespace PSH5X
         // at this point, there are no structural problems
         // let's se what we've got...
 
-        hid_t lcplist = H5Pcreate(H5P_LINK_CREATE);
-        if (lcplist >= 0) {
-            if (Force) {
-                if (H5Pset_create_intermediate_group(lcplist, 1) < 0) {
-                    WriteWarning("H5Pset_create_intermediate_group failed!");
-                }
-            }
+        lcplist = H5Pcreate(H5P_LINK_CREATE);
+        if (lcplist < 0) {
+            ex = gcnew Exception("H5Pcreate failed!!!");
+            goto error;
         }
-        else {
-            WriteWarning("H5Pcreate(H5P_LINK_CREATE) failed!");
+        if (Force) {
+            if (H5Pset_create_intermediate_group(lcplist, 1) < 0) {
+                ex = gcnew Exception("H5Pset_create_intermediate_group failed!!!");
+                goto error;
+            }
         }
 
 #pragma endregion
@@ -118,31 +130,18 @@ namespace PSH5X
             if (this->ShouldProcess(h5path,
                 String::Format("HDF5 group '{0}' does not exist, create it", linkName)))
             {
-                hid_t group = H5Gcreate2(drive->FileHandle, name, lcplist, H5P_DEFAULT, H5P_DEFAULT);
-                if (group >= 0)
-                {
-                    if (H5Fflush(group, H5F_SCOPE_LOCAL) < 0) {
-                        WriteWarning("H5Fflush failed!");
-                    }
-
-                    WriteItemObject(gcnew GroupInfo(group), path, true);   
-
-                    if (H5Gclose(group) < 0) {
-                        WriteWarning("H5Gclose failed!");
-                    }
+                gid = H5Gcreate2(drive->FileHandle, name, lcplist, H5P_DEFAULT, H5P_DEFAULT);
+                if (gid < 0) {
+                    ex = gcnew Exception("H5Gcreate2 failed!!!");
+                    goto error;
                 }
-                else {
-                    ErrorRecord^ error = gcnew ErrorRecord(
-                        gcnew ArgumentException(String::Format("H5Gcreate2 failed for '{0}'", h5path)),
-                        "Unknown", ErrorCategory::InvalidData, nullptr);
-                    ThrowTerminatingError(error);
-                }
-            }
 
-            if (lcplist >= 0) {
-                if (H5Pclose(lcplist) < 0) {
-                    WriteWarning("H5Pclose failed.");
+                if (H5Fflush(gid, H5F_SCOPE_LOCAL) < 0) {
+                    ex = gcnew Exception("H5Fflush failed!!!");
+                    goto error;
                 }
+
+                WriteItemObject(gcnew GroupInfo(gid), path, true);   
             }
 
 #pragma endregion
@@ -153,220 +152,203 @@ namespace PSH5X
 
 #pragma region HDF5 dataset
 
-            hid_t h5type = -1, h5space = -1, h5set = -1;
+            RuntimeDefinedParameterDictionary^ dynamicParameters =
+                (RuntimeDefinedParameterDictionary^) DynamicParameters;
 
-            try
+            // mandatory parameters -ElementType and -Dimensions
+
+            Object^ elemType = dynamicParameters["ElementType"]->Value;
+
+            Hashtable^ ht = nullptr;
+            String^ typeOrPath = nullptr;
+
+            if (ProviderUtils::TryGetValue(elemType, ht)) {
+                dtype = ProviderUtils::ParseH5Type(ht);
+                if (dtype < 0) {
+                    ex = gcnew ArgumentException("Invalid HDF5 datatype specified!");
+                    goto error;
+                }
+            }
+            else if (ProviderUtils::TryGetValue(elemType, typeOrPath))
             {
-                RuntimeDefinedParameterDictionary^ dynamicParameters =
-                    (RuntimeDefinedParameterDictionary^) DynamicParameters;
-
-                // mandatory parameters -ElementType and -Dimensions
-
-                Object^ elemType = dynamicParameters["ElementType"]->Value;
-
-                Hashtable^ ht = nullptr;
-                String^ typeOrPath = nullptr;
-
-                if (ProviderUtils::TryGetValue(elemType, ht)) {
-                    h5type = ProviderUtils::ParseH5Type(ht);
-                    if (h5type < 0) {
-                        throw gcnew ArgumentException("Invalid HDF5 datatype specified!");
-                    }
-                }
-                else if (ProviderUtils::TryGetValue(elemType, typeOrPath))
-                {
-                    if (typeOrPath->StartsWith("/")) {
-                        if (ProviderUtils::IsH5DatatypeObject(drive->FileHandle, typeOrPath))
-                        {
-                            char* path = (char*)(Marshal::StringToHGlobalAnsi(typeOrPath)).ToPointer();
-                            h5type = H5Topen2(drive->FileHandle, path, H5P_DEFAULT);
-                        }
-                        else {
-                            throw gcnew
-                                ArgumentException("The HDF5 path name specified does not refer to an datatype object.");
-                        }
-                    }
-                    else
+                if (typeOrPath->StartsWith("/")) {
+                    if (ProviderUtils::IsH5DatatypeObject(drive->FileHandle, typeOrPath))
                     {
-                        h5type = ProviderUtils::H5Type(typeOrPath);
-                        if (h5type < 0) {
-                            throw gcnew ArgumentException("Invalid HDF5 datatype specified!");
-                        }
-                    }
-                }
-                else {
-                    throw gcnew ArgumentException("Unrecognized type: must be string or hashtable.");
-                }
-
-                array<hsize_t>^ dims = (array<hsize_t>^) dynamicParameters["Dimensions"]->Value;
-
-                if (dims->Length < 1 || dims->Length > 32) {
-                    throw gcnew ArgumentException("Invalid rank: the dataset rank must be between 1 and 32!");
-                }
-
-                // optional parameters, determine layout first
-
-                String^ layout = "Contiguous";
-
-                bool hasMaxDims = (dynamicParameters["MaxDimensions"]->Value != nullptr);
-                bool isChunked = (dynamicParameters["Chunked"]->Value != nullptr);
-                bool isCompact = (dynamicParameters["Compact"]->IsSet);
-                bool applyGzip = (dynamicParameters["Gzip"]->Value != nullptr);
-
-                if (hasMaxDims || isChunked || applyGzip) {
-                    layout = "Chunked";
-                    if (!isChunked) {
-                        throw gcnew ArgumentException("The -MaxDimensions and -Gzip options valid only in conjunction " +
-                            "with the -Chunked option. Please specify!");
-                    }
-                    if (isCompact) {
-                        throw gcnew ArgumentException("The -Compact switch is incompatible with the " +
-                            "-MaxDimensions, -Chunked, and -Gzip options.");
-                    }
-                }
-                else if (isCompact) {
-                    layout = "Compact";
-                }
-
-                hsize_t* current_dims = new hsize_t [dims->Length];
-                for (int i = 0; i < dims->Length; ++i) {
-                    current_dims[i] = dims[i];
-                }
-
-                if (hasMaxDims)
-                {
-                    array<long long>^ maxDims = (array<long long>^) dynamicParameters["MaxDimensions"]->Value;
-                    if (dims->Length != maxDims->Length) {
-                        delete [] current_dims;
-                        throw gcnew RankException("Rank mismatch between the dimensions and max. dimensions arrays!");
-                    }
-                    hsize_t* maximum_dims = new hsize_t [dims->Length];
-                    for (int i = 0; i < dims->Length; ++i)
-                    {
-                        current_dims[i] = dims[i];
-                        hsize_t m = safe_cast<hsize_t>(maxDims[i]);
-                        if (maxDims[i] >= 0 && m < dims[i]) {
-                            delete [] maximum_dims;
-                            delete [] current_dims;
-                            throw gcnew ArgumentException("Unless unlimited (H5S_UNLIMITED) dimensions are specified" +
-                                " max. dimensions must be >= dimensions (elementwise)!");
-                        }
-                        maximum_dims[i] = (maxDims[i] >= 0) ? m : H5S_UNLIMITED;
-                    }
-                    h5space = H5Screate_simple(dims->Length, current_dims, maximum_dims);
-                    delete [] maximum_dims;
-                }
-                else {
-                    h5space = H5Screate_simple(dims->Length, current_dims, current_dims);
-                }
-                delete [] current_dims;
-
-                if (h5space >= 0)
-                {
-                    hid_t dcplist = H5Pcreate(H5P_DATASET_CREATE);
-                    if (dcplist >= 0)
-                    {
-                        if (layout == "Chunked") {
-                            if (H5Pset_layout(dcplist, H5D_CHUNKED) < 0) {
-                                throw gcnew InvalidOperationException("H5Pset_layout failed!");
-                            }
-
-                            array<hsize_t>^ cdims = (array<hsize_t>^) dynamicParameters["Chunked"]->Value;
-                            if (cdims->Length != dims->Length) {
-                                throw gcnew RankException("Rank mismatch between the dimensions and chunk dimensions arrays!");
-                            }
-
-                            hsize_t* dim = new hsize_t [cdims->Length];
-                            for (int i = 0; i < cdims->Length; ++i) { dim[i] = cdims[i]; }
-                            if (H5Pset_chunk(dcplist, cdims->Length, dim) < 0) {
-                                delete [] dim;
-                                throw gcnew InvalidOperationException("H5Pset_chunk failed!");
-                            }
-                            delete [] dim;
-                        }
-                        else if (layout == "Contiguous")
-                        {
-                            if (H5Pset_layout(dcplist, H5D_CONTIGUOUS) < 0) {
-                               throw gcnew InvalidOperationException("H5Pset_layout failed!");
-                            }
-                        }
-                        else if (layout == "Compact")
-                        {
-                            if (H5Pset_layout(dcplist, H5D_COMPACT) < 0) {
-                                throw gcnew InvalidOperationException("H5Pset_layout failed!");
-                            }
-                        }
-                        else {
-                             throw gcnew InvalidOperationException("Unknown layout!");
-                        }
-
-
-                        if (applyGzip)
-                        {
-                            unsigned level = (unsigned) dynamicParameters["Gzip"]->Value;
-                            if (level > 9) {
-                                throw gcnew InvalidOperationException("Invalid compression level! Must be in [0,9].");
-                            }
-
-                            if (H5Pset_deflate(dcplist, level) < 0) {
-                                throw gcnew InvalidOperationException("H5Pset_deflate failed!");
-                            }
-                        }
-
-                        if (this->ShouldProcess(h5path,
-                            String::Format("HDF5 dataset '{0}' does not exist, create it", linkName)))
-                        {
-
-                            h5set = H5Dcreate2(drive->FileHandle, name, h5type, h5space, lcplist, dcplist, H5P_DEFAULT);
-                            if (h5set >= 0)
-                            {
-                                if (H5Fflush(h5set, H5F_SCOPE_LOCAL) < 0) {
-                                    WriteWarning("H5Fflush failed!");
-                                }
-
-                                WriteItemObject(gcnew DatasetInfo(h5set), path, false);
-                            }
-                            else {
-                                throw gcnew InvalidOperationException("H5Dcreate2 failed!");
-                            }
+                        char* path = (char*)(Marshal::StringToHGlobalAnsi(typeOrPath)).ToPointer();
+                        dtype = H5Topen2(drive->FileHandle, path, H5P_DEFAULT);
+                        if (dtype < 0) {
+                            ex = gcnew Exception("H5Topen2 failed!!!");
+                            goto error;
                         }
                     }
                     else {
-                        throw gcnew InvalidOperationException("H5Pcreate(H5P_DATASET_CREATE) failed!");
+                        ex = gcnew ArgumentException("The HDF5 path name specified does not refer to an datatype object.");
+                        goto error;
+                    }
+                }
+                else
+                {
+                    dtype = ProviderUtils::H5Type(typeOrPath);
+                    if (dtype < 0) {
+                        ex = gcnew ArgumentException("Invalid HDF5 datatype specified!");
+                        goto error;
+                    }
+                }
+            }
+            else {
+                ex = gcnew ArgumentException("Unrecognized type: must be string or hashtable.");
+                goto error;
+            }
+
+            array<hsize_t>^ dims = (array<hsize_t>^) dynamicParameters["Dimensions"]->Value;
+
+            if (dims->Length < 1 || dims->Length > 32) {
+                ex = gcnew ArgumentException("Invalid rank: the dataset rank must be between 1 and 32!");
+                goto error;
+            }
+
+            // optional parameters, determine layout first
+
+            String^ layout = "Contiguous";
+
+            bool hasMaxDims = (dynamicParameters["MaxDimensions"]->Value != nullptr);
+            bool isChunked = (dynamicParameters["Chunked"]->Value != nullptr);
+            bool isCompact = (dynamicParameters["Compact"]->IsSet);
+            bool applyGzip = (dynamicParameters["Gzip"]->Value != nullptr);
+
+            if (hasMaxDims || isChunked || applyGzip) {
+                layout = "Chunked";
+                if (!isChunked) {
+                    ex = gcnew ArgumentException("The -MaxDimensions and -Gzip options valid only in conjunction " +
+                        "with the -Chunked option. Please specify!");
+                    goto error;
+                }
+                if (isCompact) {
+                    ex = gcnew ArgumentException("The -Compact switch is incompatible with the " +
+                        "-MaxDimensions, -Chunked, and -Gzip options.");
+                    goto error;
+                }
+            }
+            else if (isCompact) {
+                layout = "Compact";
+            }
+
+            current_dims = new hsize_t [dims->Length];
+            for (int i = 0; i < dims->Length; ++i) {
+                current_dims[i] = dims[i];
+            }
+
+            if (hasMaxDims)
+            {
+                array<long long>^ maxDims = (array<long long>^) dynamicParameters["MaxDimensions"]->Value;
+                if (dims->Length != maxDims->Length) {
+                    ex = gcnew RankException("Rank mismatch between the dimensions and max. dimensions arrays!");
+                    goto error;
+                }
+                maximum_dims = new hsize_t [dims->Length];
+                for (int i = 0; i < dims->Length; ++i)
+                {
+                    current_dims[i] = dims[i];
+                    hsize_t m = safe_cast<hsize_t>(maxDims[i]);
+                    if (maxDims[i] >= 0 && m < dims[i]) {
+                        ex = gcnew ArgumentException("Unless unlimited (H5S_UNLIMITED) dimensions are specified" +
+                            " max. dimensions must be >= dimensions (elementwise)!");
+                        goto error;
+                    }
+                    maximum_dims[i] = (maxDims[i] >= 0) ? m : H5S_UNLIMITED;
+                }
+                fspace = H5Screate_simple(dims->Length, current_dims, maximum_dims);
+                if (fspace < 0) {
+                    ex = gcnew Exception("H5Screate_simple failed!!!");
+                    goto error;
+                }
+            }
+            else {
+                fspace = H5Screate_simple(dims->Length, current_dims, current_dims);
+                if (fspace < 0) {
+                    ex = gcnew Exception("H5Screate_simple failed!!!");
+                    goto error;
+                }
+            }
+
+            if (fspace >= 0)
+            {
+                dcplist = H5Pcreate(H5P_DATASET_CREATE);
+                if (dcplist < 0) {
+                    ex = gcnew Exception("H5Pcreate failed!!!");
+                    goto error;
+                }
+
+                if (layout == "Chunked") {
+                    if (H5Pset_layout(dcplist, H5D_CHUNKED) < 0) {
+                        ex = gcnew InvalidOperationException("H5Pset_layout failed!");
+                        goto error;
+                    }
+
+                    array<hsize_t>^ cdims = (array<hsize_t>^) dynamicParameters["Chunked"]->Value;
+                    if (cdims->Length != dims->Length) {
+                        ex = gcnew RankException("Rank mismatch between the dimensions and chunk dimensions arrays!");
+                        goto error;
+                    }
+
+                    dim = new hsize_t [cdims->Length];
+                    for (int i = 0; i < cdims->Length; ++i) { dim[i] = cdims[i]; }
+                    
+                    if (H5Pset_chunk(dcplist, cdims->Length, dim) < 0) {
+                        ex = gcnew InvalidOperationException("H5Pset_chunk failed!");
+                        goto error;
+                    }
+                }
+                else if (layout == "Contiguous")
+                {
+                    if (H5Pset_layout(dcplist, H5D_CONTIGUOUS) < 0) {
+                        ex = gcnew InvalidOperationException("H5Pset_layout failed!");
+                        goto error;
+                    }
+                }
+                else if (layout == "Compact")
+                {
+                    if (H5Pset_layout(dcplist, H5D_COMPACT) < 0) {
+                        ex = gcnew InvalidOperationException("H5Pset_layout failed!");
+                        goto error;
                     }
                 }
                 else {
-                    throw gcnew InvalidOperationException("H5Screate_simple failed!");
+                    ex = gcnew InvalidOperationException("Unknown layout!");
+                    goto error;
                 }
 
-            }
-            catch (Exception^ ex)
-            {
-                ErrorRecord^ error = gcnew ErrorRecord(ex, "InvalidData", ErrorCategory::InvalidData, nullptr);
-                ThrowTerminatingError(error);
-            }
-            finally
-            {
-                if (h5set >= 0) {
-                    if (H5Dclose(h5set) < 0) {
-                        WriteWarning("H5Dclose failed.");
-                    }
-                }
-                if (h5space >= 0) {
-                    if (H5Sclose(h5space) < 0) {
-                        WriteWarning("H5Sclose failed.");
-                    }
-                }
-                if (h5type >= 0)
+
+                if (applyGzip)
                 {
-                    if (H5Tclose(h5type) < 0) {
-                        WriteWarning("H5Tclose failed.");
+                    unsigned level = (unsigned) dynamicParameters["Gzip"]->Value;
+                    if (level > 9) {
+                        ex = gcnew InvalidOperationException("Invalid compression level! Must be in [0,9].");
+                        goto error;
+                    }
+
+                    if (H5Pset_deflate(dcplist, level) < 0) {
+                        ex = gcnew InvalidOperationException("H5Pset_deflate failed!");
+                        goto error;
                     }
                 }
-                if (lcplist >= 0) {
-                    if (H5Pclose(lcplist) < 0) {
-                        WriteWarning("H5Pclose failed.");
+
+                if (this->ShouldProcess(h5path,
+                    String::Format("HDF5 dataset '{0}' does not exist, create it", linkName)))
+                {
+
+                    dset = H5Dcreate2(drive->FileHandle, name, dtype, fspace, lcplist, dcplist, H5P_DEFAULT);
+                    if (dset < 0) {
+                        ex = gcnew InvalidOperationException("H5Dcreate2 failed!");
+                        goto error;
                     }
+
+                    if (H5Fflush(dset, H5F_SCOPE_LOCAL) < 0) {
+                        ex = gcnew InvalidOperationException("H5Fflush failed!");
+                        goto error;
+                    }
+
+                    WriteItemObject(gcnew DatasetInfo(dset), path, false);
                 }
             }
 
@@ -378,69 +360,50 @@ namespace PSH5X
 
 #pragma region HDF5 datatype object
 
-            hid_t h5type = -1;
+            RuntimeDefinedParameterDictionary^ dynamicParameters =
+                (RuntimeDefinedParameterDictionary^) DynamicParameters;
 
-            try
-            {
-                RuntimeDefinedParameterDictionary^ dynamicParameters =
-                    (RuntimeDefinedParameterDictionary^) DynamicParameters;
+            // mandatory parameter -Defintion
 
-                // mandatory parameter -Defintion
+            Object^ typeDef = dynamicParameters["Definition"]->Value;
 
-                Object^ typeDef = dynamicParameters["Definition"]->Value;
+            Hashtable^ ht = nullptr;
+            String^ type = nullptr;
 
-                Hashtable^ ht = nullptr;
-                String^ type = nullptr;
-
-                if (ProviderUtils::TryGetValue(typeDef, ht)) {
-                    h5type = ProviderUtils::ParseH5Type(ht);
-                    if (h5type < 0) {
-                        throw gcnew ArgumentException("Invalid HDF5 datatype specified!");
-                    }
-                }
-                else if (ProviderUtils::TryGetValue(typeDef, type))
-                {
-                    h5type = ProviderUtils::H5Type(type);
-                    if (h5type < 0) {
-                        throw gcnew ArgumentException("Invalid HDF5 datatype specified!");
-                    }
-                }
-                else {
-                    throw gcnew ArgumentException("Unrecognized type: must be string or hashtable.");
-                }
-
-
-                if (this->ShouldProcess(h5path,
-                    String::Format("HDF5 datatype '{0}' does not exist, create it", linkName)))
-                {
-                    if (H5Tcommit2(drive->FileHandle, name, h5type, lcplist, H5P_DEFAULT, H5P_DEFAULT) < 0) {
-                        throw gcnew InvalidOperationException("H5Tcommit2 failed!");
-                    }
-
-                    WriteItemObject(gcnew DatatypeInfo(h5type), path, false);
-
-                    if (H5Fflush(drive->FileHandle, H5F_SCOPE_LOCAL) < 0) {
-                        WriteWarning("H5Fflush failed!");
-                    }
+            if (ProviderUtils::TryGetValue(typeDef, ht)) {
+                dtype = ProviderUtils::ParseH5Type(ht);
+                if (dtype < 0) {
+                    ex = gcnew ArgumentException("Invalid HDF5 datatype specified!");
+                    goto error;
                 }
             }
-            catch (Exception^ ex)
+            else if (ProviderUtils::TryGetValue(typeDef, type))
             {
-                ErrorRecord^ error = gcnew ErrorRecord(ex, "InvalidData", ErrorCategory::InvalidData, nullptr);
-                ThrowTerminatingError(error);
+                dtype = ProviderUtils::H5Type(type);
+                if (dtype < 0) {
+                    ex = gcnew ArgumentException("Invalid HDF5 datatype specified!");
+                    goto error;
+                }
             }
-            finally
+            else {
+                ex = gcnew ArgumentException("Unrecognized type: must be string or hashtable.");
+                goto error;
+            }
+
+            if (this->ShouldProcess(h5path,
+                String::Format("HDF5 datatype '{0}' does not exist, create it", linkName)))
             {
-                if (h5type >= 0) {
-                    if (H5Tclose(h5type) < 0) {
-                        WriteWarning("H5Tclose failed.");
-                    }
+                if (H5Tcommit2(drive->FileHandle, name, dtype, lcplist, H5P_DEFAULT, H5P_DEFAULT) < 0) {
+                    ex = gcnew InvalidOperationException("H5Tcommit2 failed!");
+                    goto error;
                 }
-                if (lcplist >= 0) {
-                    if (H5Pclose(lcplist) < 0) {
-                        WriteWarning("H5Pclose failed.");
-                    }
+
+                if (H5Fflush(drive->FileHandle, H5F_SCOPE_LOCAL) < 0) {
+                    ex = gcnew InvalidOperationException("H5Fflush failed!");
+                    goto error;
                 }
+
+                WriteItemObject(gcnew DatatypeInfo(dtype), path, false);
             }
 
 #pragma endregion
@@ -451,86 +414,72 @@ namespace PSH5X
 
 #pragma region HDF5 hard link
 
-            try
+            // mandatory parameters -Value
+
+            if (newValue != nullptr)
             {
-                // mandatory parameters -Value
-
-                if (newValue != nullptr)
+                String^ dest = nullptr;
+                if (ProviderUtils::TryGetValue(newValue, dest))
                 {
-                    String^ dest = nullptr;
-                    if (ProviderUtils::TryGetValue(newValue, dest))
+                    if (ProviderUtils::IsH5Object(drive->FileHandle, dest))
                     {
-                        if (ProviderUtils::IsH5Object(drive->FileHandle, dest))
+                        char* hard = (char*)(Marshal::StringToHGlobalAnsi(dest)).ToPointer();
+
+                        if (this->ShouldProcess(h5path,
+                            String::Format("HDF5 hard link '{0}' does not exist, create it", linkName)))
                         {
-                            char* hard = (char*)(Marshal::StringToHGlobalAnsi(dest)).ToPointer();
+                            if (H5Lcreate_hard(drive->FileHandle, hard, drive->FileHandle, name, lcplist, H5P_DEFAULT) < 0) {
+                                ex = gcnew InvalidOperationException("H5Lcreate_hard failed!");
+                                goto error;
+                            }
 
-                            if (this->ShouldProcess(h5path,
-                                String::Format("HDF5 hard link '{0}' does not exist, create it", linkName)))
-                            {
-                                if (H5Lcreate_hard(drive->FileHandle, hard, drive->FileHandle, name, lcplist, H5P_DEFAULT) < 0) {
-                                    throw gcnew InvalidOperationException("H5Lcreate_hard failed!");
-                                }
+                            if (H5Fflush(drive->FileHandle, H5F_SCOPE_LOCAL) < 0) {
+                                ex = gcnew Exception("H5Fflush failed!");
+                                goto error;
+                            }
 
-                                if (H5Fflush(drive->FileHandle, H5F_SCOPE_LOCAL) < 0) {
-                                    WriteWarning("H5Fflush failed!");
-                                }
+                            oid = H5Oopen(drive->FileHandle, hard, H5P_DEFAULT);
+                            if (oid < 0) {
+                                ex = gcnew Exception("H5Oopen failed!");
+                                goto error;
+                            }
 
-                                hid_t obj = H5Oopen(drive->FileHandle, hard, H5P_DEFAULT);
-                                if (obj >= 0)
-                                {
-                                    H5I_type_t t = H5Iget_type(obj);
-                                    String^ objType = nullptr;
-                                    if (t == H5I_GROUP) {
-                                        objType = "Group";
-                                    }
-                                    else if (t == H5I_DATASET) {
-                                        objType = "Dataset";
-                                    }
-                                    else if (t == H5I_DATATYPE) {
-                                        objType = "Datatype";
-                                    }
+                            H5I_type_t t = H5Iget_type(oid);
+                            String^ objType = nullptr;
+                            if (t == H5I_GROUP) {
+                                objType = "Group";
+                            }
+                            else if (t == H5I_DATASET) {
+                                objType = "Dataset";
+                            }
+                            else if (t == H5I_DATATYPE) {
+                                objType = "Datatype";
+                            }
 
-                                    if (objType != nullptr) {
-                                        if (objType != "Group") {
-                                            WriteItemObject(gcnew ObjectInfoLite(obj), path, false);
-                                        }
-                                        else {
-                                            WriteItemObject(gcnew ObjectInfoLite(obj), path, true);
-                                        }
-                                    }
-
-                                    if (H5Oclose(obj) < 0) { //TODO
-                                    }
+                            if (objType != nullptr) {
+                                if (objType != "Group") {
+                                    WriteItemObject(gcnew ObjectInfoLite(oid), path, false);
                                 }
                                 else {
-                                    throw gcnew InvalidOperationException("H5Oopen failed!");
+                                    WriteItemObject(gcnew ObjectInfoLite(oid), path, true);
                                 }
                             }
                         }
-                        else {
-                            throw gcnew ArgumentException(String::Format("Destination item '{0}' does not exist.", dest));
-                        }
-
                     }
                     else {
-                        throw gcnew ArgumentException("Cannot convert value argument (object) to link destination (string).");
+                        ex = gcnew ArgumentException(String::Format("Destination item '{0}' does not exist.", dest));
+                        goto error;
                     }
+
                 }
                 else {
-                    throw gcnew ArgumentException("No link destination found. Use -Value to specify!");
+                    ex = gcnew ArgumentException("Cannot convert value argument (object) to link destination (string).");
+                    goto error;
                 }
             }
-            catch (Exception^ ex) {
-                ErrorRecord^ error = gcnew ErrorRecord(ex, "InvalidData", ErrorCategory::InvalidData, nullptr);
-                ThrowTerminatingError(error);
-            }
-            finally
-            {
-                if (lcplist >= 0) {
-                    if (H5Pclose(lcplist) < 0) {
-                        WriteWarning("H5Pclose failed.");
-                    }
-                }
+            else {
+                ex = gcnew ArgumentException("No link destination found. Use -Value to specify!");
+                goto error;
             }
 
 #pragma endregion
@@ -541,50 +490,39 @@ namespace PSH5X
 
 #pragma region HDF5 soft link
 
-            try
+            // mandatory parameters -Value
+
+            if (newValue != nullptr)
             {
-                // mandatory parameters -Value
-
-                if (newValue != nullptr)
+                String^ dest = nullptr;
+                if (ProviderUtils::TryGetValue(newValue, dest))
                 {
-                    String^ dest = nullptr;
-                    if (ProviderUtils::TryGetValue(newValue, dest))
+                    char* soft = (char*)(Marshal::StringToHGlobalAnsi(dest)).ToPointer();
+
+                    if (this->ShouldProcess(h5path,
+                        String::Format("HDF5 soft link '{0}' does not exist, create it", linkName)))
                     {
-                        char* soft = (char*)(Marshal::StringToHGlobalAnsi(dest)).ToPointer();
-
-                        if (this->ShouldProcess(h5path,
-                            String::Format("HDF5 soft link '{0}' does not exist, create it", linkName)))
-                        {
-                            if (H5Lcreate_soft(soft, drive->FileHandle, name, lcplist, H5P_DEFAULT) < 0) {
-                                throw gcnew InvalidOperationException("H5Lcreate_soft failed!");
-                            }
-
-                            if (H5Fflush(drive->FileHandle, H5F_SCOPE_LOCAL) < 0) {
-                                WriteWarning("H5Fflush failed!");
-                            }
-
-                            WriteItemObject(gcnew LinkInfo(drive->FileHandle, h5path, "SoftLink"), path, false);
+                        if (H5Lcreate_soft(soft, drive->FileHandle, name, lcplist, H5P_DEFAULT) < 0) {
+                            ex = gcnew InvalidOperationException("H5Lcreate_soft failed!");
+                            goto error;
                         }
-                    }
-                    else {
-                        throw gcnew ArgumentException("Cannot convert value argument (object) to link destination (string).");
+
+                        if (H5Fflush(drive->FileHandle, H5F_SCOPE_LOCAL) < 0) {
+                            ex = gcnew Exception("H5Fflush failed!!!");
+                            goto error;
+                        }
+
+                        WriteItemObject(gcnew LinkInfo(drive->FileHandle, h5path, "SoftLink"), path, false);
                     }
                 }
                 else {
-                    throw gcnew ArgumentException("No link destination found. Use -Value to specify!");
+                    ex = gcnew ArgumentException("Cannot convert value argument (object) to link destination (string).");
+                    goto error;
                 }
             }
-            catch (Exception^ ex) {
-                ErrorRecord^ error = gcnew ErrorRecord(ex, "InvalidData", ErrorCategory::InvalidData, nullptr);
-                ThrowTerminatingError(error);
-            }
-            finally
-            {
-                if (lcplist >= 0) {
-                    if (H5Pclose(lcplist) < 0) {
-                        WriteWarning("H5Pclose failed.");
-                    }
-                }
+            else {
+                ex = gcnew ArgumentException("No link destination found. Use -Value to specify!");
+                goto error;
             }
 
 #pragma endregion
@@ -595,56 +533,45 @@ namespace PSH5X
 
 #pragma region HDF5 external link
 
-            try
+            // mandatory parameters -Value
+
+            if (newValue != nullptr)
             {
-                // mandatory parameters -Value
-
-                if (newValue != nullptr)
+                array<String^>^ dest = nullptr;
+                if (ProviderUtils::TryGetValue(newValue, dest))
                 {
-                    array<String^>^ dest = nullptr;
-                    if (ProviderUtils::TryGetValue(newValue, dest))
-                    {
-                        if (dest->Length != 2) {
-                            throw gcnew ArgumentException("The length of the destination array must be " +
-                                "two @(file name,path name)!");
-                        }
-
-                        char* file = (char*)(Marshal::StringToHGlobalAnsi(dest[0])).ToPointer();
-                        char* link = (char*)(Marshal::StringToHGlobalAnsi(dest[1])).ToPointer();
-
-                        if (this->ShouldProcess(h5path,
-                            String::Format("HDF5 external link '{0}' does not exist, create it", linkName)))
-                        {
-                            if (H5Lcreate_external(file, link, drive->FileHandle, name, lcplist, H5P_DEFAULT) < 0) {
-                                throw gcnew InvalidOperationException("H5Lcreate_external failed!");
-                            }
-
-                            if (H5Fflush(drive->FileHandle, H5F_SCOPE_LOCAL) < 0) {
-                                WriteWarning("H5Fflush failed!");
-                            }
-
-                            WriteItemObject(gcnew LinkInfo(drive->FileHandle, h5path, "ExtLink"), path, false);
-                        }
+                    if (dest->Length != 2) {
+                        throw gcnew ArgumentException("The length of the destination array must be " +
+                            "two @(file name,path name)!");
                     }
-                    else {
-                        throw gcnew ArgumentException("Cannot convert value argument (object) to link destination (string,string).");
+
+                    char* file = (char*)(Marshal::StringToHGlobalAnsi(dest[0])).ToPointer();
+                    char* link = (char*)(Marshal::StringToHGlobalAnsi(dest[1])).ToPointer();
+
+                    if (this->ShouldProcess(h5path,
+                        String::Format("HDF5 external link '{0}' does not exist, create it", linkName)))
+                    {
+                        if (H5Lcreate_external(file, link, drive->FileHandle, name, lcplist, H5P_DEFAULT) < 0) {
+                            ex = gcnew InvalidOperationException("H5Lcreate_external failed!");
+                            goto error;
+                        }
+
+                        if (H5Fflush(drive->FileHandle, H5F_SCOPE_LOCAL) < 0) {
+                            ex = gcnew Exception("H5Fflush failed!!!");
+                            goto error;
+                        }
+
+                        WriteItemObject(gcnew LinkInfo(drive->FileHandle, h5path, "ExtLink"), path, false);
                     }
                 }
                 else {
-                    throw gcnew ArgumentException("No link destination found. Use -Value to specify!");
+                    ex = gcnew ArgumentException("Cannot convert value argument (object) to link destination (string,string).");
+                    goto error;
                 }
             }
-            catch (Exception^ ex) {
-                ErrorRecord^ error = gcnew ErrorRecord(ex, "InvalidData", ErrorCategory::InvalidData, nullptr);
-                ThrowTerminatingError(error);
-            }
-            finally
-            {
-                if (lcplist >= 0) {
-                    if (H5Pclose(lcplist) < 0) {
-                        WriteWarning("H5Pclose failed.");
-                    }
-                }
+            else {
+                ex = gcnew ArgumentException("No link destination found. Use -Value to specify!");
+                goto error;
             }
 
 #pragma endregion
@@ -662,226 +589,218 @@ namespace PSH5X
 
 #pragma region HDF5 image
 
-            hid_t h5set = -1;
-            
-            unsigned char* rgbValues = NULL;
-            unsigned char* rgbPal = NULL;
+            unsigned bits = 0;
 
-            try
+            array<hsize_t,1>^ wxh = {0, 0};
+
+            String^ interlace = "INTERLACE_PIXEL";
+
+            hsize_t width, height;
+
+            bool link_pal = false;
+
+            RuntimeDefinedParameterDictionary^ dynamicParameters =
+                (RuntimeDefinedParameterDictionary^) DynamicParameters;
+
+            if (newValue != nullptr)
             {
-                unsigned bits = 0;
+                String^ file = nullptr;
 
-                array<hsize_t,1>^ wxh = {0, 0};
-
-                String^ interlace = "INTERLACE_PIXEL";
-
-                hsize_t width, height;
-
-                bool link_pal = false;
-
-                RuntimeDefinedParameterDictionary^ dynamicParameters =
-                    (RuntimeDefinedParameterDictionary^) DynamicParameters;
-
-                if (newValue != nullptr)
+                if (ProviderUtils::TryGetValue(newValue, file))
                 {
-                    String^ file = nullptr;
+                    Bitmap^ bmp = gcnew Bitmap(file);
+                    wxh[0] = safe_cast<hsize_t>(bmp->Width);
+                    wxh[1] = safe_cast<hsize_t>(bmp->Height);
 
-                    if (ProviderUtils::TryGetValue(newValue, file))
-                    {
-                        Bitmap^ bmp = gcnew Bitmap(file);
-                        wxh[0] = safe_cast<hsize_t>(bmp->Width);
-                        wxh[1] = safe_cast<hsize_t>(bmp->Height);
-
-                        PixelFormat pfmt = bmp->PixelFormat;
-                        if (pfmt == PixelFormat::Format8bppIndexed) {
-                            bits = 8;
-                        }
-                        else if (pfmt == PixelFormat::Format24bppRgb) {
-                            bits = 24;
-                        }
-                        else {
-                            throw gcnew ArgumentException("Only 8- or 24-bit images are supported!");
-                        }
-
-                        Rectangle rect = Rectangle(0, 0, bmp->Width, bmp->Height);
-                        BitmapData^ bmpData = bmp->LockBits(rect, ImageLockMode::ReadOnly, bmp->PixelFormat);
-                        IntPtr ptr = bmpData->Scan0;
-                        int bytes = Math::Abs(bmpData->Stride) * bmp->Height;
-                        array<Byte>^ a = gcnew array<Byte>(bytes);
-                        Marshal::Copy(ptr, a, 0, bytes);
-                        bmp->UnlockBits(bmpData);
-                        bytes = bmp->Width * bmp->Height;
-                        if (bits == 24) {
-                            bytes *= 3;
-                        }
-                        rgbValues = new unsigned char [bytes];
-                        
-                        // scan lines start at 4-byte aligned addresses
-                        // and we can't just copy the byte array
-                        // have to do it row by row
-
-                        bytes = (bits == 24) ? 3*bmp->Width : bmp->Width;
-                        int src_offset = 0, dst_offset = 0;
-                        for (int row = 0; row < bmp->Height; ++row)
-                        {
-                            unsigned char* p = (rgbValues+dst_offset);
-                            Marshal::Copy(a, src_offset, IntPtr((void*) p), bytes);
-
-                            // RGB -> BGR
-                            unsigned char swap;
-                            if (bits == 24) {
-                                for (int i = 0; i < bytes; i += 3) {
-                                    swap = p[i+2];
-                                    p[i+2] = p[i];
-                                    p[i] = swap;
-                                }
-                            }
-
-                            src_offset += bmpData->Stride;
-                            dst_offset += bytes;
-                        }
-
-                        // get palette data
-
-                        if (bits == 8)
-                        {
-                            array<Color>^ pal_entries = bmp->Palette->Entries;
-
-                            if (pal_entries->Length != 256) {
-                                 throw gcnew ArgumentException("Palette length <> 256!");
-                            }
-
-                            rgbPal = new unsigned char [3*pal_entries->Length];
-                            for (int i = 0; i < pal_entries->Length; ++i)
-                            {
-                                rgbPal[3*i]   = pal_entries[i].R;
-                                rgbPal[3*i+1] = pal_entries[i].G;
-                                rgbPal[3*i+2] = pal_entries[i].B;
-                            }
-
-                            link_pal = true;
-                        }
+                    PixelFormat pfmt = bmp->PixelFormat;
+                    if (pfmt == PixelFormat::Format8bppIndexed) {
+                        bits = 8;
+                    }
+                    else if (pfmt == PixelFormat::Format24bppRgb) {
+                        bits = 24;
                     }
                     else {
-                        throw gcnew
-                            ArgumentException("Cannot convert -Value argument to file name!");
-                    }
-                }
-                else
-                {
-                    if (dynamicParameters["Bits"]->Value != nullptr)
-                    {
-                        bits = (unsigned) dynamicParameters["Bits"]->Value;
-                        if (bits != 8 && bits != 24) {
-                            throw gcnew ArgumentException("Only 8- or 24-bit images are supported!");
-                        }
-                    }
-                    else {
-                        throw gcnew
-                            ArgumentException("Specify bits per pixel with -Bits [8,24] !");
+                        ex = gcnew ArgumentException("Only 8- or 24-bit images are supported!");
+                        goto error;
                     }
 
-                    if (dynamicParameters["WxH"]->Value != nullptr)
-                    {
-                        wxh = (array<hsize_t,1>^) dynamicParameters["WxH"]->Value;
-                        if (wxh->Length < 2) {
-                            ArgumentException("The image dimensions must be specified as an array of length 2!");
-                        }
-                    }
-                    else {
-                        throw gcnew
-                            ArgumentException("Specify image dimensions with -WxH Width,Height!");
-                    }
-
-                    array<unsigned char,1>^ rand_bytes = nullptr;
-
+                    Rectangle rect = Rectangle(0, 0, bmp->Width, bmp->Height);
+                    BitmapData^ bmpData = bmp->LockBits(rect, ImageLockMode::ReadOnly, bmp->PixelFormat);
+                    IntPtr ptr = bmpData->Scan0;
+                    int bytes = Math::Abs(bmpData->Stride) * bmp->Height;
+                    array<Byte>^ a = gcnew array<Byte>(bytes);
+                    Marshal::Copy(ptr, a, 0, bytes);
+                    bmp->UnlockBits(bmpData);
+                    bytes = bmp->Width * bmp->Height;
                     if (bits == 24) {
-                        rgbValues = new unsigned char [3*wxh[0]*wxh[1]];
-                        rand_bytes = gcnew array<unsigned char>(3*wxh[0]*wxh[1]);
+                        bytes *= 3;
                     }
-                    else {
-                        rgbValues = new unsigned char [wxh[0]*wxh[1]];
-                        rand_bytes = gcnew array<unsigned char>(wxh[0]*wxh[1]);
-                    }
+                    rgbValues = new unsigned char [bytes];
 
-                    Random^ random = gcnew Random();
-                    random->NextBytes(rand_bytes);
-                    Marshal::Copy(rand_bytes, 0, IntPtr((void*) rgbValues), rand_bytes->Length);
-                }
+                    // scan lines start at 4-byte aligned addresses
+                    // and we can't just copy the byte array
+                    // have to do it row by row
 
-                width = wxh[0]; height = wxh[1];
-
-                if (bits == 24)
-                {
-                    if (dynamicParameters["InterlaceMode"]->Value != nullptr)
+                    bytes = (bits == 24) ? 3*bmp->Width : bmp->Width;
+                    int src_offset = 0, dst_offset = 0;
+                    for (int row = 0; row < bmp->Height; ++row)
                     {
-                        String^ s = ((String^) dynamicParameters["InterlaceMode"]->Value)->Trim()->ToUpper();
+                        unsigned char* p = (rgbValues+dst_offset);
+                        Marshal::Copy(a, src_offset, IntPtr((void*) p), bytes);
 
-                        if (s == "PLANE") {
-                            interlace = "INTERLACE_PLANE";
-                        }
-                    }
-
-                    if (this->ShouldProcess(h5path,
-                        String::Format("HDF5 image '{0}' does not exist, create it", linkName)))
-                    {
-                        char* mode = (char*)(Marshal::StringToHGlobalAnsi(interlace)).ToPointer();
-
-                        if (H5IMmake_image_24bit(drive->FileHandle, name, width, height, mode, rgbValues) < 0) {
-                            throw gcnew ArgumentException("H5IMmake_image_24bit failed!");
-                        }
-                    }
-                }
-                else // 8-bit indexed GIF, TIFF
-                {
-                    if (this->ShouldProcess(h5path,
-                        String::Format("HDF5 image '{0}' does not exist, create it", linkName)))
-                    {
-                        if (H5IMmake_image_8bit(drive->FileHandle, name, width, height, rgbValues) < 0) {
-                            throw gcnew ArgumentException("H5IMmake_image_8bit failed!");
+                        // RGB -> BGR
+                        unsigned char swap;
+                        if (bits == 24) {
+                            for (int i = 0; i < bytes; i += 3) {
+                                swap = p[i+2];
+                                p[i+2] = p[i];
+                                p[i] = swap;
+                            }
                         }
 
-                        if (link_pal)
+                        src_offset += bmpData->Stride;
+                        dst_offset += bytes;
+                    }
+
+                    // get palette data
+
+                    if (bits == 8)
+                    {
+                        array<Color>^ pal_entries = bmp->Palette->Entries;
+
+                        if (pal_entries->Length != 256) {
+                            ex = gcnew ArgumentException("Palette length <> 256!");
+                            goto error;
+                        }
+
+                        rgbPal = new unsigned char [3*pal_entries->Length];
+                        for (int i = 0; i < pal_entries->Length; ++i)
                         {
-                            Guid guid = Guid::NewGuid();
+                            rgbPal[3*i]   = pal_entries[i].R;
+                            rgbPal[3*i+1] = pal_entries[i].G;
+                            rgbPal[3*i+2] = pal_entries[i].B;
+                        }
 
-                            char* pal_name = (char*)(Marshal::StringToHGlobalAnsi("PALETTE-" + guid.ToString())).ToPointer();
-                            hsize_t pal_dims[2] = {256, 3};
+                        link_pal = true;
+                    }
+                }
+                else {
+                    ex = gcnew
+                        ArgumentException("Cannot convert -Value argument to file name!");
+                    goto error;
+                }
+            }
+            else
+            {
+                if (dynamicParameters["Bits"]->Value != nullptr)
+                {
+                    bits = (unsigned) dynamicParameters["Bits"]->Value;
+                    if (bits != 8 && bits != 24) {
+                        ex = gcnew ArgumentException("Only 8- or 24-bit images are supported!");
+                        goto error;
+                    }
+                }
+                else {
+                    ex = gcnew
+                        ArgumentException("Specify bits per pixel with -Bits [8,24] !");
+                    goto error;
+                }
 
-                            if (H5IMmake_palette(drive->FileHandle, pal_name, pal_dims, rgbPal) < 0) {
-                                throw gcnew ArgumentException("H5IMmake_palette failed!");
-                            }
-                            if (H5IMlink_palette(drive->FileHandle, name, pal_name) < 0) {
-                                throw gcnew ArgumentException("H5IMlink_palette failed!");
-                            }
+                if (dynamicParameters["WxH"]->Value != nullptr)
+                {
+                    wxh = (array<hsize_t,1>^) dynamicParameters["WxH"]->Value;
+                    if (wxh->Length < 2) {
+                        ex = gcnew ArgumentException("The image dimensions must be specified as an array of length 2!");
+                        goto error;
+                    }
+                }
+                else {
+                    ex = gcnew
+                        ArgumentException("Specify image dimensions with -WxH Width,Height!");
+                    goto error;
+                }
+
+                array<unsigned char,1>^ rand_bytes = nullptr;
+
+                if (bits == 24) {
+                    rgbValues = new unsigned char [3*wxh[0]*wxh[1]];
+                    rand_bytes = gcnew array<unsigned char>(3*wxh[0]*wxh[1]);
+                }
+                else {
+                    rgbValues = new unsigned char [wxh[0]*wxh[1]];
+                    rand_bytes = gcnew array<unsigned char>(wxh[0]*wxh[1]);
+                }
+
+                Random^ random = gcnew Random();
+                random->NextBytes(rand_bytes);
+                Marshal::Copy(rand_bytes, 0, IntPtr((void*) rgbValues), rand_bytes->Length);
+            }
+
+            width = wxh[0]; height = wxh[1];
+
+            if (bits == 24)
+            {
+                if (dynamicParameters["InterlaceMode"]->Value != nullptr)
+                {
+                    String^ s = ((String^) dynamicParameters["InterlaceMode"]->Value)->Trim()->ToUpper();
+
+                    if (s == "PLANE") {
+                        interlace = "INTERLACE_PLANE";
+                    }
+                }
+
+                if (this->ShouldProcess(h5path,
+                    String::Format("HDF5 image '{0}' does not exist, create it", linkName)))
+                {
+                    char* mode = (char*)(Marshal::StringToHGlobalAnsi(interlace)).ToPointer();
+
+                    if (H5IMmake_image_24bit(drive->FileHandle, name, width, height, mode, rgbValues) < 0) {
+                        ex = gcnew ArgumentException("H5IMmake_image_24bit failed!");
+                        goto error;
+                    }
+                }
+            }
+            else // 8-bit indexed GIF, TIFF
+            {
+                if (this->ShouldProcess(h5path,
+                    String::Format("HDF5 image '{0}' does not exist, create it", linkName)))
+                {
+                    if (H5IMmake_image_8bit(drive->FileHandle, name, width, height, rgbValues) < 0) {
+                        ex = gcnew ArgumentException("H5IMmake_image_8bit failed!");
+                        goto error;
+                    }
+
+                    if (link_pal)
+                    {
+                        Guid guid = Guid::NewGuid();
+
+                        char* pal_name = (char*)(Marshal::StringToHGlobalAnsi("PALETTE-" + guid.ToString())).ToPointer();
+                        hsize_t pal_dims[2] = {256, 3};
+
+                        if (H5IMmake_palette(drive->FileHandle, pal_name, pal_dims, rgbPal) < 0) {
+                            ex = gcnew ArgumentException("H5IMmake_palette failed!");
+                            goto error;
+                        }
+                        if (H5IMlink_palette(drive->FileHandle, name, pal_name) < 0) {
+                            ex = gcnew ArgumentException("H5IMlink_palette failed!");
+                            goto error;
                         }
                     }
                 }
-
-                if (H5Fflush(drive->FileHandle, H5F_SCOPE_LOCAL) < 0) {
-                    WriteWarning("H5Fflush failed!");
-                }
-
-                h5set = H5Dopen2(drive->FileHandle, name, H5P_DEFAULT);
-                WriteItemObject(gcnew DatasetInfo(h5set), path, false);
-            
             }
-            catch (Exception^ ex)
-            {
-                ErrorRecord^ error = gcnew ErrorRecord(ex, "InvalidData", ErrorCategory::InvalidData, nullptr);
-                ThrowTerminatingError(error);
-            }
-            finally
-            {
-                delete [] rgbValues;
-                delete [] rgbPal;
 
-                if (h5set >= 0) {
-                    if (H5Dclose(h5set) < 0) {
-                        WriteWarning("H5Dclose failed.");
-                    }
-                }
+            if (H5Fflush(drive->FileHandle, H5F_SCOPE_LOCAL) < 0) {
+                ex = gcnew Exception("H5Fflush failed!!!");
+                goto error;
             }
+
+            dset = H5Dopen2(drive->FileHandle, name, H5P_DEFAULT);
+            if (dset < 0) {
+                ex = gcnew Exception("H5Dopen2 failed!!!");
+                goto error;
+            }
+
+            WriteItemObject(gcnew DatasetInfo(dset), path, false);
 
 #pragma endregion
 
@@ -898,117 +817,103 @@ namespace PSH5X
 
 #pragma region HDF5 packet table
 
-            hid_t h5type = -1, h5set = -1;
+            RuntimeDefinedParameterDictionary^ dynamicParameters =
+                (RuntimeDefinedParameterDictionary^) DynamicParameters;
 
-            try
+            // mandatory parameters -PacketType and -ChunkByteSize
+
+            Object^ packetType = dynamicParameters["PacketType"]->Value;
+
+            Hashtable^ ht = nullptr;
+            String^ typeOrPath = nullptr;
+
+            if (ProviderUtils::TryGetValue(packetType, ht)) {
+                dtype = ProviderUtils::ParseH5Type(ht);
+                if (dtype < 0) {
+                    ex = gcnew ArgumentException("Invalid HDF5 datatype specified!");
+                    goto error;
+                }
+            }
+            else if (ProviderUtils::TryGetValue(packetType, typeOrPath))
             {
-                RuntimeDefinedParameterDictionary^ dynamicParameters =
-                    (RuntimeDefinedParameterDictionary^) DynamicParameters;
-
-                // mandatory parameters -PacketType and -ChunkByteSize
-
-                Object^ packetType = dynamicParameters["PacketType"]->Value;
-
-                Hashtable^ ht = nullptr;
-                String^ typeOrPath = nullptr;
-
-                if (ProviderUtils::TryGetValue(packetType, ht)) {
-                    h5type = ProviderUtils::ParseH5Type(ht);
-                    if (h5type < 0) {
-                        throw gcnew ArgumentException("Invalid HDF5 datatype specified!");
+                if (typeOrPath->StartsWith("/")) {
+                    if (ProviderUtils::IsH5DatatypeObject(drive->FileHandle, typeOrPath))
+                    {
+                        char* path = (char*)(Marshal::StringToHGlobalAnsi(typeOrPath)).ToPointer();
+                        dtype = H5Topen2(drive->FileHandle, path, H5P_DEFAULT);
+                        if (dtype < 0) {
+                            ex = gcnew Exception("H5Topen2 failed!!!");
+                            goto error;
+                        }
+                    }
+                    else {
+                        ex = gcnew
+                            ArgumentException("The HDF5 path name specified does not refer to an datatype object.");
+                        goto error;
                     }
                 }
-                else if (ProviderUtils::TryGetValue(packetType, typeOrPath))
+                else
                 {
-                    if (typeOrPath->StartsWith("/")) {
-                        if (ProviderUtils::IsH5DatatypeObject(drive->FileHandle, typeOrPath))
-                        {
-                            char* path = (char*)(Marshal::StringToHGlobalAnsi(typeOrPath)).ToPointer();
-                            h5type = H5Topen2(drive->FileHandle, path, H5P_DEFAULT);
-                        }
-                        else {
-                            throw gcnew
-                                ArgumentException("The HDF5 path name specified does not refer to an datatype object.");
-                        }
+                    dtype = ProviderUtils::H5Type(typeOrPath);
+                    if (dtype < 0) {
+                        ex = gcnew ArgumentException("Invalid HDF5 datatype specified!");
+                        goto error;
                     }
-                    else
-                    {
-                        h5type = ProviderUtils::H5Type(typeOrPath);
-                        if (h5type < 0) {
-                            throw gcnew ArgumentException("Invalid HDF5 datatype specified!");
-                        }
-                    }
+                }
+            }
+            else {
+                ex = gcnew ArgumentException("Unrecognized type: must be string or hashtable.");
+                goto error;
+            }
+
+            hsize_t chunk_size = (hsize_t) dynamicParameters["ChunkByteSize"]->Value;
+            if (chunk_size == 0)
+            {
+                ex = gcnew ArgumentException("Chunk size (bytes) must be positive.");
+                goto error;
+            }
+
+            int compression = 5;
+            if (dynamicParameters["Gzip"]->Value != nullptr)
+            {
+                compression = (int) dynamicParameters["Gzip"]->Value;
+                if (compression < 0) {
+                    compression = -1;
                 }
                 else {
-                    throw gcnew ArgumentException("Unrecognized type: must be string or hashtable.");
-                }
-
-                hsize_t chunk_size = (hsize_t) dynamicParameters["ChunkByteSize"]->Value;
-                if (chunk_size == 0)
-                {
-                    throw gcnew ArgumentException("Chunk size (bytes) must be positive.");
-                }
-
-                int compression = 5;
-                if (dynamicParameters["Gzip"]->Value != nullptr)
-                {
-                    compression = (int) dynamicParameters["Gzip"]->Value;
-                    if (compression < 0) {
-                        compression = -1;
-                    }
-                    else {
-                        if (compression > 9) {
-                            throw gcnew ArgumentException("Compression must be in [-1,9].");
-                        }
-                    }
-                }
-
-                if (this->ShouldProcess(h5path,
-                    String::Format("HDF5 packet table '{0}' does not exist, create it", linkName)))
-                {
-
-                    h5set = H5PTcreate_fl(drive->FileHandle, name, h5type, chunk_size, compression);
-                    if (h5set >= 0)
-                    {
-                        if (h5set >= 0) {
-                            if (H5PTclose(h5set) < 0) {
-                                WriteWarning("H5PTclose failed.");
-                            }
-                        }
-
-                        // We can't call H5Fflush on a packet table...
-                        if (H5Fflush(drive->FileHandle, H5F_SCOPE_LOCAL) < 0) {
-                            WriteWarning("H5Fflush failed!");
-                        }
-
-                        h5set = H5Dopen2(drive->FileHandle, name, H5P_DEFAULT);
-
-                        WriteItemObject(gcnew DatasetInfo(h5set), path, false);
-                        
-                        if (h5set >= 0) {
-                            if (H5Dclose(h5set) < 0) {
-                                WriteWarning("H5Dclose failed.");
-                            }
-                        }
-                    }
-                    else {
-                        throw gcnew InvalidOperationException("H5PTcreate_fl failed!");
+                    if (compression > 9) {
+                        ex = gcnew ArgumentException("Compression must be in [-1,9].");
+                        goto error;
                     }
                 }
             }
-            catch (Exception^ ex)
+
+            if (this->ShouldProcess(h5path,
+                String::Format("HDF5 packet table '{0}' does not exist, create it", linkName)))
             {
-                ErrorRecord^ error = gcnew ErrorRecord(ex, "InvalidData", ErrorCategory::InvalidData, nullptr);
-                ThrowTerminatingError(error);
-            }
-            finally
-            {
-                if (h5type >= 0)
-                {
-                    if (H5Tclose(h5type) < 0) {
-                        WriteWarning("H5Tclose failed.");
-                    }
+                dset = H5PTcreate_fl(drive->FileHandle, name, dtype, chunk_size, compression);
+                if (dset < 0) {
+                    ex = gcnew Exception("H5PTcreate_fl failed!!!");
+                    goto error;
                 }
+
+                if (H5PTclose(dset) < 0) {
+                    ex = gcnew Exception("H5PTclose failed!!!");
+                    goto error;
+                }
+                // We can't call H5Fflush on a packet table...
+                if (H5Fflush(drive->FileHandle, H5F_SCOPE_LOCAL) < 0) {
+                    ex = gcnew Exception("H5Fflush failed!!!");
+                    goto error;
+                }
+
+                dset = H5Dopen2(drive->FileHandle, name, H5P_DEFAULT);
+                if (dset < 0) {
+                    ex = gcnew Exception("H5Dopen2 failed!!!");
+                    goto error;
+                }
+
+                WriteItemObject(gcnew DatasetInfo(dset), path, false);
             }
 
 #pragma endregion
@@ -1024,6 +929,60 @@ namespace PSH5X
         else
         {
             WriteWarning("Unknown item type!");
+        }
+
+error:
+
+        if (rgbValues != NULL) {
+            delete [] rgbValues;
+        }
+
+        if (rgbPal != NULL) {
+            delete [] rgbPal;
+        }
+
+        if (oid >= 0) {
+            H5Oclose(oid);
+        }
+
+        if (dim != NULL) {
+            delete [] dim;
+        }
+
+        if (dcplist >= 0) {
+            H5Pclose(dcplist);
+        }
+        
+        if (maximum_dims != NULL) {
+            delete [] maximum_dims;
+        }
+
+        if (current_dims != NULL) {
+            delete [] current_dims;
+        }
+
+        if (dtype >= 0) {
+            H5Tclose(dtype);
+        }
+        
+        if (fspace >= 0) {
+            H5Sclose(fspace);
+        }
+        
+        if (dset >= 0) {
+            H5Dclose(dset);
+        }
+
+        if (gid >= 0) {
+            H5Gclose(gid);
+        }
+
+        if (lcplist >= 0) {
+            H5Pclose(lcplist);
+        }
+
+        if (ex != nullptr) {
+            throw ex;
         }
 
         return;
