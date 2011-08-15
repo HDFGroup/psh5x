@@ -29,7 +29,7 @@ namespace PSH5X
     void Provider::ClearItem(String^ path)
     {
         WriteVerbose(String::Format("HDF5Provider::ClearItem(Path = '{0}')", path));
-        WriteWarning("The HDF5Provider::ClearItem() method has not (yet) been implemented.");
+        WriteWarning("The HDF5Provider::ClearItem() not implemented!!!");
         return;
     }
 
@@ -42,8 +42,10 @@ namespace PSH5X
     bool Provider::IsValidPath(String^ path)
     {
         WriteVerbose(String::Format("HDF5Provider::IsValidPath(Path = '{0}')", path));
+        
         String^ npath = ProviderUtils::NormalizePath(path);
         String^ h5path = ProviderUtils::PathNoDrive(npath);
+
         return ProviderUtils::IsWellFormedH5Path(h5path);
     }
 
@@ -51,6 +53,10 @@ namespace PSH5X
     {
         WriteVerbose(String::Format("HDF5Provider::GetItem(Path = '{0}')", path));
         
+        Exception^ ex = nullptr;
+
+        hid_t oid = -1, gid = -1;
+
         DriveInfo^ drive = nullptr;
         String^ h5path = nullptr;
         if (!ProviderUtils::TryGetDriveEtH5Path(path, ProviderInfo, drive, h5path))
@@ -69,121 +75,131 @@ namespace PSH5X
             detailed = dynamicParameters["Detailed"]->IsSet;
         }
 
-#pragma region root group
-
         if (ProviderUtils::IsH5RootPathName(h5path)) // root group
         {
+#pragma region root group
+
             String^ rootName = "/";
             char* root_name =  (char*)(Marshal::StringToHGlobalAnsi(rootName)).ToPointer();
             
-            hid_t group = H5Oopen(drive->FileHandle, root_name, H5P_DEFAULT);
-            if (group >= 0)
+            oid = H5Oopen(drive->FileHandle, root_name, H5P_DEFAULT);
+            if (oid < 0) {
+                ex = gcnew Exception("H5Oopen failed!!!");
+                goto error;
+            }
+
+            if (!detailed)
             {
-                if (!detailed)
-                {
-                    WriteItemObject(gcnew GroupInfoLite(group), path, true);
-                }
-                else
-                {
-                    WriteItemObject(gcnew GroupInfo(group), path, true);
-                }
-
-                if (H5Oclose(group) < 0) { // TODO
-                }
+                WriteItemObject(gcnew GroupInfoLite(oid), path, true);
             }
-            else { // TODO
+            else
+            {
+                WriteItemObject(gcnew GroupInfo(oid), path, true);
             }
-
-            return;
-        }
 
 #pragma endregion
-
-        String^ groupPath = ProviderUtils::ParentPath(h5path);
-        char* group_path = (char*)(Marshal::StringToHGlobalAnsi(groupPath)).ToPointer();
-        hid_t group_id = H5Gopen2(drive->FileHandle, group_path, H5P_DEFAULT);
-        if (group_id >= 0)
+        }
+        else
         {
+            String^ groupPath = ProviderUtils::ParentPath(h5path);
+            char* group_path = (char*)(Marshal::StringToHGlobalAnsi(groupPath)).ToPointer();
+
+            gid = H5Gopen2(drive->FileHandle, group_path, H5P_DEFAULT);
+            if (gid < 0) {
+                ex = gcnew Exception("H5Gopen2 failed!!!");
+                goto error;
+            }
+
             String^ linkName = ProviderUtils::ChildName(h5path);
             char* link_name = (char*)(Marshal::StringToHGlobalAnsi(linkName)).ToPointer();
-            if (H5Lexists(group_id, link_name, H5P_DEFAULT) > 0)
+
+            if (H5Lexists(gid, link_name, H5P_DEFAULT) > 0)
             {
                 H5L_info_t linfo;
-                if (H5Lget_info(group_id, link_name, &linfo, H5P_DEFAULT) >= 0)
-                {
-                    hid_t obj_id;
-                    char* path_name;
-
-                    switch (linfo.type)
-                    {
-                    case H5L_TYPE_HARD:
-
-                        path_name =  (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
-                        obj_id = H5Oopen(drive->FileHandle, path_name, H5P_DEFAULT);
-                        if (obj_id >= 0)
-                        {
-                            H5O_info_t oinfo;
-                            if (H5Oget_info(obj_id, &oinfo) >= 0)
-                            {
-                                switch (oinfo.type)
-                                {
-                                case H5O_TYPE_GROUP:
-                                    if (!detailed) {
-                                        WriteItemObject(gcnew GroupInfoLite(obj_id), path, true);
-                                    }
-                                    else {
-                                        WriteItemObject(gcnew GroupInfo(obj_id), path, true);
-                                    }
-                                    break;
-                                case H5O_TYPE_DATASET:
-                                    if (!detailed) {
-                                        WriteItemObject(gcnew DatasetInfoLite(obj_id), path, false);
-                                    }
-                                    else {
-                                        WriteItemObject(gcnew DatasetInfo(obj_id), path, false);
-                                    }
-                                    break;
-                                case H5O_TYPE_NAMED_DATATYPE:
-                                    WriteItemObject(gcnew DatatypeInfo(obj_id), path, false);
-                                    break;
-                                default:
-                                    WriteItemObject(gcnew ObjectInfo(obj_id), path, false);
-                                    break;
-                                }
-                            }
-
-                            if (H5Oclose(obj_id) < 0) { // TODO
-                            }
-                        }
-                        else { //TODO
-                        }
-
-                        break;
-
-                    case H5L_TYPE_SOFT:
-                        WriteItemObject(gcnew LinkInfo(group_id, linkName, "SoftLink"),
-                            path, false);
-                        break;
-                    case H5L_TYPE_EXTERNAL:
-                        WriteItemObject(gcnew LinkInfo(group_id, linkName, "ExtLink"),
-                            path, false);
-                        break;
-                    default:
-                        ErrorRecord^ error = gcnew ErrorRecord(
-                            gcnew InvalidProgramException("Unable to determine the item type for this path"),
-                            "H5L_TYPE", ErrorCategory::InvalidData, nullptr);
-                        WriteError(error);
-                        break;
-                    }
+                if (H5Lget_info(gid, link_name, &linfo, H5P_DEFAULT) < 0) {
+                    ex = gcnew Exception("H5Lget_info failed!!!");
+                    goto error;
                 }
+
+                char* path_name;
+                switch (linfo.type)
+                {
+                case H5L_TYPE_HARD:
+#pragma region HDF5 hard link
+
+                    path_name =  (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
+                    oid = H5Oopen(drive->FileHandle, path_name, H5P_DEFAULT);
+                    if (oid < 0) {
+                        ex = gcnew Exception("H5Oopen failed!!!");
+                        goto error;
+                    }
+
+                    H5O_info_t oinfo;
+                    if (H5Oget_info(oid, &oinfo) >= 0)
+                    {
+                        switch (oinfo.type)
+                        {
+                        case H5O_TYPE_GROUP:
+                            if (!detailed) {
+                                WriteItemObject(gcnew GroupInfoLite(oid), path, true);
+                            }
+                            else {
+                                WriteItemObject(gcnew GroupInfo(oid), path, true);
+                            }
+                            break;
+                        case H5O_TYPE_DATASET:
+                            if (!detailed) {
+                                WriteItemObject(gcnew DatasetInfoLite(oid), path, false);
+                            }
+                            else {
+                                WriteItemObject(gcnew DatasetInfo(oid), path, false);
+                            }
+                            break;
+                        case H5O_TYPE_NAMED_DATATYPE:
+                            WriteItemObject(gcnew DatatypeInfo(oid), path, false);
+                            break;
+                        default:
+                            WriteItemObject(gcnew ObjectInfo(oid), path, false);
+                            break;
+                        }
+                    }
+#pragma endregion
+                    break;
+
+                case H5L_TYPE_SOFT:
+                    WriteItemObject(gcnew LinkInfo(gid, linkName, "SoftLink"),
+                        path, false);
+                    break;
+                case H5L_TYPE_EXTERNAL:
+                    WriteItemObject(gcnew LinkInfo(gid, linkName, "ExtLink"),
+                        path, false);
+                    break;
+                default:
+
+                    ex = gcnew Exception("Unable to determine the item type for this path!!!");
+                    goto error;
+                    break;
+                }
+
             }
             else
             {
                 WriteWarning(String::Format("Item not found at Path = '{0}'", path));
             }
+        }
 
-            if (H5Gclose(group_id) < 0) { // TODO
-            }
+error:
+
+        if (gid >= 0) {
+            H5Gclose(gid);
+        }
+
+        if (oid >= 0) {
+            H5Oclose(oid);
+        }
+
+        if (ex != nullptr) {
+            throw ex;
         }
         
         return;
@@ -210,14 +226,18 @@ namespace PSH5X
     void Provider::InvokeDefaultAction(String^ path)
     {
         WriteVerbose(String::Format("HDF5Provider::InvokeDefaultAction(Path = '{0}')", path));
-        WriteWarning("The HDF5Provider::InvokeDefaultAction() method has not (yet) been implemented.");
+
+        ErrorRecord^ error = gcnew ErrorRecord(
+            gcnew NotImplementedException("HDF5Provider::InvokeDefaultAction not implemented!!!"),
+            "NotImplemented", ErrorCategory::NotImplemented, nullptr);
+        WriteError(error);
+
         return;
     }
 
     Object^ Provider::InvokeDefaultActionDynamicParameters(String^ path)
     {
         WriteVerbose(String::Format("HDF5Provider::InvokeDefaultActionDynamicParameters(Path = '{0}')", path));
-        WriteWarning("The HDF5Provider::InvokeDefaultActionDynamicParameters() method has not (yet) been implemented.");
         return nullptr;
     }
 

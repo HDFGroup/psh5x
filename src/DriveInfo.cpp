@@ -18,6 +18,8 @@ namespace PSH5X
     DriveInfo::DriveInfo(String^ path, bool readonly, PSDriveInfo^ drive, bool force)
         : PSDriveInfo(drive)
     {
+        Exception^ ex = nullptr;
+
         m_path = path;
         m_readonly = readonly;
 
@@ -33,141 +35,158 @@ namespace PSH5X
            if (H5Fis_hdf5(name) <= 0) {
                String^ msg = String::Format(
                    "File '{0}' is not an HDF5 file", path);
-               throw gcnew ArgumentException(msg);
+               ex = gcnew ArgumentException(msg);
+               goto error;
            }
 
            m_handle = H5Fopen(name, flags, H5P_DEFAULT);
            if (m_handle < 0) {
                String^ msg = String::Format(
                    "H5Fopen failed with status {0} for name {1}", m_handle, path);
-               throw gcnew ArgumentException(msg);
+               ex = gcnew ArgumentException(msg);
+               goto error;
            }
         }
         else if (force)
         {
             FileInfo^ info = gcnew FileInfo(path);
             char* filename = (char*)(Marshal::StringToHGlobalAnsi(info->FullName)).ToPointer();
+
             hid_t file = H5Fcreate(filename, H5F_ACC_EXCL, H5P_DEFAULT, H5P_DEFAULT);
             if (file >= 0) {
-                if (H5Fclose(file) < 0) { // TODO
+                if (H5Fclose(file) < 0) {
+                    ex = gcnew Exception("H5Fclose failed!!!");
+                    goto error;
                 }
             }
             else {
                 String^ msg = String::Format(
                     "H5Fcreate failed with status {0} for name {1}", file, info->FullName);
-                throw gcnew ArgumentException(msg);
+                ex = gcnew ArgumentException(msg);
+                goto error;
             }
             
             m_path = info->FullName;
             m_readonly = false;
+
             m_handle = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
-            if (m_handle < 0)
-            {
+            if (m_handle < 0) {
                 String^ msg = String::Format(
                     "H5Fopen failed with status {0} for name {1}", m_handle, info->FullName);
-                throw gcnew ArgumentException(msg);
+                ex = gcnew ArgumentException(msg);
+                goto error;
             }
         }
         else {
-            throw gcnew Exception(String::Format("File '{0}' not found", path));
+            ex = gcnew Exception(String::Format("File '{0}' not found", path));
+            goto error;
         }
+
+error:
+
+        if (ex != nullptr) {
+            throw ex;
+        }
+
     }
 
     Hashtable^ DriveInfo::CreationProperties::get()
     {
+        Exception^ ex = nullptr;
+
         Hashtable^ ht = gcnew Hashtable();
 
-        hid_t plist = H5Fget_create_plist(m_handle);
+        hid_t plist = -1;
+        
+        plist = H5Fget_create_plist(m_handle);
+        if (plist < 0) {
+            ex = gcnew Exception("H5Fget_create_plist failed!!!");
+            goto error;
+        }
 
-        if (plist >= 0)
+        unsigned super, freelist, stab, shhdr;
+        if (H5Pget_version(plist, &super, &freelist, &stab, &shhdr) >= 0)
         {
-            unsigned super, freelist, stab, shhdr;
-            if (H5Pget_version(plist, &super, &freelist, &stab, &shhdr) >= 0)
-            {
-                Hashtable^ ht1 = gcnew Hashtable();
-                ht1["SuperBlockVersion"] = super;
-                ht1["FreeListVersion"] = freelist;
-                ht1["SymbolTableVersion"] = stab;
-                ht1["SharedObjectHeaderVersion"] = shhdr;
-                ht["Version"] = ht1;
-            }
-            else
-            {
-                // TODO
-            }
+            Hashtable^ ht1 = gcnew Hashtable();
+            ht1["SuperBlockVersion"] = super;
+            ht1["FreeListVersion"] = freelist;
+            ht1["SymbolTableVersion"] = stab;
+            ht1["SharedObjectHeaderVersion"] = shhdr;
+            ht["Version"] = ht1;
+        }
+        else {
+            ex = gcnew Exception("H5Pget_version failed!!!");
+            goto error;
+        }
 
-            hsize_t size;
-            if (H5Pget_userblock(plist, &size) >= 0)
-            {
-                ht["UserBlockBytes"] = size;
-            }
-            else
-            {
-                // TODO
-            }
+        hsize_t size;
+        if (H5Pget_userblock(plist, &size) >= 0)
+        {
+            ht["UserBlockBytes"] = size;
+        }
+        else {
+            ex = gcnew Exception("H5Pget_userblock failed!!!");
+            goto error;
+        }
 
-            unsigned ik, lk;
-            if (H5Pget_sym_k(plist, &ik, &lk))
-            {
-                Hashtable^ ht1 = gcnew Hashtable();
-                ht1["BTreeHalfRank"] = ik;
-                ht1["LeafNodeHalfSize"] = ik;
-                ht["SymbolTable"] = ht1;
-            }
-            else
-            {
-                // TODO
-            }
+        unsigned ik, lk;
+        if (H5Pget_sym_k(plist, &ik, &lk))
+        {
+            Hashtable^ ht1 = gcnew Hashtable();
+            ht1["BTreeHalfRank"] = ik;
+            ht1["LeafNodeHalfSize"] = ik;
+            ht["SymbolTable"] = ht1;
+        }
+        else {
+            ex = gcnew Exception("H5Pget_sym_k failed!!!");
+            goto error;
+        }
 
-            if (H5Pget_istore_k(plist, &ik) >= 0)
-            {
-                ht["ChunkBTreeHalfRank"] = ik;
-            }
-            else
-            {
-                // TODO
-            }
+        if (H5Pget_istore_k(plist, &ik) >= 0)
+        {
+            ht["ChunkBTreeHalfRank"] = ik;
+        }
+        else {
+            ex = gcnew Exception("H5Pget_istore_k failed!!!");
+            goto error;
+        }
 
-            unsigned nindexes;
-            if (H5Pget_shared_mesg_nindexes(plist, &nindexes ) >= 0)
-            {
-                ht["SohmIndexCount"] = nindexes;
+        unsigned nindexes;
+        if (H5Pget_shared_mesg_nindexes(plist, &nindexes ) >= 0)
+        {
+            ht["SohmIndexCount"] = nindexes;
 
-                if (nindexes > 0)
-                {
-                    // TODO
-                }
-            }
-            else
-            {
-                // TODO
-            }
-
-            unsigned max_list, min_btree;
-            if (H5Pget_shared_mesg_phase_change(plist, &max_list, &min_btree ) >= 0)
-            {
-                Hashtable^ ht1 = gcnew Hashtable();
-                ht1["List2BTree"] = max_list;
-                ht1["BTree2List"] = min_btree;
-                ht["SohmPhaseChange"] = ht1;
-            }
-            else
-            {
-                // TODO
-            }
-
-
-
-
-
-            if (H5Pclose(plist) < 0)
+            if (nindexes > 0)
             {
                 // TODO
             }
         }
-        else
+        else {
+            ex = gcnew Exception("H5Pget_shared_mesg_nindexes failed!!!");
+            goto error;
+        }
+
+        unsigned max_list, min_btree;
+        if (H5Pget_shared_mesg_phase_change(plist, &max_list, &min_btree ) >= 0)
         {
-            // TODO
+            Hashtable^ ht1 = gcnew Hashtable();
+            ht1["List2BTree"] = max_list;
+            ht1["BTree2List"] = min_btree;
+            ht["SohmPhaseChange"] = ht1;
+        }
+        else {
+            ex = gcnew Exception("H5Pget_shared_mesg_phase_change failed!!!");
+            goto error;
+        }
+
+error:
+
+        if (plist >= 0) {
+            H5Pclose(plist);
+        }
+
+        if (ex != nullptr) {
+            throw ex;
         }
 
         return ht;
@@ -188,28 +207,21 @@ namespace PSH5X
     {
         hsize_t size;
 
-        if (H5Fget_filesize(m_handle, &size) >= 0)
-        {
-            return size;
+        if (H5Fget_filesize(m_handle, &size) < 0) {
+            throw gcnew Exception("H5Fget_filesize failed!!!");
         }
-        else
-        {
-            return 0;
-        }
+
+        return size;
     }
 
     hssize_t DriveInfo::FreeSpaceBytes::get()
     {
         hssize_t size = H5Fget_freespace(m_handle);
+        if (size < 0) {
+            throw gcnew Exception("H5Fget_freespace failed!!!");
+        }
 
-        if (size >= 0)
-        {
-            return size;
-        }
-        else
-        {
-            return -1;
-        }
+        return size;
     }
 
     Hashtable^ DriveInfo::H5FInfo::get()
@@ -230,9 +242,8 @@ namespace PSH5X
 
             ((Hashtable^)ht["Sohm"])->Add("IHSize", ht1);
         }
-        else
-        {
-            // TODO
+        else {
+            throw gcnew Exception("H5Fget_info failed!!!");
         }
 
         return ht;
@@ -312,22 +323,22 @@ namespace PSH5X
             ht["MdcApplyEmptyReserve"] = (config.apply_empty_reserve > 0);
             ht["MdcEmptyReserve"] = config.empty_reserve;
         }
+        else {
+            throw gcnew Exception("H5Fget_mdc_config failed!!!");
+        }
 
         return ht;
     }
 
     double DriveInfo::MdcHitRate::get()
     {
-        double hit_rate;
+        double hit_rate = -1;
 
-        if (H5Fget_mdc_hit_rate(m_handle, &hit_rate) >= 0)
-        {
-            return hit_rate;
+        if (H5Fget_mdc_hit_rate(m_handle, &hit_rate) < 0) {
+            throw gcnew Exception("H5Fget_mdc_hit_rate failed!!!");
         }
-        else
-        {
-            return -1.0;
-        }
+
+        return hit_rate;
     }
 
     Hashtable^ DriveInfo::MdcSize::get()
@@ -343,6 +354,9 @@ namespace PSH5X
             ht["MdcMinCleanBytes"] = min_clean_size;
             ht["MdcBytes"] = cur_size;
             ht["MdcNumberOfEntries"] = cur_num_entries;
+        }
+        else {
+            throw gcnew Exception("H5Fget_mdc_size failed!!!");
         }
 
         return ht;

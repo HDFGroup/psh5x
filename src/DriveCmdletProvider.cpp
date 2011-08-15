@@ -18,6 +18,10 @@ namespace PSH5X
     {
         WriteVerbose("HDF5Provider::InitializeDefaultDrives()");
 
+        Exception^ ex = nullptr;
+
+        hid_t status = -1;
+
         Collection<System::Management::Automation::PSDriveInfo^>^ coll =
             gcnew Collection<System::Management::Automation::PSDriveInfo^>();
 
@@ -26,33 +30,38 @@ namespace PSH5X
         String^ tmpFile = System::IO::Path::GetTempFileName();
         
         char* tmp_file = (char*)(Marshal::StringToHGlobalAnsi(tmpFile)).ToPointer();
-        hid_t status = H5Fcreate(tmp_file, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
+
+        status = H5Fcreate(tmp_file, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
         if (status < 0)
         {
             String^ msg = String::Format(
-                "H5Fcreate failed with status {0} for file '{1}'",
-                status, tmpFile);
-            throw gcnew Exception(msg); 
+                "H5Fcreate failed with status {0} for file '{1}'", status, tmpFile);
+            ex = gcnew Exception(msg); 
+            goto error;
         }
         else
         {
-            if (H5Fclose(status) >= 0)
-            {
-                System::Management::Automation::PSDriveInfo^ info =
-                    gcnew System::Management::Automation::PSDriveInfo("h5tmp",
-                    __super::ProviderInfo, "h5tmp:\\", "HDF5 sandbox drive (no dogs allowed)",
-                    __super::Credential);
+            if (H5Fclose(status) < 0) {
+                ex = gcnew Exception("H5Fclose failed!!!"); 
+                goto error;
+            }
+        }
 
-                DriveInfo^ drive = gcnew DriveInfo(tmpFile, false, info, false);
-                coll->Add(drive);
-                Environment::SetEnvironmentVariable("PSH5XTmpFile", tmpFile);
-            }
-            else
-            {
-                String^ msg = String::Format(
-                    "H5Fclose failed with for name {0}", tmpFile);
-                throw gcnew Exception(msg);
-            }
+        System::Management::Automation::PSDriveInfo^ info =
+            gcnew System::Management::Automation::PSDriveInfo("h5tmp",
+            __super::ProviderInfo, "h5tmp:\\", "HDF5 sandbox drive (no dogs allowed)",
+            __super::Credential);
+
+        DriveInfo^ drive = gcnew DriveInfo(tmpFile, false, info, false);
+        coll->Add(drive);
+        Environment::SetEnvironmentVariable("PSH5XTmpFile", tmpFile);
+
+error:
+
+        if (ex != nullptr) {
+            ErrorRecord^ error = gcnew ErrorRecord(ex,
+                "InvalidResult", ErrorCategory::InvalidResult, status);
+            WriteError(error);
         }
 
         return coll;
@@ -124,17 +133,28 @@ namespace PSH5X
     {
         WriteVerbose("HDF5Provider::RemoveDrive()");
 
+        Exception^ ex = nullptr;
+
         DriveInfo^ h5drive = (DriveInfo^) drive;
+
         herr_t status = H5Fclose(h5drive->FileHandle);
         if (status < 0)
         {
             String^ msg = String::Format("H5close failed with status {0}", status);
-            ErrorRecord^ error = gcnew ErrorRecord(gcnew Exception(msg),
+            ex = gcnew Exception(msg);
+            goto error;
+        }
+
+error:
+
+        h5drive->FileHandle = -1;
+
+        if (ex != nullptr) {
+            ErrorRecord^ error = gcnew ErrorRecord(ex,
                 "CloseError", ErrorCategory::CloseError, status);
             WriteError(error);
         }
-        h5drive->FileHandle = -1;
-        
+
         return __super::RemoveDrive(drive);
     }
 }
