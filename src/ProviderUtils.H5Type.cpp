@@ -8,7 +8,10 @@ extern "C" {
 #include <cstdlib>
 #include <cstring>
 
+using namespace Microsoft::CSharp;
+
 using namespace System;
+using namespace System::CodeDom::Compiler;
 using namespace System::Collections;
 using namespace System::Management::Automation;
 using namespace System::Reflection;
@@ -490,7 +493,9 @@ namespace PSH5X
 
     hid_t ProviderUtils::ParseH5Type(Object^ obj)
     {
-        hid_t result = -1;
+        Exception^ ex = nullptr;;
+
+        hid_t result = -1, base_type = -1;
 
         Hashtable^ ht = nullptr;
 
@@ -508,44 +513,54 @@ namespace PSH5X
 
                         if (ht->ContainsKey("Type"))
                         {
-                            hid_t base_type = ParseH5Type(ht["Type"]);
-                            
-                            if (base_type >= 0)
+                            base_type = ParseH5Type(ht["Type"]);
+                            if (base_type < 0) {
+                                ex = gcnew ArgumentException("ARRAY: No 'Type' key found.");
+                                goto error;
+                            }
+
+                            if (ht->ContainsKey("Dims"))
                             {
-                                if (ht->ContainsKey("Dims"))
+                                array<hsize_t>^ dims = nullptr;
+
+                                if (ProviderUtils::TryGetValue(ht["Dims"], dims))
                                 {
-                                    array<hsize_t>^ dims = nullptr;
-                                    
-                                    if (ProviderUtils::TryGetValue(ht["Dims"], dims))
+                                    if (dims->Length > 0 && dims->Length <= 4)
                                     {
-                                        if (dims->Length > 0 && dims->Length <= 4)
-                                        {
-                                            unsigned rank = safe_cast<unsigned>(dims->Length);
-                                            hsize_t tmp[4];
-                                            for (int i = 0; i < dims->Length; ++i) {
-                                                tmp[i] = dims[i];
+                                        unsigned rank = safe_cast<unsigned>(dims->Length);
+                                        hsize_t tmp[4];
+                                        for (int i = 0; i < dims->Length; ++i) {
+                                            tmp[i] = dims[i];
+
+                                            if (dims[i] == 0) {
+                                                ex = gcnew ArgumentException(
+                                                    "ARRAY: Dimensions must be positive.");
+                                                goto error;
                                             }
-                                            result = H5Tarray_create2(base_type, rank, tmp);
                                         }
-                                        else {
-                                            throw gcnew ArgumentException("ARRAY: The 'Dims' array's rank must not exceed 4.");
-                                        }
+                                        result = H5Tarray_create2(base_type, rank, tmp);
                                     }
                                     else {
-                                        throw gcnew ArgumentException("ARRAY: 'Dims' key has invalid value.");
+                                        ex = gcnew ArgumentException(
+                                            "ARRAY: The 'Dims' array's rank must not exceed 4.");
+                                        goto error;
                                     }
                                 }
                                 else {
-                                    throw gcnew ArgumentException("ARRAY: No 'Dims' key found.");
+                                    ex = gcnew ArgumentException(
+                                        "ARRAY: 'Dims' key has invalid value.");
+                                    goto error;
                                 }
                             }
                             else {
-                                throw gcnew ArgumentException(
-                                    String::Format("ARRAY: Unsupported base type: '{0}'", ht["Type"]));
+                                ex = gcnew ArgumentException("ARRAY: No 'Dims' key found.");
+                                goto error;
                             }
                         }
                         else {
-                            throw gcnew ArgumentException("ARRAY: No 'Type' key found.");
+                            ex = gcnew ArgumentException(
+                                String::Format("ARRAY: Unsupported base type: '{0}'", ht["Type"]));
+                            goto error;
                         }
 
 #pragma endregion
@@ -1310,7 +1325,8 @@ namespace PSH5X
                 result = ProviderUtils::ParseH5Type(ht["Type"]);
             }
             else {
-                throw gcnew ArgumentException("No 'Class' or 'Type' key found.");
+                ex = gcnew ArgumentException("No 'Class' or 'Type' key found.");
+                goto error;
             }
         }
         else
@@ -1323,9 +1339,20 @@ namespace PSH5X
         }
 
         if (result < 0) {
-            throw gcnew ArgumentException("The argument provided cannot be converted into an HDF5 datatype type.");
+            ex = gcnew ArgumentException("The argument provided cannot be converted into an HDF5 datatype type.");
+            goto error;
         }
-        
+
+error:
+
+        if (base_type >= 0) {
+            H5Tclose(base_type);
+        }
+
+        if (ex != nullptr) {
+            throw ex;
+        }
+
         return result;
     }
 
@@ -1464,6 +1491,47 @@ namespace PSH5X
         else if (ntype == Single::typeid) { result = H5T_NATIVE_FLOAT;  }
         else if (ntype == Double::typeid) { result = H5T_NATIVE_DOUBLE; }
         
+        return result;
+    }
+
+    Array^ ProviderUtils::GetPSObjectArray(long long length,
+            array<String^>^ mname, array<Type^>^ mtype)
+    {
+        Exception^ ex = nullptr;
+
+        Array^ result = nullptr;
+
+        if (mname->Length != mtype->Length) {
+            ex = gcnew ArgumentException("Argument length mismatch!!!");
+            goto error;
+        }
+        
+        CompilerParameters^ params = gcnew CompilerParameters();
+        params->GenerateInMemory = true;
+        params->TreatWarningsAsErrors = false;
+        params->GenerateExecutable = false;
+        params->CompilerOptions = "/optimize";
+
+        String^ code = "public class Point { public double x {get; set;} public double y {get; set;} public Point() {x=0;y=0;} }";
+
+        CSharpCodeProvider^ provider = gcnew CSharpCodeProvider();
+        CompilerResults^ compilate = provider->CompileAssemblyFromSource(params, code);
+
+        Assembly^ assembly = compilate->CompiledAssembly;
+        Type^ t = assembly->GetType("Point");
+        
+        result = Array::CreateInstance(t, length);
+        for (long long i = 0; i < length; ++i)
+        {
+            result->SetValue(Activator::CreateInstance(t), i);
+        }
+
+error:
+
+        if (ex != nullptr) {
+            throw ex;
+        }
+
         return result;
     }
 

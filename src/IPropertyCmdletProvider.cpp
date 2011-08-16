@@ -56,7 +56,7 @@ namespace PSH5X
         
         gid = H5Gopen2(drive->FileHandle, group_path, H5P_DEFAULT);
         if (gid < 0) {
-            ex = gcnew Exception("H5Gopen2 failed!!!");
+            ex = gcnew Exception("H5Gopen2 failed!");
             goto error;
         }
 
@@ -77,7 +77,7 @@ namespace PSH5X
 
                     oid = H5Oopen(drive->FileHandle, ipath, H5P_DEFAULT);
                     if (oid < 0) {
-                        ex = gcnew Exception("H5Oopen failed!!!");
+                        ex = gcnew Exception("H5Oopen failed!");
                         goto error;
                     }
                     
@@ -97,7 +97,7 @@ namespace PSH5X
                         {
                             aid = H5Aopen(oid, attr_name, H5P_DEFAULT);
                             if (aid < 0) {
-                                ex = gcnew Exception("H5Aopen failed!!!");
+                                ex = gcnew Exception("H5Aopen failed!");
                                 goto error;
                             }
 
@@ -113,7 +113,7 @@ namespace PSH5X
                             }
 
                             if (H5Aclose(aid) < 0) {
-                                ex = gcnew Exception("H5Aclose failed!!!");
+                                ex = gcnew Exception("H5Aclose failed!");
                                 goto error;
                             }
                             else {
@@ -178,9 +178,133 @@ error:
     {
         WriteVerbose(String::Format("HDF5Provider::SetProperty(Path = '{0}')", path));
 
+        Exception^ ex = nullptr;
 
+        hid_t gid = -1, oid = -1, aid = -1;
 
+        DriveInfo^ drive = nullptr;
+        String^ h5path = nullptr;
+        if (!ProviderUtils::TryGetDriveEtH5Path(path, ProviderInfo, drive, h5path))
+        {
+            ErrorRecord^ error = gcnew ErrorRecord(
+                gcnew ArgumentException("Ill-formed HDF5 path name and/or unable to obtain drive name!"),
+                "InvalidData", ErrorCategory::InvalidData, nullptr);
+            ThrowTerminatingError(error);
+        }
 
+        if (drive->ReadOnly)
+        {
+            ErrorRecord^ error = gcnew ErrorRecord(
+                gcnew ArgumentException("The drive is read-only and cannot be modified!"),
+                "InvalidData", ErrorCategory::InvalidData, nullptr);
+            ThrowTerminatingError(error);
+        }
+
+        String^ groupPath = ProviderUtils::ParentPath(h5path);
+        
+        char* group_path = (char*)(Marshal::StringToHGlobalAnsi(groupPath)).ToPointer();
+        
+        gid = H5Gopen2(drive->FileHandle, group_path, H5P_DEFAULT);
+        if (gid < 0) {
+            ex = gcnew Exception("H5Gopen2 failed!");
+            goto error;
+        }
+
+        String^ linkName = ProviderUtils::ChildName(h5path);
+        char* link_name = (char*)(Marshal::StringToHGlobalAnsi(linkName)).ToPointer();
+
+        if (ProviderUtils::IsH5RootPathName(groupPath) || H5Lexists(gid, link_name, H5P_DEFAULT) > 0)
+        {
+            H5L_info_t info;
+            info.type = H5L_TYPE_ERROR;
+
+            if (ProviderUtils::IsH5RootPathName(groupPath) ||
+                H5Lget_info(gid, link_name, &info, H5P_DEFAULT) >= 0)
+            {
+                if (ProviderUtils::IsH5RootPathName(groupPath) || info.type == H5L_TYPE_HARD)
+                {
+                    char* ipath =  (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
+
+                    oid = H5Oopen(drive->FileHandle, ipath, H5P_DEFAULT);
+                    if (oid < 0) {
+                        ex = gcnew Exception("H5Oopen failed!");
+                        goto error;
+                    }
+
+                    for each (PSPropertyInfo^ info in propertyValue->Properties)
+                    {
+                        String^ attributeName = info->Name;
+                        char* attr_name = (char*)(Marshal::StringToHGlobalAnsi(attributeName)).ToPointer();
+
+                        htri_t flag = H5Aexists(oid, attr_name);
+
+                        if (flag > 0)
+                        {
+                            aid = H5Aopen(oid, attr_name, H5P_DEFAULT);
+                            if (aid < 0) {
+                                ex = gcnew Exception("H5Aopen failed!");
+                                goto error;
+                            }
+
+                            Object^ obj = info->Value;
+                            if (obj != nullptr)
+                            {
+                                ProviderUtils::SetH5AttributeValue(aid, obj);
+                            }
+                            else {
+                                ex = gcnew Exception("Empty attribute value!");
+                                goto error;
+                            }
+
+                            if (H5Aclose(aid) < 0) {
+                                ex = gcnew Exception("H5Aclose failed!");
+                                goto error;
+                            }
+                            else {
+                                aid = -1;
+                            }
+                        }
+                        else
+                        {
+                            WriteWarning(
+                                String::Format("Property name '{0}' doesn't exist for item at path '{1}'",
+                                attributeName, path));
+                        }
+                    }
+                }
+                else
+                {
+                    ErrorRecord^ error = gcnew ErrorRecord(
+                        gcnew InvalidProgramException("The item type for this path has no attributes."),
+                        "H5L_TYPE", ErrorCategory::InvalidData, nullptr);
+                    WriteError(error);
+                }
+            }
+            else { // TODO
+            }
+        }
+        else
+        {
+            WriteWarning(String::Format("Item not found at Path = '{0}'", path));
+        }
+
+error:
+
+        if (aid >= 0) {
+            H5Aclose(aid);
+        }
+
+        if (oid >= 0) {
+            H5Oclose(oid);
+        }
+
+        if (gid >= 0) {
+            H5Gclose(gid);
+        }
+
+        if (ex != nullptr) {
+            throw ex;
+        }
 
         return;
     }

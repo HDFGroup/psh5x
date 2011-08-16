@@ -1015,6 +1015,7 @@ namespace PSH5X
         m_known_types["DOUBLE"] = H5T_NATIVE_DOUBLE;
         m_known_types["H5T_NATIVE_DOUBLE"] = H5T_NATIVE_DOUBLE;
         
+        m_known_types["SINGLE"] = H5T_NATIVE_FLOAT;
         m_known_types["FLOAT"] = H5T_NATIVE_FLOAT;
         m_known_types["H5T_NATIVE_FLOAT"] = H5T_NATIVE_FLOAT;
         
@@ -1113,6 +1114,8 @@ namespace PSH5X
 
 #pragma endregion
 
+#pragma region HDF5 item types
+
         m_item_types = gcnew Hashtable();
 
         m_item_types["DATASET"] = "DATASET";
@@ -1155,5 +1158,6 @@ namespace PSH5X
         m_item_types["SLINK"] = "SOFTLINK";
         m_item_types["SOFT"] = "SOFTLINK";
 
+#pragma endregion
     }
 }

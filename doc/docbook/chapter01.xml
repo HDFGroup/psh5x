@@ -9,15 +9,18 @@
       >X</emphasis>tension is a PowerShell snap-in (a .NET DLL) that contains a PowerShell provider
     and other supporting cmdlets for accessing HDF5 files (stores). The PowerShell provider
     architecture is the "secret sauce" behind the consistent user experience across a diverse set of
-    data stores, such as the Windows Registry, certificate stores, and Active Directory.</para>
+    data stores, such as the Windows Registry, certificate stores, and Active Directory. PSH5X is an
+    attempt to add a member to that ensemble of providers orchestrated by the provider
+    architecture.</para>
 
   <sect1 xml:id="windows_powershell_providers">
     <title>A Windows PowerShell Provider</title>
-    <para>The Windows PowerShell provider architecture consists of a set of core cmdlets for
-      manipulating entities that it refers to as items and properties, that may have values and/or
-      content. The actual mapping of these entities and the semantics of the core cmdlets for a
-      particular type of data store is at the discretion of the managing provider. For PSH5X the
-      mapping is as follows:</para>
+    <para>The Windows PowerShell provider architecture consists of a set of <emphasis>core
+        cmdlets</emphasis> for manipulating entities that it refers to as <emphasis>items</emphasis>
+      and <emphasis>properties</emphasis>, that may have values and/or <emphasis>content</emphasis>.
+      The actual mapping of these entities and the semantics of the core cmdlets for a particular
+      type of data store is at the discretion of the managing provider. For PSH5X the mapping is as
+      follows:</para>
     <table xml:id="items_et_properties_table">
       <title>PSH5X Items and Properties</title>
       <tgroup cols="3">
@@ -96,8 +99,8 @@
 
   <sect1>
     <title>A Collection of Windows PowerShell Cmdlets</title>
-
-    <para/>
+    <para>PSH5X also includes a set of utility cmdlets, for example, to look up type information
+    or to construct an array of a certain element type.</para>
   </sect1>
 
   <sect1>

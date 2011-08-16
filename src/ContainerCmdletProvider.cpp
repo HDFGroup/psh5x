@@ -383,6 +383,14 @@ error:
             ThrowTerminatingError(error);
         }
 
+        if (drive->ReadOnly)
+        {
+            ErrorRecord^ error = gcnew ErrorRecord(
+                gcnew ArgumentException("The drive is read-only and cannot be modified!"),
+                "InvalidData", ErrorCategory::InvalidData, nullptr);
+            ThrowTerminatingError(error);
+        }
+
         if (ProviderUtils::IsH5RootPathName(h5path)) // root group, TODO: refine with address check!
         {
             ErrorRecord^ error = gcnew ErrorRecord(

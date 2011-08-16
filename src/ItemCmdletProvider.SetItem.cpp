@@ -43,6 +43,14 @@ namespace PSH5X
             ThrowTerminatingError(error);
         }
 
+        if (drive->ReadOnly)
+        {
+            ErrorRecord^ error = gcnew ErrorRecord(
+                gcnew ArgumentException("The drive is read-only and cannot be modified!"),
+                "InvalidData", ErrorCategory::InvalidData, nullptr);
+            ThrowTerminatingError(error);
+        }
+
         if (ProviderUtils::IsH5Dataset(drive->FileHandle, h5path))
         {
 #pragma region HDF5 dataset

@@ -157,6 +157,7 @@
     <ClInclude Include="include\GroupInfoLite.h" />
     <ClInclude Include="include\ItemInfo.h" />
     <ClInclude Include="include\LinkInfo.h" />
+    <ClInclude Include="include\NewH5ArrayCommand.h" />
     <ClInclude Include="include\ObjectInfo.h" />
     <ClInclude Include="include\ObjectInfoLite.h" />
     <ClInclude Include="include\Provider.h" />
@@ -182,6 +183,7 @@
     <ClCompile Include="src\ItemCmdletProvider.SetItem.cpp" />
     <ClCompile Include="src\LinkInfo.cpp" />
     <ClCompile Include="src\NavigationCmdletProvider.cpp" />
+    <ClCompile Include="src\NewH5ArrayCommand.cpp" />
     <ClCompile Include="src\ObjectInfo.cpp" />
     <ClCompile Include="src\ObjectInfoLite.cpp" />
     <ClCompile Include="src\Provider.cpp" />

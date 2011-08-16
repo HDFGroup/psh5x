@@ -145,6 +145,9 @@ namespace PSH5X
 
         static hid_t ProviderUtils::DotNetType2H5Native(System::Type^ ntype, bool isBitfield);
 
+        static System::Array^ ProviderUtils::GetPSObjectArray(long long length,
+            array<System::String^>^ mname, array<System::Type^>^ mtype);
+
         static System::Reflection::MethodInfo^ BitConverterMethod(hid_t type_id);
 
         static bool IsH5SimpleType(hid_t dtype);
@@ -160,6 +163,8 @@ namespace PSH5X
 #pragma region HDF5 Attribute
 
         static System::Collections::Hashtable^ H5Attribute(hid_t attr_id, System::String^ attributeName);
+
+        static void SetH5AttributeValue(hid_t attr_id, System::Object^ value);
 
 #pragma endregion
 
@@ -178,6 +183,31 @@ namespace PSH5X
         static bool TryGetValue(System::Object^ obj, array<hsize_t>^% arr);
 
         static bool TryGetValue(System::Object^ obj, array<System::String^>^% arr);
+
+        template<typename T>
+        static bool TryGetValue(System::Object^ obj, array<T>^% arr)
+        {
+            bool result = false;
+
+            Object^ bobj = nullptr;
+            if (obj->GetType() == PSObject::typeid) {
+                bobj = safe_cast<PSObject^>(obj)->BaseObject;
+            }
+            else {
+                bobj = obj;
+            }
+
+            try
+            {
+                Array^ tmp = safe_cast<Array^>(bobj);
+                arr = gcnew array<T>(tmp->Length);
+                Array::Copy(tmp, arr, tmp->Length);
+                result = true;
+            }
+            catch (...) {}
+
+            return result;
+        }
 
 #pragma endregion
 

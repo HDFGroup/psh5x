@@ -83,7 +83,7 @@ error:
 
             bool readonly = true;
             if (dynamicParameters["Mode"]->Value != nullptr)
-                readonly = (dynamicParameters["Mode"]->Value->ToString()->ToUpper() == "RW");
+                readonly = (dynamicParameters["Mode"]->Value->ToString()->ToUpper() != "RW");
 
             return gcnew DriveInfo(path, readonly, drive, dynamicParameters["Force"]->IsSet);
         }

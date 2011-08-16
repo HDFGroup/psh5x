@@ -16,7 +16,7 @@
                                     <String>XSL</String>
                                 </field>
                                 <field name="url">
-                                    <String>ContainerCmdletProvider.xml</String>
+                                    <String>preface.xml</String>
                                 </field>
                             </scenarioAssociation>
                             <scenarioAssociation>
@@ -27,7 +27,7 @@
                                     <String>XSL</String>
                                 </field>
                                 <field name="url">
-                                    <String>book.xml</String>
+                                    <String>chapter03.xml</String>
                                 </field>
                             </scenarioAssociation>
                             <scenarioAssociation>
@@ -38,7 +38,18 @@
                                     <String>XSL</String>
                                 </field>
                                 <field name="url">
-                                    <String>IContentCmdletProvider.xml</String>
+                                    <String>chapter02.xml</String>
+                                </field>
+                            </scenarioAssociation>
+                            <scenarioAssociation>
+                                <field name="name">
+                                    <String>Docbook PDF duplicate</String>
+                                </field>
+                                <field name="type">
+                                    <String>XSL</String>
+                                </field>
+                                <field name="url">
+                                    <String>chapter01.xml</String>
                                 </field>
                             </scenarioAssociation>
                             <scenarioAssociation>
@@ -71,84 +82,7 @@
                                     <String>XSL</String>
                                 </field>
                                 <field name="url">
-                                    <String>IDynamicPropertyCmdletProvider.xml</String>
-                                </field>
-                            </scenarioAssociation>
-                            <scenarioAssociation>
-                                <field name="name">
-                                    <String>Docbook PDF duplicate</String>
-                                </field>
-                                <field name="type">
-                                    <String>XSL</String>
-                                </field>
-                                <field name="url">
-                                    <String>IPropertyCmdletProvider.xml</String>
-                                </field>
-                            </scenarioAssociation>
-                            <scenarioAssociation>
-                                <field name="name">
-                                    <String>Docbook PDF duplicate</String>
-                                </field>
-                                <field name="type">
-                                    <String>XSL</String>
-                                </field>
-                                <field name="url">
-                                    <String>NavigationCmdletProvider.xml</String>
-                                </field>
-                            </scenarioAssociation>
-                            <scenarioAssociation>
-                                <field name="name">
-                                    <String>Docbook PDF duplicate</String>
-                                </field>
-                                <field name="type">
-                                    <String>XSL</String>
-                                </field>
-                                <field name="url">
-                                    <String>chapter01.xml</String>
-                                </field>
-                            </scenarioAssociation>
-                            <scenarioAssociation>
-                                <field name="name">
-                                    <String>Docbook PDF duplicate</String>
-                                </field>
-                                <field name="type">
-                                    <String>XSL</String>
-                                </field>
-                                <field name="url">
-                                    <String>chapter02.xml</String>
-                                </field>
-                            </scenarioAssociation>
-                            <scenarioAssociation>
-                                <field name="name">
-                                    <String>Docbook PDF duplicate</String>
-                                </field>
-                                <field name="type">
-                                    <String>XSL</String>
-                                </field>
-                                <field name="url">
-                                    <String>ItemCmdletProvider.xml</String>
-                                </field>
-                            </scenarioAssociation>
-                            <scenarioAssociation>
-                                <field name="name">
-                                    <String>Docbook PDF duplicate</String>
-                                </field>
-                                <field name="type">
-                                    <String>XSL</String>
-                                </field>
-                                <field name="url">
-                                    <String>DriveCmdletProvider.xml</String>
-                                </field>
-                            </scenarioAssociation>
-                            <scenarioAssociation>
-                                <field name="name">
-                                    <String>Docbook PDF duplicate</String>
-                                </field>
-                                <field name="type">
-                                    <String>XSL</String>
-                                </field>
-                                <field name="url">
-                                    <String>appendix01.xml</String>
+                                    <String>book.xml</String>
                                 </field>
                             </scenarioAssociation>
                             <scenarioAssociation>
@@ -170,7 +104,128 @@
                                     <String>XSL</String>
                                 </field>
                                 <field name="url">
-                                    <String>chapter03.xml</String>
+                                    <String>appendix05.xml</String>
+                                </field>
+                            </scenarioAssociation>
+                            <scenarioAssociation>
+                                <field name="name">
+                                    <String>Docbook PDF duplicate</String>
+                                </field>
+                                <field name="type">
+                                    <String>XSL</String>
+                                </field>
+                                <field name="url">
+                                    <String>appendix04.xml</String>
+                                </field>
+                            </scenarioAssociation>
+                            <scenarioAssociation>
+                                <field name="name">
+                                    <String>Docbook PDF duplicate</String>
+                                </field>
+                                <field name="type">
+                                    <String>XSL</String>
+                                </field>
+                                <field name="url">
+                                    <String>appendix03.xml</String>
+                                </field>
+                            </scenarioAssociation>
+                            <scenarioAssociation>
+                                <field name="name">
+                                    <String>Docbook PDF duplicate</String>
+                                </field>
+                                <field name="type">
+                                    <String>XSL</String>
+                                </field>
+                                <field name="url">
+                                    <String>appendix02.xml</String>
+                                </field>
+                            </scenarioAssociation>
+                            <scenarioAssociation>
+                                <field name="name">
+                                    <String>Docbook PDF duplicate</String>
+                                </field>
+                                <field name="type">
+                                    <String>XSL</String>
+                                </field>
+                                <field name="url">
+                                    <String>appendix01.xml</String>
+                                </field>
+                            </scenarioAssociation>
+                            <scenarioAssociation>
+                                <field name="name">
+                                    <String>Docbook PDF duplicate</String>
+                                </field>
+                                <field name="type">
+                                    <String>XSL</String>
+                                </field>
+                                <field name="url">
+                                    <String>NavigationCmdletProvider.xml</String>
+                                </field>
+                            </scenarioAssociation>
+                            <scenarioAssociation>
+                                <field name="name">
+                                    <String>Docbook PDF duplicate</String>
+                                </field>
+                                <field name="type">
+                                    <String>XSL</String>
+                                </field>
+                                <field name="url">
+                                    <String>ItemCmdletProvider.xml</String>
+                                </field>
+                            </scenarioAssociation>
+                            <scenarioAssociation>
+                                <field name="name">
+                                    <String>Docbook PDF duplicate</String>
+                                </field>
+                                <field name="type">
+                                    <String>XSL</String>
+                                </field>
+                                <field name="url">
+                                    <String>IPropertyCmdletProvider.xml</String>
+                                </field>
+                            </scenarioAssociation>
+                            <scenarioAssociation>
+                                <field name="name">
+                                    <String>Docbook PDF duplicate</String>
+                                </field>
+                                <field name="type">
+                                    <String>XSL</String>
+                                </field>
+                                <field name="url">
+                                    <String>IDynamicPropertyCmdletProvider.xml</String>
+                                </field>
+                            </scenarioAssociation>
+                            <scenarioAssociation>
+                                <field name="name">
+                                    <String>Docbook PDF duplicate</String>
+                                </field>
+                                <field name="type">
+                                    <String>XSL</String>
+                                </field>
+                                <field name="url">
+                                    <String>IContentCmdletProvider.xml</String>
+                                </field>
+                            </scenarioAssociation>
+                            <scenarioAssociation>
+                                <field name="name">
+                                    <String>Docbook PDF duplicate</String>
+                                </field>
+                                <field name="type">
+                                    <String>XSL</String>
+                                </field>
+                                <field name="url">
+                                    <String>DriveCmdletProvider.xml</String>
+                                </field>
+                            </scenarioAssociation>
+                            <scenarioAssociation>
+                                <field name="name">
+                                    <String>Docbook PDF duplicate</String>
+                                </field>
+                                <field name="type">
+                                    <String>XSL</String>
+                                </field>
+                                <field name="url">
+                                    <String>ContainerCmdletProvider.xml</String>
                                 </field>
                             </scenarioAssociation>
                         </scenarioAssociation-array>
