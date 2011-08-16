@@ -177,18 +177,17 @@ error:
     void Provider::SetProperty(String^ path, PSObject^ propertyValue)
     {
         WriteVerbose(String::Format("HDF5Provider::SetProperty(Path = '{0}')", path));
+
+
+
+
+
         return;
     }
 
     Object^ Provider::SetPropertyDynamicParameters(String^ path, PSObject^ propertyValue)
     {
         WriteVerbose(String::Format("HDF5Provider::SetPropertyDynamicParameters(Path = '{0}')", path));
-
-        ErrorRecord^ error = gcnew ErrorRecord(
-            gcnew InvalidProgramException("HDF5Provider::SetPropertyDynamicParameters(...) not implemented!"),
-            "HDF5Provider", ErrorCategory::InvalidData, nullptr);
-        WriteError(error);
-        
         return nullptr;
     }
 

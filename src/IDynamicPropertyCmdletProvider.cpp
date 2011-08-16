@@ -63,20 +63,22 @@ namespace PSH5X
             String::Format("HDF5Provider::NewProperty(Path = '{0}',PropertyName='{1}',propertyTypeName = '{2}')",
             path, propertyName, propertyTypeName));
 
-        // Normalize path & get drive
-        String^ npath = ProviderUtils::NormalizePath(path);
-        String^ h5path = ProviderUtils::PathNoDrive(npath);
+        Exception^ ex = nullptr;
 
-        if (!ProviderUtils::IsWellFormedH5Path(h5path))
+        hid_t ftype = -1, fspace = -1, oid = -1, aid = -1;
+
+        hsize_t* current_size = NULL;
+
+#pragma region sanity check
+
+        DriveInfo^ drive = nullptr;
+        String^ h5path = nullptr;
+        if (!ProviderUtils::TryGetDriveEtH5Path(path, ProviderInfo, drive, h5path))
         {
-            WriteWarning(String::Format("'{0}' is not a well-formed HDF5 path name.", h5path));
-            return;
-        }
-        DriveInfo^ drive = ProviderUtils::GetDriveFromPath(path, ProviderInfo);
-        if (drive == nullptr)
-        {
-            WriteWarning(String::Format("Cannot obtain drive from path!.", h5path));
-            return;
+            ErrorRecord^ error = gcnew ErrorRecord(
+                gcnew ArgumentException("Ill-formed HDF5 path name and/or unable to obtain drive name!"),
+                "InvalidData", ErrorCategory::InvalidData, nullptr);
+            ThrowTerminatingError(error);
         }
 
         if (!ProviderUtils::IsValidAbsoluteH5Path(drive->FileHandle, h5path))
@@ -96,159 +98,172 @@ namespace PSH5X
             ThrowTerminatingError(error);
         }
 
-        hid_t h5type = -1, h5space = -1, h5obj = -1, h5attr = -1;
+#pragma endregion
 
-        try
+        RuntimeDefinedParameterDictionary^ dynamicParameters =
+            (RuntimeDefinedParameterDictionary^) DynamicParameters;
+
+        // mandatory parameters -ElementType
+
+        Object^ elemType = dynamicParameters["ElementType"]->Value;
+
+        Hashtable^ ht = nullptr;
+        String^ typeOrPath = nullptr;
+
+        if (ProviderUtils::TryGetValue(elemType, ht)) {
+            ftype = ProviderUtils::ParseH5Type(ht);
+            if (ftype < 0) {
+                ex = gcnew ArgumentException("Invalid HDF5 datatype specified!");
+                goto error;
+            }
+        }
+        else if (ProviderUtils::TryGetValue(elemType, typeOrPath))
         {
-            RuntimeDefinedParameterDictionary^ dynamicParameters =
-                (RuntimeDefinedParameterDictionary^) DynamicParameters;
-
-            // mandatory parameters -ElementType
-
-            Object^ elemType = dynamicParameters["ElementType"]->Value;
-
-            Hashtable^ ht = nullptr;
-            String^ typeOrPath = nullptr;
-
-            if (ProviderUtils::TryGetValue(elemType, ht)) {
-                h5type = ProviderUtils::ParseH5Type(ht);
-                if (h5type < 0) {
-                    throw gcnew ArgumentException("Invalid HDF5 datatype specified!");
-                }
-            }
-            else if (ProviderUtils::TryGetValue(elemType, typeOrPath))
-            {
-                if (typeOrPath->StartsWith("/")) {
-                    if (ProviderUtils::IsH5DatatypeObject(drive->FileHandle, typeOrPath))
-                    {
-                        char* path = (char*)(Marshal::StringToHGlobalAnsi(typeOrPath)).ToPointer();
-                        h5type = H5Topen2(drive->FileHandle, path, H5P_DEFAULT);
-                    }
-                    else {
-                        throw gcnew
-                            ArgumentException("The HDF5 path name specified does not refer to an datatype object.");
-                    }
-                }
-                else
+            if (typeOrPath->StartsWith("/")) {
+                if (ProviderUtils::IsH5DatatypeObject(drive->FileHandle, typeOrPath))
                 {
-                    h5type = ProviderUtils::H5Type(typeOrPath);
-                    if (h5type < 0) {
-                        throw gcnew ArgumentException("Invalid HDF5 datatype specified!");
-                    }
-                }
-            }
-            else {
-                throw gcnew ArgumentException("Unrecognized type: must be string or hashtable.");
-            }
-
-            // optional parameters, determine shape first
-
-            String^ shape = "scalar";
-
-            bool isNull = (dynamicParameters["Null"]->IsSet);
-            bool isSimple = (dynamicParameters["Simple"]->Value != nullptr);
-
-            if (isNull && isSimple) {
-                throw gcnew ArgumentException("The -Null and -Simple options are incompatible. Choose one!");
-            }
-            if (isNull)   { shape = "Null";   }
-            if (isSimple) { shape = "Simple"; }
-
-            char* attr_name = (char*)(Marshal::StringToHGlobalAnsi(propertyName)).ToPointer();
-            char* obj_path = (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
-            h5obj = H5Oopen(drive->FileHandle, obj_path, H5P_DEFAULT);
-
-            if (h5obj >= 0)
-            {
-                if (H5Aexists(h5obj, attr_name) > 0) {
-                    throw gcnew ArgumentException(String::Format(
-                        "Item '{0}' already has a property named '{1}'", path, propertyName));
-                }
-
-                if (shape->ToUpper() == "NULL") {
-                   h5space = H5Screate(H5S_NULL);
-                } else if (shape->ToUpper() == "SCALAR") {
-                   h5space = H5Screate(H5S_SCALAR);
-                } else if (shape->ToUpper() == "SIMPLE") {
-
-                    h5space = H5Screate(H5S_SIMPLE);
-                    array<hsize_t>^ dims = (array<hsize_t>^) dynamicParameters["Simple"]->Value;
-                    
-                    int rank = dims->Length;
-                    hsize_t* current_size = new hsize_t [rank];
-                    for (int i = 0; i < rank; ++i) { current_size[i] = dims[i]; }
-
-                    if (H5Sset_extent_simple(h5space, rank, current_size, current_size) < 0) {
-                        delete [] current_size;
-                        throw gcnew InvalidOperationException("H5Sset_extent_simple failed!");
-                    }
-                    delete [] current_size;
-                }
-                else {
-                    throw gcnew ArgumentException("Invalid shape!");
-                }
-
-                if (h5space >= 0)
-                {
-                    if (this->ShouldProcess(h5path,
-                        String::Format("HDF5 attribute '{0}' does not exist, create it",
-                        propertyName)))
-                    {
-                        h5attr = H5Acreate2(h5obj, attr_name, h5type, h5space,
-                            H5P_DEFAULT, H5P_DEFAULT);
-
-                        if (h5attr >= 0)
-                        {
-                            if (H5Fflush(h5attr, H5F_SCOPE_LOCAL) < 0) {
-                                WriteWarning("H5Fflush failed!");
-                            }
-
-                            Hashtable^ ht = ProviderUtils::H5Attribute(h5attr, propertyName);
-                            WritePropertyObject(ht, path);
-                        }
-                        else {
-                            throw gcnew InvalidOperationException("H5Acreate2 failed!");
-                        }
+                    char* path = (char*)(Marshal::StringToHGlobalAnsi(typeOrPath)).ToPointer();
+                    ftype = H5Topen2(drive->FileHandle, path, H5P_DEFAULT);
+                    if (ftype < 0) {
+                        ex = gcnew Exception("H5Topen2 failed!");
+                        goto error;
                     }
                 }
                 else {
-                    throw gcnew InvalidOperationException("H5Screate failed!");
+                    ex = gcnew
+                        ArgumentException("The HDF5 path name specified does not refer to an datatype object.");
+                    goto error;
                 }
             }
-            else {
-                throw gcnew InvalidOperationException("H5Oopen failed!");
+            else
+            {
+                ftype = ProviderUtils::H5Type(typeOrPath);
+                if (ftype < 0) {
+                    ex = gcnew ArgumentException("Invalid HDF5 datatype specified!");
+                    goto error;
+                }
             }
         }
-        catch (Exception^ ex)
-        {
-            ErrorRecord^ error = gcnew ErrorRecord(ex, "InvalidData", ErrorCategory::InvalidData, nullptr);
-            ThrowTerminatingError(error);
+        else {
+            ex = gcnew ArgumentException("Unrecognized type: must be string or hashtable.");
+            goto error;
         }
-        finally
+
+        // optional parameters, determine shape first
+
+        String^ shape = "scalar";
+
+        bool isNull = (dynamicParameters["Null"]->IsSet);
+        bool isSimple = (dynamicParameters["Simple"]->Value != nullptr);
+
+        if (isNull && isSimple) {
+            ex = gcnew ArgumentException("The -Null and -Simple options are incompatible. Choose one!");
+            goto error;
+        }
+        if (isNull)   { shape = "Null";   }
+        if (isSimple) { shape = "Simple"; }
+
+        char* attr_name = (char*)(Marshal::StringToHGlobalAnsi(propertyName)).ToPointer();
+        char* obj_path = (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
+
+        oid = H5Oopen(drive->FileHandle, obj_path, H5P_DEFAULT);
+        if (oid < 0) {
+            ex = gcnew Exception("H5Oopen failed!");
+            goto error;
+        }
+
+        if (H5Aexists(oid, attr_name) > 0) {
+            ex = gcnew ArgumentException(String::Format(
+                "Item '{0}' already has a property named '{1}'", path, propertyName));
+            goto error;
+        }
+
+        if (shape->ToUpper() == "NULL")
         {
-            if (h5attr >= 0) {
-                if (H5Aclose(h5attr)) {
-                    WriteWarning("H5Aclose failed.");
-                }
+            fspace = H5Screate(H5S_NULL);
+            if (fspace < 0) {
+                ex = gcnew Exception("H5Screate failed!");
+                goto error;
+            }
+        }
+        else if (shape->ToUpper() == "SCALAR")
+        {
+            fspace = H5Screate(H5S_SCALAR);
+            if (fspace < 0) {
+                ex = gcnew Exception("H5Screate failed!");
+                goto error;
+            }
+        }
+        else if (shape->ToUpper() == "SIMPLE")
+        {
+
+            fspace = H5Screate(H5S_SIMPLE);
+            if (fspace < 0) {
+                ex = gcnew Exception("H5Screate failed!");
+                goto error;
             }
 
-            if (h5space >= 0) {
-                if (H5Sclose(h5space)) {
-                    WriteWarning("H5Sclose failed.");
-                }
+            array<hsize_t>^ dims = (array<hsize_t>^) dynamicParameters["Simple"]->Value;
+
+            int rank = dims->Length;
+            current_size = new hsize_t [rank];
+            for (int i = 0; i < rank; ++i) { current_size[i] = dims[i]; }
+
+            if (H5Sset_extent_simple(fspace, rank, current_size, current_size) < 0) {
+                ex = gcnew InvalidOperationException("H5Sset_extent_simple failed!");
+                goto error;
+            }
+        }
+        else {
+            ex = gcnew ArgumentException("Invalid shape!");
+            goto error;
+        }
+
+        // TODO: set the value
+
+        if (this->ShouldProcess(h5path,
+            String::Format("HDF5 attribute '{0}' does not exist, create it",
+            propertyName)))
+        {
+            aid = H5Acreate2(oid, attr_name, ftype, fspace, H5P_DEFAULT, H5P_DEFAULT);
+            if (aid < 0) {
+                ex = gcnew Exception("H5Acreate2 failed!");
+                goto error;
             }
 
-            if (h5obj >= 0) {
-                if (H5Oclose(h5obj) < 0) {
-                     WriteWarning("H5Oclose failed.");
-                }
+            if (H5Fflush(aid, H5F_SCOPE_LOCAL) < 0) {
+                ex = gcnew Exception("H5Fflush failed!");
+                goto error;
             }
 
-            if (h5type >= 0) {
-                if (H5Tclose(h5type)) {
-                    WriteWarning("H5Tclose failed.");
-                }
-            }
+            Hashtable^ ht = ProviderUtils::H5Attribute(aid, propertyName);
+            WritePropertyObject(ht, path);
+        }
+
+error:
+
+        if (aid >= 0) {
+            H5Aclose(aid);
+        }
+
+        if (current_size != NULL) {
+            delete [] current_size;
+        }
+
+        if (fspace >= 0) {
+            H5Sclose(fspace);
+        }
+
+        if (oid >= 0) {
+            H5Oclose(oid);
+        }
+
+        if (ftype >= 0) {
+            H5Tclose(ftype);
+        }
+
+        if (ex != nullptr) {
+            throw ex;
         }
 
         return;
@@ -311,11 +326,22 @@ namespace PSH5X
         WriteVerbose(
             String::Format("HDF5Provider::RemoveProperty(Path = '{0}',PropertyName='{1}')",
             path, propertyName));
-        String^ npath = ProviderUtils::NormalizePath(path);
-        String^ h5path = ProviderUtils::PathNoDrive(npath);
-        if (!ProviderUtils::IsWellFormedH5Path(h5path)) { return; }
-        DriveInfo^ drive = ProviderUtils::GetDriveFromPath(path, ProviderInfo);
-        if (drive == nullptr) { return; }
+
+        Exception^ ex = nullptr;
+
+        hid_t oid = -1;
+
+#pragma region sanity check
+
+        DriveInfo^ drive = nullptr;
+        String^ h5path = nullptr;
+        if (!ProviderUtils::TryGetDriveEtH5Path(path, ProviderInfo, drive, h5path))
+        {
+            ErrorRecord^ error = gcnew ErrorRecord(
+                gcnew ArgumentException("Ill-formed HDF5 path name and/or unable to obtain drive name!"),
+                "InvalidData", ErrorCategory::InvalidData, nullptr);
+            ThrowTerminatingError(error);
+        }
 
         if (!ProviderUtils::IsValidAbsoluteH5Path(drive->FileHandle, h5path))
         {
@@ -334,40 +360,48 @@ namespace PSH5X
             ThrowTerminatingError(error);
         }
 
+#pragma endregion
+
         char* attr_name = (char*)(Marshal::StringToHGlobalAnsi(propertyName)).ToPointer();
         char* obj_path = (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
-        hid_t obj_id = H5Oopen(drive->FileHandle, obj_path, H5P_DEFAULT);
         
-        if (obj_id >= 0)
+        oid = H5Oopen(drive->FileHandle, obj_path, H5P_DEFAULT);
+        if (oid < 0) {
+            ex = gcnew Exception("H5Oopen failed!");
+            goto error;
+        }
+        
+        if (H5Aexists(oid, attr_name) <= 0)
         {
-            if (H5Aexists(obj_id, attr_name) <= 0)
+            ex = gcnew Exception(String::Format(
+                "Item '{0}' doesn't have an HDF5 attribute named '{1}'", path, propertyName));
+            goto error;
+        }
+        
+        if (this->ShouldProcess(h5path,
+            String::Format("Removing HDF5 attribute '{0}' from item '{1}'", propertyName, path)))
+        {
+            if (H5Adelete(oid, attr_name) >= 0)
             {
-                H5Oclose(obj_id);
-                ErrorRecord^ error = gcnew ErrorRecord(
-                    gcnew ArgumentException(String::Format(
-                    "Item '{0}' doesn't have an HDF5 attribute named '{1}'", path, propertyName)),
-                    "NoSuchProperty", ErrorCategory::InvalidData, nullptr);
-                ThrowTerminatingError(error);
-            }
-            else
-            {
-                if (this->ShouldProcess(h5path,
-                    String::Format("Removing HDF5 attribute '{0}' from item '{1}'", propertyName, path)))
-                {
-                    if (H5Adelete(obj_id, attr_name) >= 0)
-                    {
-                        if (H5Fflush(obj_id, H5F_SCOPE_LOCAL) < 0) { // TODO
-                        }
-                    }
-                    else { // TODO
-                    }
+                if (H5Fflush(oid, H5F_SCOPE_LOCAL) < 0) {
+                    ex = gcnew Exception("H5Fflush failed!");
+                    goto error;
                 }
             }
-
-            if (H5Oclose(obj_id) < 0) { // TODO
+            else {
+                ex = gcnew Exception("H5Adelete failed!");
+                goto error;
             }
         }
-        else { // TODO
+
+error:
+
+        if (oid >= 0) {
+            H5Oclose(oid);
+        }
+
+        if (ex != nullptr) {
+            throw ex;
         }
 
         return;
@@ -387,11 +421,22 @@ namespace PSH5X
         WriteVerbose(
             String::Format("HDF5Provider::RenameProperty(Path = '{0}',SourceProperty='{1}',DestinationProperty = '{2}')",
             path, sourceProperty, destinationProperty));
-        String^ npath = ProviderUtils::NormalizePath(path);
-        String^ h5path = ProviderUtils::PathNoDrive(npath);
-        if (!ProviderUtils::IsWellFormedH5Path(h5path)) { return; }
-        DriveInfo^ drive = ProviderUtils::GetDriveFromPath(path, ProviderInfo);
-        if (drive == nullptr) { return; }
+
+        Exception^ ex = nullptr;
+
+        hid_t oid = -1, aid = -1;
+
+#pragma region sanity check
+
+        DriveInfo^ drive = nullptr;
+        String^ h5path = nullptr;
+        if (!ProviderUtils::TryGetDriveEtH5Path(path, ProviderInfo, drive, h5path))
+        {
+            ErrorRecord^ error = gcnew ErrorRecord(
+                gcnew ArgumentException("Ill-formed HDF5 path name and/or unable to obtain drive name!"),
+                "InvalidData", ErrorCategory::InvalidData, nullptr);
+            ThrowTerminatingError(error);
+        }
 
         if (!ProviderUtils::IsValidAbsoluteH5Path(drive->FileHandle, h5path))
         {
@@ -410,56 +455,66 @@ namespace PSH5X
             ThrowTerminatingError(error);
         }
 
+#pragma endregion
+
         char* old_attr_name = (char*)(Marshal::StringToHGlobalAnsi(sourceProperty)).ToPointer();
         char* new_attr_name = (char*)(Marshal::StringToHGlobalAnsi(destinationProperty)).ToPointer();
 
         char* obj_path = (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
-        hid_t obj_id = H5Oopen(drive->FileHandle, obj_path, H5P_DEFAULT);
         
-        if (obj_id >= 0)
+        oid = H5Oopen(drive->FileHandle, obj_path, H5P_DEFAULT);
+        if (oid < 0) {
+            ex = gcnew Exception("H5Oopen failed!");
+            goto error;
+        }
+        
+        if (H5Aexists(oid, old_attr_name) <= 0)
         {
-            if (H5Aexists(obj_id, old_attr_name) <= 0)
+            ex = gcnew Exception(String::Format(
+                "Item '{0}' doesn't have an HDF5 attribute named '{1}'", path, sourceProperty));
+            goto error;
+        }
+        else
+        {
+            if (this->ShouldProcess(h5path,
+                String::Format("Renaming HDF5 attribute '{0}' to '{1}' for item '{2}'",
+                sourceProperty, destinationProperty, path)))
             {
-                H5Oclose(obj_id);
-                ErrorRecord^ error = gcnew ErrorRecord(
-                    gcnew ArgumentException(String::Format(
-                    "Item '{0}' doesn't have an HDF5 attribute named '{1}'", path, sourceProperty)),
-                    "NoSuchProperty", ErrorCategory::InvalidData, nullptr);
-                ThrowTerminatingError(error);
-            }
-            else
-            {
-                if (this->ShouldProcess(h5path,
-                    String::Format("Renaming HDF5 attribute '{0}' to '{1}' for item '{2}'",
-                    sourceProperty, destinationProperty, path)))
+                if (H5Arename(oid, old_attr_name, new_attr_name) >= 0)
                 {
-                    if (H5Arename(obj_id, old_attr_name, new_attr_name) >= 0)
-                    {
-                        if (H5Fflush(obj_id, H5F_SCOPE_LOCAL) < 0) { // TODO
-                        }
-
-                        hid_t attr_id = H5Aopen(obj_id, new_attr_name, H5P_DEFAULT);
-                        if (attr_id >= 0)
-                        {
-                            Hashtable^ ht = ProviderUtils::H5Attribute(attr_id, destinationProperty);
-
-                            WritePropertyObject(ht, path);
-
-                            if (H5Aclose(attr_id) < 0) { // TODO
-                            }
-                        }
-                        else { // TODO
-                        }
+                    if (H5Fflush(oid, H5F_SCOPE_LOCAL) < 0) {
+                        ex = gcnew Exception("H5Fflush failed!");
+                        goto error;
                     }
-                    else { // TODO
+
+                    aid = H5Aopen(oid, new_attr_name, H5P_DEFAULT);
+                    if (aid < 0) {
+                        ex = gcnew Exception("H5Aopen failed!");
+                        goto error;
                     }
+
+                    Hashtable^ ht = ProviderUtils::H5Attribute(aid, destinationProperty);
+                    WritePropertyObject(ht, path);
+                }
+                else {
+                    ex = gcnew Exception("H5Arename failed!");
+                    goto error;
                 }
             }
-
-            if (H5Oclose(obj_id) < 0) { // TODO
-            }
         }
-        else { // TODO
+
+error:
+
+        if (aid >= 0) {
+            H5Aclose(aid);
+        }
+
+        if (oid >= 0) {
+            H5Oclose(oid);
+        }
+
+        if (ex != nullptr) {
+            throw ex;
         }
 
         return;
