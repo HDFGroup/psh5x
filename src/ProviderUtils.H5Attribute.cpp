@@ -4,6 +4,7 @@
 
 extern "C" {
 #include "H5Apublic.h"
+#include "H5Dpublic.h"
 #include "H5Spublic.h"
 #include "H5Tpublic.h"
 }
@@ -27,6 +28,13 @@ namespace PSH5X
         hsize_t* dims = NULL;
         hsize_t* maxdims = NULL;
 
+        htri_t is_vlen = -1;
+
+        char** rdata = NULL;
+        char** vrdata = NULL;
+
+        int i = 0;
+
         H5A_info_t info;
         if (H5Aget_info(aid, &info) >= 0)
         {
@@ -48,7 +56,7 @@ namespace PSH5X
 
             H5S_class_t stype = H5Sget_simple_extent_type(fspace);
 
-            switch (H5Sget_simple_extent_type(stype))
+            switch (stype)
             {
             case H5S_SCALAR:
                 ht->Add("SimpleExtentType", "Scalar");
@@ -127,6 +135,8 @@ namespace PSH5X
 
             array<short>^ ashort = nullptr;
             pin_ptr<short> ashort_ptr = nullptr;
+
+            array<String^>^ astring = nullptr;
 
             H5T_sign_t sign = H5T_SGN_NONE;
 
@@ -304,9 +314,88 @@ namespace PSH5X
 #pragma endregion
 
                     break;
+
                 case H5T_STRING:
                     
+#pragma region HDF5 string
+
                     ht->Add("ElementTypeClass", "String");
+
+                    is_vlen = H5Tis_variable_str(ftype);
+
+                    if (is_vlen > 0)
+                    {
+                        vrdata = new char* [npoints];
+                        mtype = H5Tcopy(H5T_C_S1);
+                        if (H5Tset_size(mtype, H5T_VARIABLE) < 0) {
+                            ex = gcnew Exception("H5Tset_size failed!!!");
+                            goto error;
+                        }
+                        if (H5Aread(aid, mtype, vrdata) < 0) {
+                            ex = gcnew Exception("H5Aread failed!!!");
+                            goto error;
+                        }
+                        else
+                        {
+                            if (npoints == 1) {
+                                ht->Add("Value", gcnew String(vrdata[0]));
+                            }
+                            else
+                            {
+                                astring = gcnew array<String^>(npoints);
+                                for (i = 0; i < npoints; ++i)
+                                {
+                                    astring[i] = gcnew String(vrdata[i]);
+                                }
+                                ht->Add("Value", astring);
+                            }
+
+                            if (H5Dvlen_reclaim(mtype, fspace, H5P_DEFAULT, vrdata) < 0) {
+                                ex = gcnew Exception("H5Dvlen_reclaim failed!!!");
+                                goto error;
+                            }
+                        }
+                    }
+                    else if (is_vlen == 0)
+                    {
+                        rdata = new char* [npoints];
+                        rdata[0] = new char [npoints*(size+1)];
+                        for (i = 1; i < npoints; ++i)
+                        {
+                            rdata[i] = rdata[0] + i * (size+1);
+                        }
+                        mtype = H5Tcopy(H5T_C_S1);
+                        if (H5Tset_size(mtype, size+1) < 0) {
+                            ex = gcnew Exception("H5Tset_size failed!!!");
+                            goto error;
+                        }
+                        if (H5Aread(aid, mtype, rdata[0]) < 0) {
+                            ex = gcnew Exception("H5Aread failed!!!");
+                            goto error;
+                        }
+                        else
+                        {
+                            if (npoints == 1) {
+                                ht->Add("Value", gcnew String(rdata[0]));
+                            }
+                            else
+                            {
+                                astring = gcnew array<String^>(npoints);
+                                for (i = 0; i < npoints; ++i)
+                                {
+                                    astring[i] = gcnew String(rdata[i]);
+                                }
+                                ht->Add("Value", astring);
+                            }
+                        }
+                    }
+                    else {
+                        ex = gcnew Exception("Unknown STRING type found!!!");
+                        goto error;
+                    }
+
+#pragma endregion
+
                     break;
 
                 case H5T_BITFIELD:
@@ -318,6 +407,7 @@ namespace PSH5X
                 case H5T_OPAQUE:
                     ht->Add("ElementTypeClass", "Opaque");
                     break;
+
                 case H5T_COMPOUND:
                     ht->Add("ElementTypeClass", "Compound");
                     goto error;
@@ -350,6 +440,15 @@ namespace PSH5X
         }
 
 error:
+
+        if (vrdata != NULL) {
+            delete [] vrdata;
+        }
+
+        if (rdata != NULL) {
+            delete [] rdata[0];
+            delete [] rdata;
+        }
 
         if (mtype >= 0) {
             H5Tclose(mtype);

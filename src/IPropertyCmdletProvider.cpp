@@ -90,6 +90,7 @@ namespace PSH5X
                     for each (String^ attributeName in providerSpecificPickList)
                     {
                         char* attr_name = (char*)(Marshal::StringToHGlobalAnsi(attributeName)).ToPointer();
+
                         htri_t flag = H5Aexists(oid, attr_name);
 
                         if (flag > 0)
@@ -114,6 +115,9 @@ namespace PSH5X
                             if (H5Aclose(aid) < 0) {
                                 ex = gcnew Exception("H5Aclose failed!!!");
                                 goto error;
+                            }
+                            else {
+                                aid = -1;
                             }
                         }
                         else
