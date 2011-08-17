@@ -249,7 +249,16 @@ error:
                             Object^ obj = info->Value;
                             if (obj != nullptr)
                             {
-                                ProviderUtils::SetH5AttributeValue(aid, obj);
+                                if (this->ShouldProcess(h5path,
+                                    String::Format("Setting HDF5 attribute '{0}'", attributeName)))
+                                {
+                                    ProviderUtils::SetH5AttributeValue(aid, obj);
+
+                                    if (H5Fflush(oid, H5F_SCOPE_LOCAL) < 0) {
+                                        ex = gcnew Exception("H5Fflush failed!!!");
+                                        goto error;
+                                    }
+                                }
                             }
                             else {
                                 ex = gcnew Exception("Empty attribute value!");

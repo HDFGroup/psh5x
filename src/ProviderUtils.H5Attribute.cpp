@@ -9,6 +9,8 @@ extern "C" {
 #include "H5Tpublic.h"
 }
 
+#include <cstring>
+
 using namespace System;
 using namespace System::Collections;
 using namespace System::Management::Automation;
@@ -427,6 +429,8 @@ namespace PSH5X
 
                     if (is_vlen > 0)
                     {
+                        ht->Add("IsVariableLength", true);
+
                         vrdata = new char* [npoints];
                         mtype = H5Tcopy(H5T_C_S1);
                         if (H5Tset_size(mtype, H5T_VARIABLE) < 0) {
@@ -460,6 +464,8 @@ namespace PSH5X
                     }
                     else if (is_vlen == 0)
                     {
+                        ht->Add("IsVariableLength", false);
+
                         rdata = new char* [npoints];
                         rdata[0] = new char [npoints*(size+1)];
                         for (i = 1; i < npoints; ++i)
@@ -589,12 +595,12 @@ error:
     {
         Exception^ ex = nullptr;
 
-        hid_t fspace = -1, ftype = -1, ntype = -1;
+        hid_t fspace = -1, ftype = -1, ntype = -1, mtype = -1;
 
         htri_t is_vlen = -1;
 
-        char** rdata = NULL;
-        char** vrdata = NULL;
+        char** wdata = NULL;
+        char** vwdata = NULL;
 
         int i = 0;
 
@@ -846,7 +852,6 @@ error:
 #pragma endregion
 
             break;
-
            
         case H5T_FLOAT:
 
@@ -895,8 +900,6 @@ error:
 
             break;
 
- /*
-
         case H5T_STRING:
 
 #pragma region HDF5 string
@@ -905,32 +908,76 @@ error:
 
             if (is_vlen > 0)
             {
-                vrdata = new char* [npoints];
-                mtype = H5Tcopy(H5T_C_S1);
-                if (H5Tset_size(mtype, H5T_VARIABLE) < 0) {
-                    ex = gcnew Exception("H5Tset_size failed!!!");
-                    goto error;
+                vwdata = new char* [npoints];
+
+                astring = gcnew array<String^>(npoints);
+
+                if (ProviderUtils::TryGetValue(value, astring))
+                {
+                    for (i = 0; i < npoints; ++i)
+                    {
+                        vwdata[i] = (char*) Marshal::StringToHGlobalAnsi(astring[i]).ToPointer();
+                    }
+
+                    mtype = H5Tcopy(H5T_C_S1);
+                    if (H5Tset_size(mtype, H5T_VARIABLE) < 0) {
+                        ex = gcnew Exception("H5Tset_size failed!!!");
+                        goto error;
+                    }
+
+                    if (H5Awrite(aid, mtype, vwdata) < 0)
+                    {
+                        ex = gcnew Exception("H5Awrite failed!");
+                        goto error;
+                    }
                 }
-                if (H5Aread(aid, mtype, vrdata) < 0) {
-                    ex = gcnew Exception("H5Aread failed!!!");
+                else {
+                    ex = gcnew Exception("Value type mismatch!");
                     goto error;
                 }
             }
             else if (is_vlen == 0)
             {
-                rdata = new char* [npoints];
-                rdata[0] = new char [npoints*(size+1)];
+                wdata = new char* [npoints];
+                wdata[0] = new char [npoints*(size+1)];
                 for (i = 1; i < npoints; ++i)
                 {
-                    rdata[i] = rdata[0] + i * (size+1);
+                    wdata[i] = wdata[0] + i*(size+1);
                 }
-                mtype = H5Tcopy(H5T_C_S1);
-                if (H5Tset_size(mtype, size+1) < 0) {
-                    ex = gcnew Exception("H5Tset_size failed!!!");
-                    goto error;
+
+                astring = gcnew array<String^>(npoints);
+
+                if (ProviderUtils::TryGetValue(value, astring))
+                {
+                    for (i = 0; i < npoints; ++i)
+                    {
+                        if (astring[i]->Length > size) {
+                            ex = gcnew Exception("String too long!");
+                            goto error;
+                        }
+                    }
+
+                    for (i = 0; i < npoints; ++i)
+                    {
+                        char* buf = (char*) Marshal::StringToHGlobalAnsi(astring[i]).ToPointer();
+                        memcpy((void*) wdata[i], (void*) buf, size);
+                        Marshal::FreeHGlobal(IntPtr(buf));
+                    }
+
+                    mtype = H5Tcopy(H5T_C_S1);
+                    if (H5Tset_size(mtype, size+1) < 0) {
+                        ex = gcnew Exception("H5Tset_size failed!!!");
+                        goto error;
+                    }
+
+                    if (H5Awrite(aid, mtype, wdata[0]) < 0)
+                    {
+                        ex = gcnew Exception("H5Awrite failed!");
+                        goto error;
+                    }
                 }
-                if (H5Aread(aid, mtype, rdata[0]) < 0) {
-                    ex = gcnew Exception("H5Aread failed!!!");
+                else {
+                    ex = gcnew Exception("Value size or type mismatch!");
                     goto error;
                 }
             }
@@ -942,7 +989,6 @@ error:
 #pragma endregion
 
             break;
-            */
 
         default:
 
@@ -952,13 +998,20 @@ error:
 
 error:
 
-        if (vrdata != NULL) {
-            delete [] vrdata;
+        if (vwdata != NULL) {
+            for (i = 0; i < npoints; ++i) {   
+                Marshal::FreeHGlobal(IntPtr(vwdata[i]));
+            }
+            delete [] vwdata;
         }
 
-        if (rdata != NULL) {
-            delete [] rdata[0];
-            delete [] rdata;
+        if (wdata != NULL) {
+            delete [] wdata[0];
+            delete [] wdata;
+        }
+
+        if (mtype >= 0) {
+            H5Tclose(mtype);
         }
 
         if (ntype >= 0) {
