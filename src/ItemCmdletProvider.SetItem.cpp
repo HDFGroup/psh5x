@@ -30,6 +30,8 @@ namespace PSH5X
 
         hid_t dset = -1, fspace = -1;
 
+        char *name = NULL, *soft = NULL, *file = NULL, *link = NULL;
+
         hsize_t* maxDims = NULL;
         hsize_t* size = NULL;
 
@@ -66,7 +68,7 @@ namespace PSH5X
 
             if (ProviderUtils::IsH5ChunkedDataset(drive->FileHandle, h5path))
             {
-                char* name = (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
+                name = (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
                 dset = H5Dopen2(drive->FileHandle, name, H5P_DEFAULT);
                 if (dset < 0) {
                     ex = gcnew ArgumentException("H5Dopen failed.");
@@ -146,7 +148,7 @@ namespace PSH5X
                 {
                     // delete the old one first
 
-                    char* name = (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
+                    name = (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
 
                     if (this->ShouldProcess(h5path,
                         String::Format("HDF5 soft link '{0}' exists, delete it", h5path)))
@@ -157,7 +159,7 @@ namespace PSH5X
                         }
                     }
 
-                    char* soft = (char*)(Marshal::StringToHGlobalAnsi(dest)).ToPointer();
+                    soft = (char*)(Marshal::StringToHGlobalAnsi(dest)).ToPointer();
 
                     if (this->ShouldProcess(h5path,
                         String::Format("HDF5 soft link '{0}' does not exist, create it", dest)))
@@ -196,7 +198,7 @@ namespace PSH5X
 
                     // delete the old one first
 
-                    char* name = (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
+                    name = (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
 
                     if (this->ShouldProcess(h5path,
                         String::Format("HDF5 external link '{0}' exists, delete it", h5path)))
@@ -207,8 +209,8 @@ namespace PSH5X
                         }
                     }
 
-                    char* file = (char*)(Marshal::StringToHGlobalAnsi(dest[0])).ToPointer();
-                    char* link = (char*)(Marshal::StringToHGlobalAnsi(dest[1])).ToPointer();
+                    file = (char*)(Marshal::StringToHGlobalAnsi(dest[0])).ToPointer();
+                    link = (char*)(Marshal::StringToHGlobalAnsi(dest[1])).ToPointer();
 
                     if (this->ShouldProcess(h5path,
                         String::Format("HDF5 external link '{0}' does not exist, create it", h5path)))
@@ -257,6 +259,22 @@ error:
 
         if (dset >= 0) {
             H5Dclose(dset);
+        }
+
+        if (link != NULL) {
+            Marshal::FreeHGlobal(IntPtr(link));
+        }
+
+        if (file != NULL) {
+            Marshal::FreeHGlobal(IntPtr(file));
+        }
+
+        if (soft != NULL) {
+            Marshal::FreeHGlobal(IntPtr(soft));
+        }
+
+        if (name != NULL) {
+            Marshal::FreeHGlobal(IntPtr(name));
         }
 
         if (ex != nullptr) {

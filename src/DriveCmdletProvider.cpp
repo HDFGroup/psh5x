@@ -58,6 +58,8 @@ namespace PSH5X
 
 error:
 
+        Marshal::FreeHGlobal(IntPtr(tmp_file));
+
         if (ex != nullptr) {
             ErrorRecord^ error = gcnew ErrorRecord(ex,
                 "InvalidResult", ErrorCategory::InvalidResult, status);

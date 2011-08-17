@@ -133,6 +133,8 @@ namespace PSH5X
 
     bool ProviderUtils::IsValidAbsoluteH5Path(hid_t file, String^ h5path)
     {
+        char *name = NULL, *group_path = NULL;
+
         if (ProviderUtils::IsH5RootPathName(h5path))
             return true;
 
@@ -148,11 +150,11 @@ namespace PSH5X
         
         for each (String^ linkName in linkNames)
         {
-            char* group_path = (char*)(Marshal::StringToHGlobalAnsi(currentPath)).ToPointer();
+            group_path = (char*)(Marshal::StringToHGlobalAnsi(currentPath)).ToPointer();
             hid_t group = H5Gopen2(file, group_path, H5P_DEFAULT);
             if (group >= 0)
             {
-                char* name = (char*)(Marshal::StringToHGlobalAnsi(linkName)).ToPointer();
+                name = (char*)(Marshal::StringToHGlobalAnsi(linkName)).ToPointer();
 
                 if (H5Lexists(group, name, H5P_DEFAULT) > 0)
                 {
@@ -182,11 +184,22 @@ namespace PSH5X
             }
         }
 
+        if (group_path != NULL) {
+            Marshal::FreeHGlobal(IntPtr(group_path));
+        }
+
+        if (name != NULL) {
+            Marshal::FreeHGlobal(IntPtr(name));
+        }
+
         return result;
     }
 
     bool ProviderUtils::IsValidH5Path(hid_t loc, System::String^ h5path)
     {
+        char *path = NULL, *name = NULL;
+
+
         if (!IsWellFormedH5Path(h5path)) { return false; }
 
         if (IsH5RootPathName(h5path)) { return true; }
@@ -226,8 +239,8 @@ namespace PSH5X
 
         for (int i = 0; i < linkNames->Length; ++i)
         {
-            char* path = (char*)(Marshal::StringToHGlobalAnsi(currentPath)).ToPointer();
-            char* name = (char*)(Marshal::StringToHGlobalAnsi(linkNames[i])).ToPointer();
+            path = (char*)(Marshal::StringToHGlobalAnsi(currentPath)).ToPointer();
+            name = (char*)(Marshal::StringToHGlobalAnsi(linkNames[i])).ToPointer();
 
             group = H5Gopen2(loc, path, H5P_DEFAULT);
             if (group >= 0)
@@ -305,6 +318,17 @@ namespace PSH5X
             if (doBreak) {
                 break;
             }
+
+            Marshal::FreeHGlobal(IntPtr(path));
+            Marshal::FreeHGlobal(IntPtr(name));
+        }
+
+        if (path != NULL) {
+            Marshal::FreeHGlobal(IntPtr(path));
+        }
+
+        if (name != NULL) {
+            Marshal::FreeHGlobal(IntPtr(name));
         }
 
         return result;
@@ -312,6 +336,8 @@ namespace PSH5X
 
     bool ProviderUtils::CanCreateItemAt(hid_t loc, String^ h5path)
     {
+        char *name = NULL, *path = NULL;
+
         if (IsValidH5Path(loc, h5path)) { return false; }
 
         array<String^>^ linkNames = h5path->Split((gcnew array<wchar_t>{'/'}),
@@ -327,8 +353,8 @@ namespace PSH5X
 
         for (int i = 0; i < linkNames->Length-1; ++i)
         {
-            char* path = (char*)(Marshal::StringToHGlobalAnsi(currentPath)).ToPointer();
-            char* name = (char*)(Marshal::StringToHGlobalAnsi(linkNames[i])).ToPointer();
+            path = (char*)(Marshal::StringToHGlobalAnsi(currentPath)).ToPointer();
+            name = (char*)(Marshal::StringToHGlobalAnsi(linkNames[i])).ToPointer();
 
             bool doBreak = false;
 
@@ -393,6 +419,17 @@ namespace PSH5X
             if (count < linkNames->Length-2) {
                 result = false;
             }
+
+            Marshal::FreeHGlobal(IntPtr(path));
+            Marshal::FreeHGlobal(IntPtr(name));
+        }
+
+        if (path != NULL) {
+            Marshal::FreeHGlobal(IntPtr(path));
+        }
+
+        if (name != NULL) {
+            Marshal::FreeHGlobal(IntPtr(name));
         }
 
         return result;
@@ -400,6 +437,8 @@ namespace PSH5X
 
     bool ProviderUtils::CanForceCreateItemAt(hid_t loc, String^ h5path)
     {
+        char *name = NULL, *path = NULL;
+
         if (IsValidH5Path(loc, h5path)) { return false; }
 
         array<String^>^ linkNames = h5path->Split((gcnew array<wchar_t>{'/'}),
@@ -413,8 +452,8 @@ namespace PSH5X
 
         for (int i = 0; i < linkNames->Length-1; ++i)
         {
-            char* path = (char*)(Marshal::StringToHGlobalAnsi(currentPath)).ToPointer();
-            char* name = (char*)(Marshal::StringToHGlobalAnsi(linkNames[i])).ToPointer();
+            path = (char*)(Marshal::StringToHGlobalAnsi(currentPath)).ToPointer();
+            name = (char*)(Marshal::StringToHGlobalAnsi(linkNames[i])).ToPointer();
 
             bool doBreak = false;
 
@@ -478,6 +517,17 @@ namespace PSH5X
                 result = false;
                 break;
             }
+
+            Marshal::FreeHGlobal(IntPtr(path));
+            Marshal::FreeHGlobal(IntPtr(name));
+        }
+
+        if (path != NULL) {
+            Marshal::FreeHGlobal(IntPtr(path));
+        }
+
+        if (name != NULL) {
+            Marshal::FreeHGlobal(IntPtr(name));
         }
 
         return result;

@@ -42,6 +42,8 @@ namespace PSH5X
 
         hid_t dset = -1, ftype = -1, ntype = -1;
 
+        char *name = NULL;
+
         DriveInfo^ drive = nullptr;
         String^ h5path = nullptr;
         if (!ProviderUtils::TryGetDriveEtH5Path(path, ProviderInfo, drive, h5path))
@@ -58,7 +60,7 @@ namespace PSH5X
             goto error;
         }
 
-        char* name = (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
+        name = (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
 
         dset = H5Dopen2(drive->FileHandle, name, H5P_DEFAULT);
         if (dset < 0) {
@@ -179,6 +181,10 @@ error:
             H5Dclose(dset);
         }
 
+        if (name != NULL) {
+            Marshal::FreeHGlobal(IntPtr(name));
+        }
+
         if (ex != nullptr) {
             throw ex;
         }
@@ -200,6 +206,8 @@ error:
         Exception^ ex = nullptr;
 
         hid_t dset = -1, ftype = -1, ntype = -1;
+
+        char *name = NULL;
 
         DriveInfo^ drive = nullptr;
         String^ h5path = nullptr;
@@ -225,7 +233,7 @@ error:
             goto error;
         }
 
-        char* name = (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
+        name = (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
 
         dset = H5Dopen2(drive->FileHandle, name, H5P_DEFAULT);
         if (dset < 0) {
@@ -341,6 +349,10 @@ error:
         }
         if (dset >= 0) {
             H5Dclose(dset);
+        }
+
+        if (name != NULL) {
+            Marshal::FreeHGlobal(IntPtr(name));
         }
 
         if (ex != nullptr) {

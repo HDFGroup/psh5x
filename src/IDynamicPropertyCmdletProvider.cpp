@@ -67,6 +67,8 @@ namespace PSH5X
 
         hid_t ftype = -1, fspace = -1, oid = -1, aid = -1;
 
+        char *path_str = NULL;
+
         hsize_t* current_size = NULL;
 
 #pragma region sanity check
@@ -130,8 +132,8 @@ namespace PSH5X
             if (typeOrPath->StartsWith("/")) {
                 if (ProviderUtils::IsH5DatatypeObject(drive->FileHandle, typeOrPath))
                 {
-                    char* path = (char*)(Marshal::StringToHGlobalAnsi(typeOrPath)).ToPointer();
-                    ftype = H5Topen2(drive->FileHandle, path, H5P_DEFAULT);
+                    path_str = (char*)(Marshal::StringToHGlobalAnsi(typeOrPath)).ToPointer();
+                    ftype = H5Topen2(drive->FileHandle, path_str, H5P_DEFAULT);
                     if (ftype < 0) {
                         ex = gcnew Exception("H5Topen2 failed!");
                         goto error;
@@ -270,6 +272,10 @@ error:
             H5Tclose(ftype);
         }
 
+        if (path_str != NULL) {
+            Marshal::FreeHGlobal(IntPtr(path_str));
+        }
+
         if (ex != nullptr) {
             throw ex;
         }
@@ -339,6 +345,8 @@ error:
 
         hid_t oid = -1;
 
+        char *obj_path = NULL, *attr_name = NULL;
+
 #pragma region sanity check
 
         DriveInfo^ drive = nullptr;
@@ -378,8 +386,8 @@ error:
 
 #pragma endregion
 
-        char* attr_name = (char*)(Marshal::StringToHGlobalAnsi(propertyName)).ToPointer();
-        char* obj_path = (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
+        attr_name = (char*)(Marshal::StringToHGlobalAnsi(propertyName)).ToPointer();
+        obj_path = (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
         
         oid = H5Oopen(drive->FileHandle, obj_path, H5P_DEFAULT);
         if (oid < 0) {
@@ -414,6 +422,14 @@ error:
 
         if (oid >= 0) {
             H5Oclose(oid);
+        }
+
+        if (obj_path != NULL) {
+            Marshal::FreeHGlobal(IntPtr(obj_path));
+        }
+
+        if (attr_name != NULL) {
+            Marshal::FreeHGlobal(IntPtr(attr_name));
         }
 
         if (ex != nullptr) {
@@ -535,6 +551,18 @@ error:
 
         if (oid >= 0) {
             H5Oclose(oid);
+        }
+
+        if (old_attr_name != NULL) {
+            Marshal::FreeHGlobal(IntPtr(old_attr_name));
+        }
+
+        if (new_attr_name != NULL) {
+            Marshal::FreeHGlobal(IntPtr(new_attr_name));
+        }
+
+        if (obj_path != NULL) {
+            Marshal::FreeHGlobal(IntPtr(obj_path));
         }
 
         if (ex != nullptr) {

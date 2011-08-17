@@ -57,6 +57,8 @@ namespace PSH5X
 
         hid_t oid = -1, gid = -1;
 
+        char *root_name = NULL, *group_path = NULL, *link_name = NULL, *path_name = NULL;
+
         DriveInfo^ drive = nullptr;
         String^ h5path = nullptr;
         if (!ProviderUtils::TryGetDriveEtH5Path(path, ProviderInfo, drive, h5path))
@@ -80,7 +82,7 @@ namespace PSH5X
 #pragma region root group
 
             String^ rootName = "/";
-            char* root_name =  (char*)(Marshal::StringToHGlobalAnsi(rootName)).ToPointer();
+            root_name =  (char*)(Marshal::StringToHGlobalAnsi(rootName)).ToPointer();
             
             oid = H5Oopen(drive->FileHandle, root_name, H5P_DEFAULT);
             if (oid < 0) {
@@ -102,7 +104,7 @@ namespace PSH5X
         else
         {
             String^ groupPath = ProviderUtils::ParentPath(h5path);
-            char* group_path = (char*)(Marshal::StringToHGlobalAnsi(groupPath)).ToPointer();
+            group_path = (char*)(Marshal::StringToHGlobalAnsi(groupPath)).ToPointer();
 
             gid = H5Gopen2(drive->FileHandle, group_path, H5P_DEFAULT);
             if (gid < 0) {
@@ -111,7 +113,7 @@ namespace PSH5X
             }
 
             String^ linkName = ProviderUtils::ChildName(h5path);
-            char* link_name = (char*)(Marshal::StringToHGlobalAnsi(linkName)).ToPointer();
+            link_name = (char*)(Marshal::StringToHGlobalAnsi(linkName)).ToPointer();
 
             if (H5Lexists(gid, link_name, H5P_DEFAULT) > 0)
             {
@@ -121,7 +123,6 @@ namespace PSH5X
                     goto error;
                 }
 
-                char* path_name;
                 switch (linfo.type)
                 {
                 case H5L_TYPE_HARD:
@@ -196,6 +197,22 @@ error:
 
         if (oid >= 0) {
             H5Oclose(oid);
+        }
+
+        if (path_name != NULL) {
+            Marshal::FreeHGlobal(IntPtr(path_name));
+        }
+
+        if (link_name != NULL) {
+            Marshal::FreeHGlobal(IntPtr(link_name));
+        }
+
+        if (group_path != NULL) {
+            Marshal::FreeHGlobal(IntPtr(group_path));
+        }
+
+        if (root_name != NULL) {
+            Marshal::FreeHGlobal(IntPtr(root_name));
         }
 
         if (ex != nullptr) {

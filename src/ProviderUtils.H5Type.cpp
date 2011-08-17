@@ -742,6 +742,8 @@ namespace PSH5X
                                                 throw gcnew ArgumentException(
                                                     String::Format("COMPOUND: Component '{0}' does not contain a hashtable.", key));
                                             }
+
+                                            Marshal::FreeHGlobal(IntPtr(name));
                                         }
                                     }
                                     else {
@@ -782,6 +784,7 @@ namespace PSH5X
                                         if (H5Tenum_insert(result, name, &value) < 0)
                                         {
                                         }
+                                        Marshal::FreeHGlobal(IntPtr(name));
                                     }
                                     else {
                                         throw gcnew ArgumentException(
@@ -1178,6 +1181,7 @@ namespace PSH5X
                                     else {
                                         throw gcnew ArgumentException(String::Format("OPAQUE: Invalid tag found: '{0}'", tag));
                                     }
+                                    Marshal::FreeHGlobal(IntPtr(label));
                                 }
                                 else {
                                     result = H5Tcreate(H5T_OPAQUE, size);

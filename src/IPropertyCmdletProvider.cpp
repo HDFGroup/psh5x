@@ -40,6 +40,8 @@ namespace PSH5X
 
         hid_t gid = -1, oid = -1, aid = -1;
 
+        char *group_path = NULL, *link_name = NULL, *ipath = NULL, *attr_name = NULL;
+
         DriveInfo^ drive = nullptr;
         String^ h5path = nullptr;
         if (!ProviderUtils::TryGetDriveEtH5Path(path, ProviderInfo, drive, h5path))
@@ -52,7 +54,7 @@ namespace PSH5X
 
         String^ groupPath = ProviderUtils::ParentPath(h5path);
         
-        char* group_path = (char*)(Marshal::StringToHGlobalAnsi(groupPath)).ToPointer();
+        group_path = (char*)(Marshal::StringToHGlobalAnsi(groupPath)).ToPointer();
         
         gid = H5Gopen2(drive->FileHandle, group_path, H5P_DEFAULT);
         if (gid < 0) {
@@ -61,7 +63,7 @@ namespace PSH5X
         }
 
         String^ linkName = ProviderUtils::ChildName(h5path);
-        char* link_name = (char*)(Marshal::StringToHGlobalAnsi(linkName)).ToPointer();
+        link_name = (char*)(Marshal::StringToHGlobalAnsi(linkName)).ToPointer();
 
         if (ProviderUtils::IsH5RootPathName(groupPath) || H5Lexists(gid, link_name, H5P_DEFAULT) > 0)
         {
@@ -73,7 +75,7 @@ namespace PSH5X
             {
                 if (ProviderUtils::IsH5RootPathName(groupPath) || info.type == H5L_TYPE_HARD)
                 {
-                    char* ipath =  (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
+                    ipath =  (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
 
                     oid = H5Oopen(drive->FileHandle, ipath, H5P_DEFAULT);
                     if (oid < 0) {
@@ -89,7 +91,7 @@ namespace PSH5X
 
                     for each (String^ attributeName in providerSpecificPickList)
                     {
-                        char* attr_name = (char*)(Marshal::StringToHGlobalAnsi(attributeName)).ToPointer();
+                        attr_name = (char*)(Marshal::StringToHGlobalAnsi(attributeName)).ToPointer();
 
                         htri_t flag = H5Aexists(oid, attr_name);
 
@@ -126,6 +128,11 @@ namespace PSH5X
                                 String::Format("Property name '{0}' doesn't exist for item at path '{1}'",
                                 attributeName, path));
                         }
+
+                        if (attr_name != NULL) {
+                            Marshal::FreeHGlobal(IntPtr(attr_name));
+                            attr_name = NULL;
+                        }
                     }
 
                     WritePropertyObject(htAllAttributes, path);
@@ -160,6 +167,22 @@ error:
             H5Gclose(gid);
         }
 
+        if (attr_name != NULL) {
+            Marshal::FreeHGlobal(IntPtr(attr_name));
+        }
+
+        if (ipath != NULL) {
+            Marshal::FreeHGlobal(IntPtr(ipath));
+        }
+
+        if (link_name != NULL) {
+            Marshal::FreeHGlobal(IntPtr(link_name));
+        }
+
+        if (group_path != NULL) {
+            Marshal::FreeHGlobal(IntPtr(group_path));
+        }
+
         if (ex != nullptr) {
             throw ex;
         }
@@ -182,6 +205,8 @@ error:
 
         hid_t gid = -1, oid = -1, aid = -1;
 
+        char *group_path = NULL, *link_name = NULL, *ipath = NULL, *attr_name = NULL;
+
         DriveInfo^ drive = nullptr;
         String^ h5path = nullptr;
         if (!ProviderUtils::TryGetDriveEtH5Path(path, ProviderInfo, drive, h5path))
@@ -202,7 +227,7 @@ error:
 
         String^ groupPath = ProviderUtils::ParentPath(h5path);
         
-        char* group_path = (char*)(Marshal::StringToHGlobalAnsi(groupPath)).ToPointer();
+        group_path = (char*)(Marshal::StringToHGlobalAnsi(groupPath)).ToPointer();
         
         gid = H5Gopen2(drive->FileHandle, group_path, H5P_DEFAULT);
         if (gid < 0) {
@@ -211,7 +236,7 @@ error:
         }
 
         String^ linkName = ProviderUtils::ChildName(h5path);
-        char* link_name = (char*)(Marshal::StringToHGlobalAnsi(linkName)).ToPointer();
+        link_name = (char*)(Marshal::StringToHGlobalAnsi(linkName)).ToPointer();
 
         if (ProviderUtils::IsH5RootPathName(groupPath) || H5Lexists(gid, link_name, H5P_DEFAULT) > 0)
         {
@@ -223,7 +248,7 @@ error:
             {
                 if (ProviderUtils::IsH5RootPathName(groupPath) || info.type == H5L_TYPE_HARD)
                 {
-                    char* ipath =  (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
+                    ipath =  (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
 
                     oid = H5Oopen(drive->FileHandle, ipath, H5P_DEFAULT);
                     if (oid < 0) {
@@ -234,7 +259,7 @@ error:
                     for each (PSPropertyInfo^ info in propertyValue->Properties)
                     {
                         String^ attributeName = info->Name;
-                        char* attr_name = (char*)(Marshal::StringToHGlobalAnsi(attributeName)).ToPointer();
+                        attr_name = (char*)(Marshal::StringToHGlobalAnsi(attributeName)).ToPointer();
 
                         htri_t flag = H5Aexists(oid, attr_name);
 
@@ -279,6 +304,11 @@ error:
                                 String::Format("Property name '{0}' doesn't exist for item at path '{1}'",
                                 attributeName, path));
                         }
+
+                        if (attr_name != NULL) {
+                            Marshal::FreeHGlobal(IntPtr(attr_name));
+                            attr_name = NULL;
+                        }
                     }
                 }
                 else
@@ -309,6 +339,22 @@ error:
 
         if (gid >= 0) {
             H5Gclose(gid);
+        }
+
+        if (attr_name != NULL) {
+            Marshal::FreeHGlobal(IntPtr(attr_name));
+        }
+
+        if (ipath != NULL) {
+            Marshal::FreeHGlobal(IntPtr(ipath));
+        }
+
+        if (link_name != NULL) {
+            Marshal::FreeHGlobal(IntPtr(link_name));
+        }
+
+        if (group_path != NULL) {
+            Marshal::FreeHGlobal(IntPtr(group_path));
         }
 
         if (ex != nullptr) {

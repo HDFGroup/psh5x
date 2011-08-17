@@ -73,6 +73,9 @@ namespace PSH5X
         else {
             throw gcnew InvalidOperationException("H5Lget_info failed!");
         }
+
+        
+        Marshal::FreeHGlobal(IntPtr(name));
     }
 
 }

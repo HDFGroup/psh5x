@@ -198,6 +198,10 @@ error:
             H5Dclose(dset);
         }
 
+        if (name != NULL) {
+            Marshal::FreeHGlobal(IntPtr(name));
+        }
+
         if (ex != nullptr) {
             throw ex;
         }

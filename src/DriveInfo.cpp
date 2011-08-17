@@ -23,6 +23,8 @@ namespace PSH5X
         m_path = path;
         m_readonly = readonly;
 
+        char *name = NULL, *filename = NULL;
+
         unsigned flags = H5F_ACC_RDONLY;
         if (!m_readonly)
         {
@@ -31,7 +33,7 @@ namespace PSH5X
 
         if (File::Exists(m_path))
         {
-           char* name = (char*)(Marshal::StringToHGlobalAnsi(m_path)).ToPointer();
+           name = (char*)(Marshal::StringToHGlobalAnsi(m_path)).ToPointer();
            if (H5Fis_hdf5(name) <= 0) {
                String^ msg = String::Format(
                    "File '{0}' is not an HDF5 file", path);
@@ -50,7 +52,7 @@ namespace PSH5X
         else if (force)
         {
             FileInfo^ info = gcnew FileInfo(path);
-            char* filename = (char*)(Marshal::StringToHGlobalAnsi(info->FullName)).ToPointer();
+            filename = (char*)(Marshal::StringToHGlobalAnsi(info->FullName)).ToPointer();
 
             hid_t file = H5Fcreate(filename, H5F_ACC_EXCL, H5P_DEFAULT, H5P_DEFAULT);
             if (file >= 0) {
@@ -83,6 +85,13 @@ namespace PSH5X
         }
 
 error:
+        if (name != NULL) {
+            Marshal::FreeHGlobal(IntPtr(name));
+        }
+
+        if (filename != NULL) {
+            Marshal::FreeHGlobal(IntPtr(filename));
+        }
 
         if (ex != nullptr) {
             throw ex;

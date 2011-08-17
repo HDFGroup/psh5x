@@ -39,13 +39,13 @@ namespace PSH5X
 
         hid_t lcplist = -1, gid = -1, dtype = -1, fspace = -1, dset = -1, dcplist = -1, oid = -1;
 
+        char *name = NULL, *topath = NULL, *hard = NULL, *soft = NULL, *file = NULL, *link = NULL, *mode = NULL, *pal_name = NULL;
+
         hsize_t* current_dims = NULL;
         hsize_t* maximum_dims = NULL;
         hsize_t* dim = NULL;
 
-        unsigned char* rgbValues = NULL;
-        unsigned char* rgbPal = NULL;
-
+        unsigned char *rgbValues = NULL, *rgbPal = NULL;
         
         DriveInfo^ drive = nullptr;
         String^ h5path = nullptr;
@@ -128,7 +128,7 @@ namespace PSH5X
 #pragma endregion
 
         String^ linkName = ProviderUtils::ChildName(h5path);
-        char* name = (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
+        name = (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
 
         if (itemTypeName->ToUpper() == "GROUP")
         {
@@ -182,8 +182,8 @@ namespace PSH5X
                 if (typeOrPath->StartsWith("/")) {
                     if (ProviderUtils::IsH5DatatypeObject(drive->FileHandle, typeOrPath))
                     {
-                        char* path = (char*)(Marshal::StringToHGlobalAnsi(typeOrPath)).ToPointer();
-                        dtype = H5Topen2(drive->FileHandle, path, H5P_DEFAULT);
+                        topath = (char*)(Marshal::StringToHGlobalAnsi(typeOrPath)).ToPointer();
+                        dtype = H5Topen2(drive->FileHandle, topath, H5P_DEFAULT);
                         if (dtype < 0) {
                             ex = gcnew Exception("H5Topen2 failed!!!");
                             goto error;
@@ -431,7 +431,7 @@ namespace PSH5X
                 {
                     if (ProviderUtils::IsH5Object(drive->FileHandle, dest))
                     {
-                        char* hard = (char*)(Marshal::StringToHGlobalAnsi(dest)).ToPointer();
+                        hard = (char*)(Marshal::StringToHGlobalAnsi(dest)).ToPointer();
 
                         if (this->ShouldProcess(h5path,
                             String::Format("HDF5 hard link '{0}' does not exist, create it", linkName)))
@@ -505,7 +505,7 @@ namespace PSH5X
                 String^ dest = nullptr;
                 if (ProviderUtils::TryGetValue(newValue, dest))
                 {
-                    char* soft = (char*)(Marshal::StringToHGlobalAnsi(dest)).ToPointer();
+                    soft = (char*)(Marshal::StringToHGlobalAnsi(dest)).ToPointer();
 
                     if (this->ShouldProcess(h5path,
                         String::Format("HDF5 soft link '{0}' does not exist, create it", linkName)))
@@ -553,8 +553,8 @@ namespace PSH5X
                             "two @(file name,path name)!");
                     }
 
-                    char* file = (char*)(Marshal::StringToHGlobalAnsi(dest[0])).ToPointer();
-                    char* link = (char*)(Marshal::StringToHGlobalAnsi(dest[1])).ToPointer();
+                    file = (char*)(Marshal::StringToHGlobalAnsi(dest[0])).ToPointer();
+                    link = (char*)(Marshal::StringToHGlobalAnsi(dest[1])).ToPointer();
 
                     if (this->ShouldProcess(h5path,
                         String::Format("HDF5 external link '{0}' does not exist, create it", linkName)))
@@ -760,7 +760,7 @@ namespace PSH5X
                 if (this->ShouldProcess(h5path,
                     String::Format("HDF5 image '{0}' does not exist, create it", linkName)))
                 {
-                    char* mode = (char*)(Marshal::StringToHGlobalAnsi(interlace)).ToPointer();
+                    mode = (char*)(Marshal::StringToHGlobalAnsi(interlace)).ToPointer();
 
                     if (H5IMmake_image_24bit(drive->FileHandle, name, width, height, mode, rgbValues) < 0) {
                         ex = gcnew ArgumentException("H5IMmake_image_24bit failed!");
@@ -782,7 +782,7 @@ namespace PSH5X
                     {
                         Guid guid = Guid::NewGuid();
 
-                        char* pal_name = (char*)(Marshal::StringToHGlobalAnsi("PALETTE-" + guid.ToString())).ToPointer();
+                        pal_name = (char*)(Marshal::StringToHGlobalAnsi("PALETTE-" + guid.ToString())).ToPointer();
                         hsize_t pal_dims[2] = {256, 3};
 
                         if (H5IMmake_palette(drive->FileHandle, pal_name, pal_dims, rgbPal) < 0) {
@@ -847,8 +847,8 @@ namespace PSH5X
                 if (typeOrPath->StartsWith("/")) {
                     if (ProviderUtils::IsH5DatatypeObject(drive->FileHandle, typeOrPath))
                     {
-                        char* path = (char*)(Marshal::StringToHGlobalAnsi(typeOrPath)).ToPointer();
-                        dtype = H5Topen2(drive->FileHandle, path, H5P_DEFAULT);
+                        topath = (char*)(Marshal::StringToHGlobalAnsi(typeOrPath)).ToPointer();
+                        dtype = H5Topen2(drive->FileHandle, topath, H5P_DEFAULT);
                         if (dtype < 0) {
                             ex = gcnew Exception("H5Topen2 failed!!!");
                             goto error;
@@ -987,6 +987,38 @@ error:
 
         if (lcplist >= 0) {
             H5Pclose(lcplist);
+        }
+
+        if (name != NULL) {
+            Marshal::FreeHGlobal(IntPtr(name));
+        }
+
+        if (topath != NULL) {
+            Marshal::FreeHGlobal(IntPtr(topath));
+        }
+
+        if (hard != NULL) {
+            Marshal::FreeHGlobal(IntPtr(hard));
+        }
+
+        if (soft != NULL) {
+            Marshal::FreeHGlobal(IntPtr(soft));
+        }
+
+        if (file != NULL) {
+            Marshal::FreeHGlobal(IntPtr(file));
+        }
+
+        if (link != NULL) {
+            Marshal::FreeHGlobal(IntPtr(link));
+        }
+
+        if (mode != NULL) {
+            Marshal::FreeHGlobal(IntPtr(mode));
+        }
+
+        if (pal_name != NULL) {
+            Marshal::FreeHGlobal(IntPtr(pal_name));
         }
 
         if (ex != nullptr) {

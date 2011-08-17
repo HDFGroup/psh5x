@@ -40,6 +40,8 @@ namespace PSH5X
 
                 H5Oclose(obj_id);
             }
+
+            Marshal::FreeHGlobal(IntPtr(name));
         }
 
         return result;
@@ -63,6 +65,8 @@ namespace PSH5X
              
                 H5Oclose(obj_id);
             }
+
+            Marshal::FreeHGlobal(IntPtr(name));
         }
 
         return result;
@@ -85,6 +89,7 @@ namespace PSH5X
                 
                 H5Oclose(obj_id);
             }
+            Marshal::FreeHGlobal(IntPtr(name));
         }
 
         return result;
@@ -109,6 +114,7 @@ namespace PSH5X
 
                 H5Dclose(dset);
             }
+            Marshal::FreeHGlobal(IntPtr(name));
         }
 
         return result;
@@ -131,6 +137,7 @@ namespace PSH5X
 
                 H5Oclose(obj_id);
             }
+            Marshal::FreeHGlobal(IntPtr(name));
         }
 
         return result;
@@ -150,6 +157,7 @@ namespace PSH5X
             {
                 result = (info.type == H5L_TYPE_SOFT || info.type == H5L_TYPE_EXTERNAL);
             }
+            Marshal::FreeHGlobal(IntPtr(name));
         }
 
         return result;
@@ -167,6 +175,7 @@ namespace PSH5X
             {
                 result = (info.type == H5L_TYPE_SOFT);
             }
+            Marshal::FreeHGlobal(IntPtr(name));
         }
 
         return result;
@@ -184,6 +193,7 @@ namespace PSH5X
             {
                 result = (info.type == H5L_TYPE_EXTERNAL);
             }
+            Marshal::FreeHGlobal(IntPtr(name));
         }
 
         return result;

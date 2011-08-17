@@ -49,6 +49,8 @@ namespace PSH5X
         
         hid_t gid = -1, oid = -1;
 
+        char *gpath = NULL, *link_name = NULL;
+
         DriveInfo^ drive = nullptr;
         String^ h5path = nullptr;
         if (!ProviderUtils::TryGetDriveEtH5Path(path, ProviderInfo, drive, h5path))
@@ -69,7 +71,7 @@ namespace PSH5X
 
         if (ProviderUtils::IsH5Group(drive->FileHandle, h5path))
         {
-            char* gpath = (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
+            gpath = (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
 
             gid = H5Gopen2(drive->FileHandle, gpath, H5P_DEFAULT);
             if (gid < 0) {
@@ -86,7 +88,7 @@ namespace PSH5X
                     childPath += "\\";
                 childPath += linkName->Replace('/','\\');
 
-                char* link_name = (char*)(Marshal::StringToHGlobalAnsi(linkName)).ToPointer();
+                link_name = (char*)(Marshal::StringToHGlobalAnsi(linkName)).ToPointer();
                 H5L_info_t linfo;
                 if (H5Lget_info(gid, link_name, &linfo, H5P_DEFAULT) >= 0)
                 {
@@ -101,7 +103,6 @@ namespace PSH5X
                             ex = gcnew Exception("H5Oopen failed!!!");
                             goto error;
                         }
-
 
                         H5O_info_t oinfo;
                         if (H5Oget_info(oid, &oinfo) >= 0)
@@ -181,6 +182,14 @@ error:
         if (gid >= 0) {
             H5Gclose(gid);
         }
+
+        if (link_name != NULL) {
+            Marshal::FreeHGlobal(IntPtr(link_name));
+        }
+
+        if (gpath != NULL) {
+            Marshal::FreeHGlobal(IntPtr(gpath));
+        }
         
         if (ex != nullptr) {
             throw ex;
@@ -225,6 +234,8 @@ error:
 
         hid_t gid = -1;
 
+        char *gpath = NULL, *link_name = NULL;
+
         DriveInfo^ drive = nullptr;
         String^ h5path = nullptr;
         if (!ProviderUtils::TryGetDriveEtH5Path(path, ProviderInfo, drive, h5path))
@@ -237,7 +248,7 @@ error:
 
         if (ProviderUtils::IsH5Group(drive->FileHandle, h5path))
         {
-            char* gpath = (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
+            gpath = (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
 
             gid = H5Gopen2(drive->FileHandle, gpath, H5P_DEFAULT);
             if (gid < 0) {
@@ -251,7 +262,7 @@ error:
             {
                 String^ childPath = path + "\\" + linkName->Replace('/','\\');
 
-                char* link_name = (char*)(Marshal::StringToHGlobalAnsi(linkName)).ToPointer();
+                link_name = (char*)(Marshal::StringToHGlobalAnsi(linkName)).ToPointer();
 
                 H5L_info_t info;
                 if (H5Lget_info(gid, link_name, &info, H5P_DEFAULT) >= 0)
@@ -289,6 +300,14 @@ error:
             H5Gclose(gid);
         }
 
+        if (link_name != NULL) {
+            Marshal::FreeHGlobal(IntPtr(link_name));
+        }
+
+        if (gpath != NULL) {
+            Marshal::FreeHGlobal(IntPtr(gpath));
+        }
+
         if (ex != nullptr) {
             throw ex;
         }
@@ -315,6 +334,8 @@ error:
 
         hid_t gid = -1;
 
+        char* gpath = NULL;
+
         DriveInfo^ drive = nullptr;
         String^ h5path = nullptr;
         if (!ProviderUtils::TryGetDriveEtH5Path(path, ProviderInfo, drive, h5path))
@@ -327,7 +348,7 @@ error:
 
         if (ProviderUtils::IsH5Group(drive->FileHandle, h5path))
         {
-            char* gpath = (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
+            gpath = (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
 
             gid = H5Gopen2(drive->FileHandle, gpath, H5P_DEFAULT);
             if (gid < 0) {
@@ -352,6 +373,10 @@ error:
             H5Gclose(gid);
         }
 
+        if (gpath != NULL) {
+            Marshal::FreeHGlobal(IntPtr(gpath));
+        }
+
         if (ex != nullptr) {
             throw ex;
         }
@@ -367,6 +392,8 @@ error:
         Exception^ ex = nullptr;
 
         hid_t gid = -1;
+
+        char *group_path = NULL, *link_name = NULL;
 
         if (recurse)
         {
@@ -402,7 +429,7 @@ error:
         {
 
             String^ groupPath = ProviderUtils::ParentPath(h5path);
-            char* group_path = (char*)(Marshal::StringToHGlobalAnsi(groupPath)).ToPointer();
+            group_path = (char*)(Marshal::StringToHGlobalAnsi(groupPath)).ToPointer();
 
             gid = H5Gopen2(drive->FileHandle, group_path, H5P_DEFAULT);
             if (gid < 0) {
@@ -411,7 +438,7 @@ error:
             }
 
             String^ linkName = ProviderUtils::ChildName(h5path);
-            char* link_name = (char*)(Marshal::StringToHGlobalAnsi(linkName)).ToPointer();
+            link_name = (char*)(Marshal::StringToHGlobalAnsi(linkName)).ToPointer();
 
             if (H5Lexists(gid, link_name, H5P_DEFAULT) > 0)
             {
@@ -438,6 +465,15 @@ error:
         if (gid >= 0) {
             H5Gclose(gid);
         }
+
+        if (link_name != NULL) {
+            Marshal::FreeHGlobal(IntPtr(link_name));
+        }
+
+        if (group_path != NULL) {
+            Marshal::FreeHGlobal(IntPtr(group_path));
+        }
+
 
         if (ex != nullptr) {
             throw ex;
