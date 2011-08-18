@@ -145,6 +145,8 @@ namespace PSH5X
 
         static hid_t ProviderUtils::DotNetType2H5Native(System::Type^ ntype, bool isBitfield);
 
+        static System::Array^ ProviderUtils::GetArray(void* buffer, size_t nelems, hid_t type_id);
+
         static System::Array^ ProviderUtils::GetPSObjectArray(long long length,
             array<System::String^>^ mname, array<System::Type^>^ mtype);
 
@@ -152,11 +154,25 @@ namespace PSH5X
 
         static bool IsH5SimpleType(hid_t dtype);
 
-        static bool IsH5ArrayType(hid_t dtype);
+        static bool IsH5IntegerType(hid_t dtype);
+
+        static bool IsH5FloatType(hid_t dtype);
+
+        static bool IsH5StringType(hid_t dtype);
+
+        static bool IsH5BitfieldType(hid_t dtype);
+        
+        static bool IsH5OpaqueType(hid_t dtype);
 
         static bool IsH5CompoundType(hid_t dtype);
 
+        static bool IsH5ReferenceType(hid_t dtype);
+
+        static bool IsH5EnumType(hid_t dtype);
+
         static bool IsH5VlenType(hid_t dtype);
+
+        static bool IsH5ArrayType(hid_t dtype);
 
 #pragma endregion
 

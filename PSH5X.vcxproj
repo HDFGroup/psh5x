@@ -166,6 +166,8 @@
     <ClInclude Include="include\PSH5XException.h" />
     <ClInclude Include="include\ShowH5TypesCommand.h" />
     <ClInclude Include="include\Snapin.h" />
+    <ClInclude Include="include\StringDatasetReader.h" />
+    <ClInclude Include="include\StringDatasetWriter.h" />
     <ClInclude Include="include\TouchH5FileCommand.h" />
   </ItemGroup>
   <ItemGroup>
@@ -194,10 +196,13 @@
     <ClCompile Include="src\ItemCmdletProvider.cpp" />
     <ClCompile Include="src\ProviderUtils.cpp" />
     <ClCompile Include="src\ProviderUtils.Existential.cpp" />
+    <ClCompile Include="src\ProviderUtils.GetArray.cpp" />
     <ClCompile Include="src\ProviderUtils.H5Attribute.cpp" />
     <ClCompile Include="src\ProviderUtils.H5Type.cpp" />
     <ClCompile Include="src\ShowH5TypesCommand.cpp" />
     <ClCompile Include="src\Snapin.cpp" />
+    <ClCompile Include="src\StringDatasetReader.cpp" />
+    <ClCompile Include="src\StringDatasetWriter.cpp" />
     <ClCompile Include="src\TouchH5FileCommand.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

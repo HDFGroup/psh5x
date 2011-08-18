@@ -8,6 +8,8 @@
 #include "Provider.h"
 #include "ProviderUtils.h"
 #include "PSH5XException.h"
+#include "StringDatasetReader.h"
+#include "StringDatasetWriter.h"
 
 extern "C" {
 #include "H5public.h"
@@ -71,93 +73,128 @@ namespace PSH5X
                 throw gcnew HDF5Exception("H5Dget_type failed!");
             }
 
-            ntype = H5Tget_native_type(ftype, H5T_DIR_ASCEND);
-            if (ntype < 0) {
-                throw gcnew HDF5Exception("H5Tget_native_type failed!");
-            }
+            H5T_class_t cls = H5Tget_class(ftype);
 
-            bool isSimple = ProviderUtils::IsH5SimpleType(ntype);
+            Type^ t = nullptr;
 
-            if (isSimple)
+            switch (cls)
             {
-                Type^ t = ProviderUtils::H5NativeType2DotNet(ntype);
-                H5T_class_t cls = H5Tget_class(ntype);
+            case H5T_INTEGER:
 
-                if (cls == H5T_INTEGER)
-                {
-                    if (t == SByte::typeid) {
-                        result = gcnew DatasetReaderT<SByte>(drive->FileHandle, h5path);
-                    }
-                    else if (t == Int16::typeid) {
-                        result = gcnew DatasetReaderT<Int16>(drive->FileHandle, h5path);
-                    }
-                    else if (t == Int32::typeid) {
-                        result = gcnew DatasetReaderT<Int32>(drive->FileHandle, h5path);
-                    }
-                    else if (t == Int64::typeid) {
-                        result = gcnew DatasetReaderT<Int64>(drive->FileHandle, h5path);
-                    }
-                    else if (t == Byte::typeid) {
-                        result = gcnew DatasetReaderT<Byte>(drive->FileHandle, h5path);
-                    }
-                    else if (t == UInt16::typeid) {
-                        result = gcnew DatasetReaderT<UInt16>(drive->FileHandle, h5path);
-                    }
-                    else if (t ==  UInt32::typeid) {
-                        result = gcnew DatasetReaderT<UInt32>(drive->FileHandle, h5path);
-                    }
-                    else if (t ==  UInt64::typeid) {
-                        result = gcnew DatasetReaderT<UInt64>(drive->FileHandle, h5path);
-                    }
-                    else {
-                        throw gcnew PSH5XException("Unsupported type!");
-                    }
+#pragma region HDF5 integer
+
+                ntype = H5Tget_native_type(ftype, H5T_DIR_ASCEND);
+                if (ntype < 0) {
+                    throw gcnew HDF5Exception("H5Tget_native_type failed!");
                 }
-                else if (cls == H5T_FLOAT)
-                {
-                    if (t == Single::typeid) {
-                        result = gcnew DatasetReaderT<Single>(drive->FileHandle, h5path);
-                    }
-                    else if (t == Double::typeid) {
-                        result = gcnew DatasetReaderT<Double>(drive->FileHandle, h5path);
-                    }
-                    else {
-                        throw gcnew PSH5XException("Unsupported type!");
-                    }
+                t = ProviderUtils::H5NativeType2DotNet(ntype);
+                if (t == SByte::typeid) {
+                    result = gcnew DatasetReaderT<SByte>(drive->FileHandle, h5path);
                 }
-                else if (cls == H5T_STRING)
-                {
-                    result = gcnew DatasetReaderT<String^>(drive->FileHandle, h5path);
+                else if (t == Int16::typeid) {
+                    result = gcnew DatasetReaderT<Int16>(drive->FileHandle, h5path);
                 }
-                else if (cls == H5T_BITFIELD)
-                {
-                    if (t == Byte::typeid) {
-                        result = gcnew DatasetReaderT<Byte>(drive->FileHandle, h5path);
-                    }
-                    else if (t == UInt16::typeid) {
-                        result = gcnew DatasetReaderT<UInt16>(drive->FileHandle, h5path);
-                    }
-                    else if (t ==  UInt32::typeid) {
-                        result = gcnew DatasetReaderT<UInt32>(drive->FileHandle, h5path);
-                    }
-                    else if (t ==  UInt64::typeid) {
-                        result = gcnew DatasetReaderT<UInt64>(drive->FileHandle, h5path);
-                    }
-                    else {
-                        throw gcnew PSH5XException("Unsupported type!");
-                    }
+                else if (t == Int32::typeid) {
+                    result = gcnew DatasetReaderT<Int32>(drive->FileHandle, h5path);
                 }
-                else if (cls == H5T_OPAQUE)
-                {
+                else if (t == Int64::typeid) {
+                    result = gcnew DatasetReaderT<Int64>(drive->FileHandle, h5path);
+                }
+                else if (t == Byte::typeid) {
                     result = gcnew DatasetReaderT<Byte>(drive->FileHandle, h5path);
                 }
-                else {
-                    throw gcnew PSH5XException("Unsupported type class!");
+                else if (t == UInt16::typeid) {
+                    result = gcnew DatasetReaderT<UInt16>(drive->FileHandle, h5path);
                 }
-            }
-            else
-            {
-                result = gcnew DatasetReader(drive->FileHandle, h5path);
+                else if (t ==  UInt32::typeid) {
+                    result = gcnew DatasetReaderT<UInt32>(drive->FileHandle, h5path);
+                }
+                else if (t ==  UInt64::typeid) {
+                    result = gcnew DatasetReaderT<UInt64>(drive->FileHandle, h5path);
+                }
+                else {
+                    throw gcnew PSH5XException("Unsupported integer type!");
+                }
+
+#pragma endregion
+
+                break;
+
+            case H5T_FLOAT:
+
+#pragma region HDF5 float
+
+                ntype = H5Tget_native_type(ftype, H5T_DIR_ASCEND);
+                if (ntype < 0) {
+                    throw gcnew HDF5Exception("H5Tget_native_type failed!");
+                }
+                t = ProviderUtils::H5NativeType2DotNet(ntype);
+                if (t == Single::typeid) {
+                    result = gcnew DatasetReaderT<Single>(drive->FileHandle, h5path);
+                }
+                else if (t == Double::typeid) {
+                    result = gcnew DatasetReaderT<Double>(drive->FileHandle, h5path);
+                }
+                else {
+                    throw gcnew PSH5XException("Unsupported float type!");
+                }
+
+#pragma endregion
+
+            case H5T_STRING:
+
+                result = gcnew StringDatasetReader(drive->FileHandle, h5path);
+                break;
+
+            case H5T_BITFIELD:
+
+#pragma region HDF5 bitfield
+
+                ntype = H5Tget_native_type(ftype, H5T_DIR_DESCEND);
+                if (ntype < 0) {
+                    throw gcnew HDF5Exception("H5Tget_native_type failed!");
+                }
+                t = ProviderUtils::H5NativeType2DotNet(ntype);
+                if (t == Byte::typeid) {
+                    result = gcnew DatasetReaderT<Byte>(drive->FileHandle, h5path);
+                }
+                else if (t == UInt16::typeid) {
+                    result = gcnew DatasetReaderT<UInt16>(drive->FileHandle, h5path);
+                }
+                else if (t ==  UInt32::typeid) {
+                    result = gcnew DatasetReaderT<UInt32>(drive->FileHandle, h5path);
+                }
+                else if (t ==  UInt64::typeid) {
+                    result = gcnew DatasetReaderT<UInt64>(drive->FileHandle, h5path);
+                }
+                else {
+                    throw gcnew PSH5XException("Unsupported bitfield type!");
+                }
+
+#pragma endregion
+
+                break;
+            /*
+            case H5T_COMPOUND:
+
+                result = gcnew CompoundDatasetReader(drive->FileHandle, h5path);
+                break;
+
+            case H5T_VLEN:
+
+                result = gcnew VlenDatasetReader(drive->FileHandle, h5path);
+                break;
+
+            case H5T_ARRAY:
+
+                result = gcnew ArrayDatasetReader(drive->FileHandle, h5path);
+                break;
+             */
+
+            default:
+
+                throw gcnew PSH5XException("Unsupported type class!");
+                break;
             }
         }
         finally
@@ -229,91 +266,132 @@ namespace PSH5X
                 throw gcnew HDF5Exception("H5Dget_type failed!");
             }
 
-            ntype = H5Tget_native_type(ftype, H5T_DIR_ASCEND);
-            if (ntype < 0) {
-                throw gcnew HDF5Exception("H5Tget_native_type failed!");
-            }
+            H5T_class_t cls = H5Tget_class(ftype);
 
-            if (ProviderUtils::IsH5SimpleType(ftype))
+            Type^ t = nullptr;
+
+            switch (cls)
             {
-                Type^ t = ProviderUtils::H5NativeType2DotNet(ntype);
-                H5T_class_t cls = H5Tget_class(ntype);
+            case H5T_INTEGER:
 
-                if (cls == H5T_INTEGER)
-                {
-                    if (t == SByte::typeid) {
-                        result = gcnew DatasetWriterT<SByte>(drive->FileHandle, h5path);
-                    }
-                    else if (t == Int16::typeid) {
-                        result = gcnew DatasetWriterT<Int16>(drive->FileHandle, h5path);
-                    }
-                    else if (t ==  Int32::typeid) {
-                        result = gcnew DatasetWriterT<Int32>(drive->FileHandle, h5path);
-                    }
-                    else if (t ==  Int64::typeid) {
-                        result = gcnew DatasetWriterT<Int64>(drive->FileHandle, h5path);
-                    }
-                    else if (t == Byte::typeid) {
-                        result = gcnew DatasetWriterT<Byte>(drive->FileHandle, h5path);
-                    }
-                    else if (t == UInt16::typeid) {
-                        result = gcnew DatasetWriterT<UInt16>(drive->FileHandle, h5path);
-                    }
-                    else if (t ==  UInt32::typeid) {
-                        result = gcnew DatasetWriterT<UInt32>(drive->FileHandle, h5path);
-                    }
-                    else if (t ==  UInt64::typeid) {
-                        result = gcnew DatasetWriterT<UInt64>(drive->FileHandle, h5path);
-                    }
-                    else {
-                        throw gcnew PSH5XException("Unsupported type!");
-                    }
+#pragma region HDF5 integer
+
+                ntype = H5Tget_native_type(ftype, H5T_DIR_ASCEND);
+                if (ntype < 0) {
+                    throw gcnew HDF5Exception("H5Tget_native_type failed!");
                 }
-                else if (cls == H5T_FLOAT)
-                {
-                    if (t == Single::typeid) {
-                        result = gcnew DatasetWriterT<Single>(drive->FileHandle, h5path);
-                    }
-                    else if (t == Double::typeid) {
-                        result = gcnew DatasetWriterT<Double>(drive->FileHandle, h5path);
-                    }
-                    else {
-                        throw gcnew PSH5XException("Unsupported type!");
-                    }
+                t = ProviderUtils::H5NativeType2DotNet(ntype);
+                if (t == SByte::typeid) {
+                    result = gcnew DatasetWriterT<SByte>(drive->FileHandle, h5path);
                 }
-                else if (cls == H5T_STRING)
-                {
-                    result = gcnew DatasetWriterT<String^>(drive->FileHandle, h5path);
+                else if (t == Int16::typeid) {
+                    result = gcnew DatasetWriterT<Int16>(drive->FileHandle, h5path);
                 }
-                else if (cls == H5T_BITFIELD)
-                {
-                    if (t == Byte::typeid) {
-                        result = gcnew DatasetWriterT<Byte>(drive->FileHandle, h5path);
-                    }
-                    else if (t == UInt16::typeid) {
-                        result = gcnew DatasetWriterT<UInt16>(drive->FileHandle, h5path);
-                    }
-                    else if (t ==  UInt32::typeid) {
-                        result = gcnew DatasetWriterT<UInt32>(drive->FileHandle, h5path);
-                    }
-                    else if (t ==  UInt64::typeid) {
-                        result = gcnew DatasetWriterT<UInt64>(drive->FileHandle, h5path);
-                    }
-                    else {
-                        throw gcnew PSH5XException("Unsupported type!");
-                    }
+                else if (t ==  Int32::typeid) {
+                    result = gcnew DatasetWriterT<Int32>(drive->FileHandle, h5path);
                 }
-                else if (cls == H5T_OPAQUE)
-                {
+                else if (t ==  Int64::typeid) {
+                    result = gcnew DatasetWriterT<Int64>(drive->FileHandle, h5path);
+                }
+                else if (t == Byte::typeid) {
                     result = gcnew DatasetWriterT<Byte>(drive->FileHandle, h5path);
                 }
-                else {
-                    throw gcnew PSH5XException("Unsupported type class!");
+                else if (t == UInt16::typeid) {
+                    result = gcnew DatasetWriterT<UInt16>(drive->FileHandle, h5path);
                 }
-            }
-            else
-            {
-                result = gcnew DatasetWriter(drive->FileHandle, h5path);
+                else if (t ==  UInt32::typeid) {
+                    result = gcnew DatasetWriterT<UInt32>(drive->FileHandle, h5path);
+                }
+                else if (t ==  UInt64::typeid) {
+                    result = gcnew DatasetWriterT<UInt64>(drive->FileHandle, h5path);
+                }
+                else {
+                    throw gcnew PSH5XException("Unsupported integer type!");
+                }
+
+#pragma endregion
+
+                break;
+
+            case H5T_FLOAT:
+
+#pragma region HDF5 float
+
+                ntype = H5Tget_native_type(ftype, H5T_DIR_ASCEND);
+                if (ntype < 0) {
+                    throw gcnew HDF5Exception("H5Tget_native_type failed!");
+                }
+                t = ProviderUtils::H5NativeType2DotNet(ntype);
+                if (t == Single::typeid) {
+                    result = gcnew DatasetWriterT<Single>(drive->FileHandle, h5path);
+                }
+                else if (t == Double::typeid) {
+                    result = gcnew DatasetWriterT<Double>(drive->FileHandle, h5path);
+                }
+                else {
+                    throw gcnew PSH5XException("Unsupported float type!");
+                }
+
+#pragma endregion
+
+                break;
+
+            case H5T_STRING:
+
+                result = gcnew StringDatasetWriter(drive->FileHandle, h5path);
+                break;
+
+
+            case H5T_BITFIELD:
+
+#pragma region HDF5 bitfield
+
+                ntype = H5Tget_native_type(ftype, H5T_DIR_DESCEND);
+                if (ntype < 0) {
+                    throw gcnew HDF5Exception("H5Tget_native_type failed!");
+                }
+                t = ProviderUtils::H5NativeType2DotNet(ntype);
+                if (t == Byte::typeid) {
+                    result = gcnew DatasetWriterT<Byte>(drive->FileHandle, h5path);
+                }
+                else if (t == UInt16::typeid) {
+                    result = gcnew DatasetWriterT<UInt16>(drive->FileHandle, h5path);
+                }
+                else if (t ==  UInt32::typeid) {
+                    result = gcnew DatasetWriterT<UInt32>(drive->FileHandle, h5path);
+                }
+                else if (t ==  UInt64::typeid) {
+                    result = gcnew DatasetWriterT<UInt64>(drive->FileHandle, h5path);
+                }
+                else {
+                    throw gcnew PSH5XException("Unsupported bitfield type!");
+                }
+
+#pragma endregion
+
+                break;
+
+            /*
+            case H5T_COMPOUND:
+
+                result = gcnew CompoundDatasetWriter(drive->FileHandle, h5path);
+                break;
+
+            case H5T_VLEN:
+
+                result = gcnew VlenDatasetWriter(drive->FileHandle, h5path);
+                break;
+
+            case H5T_ARRAY:
+
+                result = gcnew ArrayDatasetWriter(drive->FileHandle, h5path);
+                break;
+             */
+
+            default:
+
+                throw gcnew PSH5XException("Unsupported type class!");
+                break;
             }
         }
         finally

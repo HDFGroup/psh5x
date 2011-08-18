@@ -1,5 +1,8 @@
 #pragma once
 
+#include "HDF5Exception.h"
+#include "PSH5XException.h"
+
 extern "C" {
 #include "H5Dpublic.h"
 #include "H5Spublic.h"
@@ -17,101 +20,93 @@ namespace PSH5X
 
         DatasetReaderT(hid_t h5file, System::String^ h5path)
         {
-            System::Exception^ ex = nullptr;
-
             char* name = (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
 
-#pragma region HDF5 handles
+            hid_t dset = -1, ftype = -1, ntype = -1, fspace = -1, mspace = -1;
 
-            hid_t dset = -1, ftype = -1, ntype = -1, fspace = -1;
-
-            dset = H5Dopen2(h5file, name, H5P_DEFAULT);
-            if (dset < 0) {
-                ex = gcnew ArgumentException("H5Dopen2 failed!");
-                goto error;
-            }
-
-            ftype = H5Dget_type(dset);
-            if (ftype < 0) {
-                ex = gcnew ArgumentException("H5Dget_type failed!");
-                goto error;
-            }
-
-            ntype = H5Tget_native_type(ftype, H5T_DIR_ASCEND);
-            if (ntype < 0) {
-                ex = gcnew ArgumentException("H5Tget_native_type failed!");
-                goto error;
-            }
-
-            fspace = H5Dget_space(dset);
-            if (fspace < 0) {
-                ex = gcnew ArgumentException("H5Dget_space failed!");
-                goto error;
-            }
-
-#pragma endregion
-
-            Type^ t = ProviderUtils::H5NativeType2DotNet(ntype);
-
-            // TODO: deal with strings
-
-            if (t != nullptr)
+            try
             {
-                size_t size = H5Tget_size(ntype);
+                dset = H5Dopen2(h5file, name, H5P_DEFAULT);
+                if (dset < 0) {
+                    throw gcnew HDF5Exception("H5Dopen2 failed!");
+                }
 
-                hssize_t npoints = H5Sget_simple_extent_npoints(fspace);
-                if (npoints > 0)
+                ftype = H5Dget_type(dset);
+                if (ftype < 0) {
+                    throw gcnew HDF5Exception("H5Dget_type failed!");
+                }
+
+                if (H5Tget_class(ftype) == H5T_BITFIELD) {
+                    ntype = H5Tget_native_type(ftype, H5T_DIR_DESCEND);
+                }
+                else {
+                    ntype = H5Tget_native_type(ftype, H5T_DIR_ASCEND);
+                }
+                if (ntype < 0) {
+                    throw gcnew HDF5Exception("H5Tget_native_type failed!");
+                }
+
+                fspace = H5Dget_space(dset);
+                if (fspace < 0) {
+                    throw gcnew HDF5Exception("H5Dget_space failed!");
+                }
+
+                Type^ t = ProviderUtils::H5NativeType2DotNet(ntype);
+
+                // TODO: deal with strings
+
+                if (t != nullptr)
                 {
-                    hsize_t dims[1];
-                    dims[0] = static_cast<hsize_t>(npoints);
+                    size_t size = H5Tget_size(ntype);
 
-                    hid_t mspace = H5Screate_simple(1, dims, NULL);
-                    if (mspace < 0) {
-                        ex = gcnew ArgumentException("H5Screate_simple failed!");
-                        goto error;
+                    hssize_t npoints = H5Sget_simple_extent_npoints(fspace);
+                    if (npoints > 0)
+                    {
+                        hsize_t dims[1];
+                        dims[0] = static_cast<hsize_t>(npoints);
+
+                        mspace = H5Screate_simple(1, dims, NULL);
+                        if (mspace < 0) {
+                            throw gcnew HDF5Exception("H5Screate_simple failed!");
+                        }
+
+                        m_array = gcnew array<T>(dims[0]);
+                        pin_ptr<T> ptr = &m_array[0];
+
+                        if (H5Dread(dset, ntype, mspace, H5S_ALL, H5P_DEFAULT, ptr) < 0) {
+                            H5Sclose(mspace);
+                            throw gcnew HDF5Exception("H5Dread failed!");
+                        }
                     }
-
-                    m_array = gcnew array<T>(dims[0]);
-                    pin_ptr<T> ptr = &m_array[0];
-
-                    if (H5Dread(dset, ntype, mspace, H5S_ALL, H5P_DEFAULT, ptr) < 0) {
-                        H5Sclose(mspace);
-                        ex = gcnew ArgumentException("H5Dread failed!");
-                        goto error;
+                    else
+                    {
+                        m_array = gcnew array<T>(0);
                     }
-
+                }
+                else {
+                    throw gcnew HDF5Exception("Unsupported HDF5 atomic type!");
+                }
+            }
+            finally
+            {
+                if (mspace >= 0) {
                     H5Sclose(mspace);
                 }
-                else
-                {
-                    m_array = gcnew array<T>(0);
+                if (fspace >= 0) {
+                    H5Sclose(fspace);
                 }
-            }
-            else {
-                ex = gcnew ArgumentException("Unsupported HDF5 atomic type!");
-                goto error;
-            }
+                if (ntype >= 0) {
+                    H5Tclose(ntype);
+                }
+                if (ftype >= 0) {
+                    H5Tclose(ftype);
+                }
 
-error:
+                if (dset >= 0) {
+                    H5Dclose(dset);
+                }
 
-            if (fspace >= 0) {
-                H5Sclose(fspace);
-            }
-            if (ntype >= 0) {
-                H5Tclose(ntype);
-            }
-            if (ftype >= 0) {
-                H5Tclose(ftype);
-            }
-
-            if (dset >= 0) {
-                H5Dclose(dset);
-            }
-
-            Marshal::FreeHGlobal(IntPtr(name));
-
-            if (ex != nullptr) {
-                throw ex;
+                Marshal::FreeHGlobal(IntPtr(name));
             }
 
         }

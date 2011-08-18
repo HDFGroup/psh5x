@@ -421,7 +421,7 @@ namespace PSH5X
 
                 case H5T_STRING:
                     
-#pragma region HDF5 string
+#pragma region HDF5 STRING
 
                     ht->Add("ElementTypeClass", "String");
 
