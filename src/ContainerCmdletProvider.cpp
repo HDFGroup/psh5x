@@ -4,10 +4,12 @@
 #include "DatatypeInfo.h"
 #include "GroupInfo.h"
 #include "GroupInfoLite.h"
+#include "HDF5Exception.h"
 #include "LinkInfo.h"
 #include "ObjectInfo.h"
 #include "Provider.h"
 #include "ProviderUtils.h"
+#include "PSH5XException.h"
 
 extern "C" {
 #include "H5Gpublic.h"
@@ -28,7 +30,9 @@ namespace PSH5X
         WriteVerbose(String::Format(
             "HDF5Provider::CopyItem(Path = '{0}', CopyPath = '{1}', Recurse = {2})",
             path, copyPath, recurse));
-        WriteWarning("The HDF5Provider::CopyItem() method has not (yet) been implemented.");
+
+        throw gcnew PSH5XException("The HDF5Provider::CopyItem() method has not (yet) been implemented.");
+        
         return;
     }
 
@@ -37,6 +41,7 @@ namespace PSH5X
         WriteVerbose(String::Format(
             "HDF5Provider::CopyItemDynamicParameters(Path = '{0}', CopyPath = '{1}', Recurse = {2})",
             path, copyPath, recurse));
+
         return nullptr;
     }
 
@@ -45,156 +50,146 @@ namespace PSH5X
         WriteVerbose(String::Format("HDF5Provider::GetChildItems(Path = '{0}', recurse = '{1}')",
             path, recurse));
 
-        Exception^ ex = nullptr;
-        
         hid_t gid = -1, oid = -1;
 
         char *gpath = NULL, *link_name = NULL;
 
-        DriveInfo^ drive = nullptr;
-        String^ h5path = nullptr;
-        if (!ProviderUtils::TryGetDriveEtH5Path(path, ProviderInfo, drive, h5path))
+        try
         {
-            ErrorRecord^ error = gcnew ErrorRecord(
-                gcnew ArgumentException("Ill-formed HDF5 path name and/or unable to obtain drive name!"),
-                "InvalidData", ErrorCategory::InvalidData, nullptr);
-            ThrowTerminatingError(error);
-        }
 
-        bool detailed = false;
-        RuntimeDefinedParameterDictionary^ dynamicParameters =
-            (RuntimeDefinedParameterDictionary^) DynamicParameters;
-        if (dynamicParameters != nullptr && dynamicParameters->ContainsKey("Detailed"))
-        {
-            detailed = dynamicParameters["Detailed"]->IsSet;
-        }
-
-        if (ProviderUtils::IsH5Group(drive->FileHandle, h5path))
-        {
-            gpath = (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
-
-            gid = H5Gopen2(drive->FileHandle, gpath, H5P_DEFAULT);
-            if (gid < 0) {
-                ex = gcnew Exception("H5Gopen2 failed!!!");
-                goto error;
+            DriveInfo^ drive = nullptr;
+            String^ h5path = nullptr;
+            if (!ProviderUtils::TryGetDriveEtH5Path(path, ProviderInfo, drive, h5path))
+            {
+                throw gcnew PSH5XException("Ill-formed HDF5 path name and/or unable to obtain drive name!");
             }
 
-            array<String^>^ linkNames = ProviderUtils::GetGroupLinkNames(gid, recurse);
-
-            for each (String^ linkName in linkNames)
+            bool detailed = false;
+            RuntimeDefinedParameterDictionary^ dynamicParameters =
+                (RuntimeDefinedParameterDictionary^) DynamicParameters;
+            if (dynamicParameters != nullptr && dynamicParameters->ContainsKey("Detailed"))
             {
-                String^ childPath = path;
-                if (path != (drive->Name + ":\\"))
-                    childPath += "\\";
-                childPath += linkName->Replace('/','\\');
+                detailed = dynamicParameters["Detailed"]->IsSet;
+            }
 
-                link_name = (char*)(Marshal::StringToHGlobalAnsi(linkName)).ToPointer();
-                H5L_info_t linfo;
-                if (H5Lget_info(gid, link_name, &linfo, H5P_DEFAULT) >= 0)
+            if (ProviderUtils::IsH5Group(drive->FileHandle, h5path))
+            {
+                gpath = (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
+
+                gid = H5Gopen2(drive->FileHandle, gpath, H5P_DEFAULT);
+                if (gid < 0) {
+                    throw gcnew HDF5Exception("H5Gopen2 failed!!!");
+                }
+
+                array<String^>^ linkNames = ProviderUtils::GetGroupLinkNames(gid, recurse);
+
+                for each (String^ linkName in linkNames)
                 {
-                    switch (linfo.type)
+                    String^ childPath = path;
+                    if (path != (drive->Name + ":\\"))
+                        childPath += "\\";
+                    childPath += linkName->Replace('/','\\');
+
+                    link_name = (char*)(Marshal::StringToHGlobalAnsi(linkName)).ToPointer();
+                    H5L_info_t linfo;
+                    if (H5Lget_info(gid, link_name, &linfo, H5P_DEFAULT) >= 0)
                     {
-                    case H5L_TYPE_HARD:
+                        switch (linfo.type)
+                        {
+                        case H5L_TYPE_HARD:
 
 #pragma region HDF5 hard link
 
-                        oid = H5Oopen(gid, link_name, H5P_DEFAULT);
-                        if (oid < 0) {
-                            ex = gcnew Exception("H5Oopen failed!!!");
-                            goto error;
-                        }
-
-                        H5O_info_t oinfo;
-                        if (H5Oget_info(oid, &oinfo) >= 0)
-                        {
-                            switch (oinfo.type)
-                            {
-                            case H5O_TYPE_GROUP:
-                                if (!detailed)
-                                {
-                                    WriteItemObject(gcnew GroupInfoLite(oid), childPath,
-                                        true);
-                                }
-                                else
-                                {
-                                    WriteItemObject(gcnew GroupInfo(oid), childPath, true);
-                                }
-                                break;
-                            case H5O_TYPE_DATASET:
-                                if (!detailed)
-                                {
-                                    WriteItemObject(gcnew DatasetInfoLite(oid), childPath,
-                                        false);
-                                }
-                                else
-                                {
-                                    WriteItemObject(gcnew DatasetInfo(oid), childPath,
-                                        false);
-                                }
-                                break;
-                            case H5O_TYPE_NAMED_DATATYPE:
-                                WriteItemObject(gcnew DatatypeInfo(oid), childPath, false);
-                                break;
-                            default:
-                                WriteItemObject(gcnew ObjectInfo(oid), childPath, false);
-                                break;
+                            oid = H5Oopen(gid, link_name, H5P_DEFAULT);
+                            if (oid < 0) {
+                                throw gcnew HDF5Exception("H5Oopen failed!");
                             }
-                        }
-                        else {
-                            ex = gcnew Exception("H5Oget_info failed!!!");
-                            goto error;
-                        }
-                            
+
+                            H5O_info_t oinfo;
+                            if (H5Oget_info(oid, &oinfo) >= 0)
+                            {
+                                switch (oinfo.type)
+                                {
+                                case H5O_TYPE_GROUP:
+                                    if (!detailed)
+                                    {
+                                        WriteItemObject(gcnew GroupInfoLite(oid), childPath,
+                                            true);
+                                    }
+                                    else
+                                    {
+                                        WriteItemObject(gcnew GroupInfo(oid), childPath, true);
+                                    }
+                                    break;
+                                case H5O_TYPE_DATASET:
+                                    if (!detailed)
+                                    {
+                                        WriteItemObject(gcnew DatasetInfoLite(oid), childPath,
+                                            false);
+                                    }
+                                    else
+                                    {
+                                        WriteItemObject(gcnew DatasetInfo(oid), childPath,
+                                            false);
+                                    }
+                                    break;
+                                case H5O_TYPE_NAMED_DATATYPE:
+                                    WriteItemObject(gcnew DatatypeInfo(oid), childPath, false);
+                                    break;
+                                default:
+                                    WriteItemObject(gcnew ObjectInfo(oid), childPath, false);
+                                    break;
+                                }
+                            }
+                            else {
+                                throw gcnew HDF5Exception("H5Oget_info failed!!!");
+                            }
+
 #pragma endregion
 
-                        break;
+                            break;
 
-                    case H5L_TYPE_SOFT:
-                        WriteItemObject(gcnew LinkInfo(gid, linkName, "SoftLink"),
-                            childPath, false);
-                        break;
+                        case H5L_TYPE_SOFT:
+                            WriteItemObject(gcnew LinkInfo(gid, linkName, "SoftLink"),
+                                childPath, false);
+                            break;
 
-                    case H5L_TYPE_EXTERNAL:
-                        WriteItemObject(gcnew LinkInfo(gid, linkName, "ExtLink"),
-                            childPath, false);
-                        break;
+                        case H5L_TYPE_EXTERNAL:
+                            WriteItemObject(gcnew LinkInfo(gid, linkName, "ExtLink"),
+                                childPath, false);
+                            break;
 
-                    default:
+                        default:
 
-                        ex = gcnew Exception("Unable to determine the item type for this path!!!");
-                        goto error;
-                        break;
+                            throw gcnew PSH5XException("Unable to determine the item type for this path!!!");
+                            break;
+                        }
                     }
-                }
-                else {
-                    ex = gcnew Exception("H5Lget_info failed!!!");
-                    goto error;
+                    else {
+                        throw gcnew HDF5Exception("H5Lget_info failed!!!");
+                    }
                 }
             }
         }
+        finally
+        {
+            if (oid >= 0) {
+                H5Oclose(oid);
+            }
 
-error:
+            if (gid >= 0) {
+                H5Gclose(gid);
+            }
 
-        if (oid >= 0) {
-            H5Oclose(oid);
+            if (link_name != NULL) {
+                Marshal::FreeHGlobal(IntPtr(link_name));
+            }
+
+            if (gpath != NULL) {
+                Marshal::FreeHGlobal(IntPtr(gpath));
+            }
         }
 
-        if (gid >= 0) {
-            H5Gclose(gid);
-        }
-
-        if (link_name != NULL) {
-            Marshal::FreeHGlobal(IntPtr(link_name));
-        }
-
-        if (gpath != NULL) {
-            Marshal::FreeHGlobal(IntPtr(gpath));
-        }
-        
-        if (ex != nullptr) {
-            throw ex;
-        }
-        
         return;
 
     }
@@ -230,88 +225,80 @@ error:
         WriteVerbose(String::Format("HDF5Provider::GetChildNames(Path = '{0}', ReturnContainers = '{1}')",
             path, returnContainers));
 
-        Exception^ ex = nullptr;
-
         hid_t gid = -1;
 
         char *gpath = NULL, *link_name = NULL;
 
-        DriveInfo^ drive = nullptr;
-        String^ h5path = nullptr;
-        if (!ProviderUtils::TryGetDriveEtH5Path(path, ProviderInfo, drive, h5path))
+        try
         {
-            ErrorRecord^ error = gcnew ErrorRecord(
-                gcnew ArgumentException("Ill-formed HDF5 path name and/or unable to obtain drive name!"),
-                "InvalidData", ErrorCategory::InvalidData, nullptr);
-            ThrowTerminatingError(error);
-        }
-
-        if (ProviderUtils::IsH5Group(drive->FileHandle, h5path))
-        {
-            gpath = (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
-
-            gid = H5Gopen2(drive->FileHandle, gpath, H5P_DEFAULT);
-            if (gid < 0) {
-                ex = gcnew Exception("H5Gopen2 failed!!!");
-                goto error;
+            DriveInfo^ drive = nullptr;
+            String^ h5path = nullptr;
+            if (!ProviderUtils::TryGetDriveEtH5Path(path, ProviderInfo, drive, h5path))
+            {
+                throw gcnew PSH5XException("Ill-formed HDF5 path name and/or unable to obtain drive name!");
             }
 
-            array<String^>^ linkNames = ProviderUtils::GetGroupLinkNames(gid, false);
-
-            for each (String^ linkName in linkNames)
+            if (ProviderUtils::IsH5Group(drive->FileHandle, h5path))
             {
-                String^ childPath = path + "\\" + linkName->Replace('/','\\');
+                gpath = (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
 
-                link_name = (char*)(Marshal::StringToHGlobalAnsi(linkName)).ToPointer();
+                gid = H5Gopen2(drive->FileHandle, gpath, H5P_DEFAULT);
+                if (gid < 0) {
+                    throw gcnew HDF5Exception("H5Gopen2 failed!");
+                }
 
-                H5L_info_t info;
-                if (H5Lget_info(gid, link_name, &info, H5P_DEFAULT) >= 0)
+                array<String^>^ linkNames = ProviderUtils::GetGroupLinkNames(gid, false);
+
+                for each (String^ linkName in linkNames)
                 {
-                    switch (info.type)
-                    {
-                    case H5L_TYPE_HARD:
+                    String^ childPath = path + "\\" + linkName->Replace('/','\\');
 
+                    link_name = (char*)(Marshal::StringToHGlobalAnsi(linkName)).ToPointer();
+
+                    H5L_info_t info;
+                    if (H5Lget_info(gid, link_name, &info, H5P_DEFAULT) >= 0)
+                    {
                         switch (info.type)
                         {
-                        case H5O_TYPE_GROUP:
-                            WriteItemObject(linkName, childPath, true);
+                        case H5L_TYPE_HARD:
+
+                            switch (info.type)
+                            {
+                            case H5O_TYPE_GROUP:
+                                WriteItemObject(linkName, childPath, true);
+                                break;
+                            default:
+                                WriteItemObject(linkName, childPath, false);
+                                break;
+                            }
                             break;
+
                         default:
                             WriteItemObject(linkName, childPath, false);
                             break;
                         }
-                        break;
-
-                    default:
-                        WriteItemObject(linkName, childPath, false);
-                        break;
                     }
-                }
-                else {
-                    ex = gcnew Exception("H5Lget_info failed!!!");
-                    goto error;
+                    else {
+                        throw gcnew HDF5Exception("H5Lget_info failed!");
+                    }
                 }
             }
         }
+        finally
+        {
+            if (gid >= 0) {
+                H5Gclose(gid);
+            }
 
-error:
+            if (link_name != NULL) {
+                Marshal::FreeHGlobal(IntPtr(link_name));
+            }
 
-        if (gid >= 0) {
-            H5Gclose(gid);
+            if (gpath != NULL) {
+                Marshal::FreeHGlobal(IntPtr(gpath));
+            }
         }
 
-        if (link_name != NULL) {
-            Marshal::FreeHGlobal(IntPtr(link_name));
-        }
-
-        if (gpath != NULL) {
-            Marshal::FreeHGlobal(IntPtr(gpath));
-        }
-
-        if (ex != nullptr) {
-            throw ex;
-        }
-        
         return;
     }
 
@@ -330,55 +317,47 @@ error:
 
         bool result = false;
 
-        Exception^ ex = nullptr;
-
         hid_t gid = -1;
 
         char* gpath = NULL;
 
-        DriveInfo^ drive = nullptr;
-        String^ h5path = nullptr;
-        if (!ProviderUtils::TryGetDriveEtH5Path(path, ProviderInfo, drive, h5path))
+        try
         {
-            ErrorRecord^ error = gcnew ErrorRecord(
-                gcnew ArgumentException("Ill-formed HDF5 path name and/or unable to obtain drive name!"),
-                "InvalidData", ErrorCategory::InvalidData, nullptr);
-            ThrowTerminatingError(error);
-        }
-
-        if (ProviderUtils::IsH5Group(drive->FileHandle, h5path))
-        {
-            gpath = (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
-
-            gid = H5Gopen2(drive->FileHandle, gpath, H5P_DEFAULT);
-            if (gid < 0) {
-                ex = gcnew Exception("H5Gopen2 failed!!!");
-                goto error;
-            }
-
-            H5G_info_t info;
-            if (H5Gget_info(gid, &info) >= 0)
+            DriveInfo^ drive = nullptr;
+            String^ h5path = nullptr;
+            if (!ProviderUtils::TryGetDriveEtH5Path(path, ProviderInfo, drive, h5path))
             {
-                result = (info.nlinks > 0);
+                throw gcnew PSH5XException("Ill-formed HDF5 path name and/or unable to obtain drive name!");
             }
-            else {
-                ex = gcnew Exception("H5Gget_info failed!!!");
-                goto error;
+
+            if (ProviderUtils::IsH5Group(drive->FileHandle, h5path))
+            {
+                gpath = (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
+
+                gid = H5Gopen2(drive->FileHandle, gpath, H5P_DEFAULT);
+                if (gid < 0) {
+                    throw gcnew Exception("H5Gopen2 failed!");
+                }
+
+                H5G_info_t info;
+                if (H5Gget_info(gid, &info) >= 0)
+                {
+                    result = (info.nlinks > 0);
+                }
+                else {
+                    throw gcnew Exception("H5Gget_info failed!");
+                }
             }
         }
+        finally
+        {
+            if (gid >= 0) {
+                H5Gclose(gid);
+            }
 
-error:
-
-        if (gid >= 0) {
-            H5Gclose(gid);
-        }
-
-        if (gpath != NULL) {
-            Marshal::FreeHGlobal(IntPtr(gpath));
-        }
-
-        if (ex != nullptr) {
-            throw ex;
+            if (gpath != NULL) {
+                Marshal::FreeHGlobal(IntPtr(gpath));
+            }
         }
 
         return result;
@@ -389,94 +368,79 @@ error:
         WriteVerbose(String::Format(
             "HDF5Provider::RemoveItem(Path = '{0}', Recurse = {1})", path, recurse));
 
-        Exception^ ex = nullptr;
-
         hid_t gid = -1;
 
         char *group_path = NULL, *link_name = NULL;
 
-        if (recurse)
-        {
-            WriteWarning("The '-Recurse' option has no effect at the moment.");
-        }
-
-        DriveInfo^ drive = nullptr;
-        String^ h5path = nullptr;
-        if (!ProviderUtils::TryGetDriveEtH5Path(path, ProviderInfo, drive, h5path))
-        {
-            ErrorRecord^ error = gcnew ErrorRecord(
-                gcnew ArgumentException("Ill-formed HDF5 path name and/or unable to obtain drive name!"),
-                "InvalidData", ErrorCategory::InvalidData, nullptr);
-            ThrowTerminatingError(error);
-        }
-
-        if (drive->ReadOnly)
-        {
-            ErrorRecord^ error = gcnew ErrorRecord(
-                gcnew ArgumentException("The drive is read-only and cannot be modified!"),
-                "InvalidData", ErrorCategory::InvalidData, nullptr);
-            ThrowTerminatingError(error);
-        }
-
-        if (ProviderUtils::IsH5RootPathName(h5path)) // root group, TODO: refine with address check!
-        {
-            ErrorRecord^ error = gcnew ErrorRecord(
-                gcnew ArgumentException(String::Format("Cannot remove root group '{0}'", h5path)),
-                "h5path", ErrorCategory::InvalidData, nullptr);
-            ThrowTerminatingError(error);
-        }
-        else
+        try
         {
 
-            String^ groupPath = ProviderUtils::ParentPath(h5path);
-            group_path = (char*)(Marshal::StringToHGlobalAnsi(groupPath)).ToPointer();
-
-            gid = H5Gopen2(drive->FileHandle, group_path, H5P_DEFAULT);
-            if (gid < 0) {
-                ex = gcnew Exception("H5Gopen2 failed!!!");
-                goto error;
+            if (recurse)
+            {
+                WriteWarning("The '-Recurse' option has no effect at the moment.");
             }
 
-            String^ linkName = ProviderUtils::ChildName(h5path);
-            link_name = (char*)(Marshal::StringToHGlobalAnsi(linkName)).ToPointer();
-
-            if (H5Lexists(gid, link_name, H5P_DEFAULT) > 0)
+            DriveInfo^ drive = nullptr;
+            String^ h5path = nullptr;
+            if (!ProviderUtils::TryGetDriveEtH5Path(path, ProviderInfo, drive, h5path))
             {
-                if (this->ShouldProcess(h5path,
-                    String::Format("Removing HDF5 item '{0}'", path)))
+                throw gcnew PSH5XException("Ill-formed HDF5 path name and/or unable to obtain drive name!");
+            }
+
+            if (drive->ReadOnly)
+            {
+                throw gcnew PSH5XException("The drive is read-only and cannot be modified!");
+            }
+
+            if (ProviderUtils::IsH5RootPathName(h5path)) // root group, TODO: refine with address check!
+            {
+                throw gcnew PSH5XException(String::Format("Cannot remove root group '{0}'", h5path));
+            }
+            else
+            {
+
+                String^ groupPath = ProviderUtils::ParentPath(h5path);
+                group_path = (char*)(Marshal::StringToHGlobalAnsi(groupPath)).ToPointer();
+
+                gid = H5Gopen2(drive->FileHandle, group_path, H5P_DEFAULT);
+                if (gid < 0) {
+                    throw gcnew HDF5Exception("H5Gopen2 failed!");
+                }
+
+                String^ linkName = ProviderUtils::ChildName(h5path);
+                link_name = (char*)(Marshal::StringToHGlobalAnsi(linkName)).ToPointer();
+
+                if (H5Lexists(gid, link_name, H5P_DEFAULT) > 0)
                 {
-                    if (H5Ldelete(gid, link_name, H5P_DEFAULT) >= 0)
+                    if (this->ShouldProcess(h5path,
+                        String::Format("Removing HDF5 item '{0}'", path)))
                     {
-                        if (H5Fflush(gid, H5F_SCOPE_LOCAL) < 0) {
-                            ex = gcnew Exception("H5Fflush failed!!!");
-                            goto error;
+                        if (H5Ldelete(gid, link_name, H5P_DEFAULT) >= 0)
+                        {
+                            if (H5Fflush(gid, H5F_SCOPE_LOCAL) < 0) {
+                                throw gcnew Exception("H5Fflush failed!");
+                            }
                         }
-                    }
-                    else {
-                        ex = gcnew Exception("H5Ldelete failed!!!");
-                        goto error;
+                        else {
+                            throw gcnew Exception("H5Ldelete failed!!!");
+                        }
                     }
                 }
             }
         }
+        finally
+        {
+            if (gid >= 0) {
+                H5Gclose(gid);
+            }
 
-error:
+            if (link_name != NULL) {
+                Marshal::FreeHGlobal(IntPtr(link_name));
+            }
 
-        if (gid >= 0) {
-            H5Gclose(gid);
-        }
-
-        if (link_name != NULL) {
-            Marshal::FreeHGlobal(IntPtr(link_name));
-        }
-
-        if (group_path != NULL) {
-            Marshal::FreeHGlobal(IntPtr(group_path));
-        }
-
-
-        if (ex != nullptr) {
-            throw ex;
+            if (group_path != NULL) {
+                Marshal::FreeHGlobal(IntPtr(group_path));
+            }
         }
 
         return;
@@ -495,11 +459,8 @@ error:
         WriteVerbose(String::Format(
             "HDF5Provider::RenameItem(Path = '{0}', NewName = '{1}')", path, newName));
 
-        ErrorRecord^ error = gcnew ErrorRecord(
-            gcnew NotImplementedException("HDF5Provider::RenameItem not implemented!!!"),
-            "NotImplemented", ErrorCategory::NotImplemented, nullptr);
-        WriteError(error);
-
+        throw gcnew PSH5XException("HDF5Provider::RenameItem not implemented!");
+            
         return;
     }
 

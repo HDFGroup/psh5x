@@ -1,6 +1,7 @@
 
 #include "Provider.h"
 #include "ProviderUtils.h"
+#include "PSH5XException.h"
 
 extern "C" {
 #include "H5public.h"
@@ -23,17 +24,11 @@ namespace PSH5X
 
 
         if (itemTypeName == nullptr || itemTypeName->Trim() == "") {
-            ErrorRecord^ error = gcnew ErrorRecord(
-                gcnew ArgumentException("Item type must not be empty. Use -ItemType to specify!"),
-                "InvalidData", ErrorCategory::InvalidData, nullptr);
-            ThrowTerminatingError(error);
+            throw gcnew PSH5XException("Item type must not be empty. Use -ItemType to specify!");
         }
 
         if (!ProviderUtils::ResolveItemType(itemTypeName, itemTypeName)) {
-            ErrorRecord^ error = gcnew ErrorRecord(
-                gcnew ArgumentException("Invalid item type"),
-                "InvalidData", ErrorCategory::InvalidData, nullptr);
-            ThrowTerminatingError(error);
+            throw gcnew PSH5XException("Invalid item type");
         }
 
         RuntimeDefinedParameterDictionary^ dict = gcnew RuntimeDefinedParameterDictionary();
