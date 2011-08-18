@@ -14,7 +14,7 @@
     HDF5. On the extremes, purists may argue that this kind of agnosticism must be maintained
     unconditionally, and cynics may argue that all this attitude achieves is a perpetuation of a
     least common denominator. </para>
-  <para>The user-interface for HDF5 proposed in this document is not about an ideological debate. It
+  <para>The user interface for HDF5 proposed in this document is not about an ideological debate. It
     recognizes that a profound change of the Windows user-interface took place in 2006 with the
     arrival of Windows PowerShell version 1. The PowerShell provider architecture (see <xref
       xlink:href="#windows_powershell_providers"/>) is a blueprint for and an invitation to an HDF5

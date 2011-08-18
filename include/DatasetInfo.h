@@ -96,6 +96,21 @@ namespace PSH5X
             int get() { return m_external_count; }
         }
 
+        ~DatasetInfo()
+        {
+            delete m_elem_type_class;
+            delete m_elem_type;
+            delete m_dataspace_alloc_status;
+            delete m_simple_extent_type;
+            delete m_dims;
+            delete m_maxdims;
+            delete m_layout;
+            delete m_chunk;
+            delete m_fill_value_def;
+            delete m_fill_time;
+            delete m_alloc_time;
+        }
+
     private:
 
         haddr_t           m_offset;

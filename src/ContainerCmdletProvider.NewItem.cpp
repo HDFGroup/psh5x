@@ -110,6 +110,8 @@ namespace PSH5X
             }
         }
 
+#pragma endregion
+
         // at this point, there are no structural problems
         // let's se what we've got...
 
@@ -124,8 +126,6 @@ namespace PSH5X
                 goto error;
             }
         }
-
-#pragma endregion
 
         String^ linkName = ProviderUtils::ChildName(h5path);
         name = (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();

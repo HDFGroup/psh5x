@@ -691,11 +691,11 @@ namespace PSH5X
                             {
                                 result = H5Tcreate(H5T_COMPOUND, size);
 
-                                if (ht->ContainsKey("Components"))
+                                if (ht->ContainsKey("Members"))
                                 {
                                     Hashtable^ components = nullptr;
                                     
-                                    if (TryGetValue(ht["Components"], components))
+                                    if (TryGetValue(ht["Members"], components))
                                     {
                                         for each (String^ key in components->Keys)
                                         {
@@ -740,18 +740,18 @@ namespace PSH5X
                                             }
                                             else {
                                                 throw gcnew ArgumentException(
-                                                    String::Format("COMPOUND: Component '{0}' does not contain a hashtable.", key));
+                                                    String::Format("COMPOUND: Member '{0}' does not contain a hashtable.", key));
                                             }
 
                                             Marshal::FreeHGlobal(IntPtr(name));
                                         }
                                     }
                                     else {
-                                        throw gcnew ArgumentException("COMPOUND: 'Components' does not contain a hashtable.");
+                                        throw gcnew ArgumentException("COMPOUND: 'Members' does not contain a hashtable.");
                                     }
                                 }
                                 else {
-                                    throw gcnew ArgumentException("COMPOUND: No 'Components' key found.");
+                                    throw gcnew ArgumentException("COMPOUND: No 'Members' key found.");
                                 }
                             }
                             else {

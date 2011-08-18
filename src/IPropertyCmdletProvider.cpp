@@ -40,6 +40,8 @@ namespace PSH5X
 
         hid_t gid = -1, oid = -1, aid = -1;
 
+        IntPtr igroup_path = IntPtr::Zero, ilink_name = IntPtr::Zero, iipath = IntPtr::Zero, iattr_name = IntPtr::Zero;
+
         char *group_path = NULL, *link_name = NULL, *ipath = NULL, *attr_name = NULL;
 
         DriveInfo^ drive = nullptr;
@@ -82,12 +84,6 @@ namespace PSH5X
                         ex = gcnew Exception("H5Oopen failed!");
                         goto error;
                     }
-                    
-                    // If more than one property is requested, we return a hashtable of hashtables
-                    // keyed by property name.
-                    // If only one property is requested, we return only one hashtable.
-
-                    Hashtable^ htAllAttributes = gcnew Hashtable();
 
                     for each (String^ attributeName in providerSpecificPickList)
                     {
@@ -103,16 +99,7 @@ namespace PSH5X
                                 goto error;
                             }
 
-                            if (providerSpecificPickList->Count == 1)
-                            {
-                                htAllAttributes =
-                                    ProviderUtils::H5Attribute(aid, attributeName);
-                            }
-                            else
-                            {
-                                htAllAttributes[attributeName] =
-                                    ProviderUtils::H5Attribute(aid, attributeName);
-                            }
+                            WritePropertyObject(ProviderUtils::H5Attribute(aid, attributeName), path);
 
                             if (H5Aclose(aid) < 0) {
                                 ex = gcnew Exception("H5Aclose failed!");
@@ -134,8 +121,6 @@ namespace PSH5X
                             attr_name = NULL;
                         }
                     }
-
-                    WritePropertyObject(htAllAttributes, path);
                 }
                 else
                 {

@@ -11,9 +11,9 @@ $ret = New-ItemProperty -Path h5tmp:\ -Name attr1 -ElementType $t
 $ret = New-Item -Path h5tmp:\dset1 -ItemType Dataset -ElementType H5T_STD_I32BE -Dimensions 10,10
 
 $t = @{
-  Class      = 'Compound';
-  Size       = 16;
-  Components = @{
+  Class   = 'Compound';
+  Size    = 16;
+  Members = @{
     a = @{Class = 'Integer'; Type = 'H5T_STD_I32BE' ; MemberOffset = 0 };
     b = @{Class = 'Float'  ; Type = 'H5T_IEEE_F32BE'; MemberOffset = 4 };
     # for known types we don't have to specify the type class
@@ -26,9 +26,9 @@ $ret = New-Item -Path h5tmp:\dset2 -ItemType Dataset -ElementType $t -Dimensions
 $ret = New-Item -Path h5tmp:\group1 -ItemType Group
 
 $t = @{
-  Class      = 'Compound';
-  Size       = 136;
-  Components = @{
+  Class   = 'Compound';
+  Size    = 136;
+  Members = @{
     a = @{Class = 'Array'; Type = 'H5T_STD_I32BE' ; Dims = @(4)  ; MemberOffset = 0 }
     b = @{Class = 'Array'; Type = 'H5T_IEEE_F32BE'; Dims = @(5,6); MemberOffset = 16 }
   }

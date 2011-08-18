@@ -24,6 +24,11 @@ namespace PSH5X
             System::Collections::Hashtable^ get() { return m_definition; }
         }
 
+        ~DatatypeInfo()
+        {
+            delete m_definition;
+        }
+
     private:
 
         System::Collections::Hashtable^ m_definition;

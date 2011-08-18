@@ -38,7 +38,17 @@ namespace PSH5X
         }
 
         ObjectInfoLite(hid_t obj_id);
-            
+
+        ~ObjectInfoLite()
+        {
+            for (int i = 0; i < m_attribute_names->Length; ++i)
+            {
+                delete m_attribute_names[i];
+            }
+
+            delete m_attribute_names;
+        }
+   
     protected:
 
         time_t                  m_atime;

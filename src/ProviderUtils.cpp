@@ -320,7 +320,9 @@ namespace PSH5X
             }
 
             Marshal::FreeHGlobal(IntPtr(path));
+            path = NULL;
             Marshal::FreeHGlobal(IntPtr(name));
+            name = NULL;
         }
 
         if (path != NULL) {
@@ -421,7 +423,9 @@ namespace PSH5X
             }
 
             Marshal::FreeHGlobal(IntPtr(path));
+            path = NULL;
             Marshal::FreeHGlobal(IntPtr(name));
+            name = NULL;
         }
 
         if (path != NULL) {
@@ -519,7 +523,9 @@ namespace PSH5X
             }
 
             Marshal::FreeHGlobal(IntPtr(path));
+            path = NULL;
             Marshal::FreeHGlobal(IntPtr(name));
+            name = NULL;
         }
 
         if (path != NULL) {
@@ -591,18 +597,30 @@ namespace PSH5X
         void*             op_data)
     {
         vector<string>* v = static_cast<vector<string>*>(op_data);
-        v->push_back(string(attr_name));
+        size_t i = 0;
+        while ((*v)[i] != "") {
+            ++i;
+        }
+
+        (*v)[i] = string(attr_name);
+
         return 0;
     }
 
     array<String^>^ ProviderUtils::GetObjectAttributeNames(hid_t obj_id)
     {
+        H5O_info_t info;
+        if (H5Oget_info(obj_id, &info) < 0) {
+            throw gcnew Exception("H5Oget_info failed!");
+        }
+
+        vector<string> v(info.num_attrs);
         hsize_t n;
-        vector<string> v;
+
         herr_t status = H5Aiterate2(obj_id, H5_INDEX_NAME,
             H5_ITER_NATIVE, &n, &H5AIterateCallback, (void*) &v);
 
-        array<String^>^ result = gcnew array<String^>(safe_cast<int>(v.size()));
+        array<String^>^ result = gcnew array<String^>(safe_cast<int>(info.num_attrs));
         for (int i = 0; i < result->Length; ++i)
             result[i] = gcnew String(v[i].c_str());
 

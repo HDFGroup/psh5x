@@ -25,7 +25,8 @@ namespace PSH5X
             {    
                 m_nlinks = grp_info.nlinks;
             }
-            else { // TODO
+            else {
+                throw gcnew System::Exception("H5Gget_info failed!");
             }
         }
 

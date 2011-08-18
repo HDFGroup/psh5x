@@ -36,6 +36,7 @@ namespace PSH5X
 
         GroupInfo(hid_t group) : ObjectInfo(group)
         {
+            
             H5G_info_t grp_info;
             if (H5Gget_info(group, &grp_info) >= 0)
             {
@@ -59,10 +60,6 @@ namespace PSH5X
                 m_max_corder = grp_info.max_corder;
                 m_mounted = grp_info.mounted;
             }
-            else
-            {
-                // TODO
-            }
 
             hid_t cplist = H5Gget_create_plist(group);
             if (cplist >= 0)
@@ -75,7 +72,8 @@ namespace PSH5X
                     ht["AverageNameLength"] = est_name_len;
                     __super::m_cplist["Estimates"] = ht;
                 }
-                else { // TODO
+                else {
+                    throw gcnew System::Exception("H5Pget_est_link_info failed!");
                 }
 
                 unsigned crt_order_flags;
@@ -97,7 +95,8 @@ namespace PSH5X
                         }
                     }
                 }
-                else { // TODO
+                else {
+                    throw gcnew System::Exception("H5Pget_link_creation_order failed!");
                 }
                 
                 unsigned max_compact, min_dense;
@@ -116,6 +115,11 @@ namespace PSH5X
             }
             else { // TODO
             }
+        }
+
+        ~GroupInfo()
+        {
+            delete m_storage_type;
         }
 
     private:

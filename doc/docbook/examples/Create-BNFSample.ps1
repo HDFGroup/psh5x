@@ -11,10 +11,16 @@ $ret = New-ItemProperty -Path h5tmp:\ -Name attr1 -ElementType $t
 $ret = New-Item -Path h5tmp:\dset1 -ItemType Dataset `
     -ElementType H5T_STD_I32BE -Dimensions 10,10
 
+$a = New-Object 'int[]' 100
+
+for ($i = 0; $i -lt 100; $i++) { $a[$i] = $i%10 }
+
+Set-Content h5tmp:\dset1 $a
+
 $t = @{
-  Class      = 'Compound';
-  Size       = 16;
-  Components = @{
+  Class   = 'Compound';
+  Size    = 16;
+  Members = @{
     a = @{Class = 'Integer'; Type = 'H5T_STD_I32BE' ; `
           MemberOffset = 0 };
     b = @{Class = 'Float'  ; Type = 'H5T_IEEE_F32BE'; `
@@ -29,9 +35,9 @@ $ret = New-Item -Path h5tmp:\dset2 -ItemType Dataset `
 $ret = New-Item -Path h5tmp:\group1 -ItemType Group
 
 $t = @{
-  Class      = 'Compound';
-  Size       = 136;
-  Components = @{
+  Class   = 'Compound';
+  Size    = 136;
+  Members = @{
     a = @{Class = 'Array'; Type = 'H5T_STD_I32BE' ; `
           Dims = @(4)  ; MemberOffset = 0 }
     b = @{Class = 'Array'; Type = 'H5T_IEEE_F32BE'; `

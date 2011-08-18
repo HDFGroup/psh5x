@@ -61,6 +61,17 @@ namespace PSH5X
 
          DatasetInfoLite(hid_t dset);
 
+         ~DatasetInfoLite()
+         {
+             delete m_elem_type_class;
+             delete m_elem_type;
+             delete m_simple_extent_type;
+             delete m_dims;
+             delete m_maxdims;
+             delete m_layout;
+             delete m_chunk;
+         }
+
     private:
 
         System::String^   m_elem_type_class;

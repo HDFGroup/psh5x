@@ -43,7 +43,8 @@ namespace PSH5X
             m_num_attrs = info.num_attrs;
             m_attribute_names = ProviderUtils::GetObjectAttributeNames(obj);
         }
-        else { // TODO
+        else {
+            throw gcnew Exception("H5Oget_info failed!");
         }
     }
 }

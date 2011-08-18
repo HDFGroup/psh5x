@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://www.oasis-open.org/docbook/xml/5.0/rng/docbookxi.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<appendix xml:id="appendx_type_comp" xmlns="http://docbook.org/ns/docbook"
+    xmlns:xi="http://www.w3.org/2001/XInclude">
+    <title>Keyword Comparison </title>
+    <table>
+        <title>Type keyword comparison and Common Language Specification compliance</title>
+        <tgroup cols="4">
+            <thead>
+                <row>
+                    <entry>C/C++</entry>
+                    <entry>.NET</entry>
+                    <entry>PowerShell</entry>
+                    <entry>CLS Compliant</entry>
+                </row>
+            </thead>
+            <tbody>
+                <row>
+                    <entry><literal>unsigned char</literal></entry>
+                    <entry><literal>System.Byte</literal></entry>
+                    <entry><literal>[byte]</literal></entry>
+                    <entry>Yes</entry>
+                </row>
+                <row>
+                    <entry><literal>char</literal></entry>
+                    <entry><literal>System.SByte</literal></entry>
+                    <entry><literal>N/A</literal></entry>
+                    <entry>No</entry>
+                </row>
+                <row>
+                    <entry><literal>short</literal></entry>
+                    <entry><literal>System.Int16</literal></entry>
+                    <entry><literal>N/A</literal></entry>
+                    <entry>Yes</entry>
+                </row>
+                <row>
+                    <entry><literal>int</literal></entry>
+                    <entry><literal>System.Int32</literal></entry>
+                    <entry><literal>[int]</literal></entry>
+                    <entry>Yes</entry>
+                </row>
+                <row>
+                    <entry><literal>long long</literal></entry>
+                    <entry><literal>System.Int64</literal></entry>
+                    <entry><literal>[long]</literal></entry>
+                    <entry>Yes</entry>
+                </row>
+                <row>
+                    <entry><literal>unsigned short</literal></entry>
+                    <entry><literal>System.UInt16</literal></entry>
+                    <entry><literal>N/A</literal></entry>
+                    <entry>No</entry>
+                </row>
+                <row>
+                    <entry><literal>unsigned int</literal></entry>
+                    <entry><literal>System.UInt32</literal></entry>
+                    <entry><literal>N/A</literal></entry>
+                    <entry>No</entry>
+                </row>
+                <row>
+                    <entry><literal>unsigned long long</literal></entry>
+                    <entry><literal>System.UInt64</literal></entry>
+                    <entry><literal>N/A</literal></entry>
+                    <entry>No</entry>
+                </row>
+                <row>
+                    <entry><literal>float</literal></entry>
+                    <entry><literal>System.Single</literal></entry>
+                    <entry><literal>[float]</literal></entry>
+                    <entry>Yes</entry>
+                </row>
+                <row>
+                    <entry><literal>double</literal></entry>
+                    <entry><literal>System.Double</literal></entry>
+                    <entry><literal>[double]</literal></entry>
+                    <entry>Yes</entry>
+                </row>
+                <row>
+                    <entry><literal>__wchar_t</literal></entry>
+                    <entry><literal>System.Char</literal></entry>
+                    <entry><literal>[char]</literal></entry>
+                    <entry>Yes</entry>
+                </row>
+            </tbody>
+        </tgroup>
+    </table>
+</appendix>

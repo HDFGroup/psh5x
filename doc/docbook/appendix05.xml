@@ -103,9 +103,9 @@
 @{
     Class = 'COMPOUND';
     
-    # the components are listed as name/type pairs
+    # the members are listed as name/type pairs
     
-    Components = @{
+    Members = @{
     
         &lt;name&gt; = @{
                 Class        = &lt;name&gt;;

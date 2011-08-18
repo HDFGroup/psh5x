@@ -57,6 +57,12 @@ namespace PSH5X
             m_data_size = info->data_size;
         }
 
+        ~AttributeInfo()
+        {
+            delete m_attribute_name;
+            delete m_cset;
+        }
+
     private:
         
         System::String^ m_attribute_name;

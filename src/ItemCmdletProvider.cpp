@@ -181,7 +181,6 @@ namespace PSH5X
                     goto error;
                     break;
                 }
-
             }
             else
             {

@@ -40,6 +40,14 @@ namespace PSH5X
 
         LinkInfo(hid_t locid, System::String^ linkName, System::String^ itemType);
 
+        ~LinkInfo()
+        {
+            delete m_cset;
+            delete m_file_name;
+            delete m_h5_path_name;
+        }
+
+
     private:
 
         hbool_t         m_corder_valid;

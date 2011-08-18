@@ -47,7 +47,7 @@ namespace PSH5X
             ht->Add("AttributeNameCharacterSet", attrInfo->AttributeNameCharacterSet);
             ht->Add("DataSizeBytes", attrInfo->DataSizeBytes);
             ht->Add("StorageSizeBytes", H5Aget_storage_size(aid));
-
+            
 #pragma region H5Aget_space
 
             fspace = H5Aget_space(aid);
@@ -431,12 +431,15 @@ namespace PSH5X
                     {
                         ht->Add("IsVariableLength", true);
 
+                        Console::WriteLine(npoints);
                         vrdata = new char* [npoints];
+                        
                         mtype = H5Tcopy(H5T_C_S1);
                         if (H5Tset_size(mtype, H5T_VARIABLE) < 0) {
                             ex = gcnew Exception("H5Tset_size failed!!!");
                             goto error;
                         }
+
                         if (H5Aread(aid, mtype, vrdata) < 0) {
                             ex = gcnew Exception("H5Aread failed!!!");
                             goto error;
@@ -604,6 +607,8 @@ error:
 
         int i = 0;
 
+        hssize_t npoints = -1;
+
         fspace = H5Aget_space(aid);
         if (fspace < 0) {
             ex = gcnew Exception("H5Aget_space failed!!!");
@@ -615,8 +620,6 @@ error:
             // nothing needs to be done
             goto error;
         }
-
-        hssize_t npoints = -1;
 
         if (stype == H5S_SIMPLE)
         {

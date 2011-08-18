@@ -52,6 +52,14 @@ namespace PSH5X
 
         ObjectInfo(hid_t obj_id);
 
+        ~ObjectInfo()
+        {
+            delete m_cplist;
+            delete m_header;
+            delete m_meta_size;
+        }
+
+
     protected:
 
         System::Collections::Hashtable^ m_cplist;
