@@ -1,10 +1,7 @@
 
 #include "Provider.h"
 #include "ProviderUtils.h"
-
-extern "C" {
-#include "H5Opublic.h"
-}
+#include "PSH5XException.h"
 
 using namespace System;
 using namespace System::Collections::Generic;
@@ -36,10 +33,7 @@ namespace PSH5X
         String^ h5path = nullptr;
         if (!ProviderUtils::TryGetDriveEtH5Path(path, ProviderInfo, drive, h5path))
         {
-            ErrorRecord^ error = gcnew ErrorRecord(
-                gcnew ArgumentException("Ill-formed HDF5 path name and/or unable to obtain drive name!"),
-                "InvalidData", ErrorCategory::InvalidData, nullptr);
-            ThrowTerminatingError(error);
+            throw gcnew PSH5XException("Ill-formed HDF5 path name and/or unable to obtain drive name!");
         }
 
         if (ProviderUtils::IsH5RootPathName(h5path)) { return true; }
