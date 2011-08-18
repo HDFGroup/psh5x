@@ -101,6 +101,9 @@
     <ClCompile Include="src\NewH5ArrayCommand.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\ItemCmdletProvider.GetItem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Snapin.h">
@@ -167,6 +170,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\NewH5ArrayCommand.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\HDF5Exception.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PSH5XException.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

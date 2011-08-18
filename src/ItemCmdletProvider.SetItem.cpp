@@ -1,7 +1,9 @@
 
+#include "HDF5Exception.h"
 #include "LinkInfo.h"
 #include "Provider.h"
 #include "ProviderUtils.h"
+#include "PSH5XException.h"
 
 extern "C" {
 #include "H5Dpublic.h"
@@ -26,8 +28,6 @@ namespace PSH5X
             String::Format("HDF5Provider::SetItem(Path = '{0}', Value = '{1}')",
             path, value->ToString()));
 
-        Exception^ ex = nullptr;
-
         hid_t dset = -1, fspace = -1;
 
         char *name = NULL, *soft = NULL, *file = NULL, *link = NULL;
@@ -35,250 +35,220 @@ namespace PSH5X
         hsize_t* maxDims = NULL;
         hsize_t* size = NULL;
 
-        DriveInfo^ drive = nullptr;
-        String^ h5path = nullptr;
-        if (!ProviderUtils::TryGetDriveEtH5Path(path, ProviderInfo, drive, h5path))
+        try
         {
-            ErrorRecord^ error = gcnew ErrorRecord(
-                gcnew ArgumentException("Ill-formed HDF5 path name and/or unable to obtain drive name!"),
-                "InvalidData", ErrorCategory::InvalidData, nullptr);
-            ThrowTerminatingError(error);
-        }
+            DriveInfo^ drive = nullptr;
+            String^ h5path = nullptr;
+            if (!ProviderUtils::TryGetDriveEtH5Path(path, ProviderInfo, drive, h5path))
+            {
+                throw gcnew PSH5XException("Ill-formed HDF5 path name and/or unable to obtain drive name!");
+            }
 
-        if (drive->ReadOnly)
-        {
-            ErrorRecord^ error = gcnew ErrorRecord(
-                gcnew ArgumentException("The drive is read-only and cannot be modified!"),
-                "InvalidData", ErrorCategory::InvalidData, nullptr);
-            ThrowTerminatingError(error);
-        }
+            if (drive->ReadOnly)
+            {
+                throw gcnew PSH5XException("The drive is read-only and cannot be modified!");
+            }
 
-        if (ProviderUtils::IsH5Dataset(drive->FileHandle, h5path))
-        {
+            if (ProviderUtils::IsH5Dataset(drive->FileHandle, h5path))
+            {
 #pragma region HDF5 dataset
 
-            array<hsize_t>^ newDims = nullptr;
-            if (!ProviderUtils::TryGetValue(value, newDims)) {
-                ErrorRecord^ error = gcnew ErrorRecord(
-                    gcnew ArgumentException(
-                    "Cannot convert the -Dimensions argument to hsize_t[]!"),
-                    "InvalidData", ErrorCategory::InvalidData, nullptr);
-                ThrowTerminatingError(error);
-            }
-
-            if (ProviderUtils::IsH5ChunkedDataset(drive->FileHandle, h5path))
-            {
-                name = (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
-                dset = H5Dopen2(drive->FileHandle, name, H5P_DEFAULT);
-                if (dset < 0) {
-                    ex = gcnew ArgumentException("H5Dopen failed.");
-                    goto error;
+                array<hsize_t>^ newDims = nullptr;
+                if (!ProviderUtils::TryGetValue(value, newDims)) {
+                    throw gcnew PSH5XException(
+                        "Cannot convert the -Dimensions argument to hsize_t[]!");
                 }
 
-                fspace = H5Dget_space(dset);
-
-                if (fspace < 0) {
-                    ex = gcnew ArgumentException("H5Dget_space failed.");
-                    goto error;
-                }
-
-                int rank = H5Sget_simple_extent_ndims(fspace);
-                if (rank <= 0) {
-                    ex = gcnew ArgumentException("Rank must be positive!");
-                    goto error;
-                }
-
-                if (rank != newDims->Length) {
-                    ex = gcnew ArgumentException(
-                        "Rank mismatch. The rank of the -Dimensions argument must equal the HDF5 dataset rank!");
-                    goto error;
-                }
-
-                maxDims = new hsize_t [rank];
-
-                if (H5Sget_simple_extent_dims(fspace, NULL, maxDims) != rank)
+                if (ProviderUtils::IsH5ChunkedDataset(drive->FileHandle, h5path))
                 {
-                    ex = gcnew ArgumentException("H5Sget_simple_extent_dims failed.");
-                    goto error;
-                }
+                    name = (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
+                    dset = H5Dopen2(drive->FileHandle, name, H5P_DEFAULT);
+                    if (dset < 0) {
+                        throw gcnew HDF5Exception("H5Dopen failed.");
+                    }
 
-                for (int i = 0; i < rank; ++i)
-                {
-                    if (newDims[i] == H5S_UNLIMITED ||
-                        (newDims[i] > maxDims[i] && !(maxDims[i] == H5S_UNLIMITED)))
+                    fspace = H5Dget_space(dset);
+                    if (fspace < 0) {
+                        throw gcnew HDF5Exception("H5Dget_space failed.");
+                    }
+
+                    int rank = H5Sget_simple_extent_ndims(fspace);
+                    if (rank <= 0) {
+                        throw gcnew HDF5Exception("Rank must be positive!");
+                    }
+
+                    if (rank != newDims->Length) {
+                        throw gcnew PSH5XException(
+                            "Rank mismatch. The rank of the -Dimensions argument must equal the HDF5 dataset rank!");
+                    }
+
+                    maxDims = new hsize_t [rank];
+                    if (H5Sget_simple_extent_dims(fspace, NULL, maxDims) != rank)
                     {
-                        ex = gcnew ArgumentException(
-                            "The dimensions specified must not exceed the HDF5 dataset's maximum dimensions!");
-                        goto error;
+                        throw gcnew HDF5Exception("H5Sget_simple_extent_dims failed.");
+                    }
+
+                    for (int i = 0; i < rank; ++i)
+                    {
+                        if (newDims[i] == H5S_UNLIMITED ||
+                            (newDims[i] > maxDims[i] && !(maxDims[i] == H5S_UNLIMITED)))
+                        {
+                            throw gcnew PSH5XException(
+                                "The dimensions specified must not exceed the HDF5 dataset's maximum dimensions!");
+                        }
+                    }
+
+                    size = new hsize_t [rank];
+                    for (int i = 0; i < rank; ++i) { size[i] = newDims[i]; }
+
+                    if (this->ShouldProcess(h5path,
+                        String::Format("Resizing HDF5 dataset '{0}'", path)))
+                    {
+                        if (H5Dset_extent(dset, size) < 0) {
+                            throw gcnew HDF5Exception("H5Sget_simple_extent_dims failed.");
+                        }
                     }
                 }
-
-                size = new hsize_t [rank];
-                for (int i = 0; i < rank; ++i) { size[i] = newDims[i]; }
-
-                if (this->ShouldProcess(h5path,
-                    String::Format("Resizing HDF5 dataset '{0}'", path)))
-                {
-                    if (H5Dset_extent(dset, size) < 0) {
-                        ex = gcnew ArgumentException("H5Sget_simple_extent_dims failed.");
-                        goto error;
-                    }
+                else {
+                    throw gcnew PSH5XException(String::Format(
+                        "The dataset at '{0}' is not chunked and cannot be resized.", h5path));
                 }
-            }
-            else {
-                ex = gcnew ArgumentException(String::Format(
-                    "The dataset at '{0}' is not chunked and cannot be resized.", h5path));
-                goto error;
-            }
-            
+
 #pragma endregion
-        }
-        else if (ProviderUtils::IsH5SymLink(drive->FileHandle, h5path))
-        {
-            // The HDF5 C API does not have a call for setting the value
-            // of s symbolic link. We gotta delete it and create a new one...
-
-            if (ProviderUtils::IsH5SoftLink(drive->FileHandle, h5path))
+            }
+            else if (ProviderUtils::IsH5SymLink(drive->FileHandle, h5path))
             {
+                // The HDF5 C API does not have a call for setting the value
+                // of s symbolic link. We gotta delete it and create a new one...
+
+                if (ProviderUtils::IsH5SoftLink(drive->FileHandle, h5path))
+                {
 #pragma region HDF5 soft link
 
 
-                String^ dest = nullptr;
-                if (ProviderUtils::TryGetValue(value, dest))
-                {
-                    // delete the old one first
-
-                    name = (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
-
-                    if (this->ShouldProcess(h5path,
-                        String::Format("HDF5 soft link '{0}' exists, delete it", h5path)))
+                    String^ dest = nullptr;
+                    if (ProviderUtils::TryGetValue(value, dest))
                     {
-                        if (H5Ldelete(drive->FileHandle, name, H5P_DEFAULT) < 0) {
-                            ex = gcnew ArgumentException("H5Ldelete failed!");
-                            goto error;
+                        // delete the old one first
+
+                        name = (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
+
+                        if (this->ShouldProcess(h5path,
+                            String::Format("HDF5 soft link '{0}' exists, delete it", h5path)))
+                        {
+                            if (H5Ldelete(drive->FileHandle, name, H5P_DEFAULT) < 0) {
+                                throw gcnew HDF5Exception("H5Ldelete failed!");
+                            }
+                        }
+
+                        soft = (char*)(Marshal::StringToHGlobalAnsi(dest)).ToPointer();
+
+                        if (this->ShouldProcess(h5path,
+                            String::Format("HDF5 soft link '{0}' does not exist, create it", dest)))
+                        {
+                            if (H5Lcreate_soft(soft, drive->FileHandle, name, H5P_DEFAULT, H5P_DEFAULT) < 0) {
+                                throw gcnew HDF5Exception("H5Lcreate_soft failed!");
+                            }
+
+                            if (H5Fflush(drive->FileHandle, H5F_SCOPE_LOCAL) < 0) {
+                                throw gcnew HDF5Exception("H5Fflush failed!");
+                            }
+
+                            WriteItemObject(gcnew LinkInfo(drive->FileHandle, h5path, "SoftLink"), path, false);
                         }
                     }
-
-                    soft = (char*)(Marshal::StringToHGlobalAnsi(dest)).ToPointer();
-
-                    if (this->ShouldProcess(h5path,
-                        String::Format("HDF5 soft link '{0}' does not exist, create it", dest)))
-                    {
-                        if (H5Lcreate_soft(soft, drive->FileHandle, name, H5P_DEFAULT, H5P_DEFAULT) < 0) {
-                            ex = gcnew InvalidOperationException("H5Lcreate_soft failed!");
-                            goto error;
-                        }
-
-                        if (H5Fflush(drive->FileHandle, H5F_SCOPE_LOCAL) < 0) {
-                            WriteWarning("H5Fflush failed!");
-                        }
-
-                        WriteItemObject(gcnew LinkInfo(drive->FileHandle, h5path, "SoftLink"), path, false);
+                    else {
+                        throw gcnew PSH5XException("Cannot convert value argument (object) to link destination (string).");
                     }
-                }
-                else {
-                    ex = gcnew ArgumentException("Cannot convert value argument (object) to link destination (string).");
-                    goto error;
-                }
-
 
 #pragma endregion
-            }
-            else if (ProviderUtils::IsH5ExternalLink(drive->FileHandle, h5path))
-            {
+                }
+                else if (ProviderUtils::IsH5ExternalLink(drive->FileHandle, h5path))
+                {
 #pragma region HDF5 external link
 
-                array<String^>^ dest = nullptr;
-                if (ProviderUtils::TryGetValue(value, dest))
-                {
-                    if (dest->Length != 2) {
-                        throw gcnew ArgumentException("The length of the destination array must be " +
-                            "two @(file name,path name)!");
-                    }
-
-                    // delete the old one first
-
-                    name = (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
-
-                    if (this->ShouldProcess(h5path,
-                        String::Format("HDF5 external link '{0}' exists, delete it", h5path)))
+                    array<String^>^ dest = nullptr;
+                    if (ProviderUtils::TryGetValue(value, dest))
                     {
-                        if (H5Ldelete(drive->FileHandle, name, H5P_DEFAULT) < 0) {
-                            ex = gcnew ArgumentException("H5Ldelete failed!");
-                            goto error;
+                        if (dest->Length != 2) {
+                            throw gcnew PSH5XException("The length of the destination array must be " +
+                                "two @(file name,path name)!");
+                        }
+
+                        // delete the old one first
+
+                        name = (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
+
+                        if (this->ShouldProcess(h5path,
+                            String::Format("HDF5 external link '{0}' exists, delete it", h5path)))
+                        {
+                            if (H5Ldelete(drive->FileHandle, name, H5P_DEFAULT) < 0) {
+                                throw gcnew PSH5XException("H5Ldelete failed!");
+                            }
+                        }
+
+                        file = (char*)(Marshal::StringToHGlobalAnsi(dest[0])).ToPointer();
+                        link = (char*)(Marshal::StringToHGlobalAnsi(dest[1])).ToPointer();
+
+                        if (this->ShouldProcess(h5path,
+                            String::Format("HDF5 external link '{0}' does not exist, create it", h5path)))
+                        {
+                            if (H5Lcreate_external(file, link, drive->FileHandle, name, H5P_DEFAULT, H5P_DEFAULT) < 0) {
+                                throw gcnew HDF5Exception("H5Lcreate_external failed!");
+                            }
+
+                            if (H5Fflush(drive->FileHandle, H5F_SCOPE_LOCAL) < 0) {
+                                throw gcnew HDF5Exception("H5Fflush failed!");
+                            }
+
+                            WriteItemObject(gcnew LinkInfo(drive->FileHandle, h5path, "ExtLink"), path, false);
                         }
                     }
-
-                    file = (char*)(Marshal::StringToHGlobalAnsi(dest[0])).ToPointer();
-                    link = (char*)(Marshal::StringToHGlobalAnsi(dest[1])).ToPointer();
-
-                    if (this->ShouldProcess(h5path,
-                        String::Format("HDF5 external link '{0}' does not exist, create it", h5path)))
-                    {
-                        if (H5Lcreate_external(file, link, drive->FileHandle, name, H5P_DEFAULT, H5P_DEFAULT) < 0) {
-                            ex = gcnew InvalidOperationException("H5Lcreate_external failed!");
-                            goto error;
-                        }
-
-                        if (H5Fflush(drive->FileHandle, H5F_SCOPE_LOCAL) < 0) {
-                            WriteWarning("H5Fflush failed!");
-                        }
-
-                        WriteItemObject(gcnew LinkInfo(drive->FileHandle, h5path, "ExtLink"), path, false);
+                    else {
+                        throw gcnew PSH5XException("Cannot convert value argument (object) to link destination string[2].");
                     }
-                }
-                else {
-                    ex = gcnew ArgumentException("Cannot convert value argument (object) to link destination string[2].");
-                    goto error;
-                }
 
 #pragma endregion
-            }
-            else
-            {
-                ErrorRecord^ error = gcnew ErrorRecord(
-                    gcnew ArgumentException("What kind of symbolic link is this?"),
-                    "InvalidData", ErrorCategory::InvalidData, nullptr);
-                ThrowTerminatingError(error);
+                }
+                else
+                {
+                    throw gcnew PSH5XException("What kind of symbolic link is this?");
+                }
             }
         }
+        finally
+        {
+            if (size) {
+                delete [] size;
+            }
 
-error:
+            if (maxDims) {
+                delete [] maxDims;
+            }
 
-        if (size) {
-            delete [] size;
-        }
+            if (fspace >= 0) {
+                H5Sclose(fspace);
+            }
 
-        if (maxDims) {
-            delete [] maxDims;
-        }
+            if (dset >= 0) {
+                H5Dclose(dset);
+            }
 
-        if (fspace >= 0) {
-            H5Sclose(fspace);
-        }
+            if (link != NULL) {
+                Marshal::FreeHGlobal(IntPtr(link));
+            }
 
-        if (dset >= 0) {
-            H5Dclose(dset);
-        }
+            if (file != NULL) {
+                Marshal::FreeHGlobal(IntPtr(file));
+            }
 
-        if (link != NULL) {
-            Marshal::FreeHGlobal(IntPtr(link));
-        }
+            if (soft != NULL) {
+                Marshal::FreeHGlobal(IntPtr(soft));
+            }
 
-        if (file != NULL) {
-            Marshal::FreeHGlobal(IntPtr(file));
-        }
-
-        if (soft != NULL) {
-            Marshal::FreeHGlobal(IntPtr(soft));
-        }
-
-        if (name != NULL) {
-            Marshal::FreeHGlobal(IntPtr(name));
-        }
-
-        if (ex != nullptr) {
-            throw ex;
+            if (name != NULL) {
+                Marshal::FreeHGlobal(IntPtr(name));
+            }
         }
 
         return;

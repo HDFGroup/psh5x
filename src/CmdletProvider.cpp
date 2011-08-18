@@ -1,4 +1,5 @@
 
+#include "HDF5Exception.h"
 #include "Provider.h"
 
 extern "C" {
@@ -50,7 +51,7 @@ namespace PSH5X
         if (status < 0)
         {
             String^ msg = String::Format("H5open failed with status {0}", status);
-            ErrorRecord^ error = gcnew ErrorRecord(gcnew Exception(msg), "OpenError",
+            ErrorRecord^ error = gcnew ErrorRecord(gcnew HDF5Exception(msg), "OpenError",
                 ErrorCategory::OpenError, status);
             ThrowTerminatingError(error);
         }
@@ -60,7 +61,7 @@ namespace PSH5X
         if (status < 0)
         {
             String^ msg = String::Format("H5get_libversion failed with status {0}", status);
-            ErrorRecord^ error = gcnew ErrorRecord(gcnew Exception(msg), "ReadError",
+            ErrorRecord^ error = gcnew ErrorRecord(gcnew HDF5Exception(msg), "ReadError",
                 ErrorCategory::ReadError, status);
             ThrowTerminatingError(error);
         }
@@ -79,7 +80,7 @@ namespace PSH5X
         if (status < 0)
         {
             String^ msg = String::Format("H5close failed with status {0}", status);
-            ErrorRecord^ error = gcnew ErrorRecord(gcnew Exception(msg), "CloseError",
+            ErrorRecord^ error = gcnew ErrorRecord(gcnew HDF5Exception(msg), "CloseError",
                 ErrorCategory::CloseError, status);
             ThrowTerminatingError(error);
         }

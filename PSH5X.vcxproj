@@ -155,6 +155,7 @@
     <ClInclude Include="include\DriveInfo.h" />
     <ClInclude Include="include\GroupInfo.h" />
     <ClInclude Include="include\GroupInfoLite.h" />
+    <ClInclude Include="include\HDF5Exception.h" />
     <ClInclude Include="include\ItemInfo.h" />
     <ClInclude Include="include\LinkInfo.h" />
     <ClInclude Include="include\NewH5ArrayCommand.h" />
@@ -162,6 +163,7 @@
     <ClInclude Include="include\ObjectInfoLite.h" />
     <ClInclude Include="include\Provider.h" />
     <ClInclude Include="include\ProviderUtils.h" />
+    <ClInclude Include="include\PSH5XException.h" />
     <ClInclude Include="include\ShowH5TypesCommand.h" />
     <ClInclude Include="include\Snapin.h" />
     <ClInclude Include="include\TouchH5FileCommand.h" />
@@ -180,6 +182,7 @@
     <ClCompile Include="src\IContentCmdletProvider.cpp" />
     <ClCompile Include="src\IDynamicPropertyCmdletProvider.cpp" />
     <ClCompile Include="src\IPropertyCmdletProvider.cpp" />
+    <ClCompile Include="src\ItemCmdletProvider.GetItem.cpp" />
     <ClCompile Include="src\ItemCmdletProvider.SetItem.cpp" />
     <ClCompile Include="src\LinkInfo.cpp" />
     <ClCompile Include="src\NavigationCmdletProvider.cpp" />
