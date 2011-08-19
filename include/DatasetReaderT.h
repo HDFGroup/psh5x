@@ -53,8 +53,6 @@ namespace PSH5X
 
                 Type^ t = ProviderUtils::H5Type2DotNet(ntype);
 
-                // TODO: deal with strings
-
                 if (t != nullptr)
                 {
                     size_t size = H5Tget_size(ntype);
