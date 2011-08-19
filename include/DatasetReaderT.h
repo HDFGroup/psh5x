@@ -51,7 +51,7 @@ namespace PSH5X
                     throw gcnew HDF5Exception("H5Dget_space failed!");
                 }
 
-                Type^ t = ProviderUtils::H5NativeType2DotNet(ntype);
+                Type^ t = ProviderUtils::H5Type2DotNet(ntype);
 
                 // TODO: deal with strings
 

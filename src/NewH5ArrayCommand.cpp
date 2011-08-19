@@ -55,7 +55,7 @@ namespace PSH5X
         {
             if (m_is_str)
             {
-                System::Type^ t = ProviderUtils::H5NativeType2DotNet(dtype);
+                System::Type^ t = ProviderUtils::H5Type2DotNet(dtype);
                 result = Array::CreateInstance(t, dims); 
             }
             else if (m_is_ht)
@@ -67,7 +67,7 @@ namespace PSH5X
 #pragma region HDF5 array type
 
                     base_type = H5Tget_super(ntype);
-                    System::Type^ t = ProviderUtils::H5NativeType2DotNet(base_type);
+                    System::Type^ t = ProviderUtils::H5Type2DotNet(base_type);
 
                     if (t != nullptr)
                     {
@@ -110,7 +110,7 @@ namespace PSH5X
                     mname[i] = gcnew String(name);
 
                     dtype = H5Tget_member_type(ntype, safe_cast<unsigned>(i));
-                    mtype[i] = ProviderUtils::H5NativeType2DotNet(dtype);
+                    mtype[i] = ProviderUtils::H5Type2DotNet(dtype);
                     if (mtype[i] == nullptr) {
                         ex = gcnew ArgumentException("Unsupported member datatype in COMPOUND!");
                         goto error;

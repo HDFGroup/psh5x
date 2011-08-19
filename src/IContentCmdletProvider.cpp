@@ -1,5 +1,6 @@
 
-#include "DatasetReader.h"
+#include "ArrayDatasetReader.h"
+#include "CompoundDatasetReader.h"
 #include "DatasetReaderT.h"
 #include "DatasetWriter.h"
 #include "DatasetWriterT.h"
@@ -10,6 +11,7 @@
 #include "PSH5XException.h"
 #include "StringDatasetReader.h"
 #include "StringDatasetWriter.h"
+#include "VlenDatasetReader.h"
 
 extern "C" {
 #include "H5public.h"
@@ -83,11 +85,7 @@ namespace PSH5X
 
 #pragma region HDF5 integer
 
-                ntype = H5Tget_native_type(ftype, H5T_DIR_ASCEND);
-                if (ntype < 0) {
-                    throw gcnew HDF5Exception("H5Tget_native_type failed!");
-                }
-                t = ProviderUtils::H5NativeType2DotNet(ntype);
+                t = ProviderUtils::H5Type2DotNet(ftype);
                 if (t == SByte::typeid) {
                     result = gcnew DatasetReaderT<SByte>(drive->FileHandle, h5path);
                 }
@@ -124,11 +122,7 @@ namespace PSH5X
 
 #pragma region HDF5 float
 
-                ntype = H5Tget_native_type(ftype, H5T_DIR_ASCEND);
-                if (ntype < 0) {
-                    throw gcnew HDF5Exception("H5Tget_native_type failed!");
-                }
-                t = ProviderUtils::H5NativeType2DotNet(ntype);
+                t = ProviderUtils::H5Type2DotNet(ftype);
                 if (t == Single::typeid) {
                     result = gcnew DatasetReaderT<Single>(drive->FileHandle, h5path);
                 }
@@ -150,11 +144,7 @@ namespace PSH5X
 
 #pragma region HDF5 bitfield
 
-                ntype = H5Tget_native_type(ftype, H5T_DIR_DESCEND);
-                if (ntype < 0) {
-                    throw gcnew HDF5Exception("H5Tget_native_type failed!");
-                }
-                t = ProviderUtils::H5NativeType2DotNet(ntype);
+                t = ProviderUtils::H5Type2DotNet(ftype);
                 if (t == Byte::typeid) {
                     result = gcnew DatasetReaderT<Byte>(drive->FileHandle, h5path);
                 }
@@ -174,7 +164,7 @@ namespace PSH5X
 #pragma endregion
 
                 break;
-            /*
+
             case H5T_COMPOUND:
 
                 result = gcnew CompoundDatasetReader(drive->FileHandle, h5path);
@@ -189,7 +179,6 @@ namespace PSH5X
 
                 result = gcnew ArrayDatasetReader(drive->FileHandle, h5path);
                 break;
-             */
 
             default:
 
@@ -199,11 +188,6 @@ namespace PSH5X
         }
         finally
         {
-
-            if (ntype >= 0) {
-                H5Tclose(ntype); 
-            }
-
             if (ftype >= 0) {
                 H5Tclose(ftype); 
             }
@@ -231,7 +215,7 @@ namespace PSH5X
 
         IContentWriter^ result = nullptr;
 
-        hid_t dset = -1, ftype = -1, ntype = -1;
+        hid_t dset = -1, ftype = -1;
 
         char *name = NULL;
 
@@ -276,11 +260,7 @@ namespace PSH5X
 
 #pragma region HDF5 integer
 
-                ntype = H5Tget_native_type(ftype, H5T_DIR_ASCEND);
-                if (ntype < 0) {
-                    throw gcnew HDF5Exception("H5Tget_native_type failed!");
-                }
-                t = ProviderUtils::H5NativeType2DotNet(ntype);
+                t = ProviderUtils::H5Type2DotNet(ftype);
                 if (t == SByte::typeid) {
                     result = gcnew DatasetWriterT<SByte>(drive->FileHandle, h5path);
                 }
@@ -317,11 +297,7 @@ namespace PSH5X
 
 #pragma region HDF5 float
 
-                ntype = H5Tget_native_type(ftype, H5T_DIR_ASCEND);
-                if (ntype < 0) {
-                    throw gcnew HDF5Exception("H5Tget_native_type failed!");
-                }
-                t = ProviderUtils::H5NativeType2DotNet(ntype);
+                t = ProviderUtils::H5Type2DotNet(ftype);
                 if (t == Single::typeid) {
                     result = gcnew DatasetWriterT<Single>(drive->FileHandle, h5path);
                 }
@@ -346,11 +322,7 @@ namespace PSH5X
 
 #pragma region HDF5 bitfield
 
-                ntype = H5Tget_native_type(ftype, H5T_DIR_DESCEND);
-                if (ntype < 0) {
-                    throw gcnew HDF5Exception("H5Tget_native_type failed!");
-                }
-                t = ProviderUtils::H5NativeType2DotNet(ntype);
+                t = ProviderUtils::H5Type2DotNet(ftype);
                 if (t == Byte::typeid) {
                     result = gcnew DatasetWriterT<Byte>(drive->FileHandle, h5path);
                 }
@@ -396,9 +368,6 @@ namespace PSH5X
         }
         finally
         {
-            if (ntype >= 0) {
-                H5Tclose(ntype); 
-            }
             if (ftype >= 0) {
                 H5Tclose(ftype); 
             }

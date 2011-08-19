@@ -1,5 +1,7 @@
 
+#include "HDF5Exception.h"
 #include "ProviderUtils.h"
+#include "PSH5XException.h"
 
 extern "C" {
 #include "H5Tpublic.h"
@@ -1437,44 +1439,65 @@ error:
         return result;
     }
 
-    Type^ ProviderUtils::H5NativeType2DotNet(hid_t ntype)
+    Type^ ProviderUtils::H5Type2DotNet(hid_t dtype)
     {
         Type^ result = nullptr;
 
-        H5T_class_t cls = H5Tget_class(ntype);
+        H5T_class_t cls = H5Tget_class(dtype);
 
-        if (cls == H5T_INTEGER)
-        {
-            if      (H5Tequal(ntype, H5T_NATIVE_CHAR)   > 0) { result = SByte::typeid;  }
-            else if (H5Tequal(ntype, H5T_NATIVE_SHORT)  > 0) { result = Int16::typeid;  }
-            else if (H5Tequal(ntype, H5T_NATIVE_INT)    > 0) { result = Int32::typeid;  }
-            else if (H5Tequal(ntype, H5T_NATIVE_LONG)   > 0) { result = Int32::typeid;  }
-            else if (H5Tequal(ntype, H5T_NATIVE_LLONG)  > 0) { result = Int64::typeid;  }
-            else if (H5Tequal(ntype, H5T_NATIVE_UCHAR)  > 0) { result = Byte::typeid;   }
-            else if (H5Tequal(ntype, H5T_NATIVE_USHORT) > 0) { result = UInt16::typeid; }
-            else if (H5Tequal(ntype, H5T_NATIVE_UINT)   > 0) { result = UInt32::typeid; }
-            else if (H5Tequal(ntype, H5T_NATIVE_ULONG)  > 0) { result = UInt32::typeid; }
-            else if (H5Tequal(ntype, H5T_NATIVE_ULLONG) > 0) { result = UInt64::typeid; }
-        }
-        else if (cls == H5T_FLOAT)
-        {
-            if      (H5Tequal(ntype, H5T_NATIVE_FLOAT) > 0)   { result = Single::typeid; }
-            else if (H5Tequal(ntype, H5T_NATIVE_DOUBLE) > 0)  { result = Double::typeid; }
-            else if (H5Tequal(ntype, H5T_NATIVE_LDOUBLE) > 0) { result = Double::typeid; }
+        hid_t ntype = -1;
 
-        }
-        else if (cls == H5T_STRING) {
-            result = String::typeid;
-        }
-        else if (cls == H5T_BITFIELD)
+        try
         {
-            if      (H5Tequal(ntype, H5T_NATIVE_B8) > 0)  { result = Byte::typeid;   }
-            else if (H5Tequal(ntype, H5T_NATIVE_B16) > 0) { result = UInt16::typeid; }
-            else if (H5Tequal(ntype, H5T_NATIVE_B32) > 0) { result = UInt32::typeid; }
-            else if (H5Tequal(ntype, H5T_NATIVE_B64) > 0) { result = UInt64::typeid; }
+            if (cls == H5T_BITFIELD) {
+                ntype = H5Tget_native_type(dtype, H5T_DIR_DESCEND);
+            }
+            else {
+                ntype = H5Tget_native_type(dtype, H5T_DIR_ASCEND);
+            }
+            if (ntype < 0) {
+                throw gcnew HDF5Exception("H5Tget_native_type failed!");
+            }
+
+            if (cls == H5T_INTEGER)
+            {
+                if      (H5Tequal(ntype, H5T_NATIVE_CHAR)   > 0) { result = SByte::typeid;  }
+                else if (H5Tequal(ntype, H5T_NATIVE_SHORT)  > 0) { result = Int16::typeid;  }
+                else if (H5Tequal(ntype, H5T_NATIVE_INT)    > 0) { result = Int32::typeid;  }
+                else if (H5Tequal(ntype, H5T_NATIVE_LONG)   > 0) { result = Int32::typeid;  }
+                else if (H5Tequal(ntype, H5T_NATIVE_LLONG)  > 0) { result = Int64::typeid;  }
+                else if (H5Tequal(ntype, H5T_NATIVE_UCHAR)  > 0) { result = Byte::typeid;   }
+                else if (H5Tequal(ntype, H5T_NATIVE_USHORT) > 0) { result = UInt16::typeid; }
+                else if (H5Tequal(ntype, H5T_NATIVE_UINT)   > 0) { result = UInt32::typeid; }
+                else if (H5Tequal(ntype, H5T_NATIVE_ULONG)  > 0) { result = UInt32::typeid; }
+                else if (H5Tequal(ntype, H5T_NATIVE_ULLONG) > 0) { result = UInt64::typeid; }
+            }
+            else if (cls == H5T_FLOAT)
+            {
+                if      (H5Tequal(ntype, H5T_NATIVE_FLOAT) > 0)   { result = Single::typeid; }
+                else if (H5Tequal(ntype, H5T_NATIVE_DOUBLE) > 0)  { result = Double::typeid; }
+                else if (H5Tequal(ntype, H5T_NATIVE_LDOUBLE) > 0) { result = Double::typeid; }
+
+            }
+            else if (cls == H5T_STRING) {
+                result = String::typeid;
+            }
+            else if (cls == H5T_BITFIELD)
+            {
+                if      (H5Tequal(ntype, H5T_NATIVE_B8) > 0)  { result = Byte::typeid;   }
+                else if (H5Tequal(ntype, H5T_NATIVE_B16) > 0) { result = UInt16::typeid; }
+                else if (H5Tequal(ntype, H5T_NATIVE_B32) > 0) { result = UInt32::typeid; }
+                else if (H5Tequal(ntype, H5T_NATIVE_B64) > 0) { result = UInt64::typeid; }
+            }
+            else if (cls == H5T_OPAQUE) {
+                result = Byte::typeid;
+            }
         }
-        else if (cls == H5T_OPAQUE) {
-            result = Byte::typeid;
+        finally
+        {
+            if (ntype >= 0) {
+                H5Tclose(ntype);
+            }
         }
 
         return result;
@@ -1550,32 +1573,32 @@ error:
         {
         case H5T_INTEGER:
 
-            if (ProviderUtils::H5NativeType2DotNet(type_id) == Int32::typeid) {
+            if (ProviderUtils::H5Type2DotNet(type_id) == Int32::typeid) {
                 minfo = magicType->GetMethod("ToInt32");
             }
-            else if (ProviderUtils::H5NativeType2DotNet(type_id) == Int64::typeid) {
+            else if (ProviderUtils::H5Type2DotNet(type_id) == Int64::typeid) {
                 minfo = magicType->GetMethod("ToInt64");
             }
-            else if (ProviderUtils::H5NativeType2DotNet(type_id) == Int16::typeid) {
+            else if (ProviderUtils::H5Type2DotNet(type_id) == Int16::typeid) {
                 minfo = magicType->GetMethod("ToInt16");
             }
-            if (ProviderUtils::H5NativeType2DotNet(type_id) == UInt32::typeid) {
+            if (ProviderUtils::H5Type2DotNet(type_id) == UInt32::typeid) {
                 minfo = magicType->GetMethod("ToUInt32");
             }
-            else if (ProviderUtils::H5NativeType2DotNet(type_id) == UInt64::typeid) {
+            else if (ProviderUtils::H5Type2DotNet(type_id) == UInt64::typeid) {
                 minfo = magicType->GetMethod("ToUInt64");
             }
-            else if (ProviderUtils::H5NativeType2DotNet(type_id) == UInt16::typeid) {
+            else if (ProviderUtils::H5Type2DotNet(type_id) == UInt16::typeid) {
                 minfo = magicType->GetMethod("ToUInt16");
             }
             break;
 
         case H5T_FLOAT:
 
-            if (ProviderUtils::H5NativeType2DotNet(type_id) == Double::typeid) {
+            if (ProviderUtils::H5Type2DotNet(type_id) == Double::typeid) {
                 minfo = magicType->GetMethod("ToDouble");
             }
-            else if (ProviderUtils::H5NativeType2DotNet(type_id) == Single::typeid) {
+            else if (ProviderUtils::H5Type2DotNet(type_id) == Single::typeid) {
                 minfo = magicType->GetMethod("ToSingle");
             }
             break;

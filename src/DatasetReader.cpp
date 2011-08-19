@@ -126,28 +126,6 @@ namespace PSH5X
 
 #pragma endregion
                 }
-                else if (ProviderUtils::IsH5ArrayType(ntype))
-                {
-#pragma region HDF5 array type
-
-                    m_array = gcnew array<PSObject^>(dims[0]);
-
-                    base_type = H5Tget_super(ntype);
-                    if (ProviderUtils::H5NativeType2DotNet(base_type) != nullptr)
-                    {
-                        int rank = H5Tget_array_ndims(ntype);
-                        hsize_t* dims = new hsize_t [rank];
-                        rank = H5Tget_array_dims2(ntype, dims);
-
-
-                        delete [] dims;
-                    }
-                    else {
-                        throw gcnew PSH5XException("Unsupported base datatype for ARRAY!");
-                    }
-
-#pragma endregion
-                }
                 else if (ProviderUtils::IsH5VlenType(ntype))
                 {
 #pragma region HDF5 variable length type
@@ -171,7 +149,7 @@ namespace PSH5X
                         throw gcnew HDF5Exception("H5Dread failed!");
                     }
 
-                    Type^ t = ProviderUtils::H5NativeType2DotNet(nbase_type);
+                    Type^ t = ProviderUtils::H5Type2DotNet(nbase_type);
                     if (t != nullptr)
                     {
                         for (long long i = 0; i < dims[0]; ++i)

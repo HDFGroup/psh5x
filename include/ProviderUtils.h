@@ -141,7 +141,7 @@ namespace PSH5X
 
         static System::String^ H5NativeType2String(hid_t type_id);
 
-        static System::Type^ ProviderUtils::H5NativeType2DotNet(hid_t type_id);
+        static System::Type^ ProviderUtils::H5Type2DotNet(hid_t type_id);
 
         static hid_t ProviderUtils::DotNetType2H5Native(System::Type^ ntype, bool isBitfield);
 
