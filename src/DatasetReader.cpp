@@ -126,50 +126,6 @@ namespace PSH5X
 
 #pragma endregion
                 }
-                else if (ProviderUtils::IsH5VlenType(ntype))
-                {
-#pragma region HDF5 variable length type
-
-                    m_array = gcnew array<PSObject^>(dims[0]);
-
-                    hvl_t* buf = new hvl_t [npoints];
-
-                    base_type = H5Tget_super(ftype);
-                    if (ProviderUtils::IsH5BitfieldType(base_type)) {
-                        nbase_type = H5Tget_native_type(base_type, H5T_DIR_DESCEND);
-                    }
-                    else {
-                        nbase_type = H5Tget_native_type(base_type, H5T_DIR_ASCEND);   
-                    }
-                    if (nbase_type < 0) {
-                        throw gcnew HDF5Exception("H5Tget_native_type failed!");
-                    }
-
-                    if (H5Dread(dset, ntype, mspace, H5S_ALL, H5P_DEFAULT, buf) < 0) {
-                        throw gcnew HDF5Exception("H5Dread failed!");
-                    }
-
-                    Type^ t = ProviderUtils::H5Type2DotNet(nbase_type);
-                    if (t != nullptr)
-                    {
-                        for (long long i = 0; i < dims[0]; ++i)
-                        {
-                            m_array[i] = gcnew PSObject(ProviderUtils::GetArray(buf[i].p, buf[i].len, base_type));
-                        }
-                    }
-                    else {
-                        if (H5Dvlen_reclaim(ntype, mspace, H5P_DEFAULT, buf) < 0) {
-                            throw gcnew HDF5Exception("H5Dvlen_reclaim failed!");
-                        }
-                        throw gcnew PSH5XException("Unsupported base datatype for VLEN!");
-                    }
-
-                    if (H5Dvlen_reclaim(ntype, mspace, H5P_DEFAULT, buf) < 0) {
-                        throw gcnew HDF5Exception("H5Dvlen_reclaim failed!");
-                    }
-
-#pragma endregion
-                }
                 else // atomic type
                 {
                     throw gcnew PSH5XException("Unsupported datatype!");

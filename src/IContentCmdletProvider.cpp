@@ -135,6 +135,8 @@ namespace PSH5X
 
 #pragma endregion
 
+                break;
+
             case H5T_STRING:
 
                 result = gcnew StringDatasetReader(drive->FileHandle, h5path);

@@ -66,7 +66,7 @@ namespace PSH5X
                     vrdata = new char* [dims[0]];
 
                     if (H5Dread (dset, mtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, vrdata) < 0) {
-                        throw gcnew HDF5Exception("H5Dread failed!!!");
+                        throw gcnew HDF5Exception("H5Dread failed!");
                     }
 
                     for (size_t i = 0; i < m_array->Length; ++i)
@@ -94,7 +94,7 @@ namespace PSH5X
                     }
 
                     if (H5Dread (dset, mtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, rdata[0]) < 0) {
-                        throw gcnew HDF5Exception("H5Dread failed!!!");
+                        throw gcnew HDF5Exception("H5Dread failed!");
                     }
 
                     for (size_t i = 0; i < m_array->Length; ++i)

@@ -27,6 +27,7 @@ namespace PSH5X
         ~CompoundDatasetReader()
         {
             delete m_array;
+            delete m_type;
             this->!CompoundDatasetReader();
         }
 
@@ -43,10 +44,13 @@ namespace PSH5X
 
     private:
 
-        array<System::Management::Automation::PSObject^>^ m_array;
+        array<Object^>^ m_array;
+
+        System::Type^ m_type;
 
         long long m_position;
         
+
     };
 
 }

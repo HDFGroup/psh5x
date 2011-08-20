@@ -150,6 +150,10 @@ namespace PSH5X
                     result["StrPad"] = "UNKNOWN";
                     break;
                 }
+                result["IsVariableLength"] = false;
+            }
+            else if (ierr > 0) {
+                result["IsVariableLength"] = true;
             }
  
             break;
@@ -1501,6 +1505,46 @@ error:
         }
 
         return result;
+    }
+
+    __wchar_t ProviderUtils::TypeCode(Type^ t)
+    {
+        if (t == System::String::typeid) {
+            return 's';
+        }
+        else if (t == System::Single::typeid) {
+            return 'f';
+        }
+        else if (t == System::Double::typeid) {
+            return 'd';
+        }
+        else if (t == System::SByte::typeid) {
+            return 'b';
+        }
+        else if (t == System::Byte::typeid) {
+            return 'B';
+        }
+        if (t == System::Int16::typeid) {
+            return 'h';
+        }
+        else if (t == System::UInt16::typeid) {
+            return 'H';
+        }
+        if (t == System::Int32::typeid) {
+            return 'i';
+        }
+        else if (t == System::UInt32::typeid) {
+            return 'I';
+        }
+        if (t == System::Int64::typeid) {
+            return 'l';
+        }
+        else if (t == System::UInt64::typeid) {
+            return 'L';
+        }
+        else {
+            return '\0';
+        }
     }
 
     hid_t ProviderUtils::DotNetType2H5Native(Type^ ntype, bool isBitfield)

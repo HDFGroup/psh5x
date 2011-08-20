@@ -143,6 +143,8 @@ namespace PSH5X
 
         static System::Type^ ProviderUtils::H5Type2DotNet(hid_t type_id);
 
+        static __wchar_t ProviderUtils::TypeCode(System::Type^ t);
+
         static hid_t ProviderUtils::DotNetType2H5Native(System::Type^ ntype, bool isBitfield);
 
         static System::Array^ ProviderUtils::GetArray(void* buffer, size_t nelems, hid_t type_id);
@@ -261,6 +263,5 @@ namespace PSH5X
         static System::Collections::Hashtable^ m_known_types;
 
         static System::Collections::Hashtable^ m_item_types;
-
     };
 }

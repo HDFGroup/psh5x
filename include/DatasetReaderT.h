@@ -22,7 +22,7 @@ namespace PSH5X
         {
             char* name = (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
 
-            hid_t dset = -1, ftype = -1, ntype = -1, fspace = -1, mspace = -1;
+            hid_t dset = -1, ftype = -1, ntype = -1, fspace = -1;
 
             try
             {
@@ -60,19 +60,10 @@ namespace PSH5X
                     hssize_t npoints = H5Sget_simple_extent_npoints(fspace);
                     if (npoints > 0)
                     {
-                        hsize_t dims[1];
-                        dims[0] = static_cast<hsize_t>(npoints);
-
-                        mspace = H5Screate_simple(1, dims, NULL);
-                        if (mspace < 0) {
-                            throw gcnew HDF5Exception("H5Screate_simple failed!");
-                        }
-
-                        m_array = gcnew array<T>(dims[0]);
+                        m_array = gcnew array<T>(npoints);
                         pin_ptr<T> ptr = &m_array[0];
 
-                        if (H5Dread(dset, ntype, mspace, H5S_ALL, H5P_DEFAULT, ptr) < 0) {
-                            H5Sclose(mspace);
+                        if (H5Dread(dset, ntype, H5S_ALL, H5S_ALL, H5P_DEFAULT, ptr) < 0) {
                             throw gcnew HDF5Exception("H5Dread failed!");
                         }
                     }
@@ -87,9 +78,6 @@ namespace PSH5X
             }
             finally
             {
-                if (mspace >= 0) {
-                    H5Sclose(mspace);
-                }
                 if (fspace >= 0) {
                     H5Sclose(fspace);
                 }
@@ -133,17 +121,27 @@ namespace PSH5X
             if (remaining > 0)
             {
                 long long length = 0;
-                if (readCount > remaining) { length = remaining; }
-                else { length = readCount; }
+
+                if (readCount > remaining)
+                {
+                    length = remaining;
+                }
+                else
+                {
+                    if (readCount > 0)
+                    {
+                        length = readCount;
+                    }
+                    else
+                    {
+                        length = m_array->LongLength;
+                    }
+                }
 
                 result = gcnew array<T>(length);
 
-                long long pos = m_position;
-                for (long long i = 0; i < length; ++i)
-                {
-                    result[i] = m_array[pos++];
-                }
-
+                Array::Copy((Array^) m_array, m_position, (Array^) result, (long long) 0, length);
+                
                 m_position += length;
             }
 
@@ -152,7 +150,7 @@ namespace PSH5X
 
         virtual void Seek(long long offset, System::IO::SeekOrigin origin)
         {
-            System::Console::WriteLine("DatasetReader::Seek()");
+            System::Console::WriteLine("DatasetReaderT::Seek()");
         }
 
     private:
