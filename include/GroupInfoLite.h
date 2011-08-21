@@ -1,5 +1,6 @@
 #pragma once
 
+#include "HDF5Exception.h"
 #include "ObjectInfoLite.h"
 
 extern "C" {
@@ -26,7 +27,7 @@ namespace PSH5X
                 m_nlinks = grp_info.nlinks;
             }
             else {
-                throw gcnew System::Exception("H5Gget_info failed!");
+                throw gcnew HDF5Exception("H5Gget_info failed!");
             }
         }
 

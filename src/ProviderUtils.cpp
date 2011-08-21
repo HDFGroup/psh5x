@@ -615,7 +615,7 @@ namespace PSH5X
         }
 
         vector<string> v(info.num_attrs);
-        hsize_t n;
+        hsize_t n = 0;
 
         herr_t status = H5Aiterate2(obj_id, H5_INDEX_NAME,
             H5_ITER_NATIVE, &n, &H5AIterateCallback, (void*) &v);
@@ -625,17 +625,6 @@ namespace PSH5X
             result[i] = gcnew String(v[i].c_str());
 
         return result;
-    }
-
-    herr_t H5LIterateCallback(
-        hid_t             group,
-        const char*       name,
-        const H5L_info_t* info,
-        void*             op_data)
-    {
-        vector<string>* v = static_cast<vector<string>*>(op_data);
-        v->push_back(string(name));
-        return 0;
     }
 
     herr_t H5LVisitCallback(
@@ -649,11 +638,23 @@ namespace PSH5X
         return 0;
     }
 
+        herr_t H5LIterateCallback(
+        hid_t             group,
+        const char*       name,
+        const H5L_info_t* info,
+        void*             op_data)
+    {
+        vector<string>* v = static_cast<vector<string>*>(op_data);
+        v->push_back(string(name));
+        return 0;
+    }
+
     array<String^>^ ProviderUtils::GetGroupLinkNames(hid_t group_id, bool recurse)
     {
-        hsize_t idx;
+        array<String^>^ result = nullptr;
+        hsize_t idx = 0;
         vector<string> v;
-        herr_t status;
+        herr_t status = -1;
         
         if (recurse)
         {
@@ -661,13 +662,12 @@ namespace PSH5X
             status = H5Lvisit(group_id, H5_INDEX_NAME, H5_ITER_NATIVE, &H5LVisitCallback,
                 (void*) &v);
         }
-        else
-        {
+        else {
             status = H5Literate(group_id, H5_INDEX_NAME, H5_ITER_NATIVE, &idx,
                 &H5LIterateCallback, (void*) &v);
         }
 
-        array<String^>^ result = gcnew array<String^>(safe_cast<int>(v.size()));
+        result = gcnew array<String^>(safe_cast<int>(v.size()));
         for (int i = 0; i < result->Length; ++i)
             result[i] = gcnew String(v[i].c_str());
 

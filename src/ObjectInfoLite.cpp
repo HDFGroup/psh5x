@@ -1,4 +1,5 @@
 
+#include "HDF5Exception.h"
 #include "ProviderUtils.h"
 #include "ObjectInfoLite.h"
 
@@ -44,7 +45,7 @@ namespace PSH5X
             m_attribute_names = ProviderUtils::GetObjectAttributeNames(obj);
         }
         else {
-            throw gcnew Exception("H5Oget_info failed!");
+            throw gcnew HDF5Exception("H5Oget_info failed!");
         }
     }
 }

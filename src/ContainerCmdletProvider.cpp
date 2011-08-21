@@ -56,7 +56,6 @@ namespace PSH5X
 
         try
         {
-
             DriveInfo^ drive = nullptr;
             String^ h5path = nullptr;
             if (!ProviderUtils::TryGetDriveEtH5Path(path, ProviderInfo, drive, h5path))
@@ -111,32 +110,35 @@ namespace PSH5X
                                 switch (oinfo.type)
                                 {
                                 case H5O_TYPE_GROUP:
-                                    if (!detailed)
-                                    {
+                                    
+                                    if (!detailed) {
                                         WriteItemObject(gcnew GroupInfoLite(oid), childPath,
                                             true);
                                     }
-                                    else
-                                    {
+                                    else {
                                         WriteItemObject(gcnew GroupInfo(oid), childPath, true);
                                     }
                                     break;
+
                                 case H5O_TYPE_DATASET:
-                                    if (!detailed)
-                                    {
+
+                                    if (!detailed) {
                                         WriteItemObject(gcnew DatasetInfoLite(oid), childPath,
                                             false);
                                     }
-                                    else
-                                    {
+                                    else {
                                         WriteItemObject(gcnew DatasetInfo(oid), childPath,
                                             false);
                                     }
                                     break;
+
                                 case H5O_TYPE_NAMED_DATATYPE:
+
                                     WriteItemObject(gcnew DatatypeInfo(oid), childPath, false);
                                     break;
+
                                 default:
+
                                     WriteItemObject(gcnew ObjectInfo(oid), childPath, false);
                                     break;
                                 }
