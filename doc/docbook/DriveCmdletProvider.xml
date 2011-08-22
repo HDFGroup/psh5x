@@ -10,8 +10,7 @@
         HDF5 files. </para>
     <para>The list of exisiting PowerShell drives can be displayed via the
             <literal>Get-PSDrive</literal> cmdlet.</para>
-    <screen>
-<prompt>PS:1 ></prompt> <command>Get-PSDrive</command>
+    <screen><prompt>PS:1 ></prompt> <command>Get-PSDrive</command>
 Name      Used (GB)   Free (GB) Provider      Root
 ----      ---------   --------- --------      ----
 Alias                           Alias
@@ -24,8 +23,7 @@ h5tmp                           HDF5          h5tmp:\
 HKCU                            Registry      HKEY_CURRENT_USER
 HKLM                            Registry      HKEY_LOCAL_MACHINE
 Variable                        Variable
-WSMan                           WSMan
-    </screen>
+WSMan                           WSMan</screen>
     <para>As part of its initialization, the <literal>DriveCmdletProvider</literal> creates an empty
         HDF5 file and maps it as a PowerShell drive called <literal>h5tmp</literal> with read/write
         access. This drive is intended as a sandbox environment.</para>
@@ -36,10 +34,8 @@ WSMan                           WSMan
                 <literal>h5tmp</literal> is stored in the <literal>PSH5XTmpFile</literal>
             environment variable. The file is not deleted when the session is closed so that it can
             be recovered. For example:</para>
-        <screen>
-<prompt>PS:1 ></prompt> <command>$Env:PSH5XTmpFile</command>
-C:\Users\gheber\AppData\Local\Temp\tmpC798.tmp
-      </screen>
+        <screen><prompt>PS:1 ></prompt> <command>$Env:PSH5XTmpFile</command>
+C:\Users\gheber\AppData\Local\Temp\tmpC798.tmp</screen>
     </note>
     <para>PSH5X implements the <literal>NewDrive()</literal> and <literal>RemoveDrive()</literal>
         methods that let users map exisiting HDF5 files as PowerShell drives or to remove such
@@ -121,24 +117,20 @@ C:\Users\gheber\AppData\Local\Temp\tmpC798.tmp
         </variablelist>
         <example>
             <title>Creating a new PowerShell drive from an HDF5 file</title>
-            <screen>
-<prompt>PS:1 ></prompt> <command>New-PSDrive -Name h5new -PSProvider HDF5 `
+            <screen><prompt>PS:1 ></prompt> <command>New-PSDrive -Name h5new -PSProvider HDF5 `
     -Path E:\HDF5\h5\sample.h5 -Root h5new:\</command>
 Name       Used (GB)     Free (GB) Provider      Root
 ----       ---------     --------- --------      ----
-h5new                              HDF5          h5new:\
-      </screen>
+h5new                              HDF5          h5new:\</screen>
         </example>
         <example>
             <title>Creating a new PowerShell drive with a different root and read/write
                 access</title>
-            <screen>
-<prompt>PS:1 ></prompt> <command>New-PSDrive -Name h5new -PSProvider HDF5 `
+            <screen><prompt>PS:1 ></prompt> <command>New-PSDrive -Name h5new -PSProvider HDF5 `
     -Path E:\HDF5\h5\sample.h5 -Root h5new:\A\B -Mode RW</command>
 Name       Used (GB)     Free (GB) Provider      Root
 ----       ---------     --------- --------      ----
-h5new                              HDF5          h5new:\A\B
-      </screen>
+h5new                              HDF5          h5new:\A\B</screen>
         </example>
         <para>A PowerShell drive is represented as a PowerShell object. See <xref
                 linkend="drive_object"/> for a detailed description of its properties.</para>
@@ -170,9 +162,7 @@ h5new                              HDF5          h5new:\A\B
         </variablelist>
         <example>
             <title>Removing two PowerShell drives</title>
-            <screen>
-<prompt>PS:1 ></prompt> <command>Remove-PSDrive h5new,h51</command>
-      </screen>
+            <screen><prompt>PS:1 ></prompt> <command>Remove-PSDrive h5new,h51</command></screen>
         </example>
     </sect2>
 

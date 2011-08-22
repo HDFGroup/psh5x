@@ -41,14 +41,12 @@
         </variablelist>
         <example>
             <title>Joining paths</title>
-            <screen>
-<prompt>PS:1 ></prompt> <command>Join-Path h5tmp: dset*</command>
+            <screen><prompt>PS:1 ></prompt> <command>Join-Path h5tmp: dset*</command>
 h5tmp:\dset*
 <prompt>PS:2 ></prompt> <command>Join-Path h5tmp: dset* -Resolve</command>
 h5tmp:\dset1
 h5tmp:\dset2
-h5tmp:\dset3
-        </screen>
+h5tmp:\dset3</screen>
         </example>
     </sect2>
 

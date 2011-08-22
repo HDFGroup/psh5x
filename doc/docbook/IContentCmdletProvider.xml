@@ -47,8 +47,7 @@
         <para/>
         <example>
             <title>Getting the first 10 elements of a dataset</title>
-            <screen>
-<prompt>PS:1 ></prompt> <command>Get-Content h5tmp:\dset1 -TotalCount 10</command>
+            <screen><prompt>PS:1 ></prompt> <command>Get-Content h5tmp:\dset1 -TotalCount 10</command>
 0
 1
 4
@@ -58,8 +57,7 @@
 36
 49
 64
-81
-      </screen>
+81</screen>
         </example>
     </sect2>
 
@@ -90,8 +88,7 @@
         </variablelist>
         <example>
             <title>Setting the content of a dataset from a one- or two-dimensional array</title>
-            <screen>
-<prompt>PS:1 ></prompt> <command>(Get-Item h5tmp:\dset1).Dimensions</command>
+            <screen><prompt>PS:1 ></prompt> <command>(Get-Item h5tmp:\dset1).Dimensions</command>
 10
 10
 <prompt>PS:2 ></prompt> <command>(Get-Item h5tmp:\dset1).ElementType</command>
@@ -112,8 +109,7 @@ Size                           4
 <prompt>PS:5 ></prompt> <command>Set-Content h5tmp:\dset1 $a</command>
 <prompt>PS:6 ></prompt> <command>$b = New-Object 'int[,]' 10,10</command>
 <prompt>PS:7 ></prompt> <command>for ($i = 0; $i -lt 10; $i++) { $b[$i,$i] = $i }</command>
-<prompt>PS:8 ></prompt> <command>Set-Content h5tmp:\dset1 $b</command>
-      </screen>
+<prompt>PS:8 ></prompt> <command>Set-Content h5tmp:\dset1 $b</command></screen>
         </example>
     </sect2>
 

@@ -62,9 +62,8 @@
         </variablelist>
         <example>
             <title>Getting the children of the PSDrive with root <literal>h5tmp:\</literal></title>
-            <screen>
-<prompt>PS:1 ></prompt> <command>Get-ChildItem h5tmp:\</command>
-
+            <screen><prompt>PS:1 ></prompt> <command>Get-ChildItem h5tmp:\</command>
+                
    PSParentPath: HDF5\HDF5::h5tmp:
 
 LinkName                 ItemType   LastWriteTime          #Attr.
@@ -85,14 +84,12 @@ LinkName                 ItemType   LastWriteTime          #Attr.
 --------                 --------   -------------          ------
 dset1                    Dataset    8/8/2011 4:07:21 PM    0
 dset2                    Dataset    8/8/2011 4:05:00 PM    0
-dset3                    Dataset    8/8/2011 4:05:00 PM    0                
-            </screen>
+dset3                    Dataset    8/8/2011 4:05:00 PM    0</screen>
         </example>
         <example>
             <title>Recursively getting the children of the PSDrive with root
                     <literal>h5tmp:\</literal></title>
-            <screen>
-<prompt>PS:1 ></prompt> <command>Get-ChildItem h5tmp:\ -Recurse</command>
+            <screen><prompt>PS:1 ></prompt> <command>Get-ChildItem h5tmp:\ -Recurse</command>
 
    PSParentPath: HDF5\HDF5::h5tmp:
 
@@ -117,9 +114,7 @@ LinkName                 ItemType   LastWriteTime          #Attr.
 --------                 --------   -------------          ------
 group2                   Group      1/1/1970 12:00:00 AM   0
 slink1                   SoftLink
-type1                    Datatyp... 1/1/1970 12:00:00 AM   0
-
-            </screen>
+type1                    Datatyp... 1/1/1970 12:00:00 AM   0</screen>
         </example>
     </sect2>
 
@@ -271,9 +266,7 @@ type1                    Datatyp... 1/1/1970 12:00:00 AM   0
         </variablelist>
         <example>
             <title>Remove items with a wildcard</title>
-            <screen>
-<prompt>PS:1 ></prompt> <command>Remove-Item h5tmp:\dset*</command>
-      </screen>
+            <screen><prompt>PS:1 ></prompt> <command>Remove-Item h5tmp:\dset*</command></screen>
         </example>
     </sect2>
 
@@ -303,15 +296,13 @@ type1                    Datatyp... 1/1/1970 12:00:00 AM   0
         </variablelist>
         <example>
             <title>Set the working location to <literal>h5tmp:\group2</literal></title>
-            <screen>
-<prompt>PS:1 ></prompt> <command>Set-Location h5tmp:\group2; Get-ChildItem</command>
+            <screen><prompt>PS:1 ></prompt> <command>Set-Location h5tmp:\group2; Get-ChildItem</command>
       
    PSParentPath: HDF5\HDF5::h5tmp:\group2
 
 LinkName                 ItemType   LastWriteTime          #Attr.
 --------                 --------   -------------          ------
-dset3                    Dataset    8/8/2011 4:05:00 PM    0    
-      </screen>
+dset3                    Dataset    8/8/2011 4:05:00 PM    0</screen>
         </example>
     </sect2>
 
@@ -343,8 +334,7 @@ dset3                    Dataset    8/8/2011 4:05:00 PM    0
             location in each drive.</para>
         <example>
             <title>Working with locations</title>
-            <screen>
-<prompt>PS:1 ></prompt> <command>Get-Location</command>
+            <screen><prompt>PS:1 ></prompt> <command>Get-Location</command>
 
 Path
 ----
@@ -358,9 +348,7 @@ C:\
                 
 Path
 ----
-h5tmp:\group1
-
-      </screen>
+h5tmp:\group1</screen>
         </example>
     </sect2>
 
@@ -384,16 +372,13 @@ h5tmp:\group1
         </variablelist>
         <example>
             <title>Resolving a path</title>
-            <screen>
-<prompt>PS:1 ></prompt> <command>Resolve-Path h5tmp:\dset*</command>
+            <screen><prompt>PS:1 ></prompt> <command>Resolve-Path h5tmp:\dset*</command>
 
 Path
 ----
 h5tmp:\dset1
 h5tmp:\dset2
-h5tmp:\dset3
-
-        </screen>
+h5tmp:\dset3</screen>
         </example>
     </sect2>
 
@@ -467,16 +452,14 @@ h5tmp:\dset3
         </variablelist>
         <example>
             <title>Testing paths</title>
-            <screen>
-<prompt>PS:1 ></prompt> <command>Test-Path h5tmp:\dset*</command>
+            <screen><prompt>PS:1 ></prompt> <command>Test-Path h5tmp:\dset*</command>
 True
 <prompt>PS:2 ></prompt> <command>Test-Path h5tmp:\dsett*</command>
 False
 <prompt>PS:3 ></prompt> <command>Test-Path h5tmp:\dset* -IsValid</command>
 True
 <prompt>PS:3 ></prompt> <command>Test-Path h5tmp:\dset* -PathType Container</command>
-False
-        </screen>
+False</screen>
         </example>
     </sect2>
 

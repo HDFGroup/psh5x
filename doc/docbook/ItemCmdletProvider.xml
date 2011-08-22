@@ -33,8 +33,7 @@
             about an item.</para>
         <example>
             <title>Retrieving the root group of the HDF5 scratch PSDrive</title>
-            <screen>
-<prompt>PS:1 ></prompt> <command>Get-Item h5tmp:\ | Format-List</command>
+            <screen><prompt>PS:1 ></prompt> <command>Get-Item h5tmp:\ | Format-List</command>
 
 PSPath         : HDF5\HDF5::h5tmp:\
 PSParentPath   :
@@ -46,13 +45,11 @@ LinkCount      : 7
 Timestamps     : {ModificationTime, AccessTime, ChangeTime, BirthTime}
 AttributeNames : {attr1}
 AttributeCount : 1
-ItemType       : Group
-      </screen>
+ItemType       : Group</screen>
         </example>
         <example>
             <title>Retrieving more details about the root group of the HDF5 scratch PSDrive</title>
-            <screen>
-<prompt>PS:1 ></prompt> <command>Get-Item h5tmp:\ -Detailed | Format-List</command>
+            <screen><prompt>PS:1 ></prompt> <command>Get-Item h5tmp:\ -Detailed | Format-List</command>
 
 PSPath               : HDF5\HDF5::h5tmp:\
 PSParentPath         :
@@ -76,13 +73,11 @@ Address              : 96
 Timestamps           : {ModificationTime, AccessTime, ChangeTime, BirthTime}
 AttributeNames       : {attr1}
 AttributeCount       : 1
-ItemType             : Group
-      </screen>
+ItemType             : Group</screen>
         </example>
         <example>
             <title>Use a wildcard to retrieve all group members</title>
-            <screen>
-<prompt>PS:1 ></prompt> <command>Get-Item h5tmp:\*</command>
+            <screen><prompt>PS:1 ></prompt> <command>Get-Item h5tmp:\*</command>
 
    PSParentPath: HDF5\HDF5::h5tmp:
 
@@ -94,16 +89,13 @@ dset3                    Dataset    8/3/2011 8:10:55 PM    0
 group1                   Group      1/1/1970 12:00:00 AM   0
 group2                   Group      1/1/1970 12:00:00 AM   0
 slink1                   SoftLink
-type1                    Datatype   1/1/1970 12:00:00 AM   0
-      </screen>
+type1                    Datatype   1/1/1970 12:00:00 AM   0</screen>
         </example>
         <example>
             <title>Compare the addresses of two items</title>
-            <screen>
-<prompt>PS:1 ></prompt> <command>(Get-Item h5tmp:\group1\dset3 -Detailed).Address -eq
+            <screen><prompt>PS:1 ></prompt> <command>(Get-Item h5tmp:\group1\dset3 -Detailed).Address -eq
     (Get-Item h5tmp:\group2\dset3 -Detailed).Address</command>
-True
-      </screen>
+True</screen>
         </example>
 
     </sect2>
@@ -147,15 +139,11 @@ True
         </variablelist>
         <example>
             <title>Adjusting the shape of an extendible dataset</title>
-            <screen>
-<prompt>PS:1 ></prompt> <command>Set-Item h5tmp:\group1\dset3 @(44,55,66)</command>
-      </screen>
+            <screen><prompt>PS:1 ></prompt> <command>Set-Item h5tmp:\group1\dset3 @(44,55,66)</command></screen>
         </example>
         <example>
             <title>Assigning a new value to a soft link</title>
-            <screen>
-<prompt>PS:1 ></prompt> <command>Set-Item h5tmp:\slink1 '/new/destination'</command>
-      </screen>
+            <screen><prompt>PS:1 ></prompt> <command>Set-Item h5tmp:\slink1 '/new/destination'</command></screen>
         </example>
 
     </sect2>

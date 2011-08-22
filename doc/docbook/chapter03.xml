@@ -62,8 +62,7 @@
 
       <example>
         <title>Show all pre-defined HDF5 float datatypes</title>
-        <screen>
-<prompt>PS:1 ></prompt> <command>Show-H5Types -Float</command>
+        <screen><prompt>PS:1 ></prompt> <command>Show-H5Types -Float</command>
 
 Name                           Value
 ----                           -----
@@ -80,8 +79,7 @@ H5T_NATIVE_FLOAT               {SignBitPos, MantBitPos, ExpBias, ByteOrder...}
 
       <example>
         <title>Show details for H5T_IEEE_F64LE</title>
-        <screen>  
-<prompt>PS:1 ></prompt> <command>(Show-H5Types).H5T_IEEE_F64LE</command>
+        <screen><prompt>PS:1 ></prompt> <command>(Show-H5Types).H5T_IEEE_F64LE</command>
 
 Name                           Value
 ----                           -----
@@ -99,9 +97,7 @@ Class                          FLOAT
 MSBitPadding                   Zero
 ExpBits                        11
 Size                           8
-MantBits                       52
-
-        </screen>
+MantBits                       52</screen>
       </example>
 
     </sect2>

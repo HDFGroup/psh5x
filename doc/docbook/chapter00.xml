@@ -8,13 +8,9 @@
 
     <para> Below is a simple Python script which uses the h5py module to create a chunked,
         compressed dataset.
-        <programlisting>
-<xi:include parse="text" href="examples/dataset.py"/>
-        </programlisting>
+        <programlisting><xi:include parse="text" href="examples/dataset.py"/></programlisting>
         Here is a PowerShell script that performs the same task.
-        <programlisting>
-<xi:include parse="text" href="examples/dataset.ps1"/>
-        </programlisting>
+        <programlisting><xi:include parse="text" href="examples/dataset.ps1"/></programlisting>
     </para>
 
     <variablelist>
@@ -97,9 +93,7 @@
                 example, let's say you'd like to read the elements on a hyperslab of a
                 two-dimensional dataset <literal>/A/dset</literal>. In PSH5X, you'd say something
                 like this:</para>
-            <screen>
-Get-Content h5:/A/dest -Start 0,0 -Stride 4,3 -Count 15,24 -Block 8,16
-            </screen>
+            <screen>Get-Content h5:/A/dest -Start 0,0 -Stride 4,3 -Count 15,24 -Block 8,16</screen>
             <para>Internally, PSH5X creates a dataset reader object that does a partial read on the
                 dataset and returns the result to PowerShell as a two-dimensional array of an
                 appropriate native type. However, things take a different turn from here. The
@@ -110,10 +104,8 @@ Get-Content h5:/A/dest -Start 0,0 -Stride 4,3 -Count 15,24 -Block 8,16
                 data in a stream-oriented fashion then that may be exactly what you want. For
                 example, say you are looking for all elements (of a compound type) where the
                     <literal>temperature</literal> member exceeds a certain value:</para>
-            <screen>
-$a = (Get-Content h5:/A/dest -Start 0,0 -Stride 4,3 -Count 15,24 -Block 8,16 `
-     | Where-Object {$_.temperature -gt 80})
-                </screen>
+            <screen>$a = (Get-Content h5:/A/dest -Start 0,0 -Stride 4,3 -Count 15,24 -Block 8,16 `
+     | Where-Object {$_.temperature -gt 80})</screen>
             <para> In case you were looking for the original array created by the dataset reader,
                 it's gone for good. This is a stream-oriented interface after all.</para>
             <para> The message is this: there is nothing in the PowerShell provider interface that
@@ -126,7 +118,6 @@ $a = (Get-Content h5:/A/dest -Start 0,0 -Stride 4,3 -Count 15,24 -Block 8,16 `
                 version of NumPy and SciPy for IronPython which may open the door for bringing
                 numarrays to PSH5X. Stay tuned for more... (Did I mention LINQ?)</para>
         </sect2>
-
 
         <sect2>
             <title>Beyond Simple HDF5 Datatypes</title>
