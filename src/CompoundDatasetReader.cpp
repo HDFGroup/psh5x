@@ -11,6 +11,7 @@ extern "C" {
 }
 
 #include <cstdlib>
+#include <cstring>
 
 using namespace Microsoft::CSharp;
 
@@ -69,7 +70,9 @@ namespace PSH5X
                 array<String^>^ member_type = gcnew array<String^>(mcount);
                 array<int>^ member_size = gcnew array<int>(mcount);
                 array<int>^ member_offset = gcnew array<int>(mcount);
+
                 array<MethodInfo^>^ member_info = gcnew array<MethodInfo^>(mcount);
+                array<bool>^ member_is_vlen_str = gcnew array<bool>(mcount);
 
                 for (int i = 0; i < mcount; ++i)
                 {
@@ -83,10 +86,15 @@ namespace PSH5X
                     }
                     member_class[i] = H5Tget_class(mtype);
 
-                    if (member_class[i]) {
+                    if (member_class[i] == H5T_BITFIELD) {
                         ntype = H5Tget_native_type(mtype, H5T_DIR_DESCEND);
                     }
-                    else {
+                    else
+                    {
+                        if (member_class[i] == H5T_STRING) {
+                            member_is_vlen_str[i] = (H5Tis_variable_str(mtype) > 0);
+                        }
+
                         ntype = H5Tget_native_type(mtype, H5T_DIR_ASCEND);
                     }
                     if (ntype < 0) {
@@ -158,7 +166,21 @@ namespace PSH5X
                             }
                             else if(member_class[m] == H5T_STRING)
                             {
-                                args[m] = Marshal::PtrToStringAnsi(IntPtr(buf+size*i+member_offset[m]));
+                                if (member_is_vlen_str[m])
+                                {
+                                    // this is pretty ugly, but Id on't see a better way at the moment
+                                    IntPtr ptr = IntPtr::Zero;
+                                    if (IntPtr::Size == 8) {
+                                        ptr = IntPtr(BitConverter::ToInt64(row, member_offset[m]));
+                                    }
+                                    else {
+                                        ptr = IntPtr(BitConverter::ToInt32(row, member_offset[m]));
+                                    }
+                                    args[m] = Marshal::PtrToStringAnsi(IntPtr(ptr));
+                                }
+                                else {
+                                    args[m] = Marshal::PtrToStringAnsi(IntPtr(buf+size*i+member_offset[m]));
+                                }
                             }
                             else {
                                 args[m] = "\"" + BitConverter::ToString(row, member_offset[m], member_size[m]) + "\""; 
