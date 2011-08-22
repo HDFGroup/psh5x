@@ -17,11 +17,11 @@ namespace PSH5X
         /*
         TODO: implement this
 
-        DatasetReader(hid_t h5file, System::String^ h5path,
+        ArrayDatasetReader(hid_t h5file, System::String^ h5path,
             array<hsize_t>^ start, array<hsize_t>^ stride,
             array<hsize_t>^ count, array<hsize_t>^ block);
         
-        DatasetReader(hid_t h5file, System::String^ h5path, array<hsize_t>^ coord);
+        ArrayDatasetReader(hid_t h5file, System::String^ h5path, array<hsize_t>^ coord);
         */
 
         ~ArrayDatasetReader()
@@ -43,7 +43,7 @@ namespace PSH5X
 
     private:
 
-        array<System::Management::Automation::PSObject^>^ m_array;
+        array<System::Array^>^ m_array;
 
         long long m_position;
         

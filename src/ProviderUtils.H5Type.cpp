@@ -18,6 +18,7 @@ using namespace System::Collections;
 using namespace System::Management::Automation;
 using namespace System::Reflection;
 using namespace System::Runtime::InteropServices;
+using namespace System::Text;
 
 namespace PSH5X
 {
@@ -1650,7 +1651,7 @@ namespace PSH5X
 
         H5T_class_t cls = H5Tget_class(dtype);
 
-        hid_t ntype = -1;
+        hid_t ntype = -1, super = -1;
 
         try
         {
@@ -1697,11 +1698,29 @@ namespace PSH5X
             else if (cls == H5T_OPAQUE) {
                 result = Byte::typeid;
             }
+            else if (cls == H5T_ENUM)
+            {
+                super = H5Tget_super(ntype);
+
+                if      (H5Tequal(super, H5T_NATIVE_CHAR)   > 0) { result = SByte::typeid;  }
+                else if (H5Tequal(super, H5T_NATIVE_SHORT)  > 0) { result = Int16::typeid;  }
+                else if (H5Tequal(super, H5T_NATIVE_INT)    > 0) { result = Int32::typeid;  }
+                else if (H5Tequal(super, H5T_NATIVE_LONG)   > 0) { result = Int32::typeid;  }
+                else if (H5Tequal(super, H5T_NATIVE_LLONG)  > 0) { result = Int64::typeid;  }
+                else if (H5Tequal(super, H5T_NATIVE_UCHAR)  > 0) { result = Byte::typeid;   }
+                else if (H5Tequal(super, H5T_NATIVE_USHORT) > 0) { result = UInt16::typeid; }
+                else if (H5Tequal(super, H5T_NATIVE_UINT)   > 0) { result = UInt32::typeid; }
+                else if (H5Tequal(super, H5T_NATIVE_ULONG)  > 0) { result = UInt32::typeid; }
+                else if (H5Tequal(super, H5T_NATIVE_ULLONG) > 0) { result = UInt64::typeid; }
+            }
         }
         finally
         {
             if (ntype >= 0) {
                 H5Tclose(ntype);
+            }
+            if (super >= 0) {
+                H5Tclose(super);
             }
         }
 
@@ -1813,47 +1832,228 @@ error:
 
         Type^ magicType = System::BitConverter::typeid;
 
-        H5T_class_t cls = H5Tget_class(type_id);
-        switch (cls)
+        hid_t super = -1;
+
+        try
         {
-        case H5T_INTEGER:
+            H5T_class_t cls = H5Tget_class(type_id);
+            switch (cls)
+            {
+            case H5T_INTEGER:
 
-            if (ProviderUtils::H5Type2DotNet(type_id) == Int32::typeid) {
-                minfo = magicType->GetMethod("ToInt32");
-            }
-            else if (ProviderUtils::H5Type2DotNet(type_id) == Int64::typeid) {
-                minfo = magicType->GetMethod("ToInt64");
-            }
-            else if (ProviderUtils::H5Type2DotNet(type_id) == Int16::typeid) {
-                minfo = magicType->GetMethod("ToInt16");
-            }
-            if (ProviderUtils::H5Type2DotNet(type_id) == UInt32::typeid) {
-                minfo = magicType->GetMethod("ToUInt32");
-            }
-            else if (ProviderUtils::H5Type2DotNet(type_id) == UInt64::typeid) {
-                minfo = magicType->GetMethod("ToUInt64");
-            }
-            else if (ProviderUtils::H5Type2DotNet(type_id) == UInt16::typeid) {
-                minfo = magicType->GetMethod("ToUInt16");
-            }
-            break;
+                if (ProviderUtils::H5Type2DotNet(type_id) == Int32::typeid) {
+                    minfo = magicType->GetMethod("ToInt32");
+                }
+                else if (ProviderUtils::H5Type2DotNet(type_id) == Int64::typeid) {
+                    minfo = magicType->GetMethod("ToInt64");
+                }
+                else if (ProviderUtils::H5Type2DotNet(type_id) == Int16::typeid) {
+                    minfo = magicType->GetMethod("ToInt16");
+                }
+                if (ProviderUtils::H5Type2DotNet(type_id) == UInt32::typeid) {
+                    minfo = magicType->GetMethod("ToUInt32");
+                }
+                else if (ProviderUtils::H5Type2DotNet(type_id) == UInt64::typeid) {
+                    minfo = magicType->GetMethod("ToUInt64");
+                }
+                else if (ProviderUtils::H5Type2DotNet(type_id) == UInt16::typeid) {
+                    minfo = magicType->GetMethod("ToUInt16");
+                }
+                break;
 
-        case H5T_FLOAT:
+            case H5T_FLOAT:
 
-            if (ProviderUtils::H5Type2DotNet(type_id) == Double::typeid) {
-                minfo = magicType->GetMethod("ToDouble");
-            }
-            else if (ProviderUtils::H5Type2DotNet(type_id) == Single::typeid) {
-                minfo = magicType->GetMethod("ToSingle");
-            }
-            break;
+                if (ProviderUtils::H5Type2DotNet(type_id) == Double::typeid) {
+                    minfo = magicType->GetMethod("ToDouble");
+                }
+                else if (ProviderUtils::H5Type2DotNet(type_id) == Single::typeid) {
+                    minfo = magicType->GetMethod("ToSingle");
+                }
+                break;
 
-        default:
-            break;
+            case H5T_ENUM:
+
+                super = H5Tget_super(type_id);
+
+                if (ProviderUtils::H5Type2DotNet(super) == Int32::typeid) {
+                    minfo = magicType->GetMethod("ToInt32");
+                }
+                else if (ProviderUtils::H5Type2DotNet(super) == Int64::typeid) {
+                    minfo = magicType->GetMethod("ToInt64");
+                }
+                else if (ProviderUtils::H5Type2DotNet(super) == Int16::typeid) {
+                    minfo = magicType->GetMethod("ToInt16");
+                }
+                if (ProviderUtils::H5Type2DotNet(super) == UInt32::typeid) {
+                    minfo = magicType->GetMethod("ToUInt32");
+                }
+                else if (ProviderUtils::H5Type2DotNet(super) == UInt64::typeid) {
+                    minfo = magicType->GetMethod("ToUInt64");
+                }
+                else if (ProviderUtils::H5Type2DotNet(super) == UInt16::typeid) {
+                    minfo = magicType->GetMethod("ToUInt16");
+                }
+                break;
+
+            default:
+                break;
+            }
+        }
+        finally
+        {
+            if (super >= 0) {
+                H5Tclose(super);
+            }
         }
 
         return minfo;
     }
+
+    Type^ ProviderUtils::GetCompundDotNetType(hid_t type_id)
+    {
+        Type^ result = nullptr;
+
+        if (H5Tget_class(type_id) != H5T_COMPOUND) {
+            throw gcnew PSH5XException("This is not a compound type");
+        }
+
+        size_t size = H5Tget_size(type_id);
+
+        int member_count = H5Tget_nmembers(type_id);
+        if (member_count < 0) {
+            throw gcnew HDF5Exception("H5Tget_nmembers failed!");
+        }
+
+        array<String^>^ member_name = gcnew array<String^>(member_count);
+        array<String^>^ member_type = gcnew array<String^>(member_count);
+        array<int>^ member_size = gcnew array<int>(member_count);
+        array<int>^ member_offset = gcnew array<int>(member_count);
+        array<__wchar_t>^ member_tcode = gcnew array<__wchar_t>(member_count);
+
+        StringBuilder^ sbname = gcnew StringBuilder();
+        StringBuilder^ sbconstr = gcnew StringBuilder("(");
+
+        char* name = NULL;
+
+        hid_t mtype = -1, ntype = -1;
+
+        try
+        {
+            for (int i = 0; i < member_count; ++i)
+            {
+                size_t offset = H5Tget_member_offset(type_id, i);
+
+                member_offset[i] = safe_cast<int>(offset);
+
+                name = H5Tget_member_name(type_id, safe_cast<unsigned>(i));
+                if (name == NULL) {
+                    throw gcnew HDF5Exception("H5Tget_member_name failed!");
+                }
+
+                mtype = H5Tget_member_type(type_id, safe_cast<unsigned>(i));
+                if (mtype < 0) {
+                    throw gcnew HDF5Exception("H5Tget_member_type failed!");
+                }
+
+                if (H5Tget_class(mtype) == H5T_BITFIELD) {
+                    ntype = H5Tget_native_type(mtype, H5T_DIR_DESCEND);
+                }
+                else {
+                    ntype = H5Tget_native_type(mtype, H5T_DIR_ASCEND);
+                }
+                if (ntype < 0) {
+                    throw gcnew HDF5Exception("H5Tget_native_type failed!");
+                }
+
+                member_size[i] = safe_cast<int>(H5Tget_size(ntype));
+
+                Type^ t = ProviderUtils::H5Type2DotNet(ntype);
+                if (t != nullptr)
+                {
+                    member_type[i]  = t->ToString();
+                    member_tcode[i] = ProviderUtils::TypeCode(t);
+                    sbname->Append(member_tcode[i]);
+                    member_name[i]  = member_tcode[i] + Convert::ToString(i);
+                }
+                else {
+                    throw gcnew PSH5XException("Unsupported member type in compound!");
+                }
+
+                sbconstr->Append(member_type[i] + " " + "param" + Convert::ToString(i));
+                if (i < member_count-1) {
+                    sbconstr->Append(", ");
+                }
+
+                if (H5Tclose(ntype) < 0) {
+                    throw gcnew HDF5Exception("H5Tclose failed!");
+                }
+                ntype = -1;
+
+                if (H5Tclose(mtype) < 0) {
+                    throw gcnew HDF5Exception("H5Tclose failed!");
+                }
+                mtype = -1;
+            }
+
+            sbconstr->Append(") {");
+
+            String^ class_name = sbname->ToString();
+
+            StringBuilder^ sbcode = gcnew StringBuilder();
+            sbcode->Append("using System.Runtime.InteropServices; ");
+            sbcode->Append("[StructLayout(LayoutKind.Explicit,Size= " + size + ",CharSet=CharSet.Ansi)] ");
+            sbcode->Append("public class " + class_name + " { ");
+
+            StringBuilder^ sb_def_constr = gcnew StringBuilder();
+            sb_def_constr->Append(" public " + class_name + "() {");
+
+            for (int i = 0; i < member_count; ++i)
+            {
+                sbcode->Append("[FieldOffset(" + member_offset[i] + ")]");
+                sbcode->Append(" public " + member_type[i] + " " + member_name[i] + ";"); // + " {get;set;} ");
+
+                if (member_tcode[i] == 's') {
+                    sb_def_constr->Append(" " + member_name[i] + " = \"\"; ");
+                }
+
+                sbconstr->Append(member_name[i] + " = param" + Convert::ToString(i) + ";");
+            }
+
+            sb_def_constr->Append(" }");
+            sbconstr->Append(" }");
+
+            sbcode->Append(sb_def_constr->ToString());
+            sbcode->Append(" public " + class_name + sbconstr->ToString());
+
+            String^ code = sbcode->ToString() + "}";
+
+            //Console::WriteLine(code);
+
+            CompilerParameters^ params = gcnew CompilerParameters();
+            params->GenerateInMemory = true;
+            params->TreatWarningsAsErrors = false;
+            params->GenerateExecutable = false;
+            params->CompilerOptions = "/optimize";
+
+            CSharpCodeProvider^ provider = gcnew CSharpCodeProvider();
+            CompilerResults^ compilate = provider->CompileAssemblyFromSource(params, code);
+
+            Assembly^ assembly = compilate->CompiledAssembly;
+            result = assembly->GetType(sbname->ToString());
+        }
+        finally
+        {
+            if (mtype >= 0) {
+                H5Tclose(mtype);
+            }
+            if (ntype >= 0) {
+                H5Tclose(ntype);
+            }
+        }
+
+        return result;
+    }
+
 
     bool ProviderUtils::IsH5SimpleType(hid_t dtype)
     {

@@ -154,6 +154,8 @@ namespace PSH5X
 
         static System::Reflection::MethodInfo^ BitConverterMethod(hid_t type_id);
 
+        static System::Type^ GetCompundDotNetType(hid_t type_id);
+
         static bool IsH5SimpleType(hid_t dtype);
 
         static bool IsH5IntegerType(hid_t dtype);

@@ -47,16 +47,16 @@ namespace PSH5X
                 throw gcnew HDF5Exception("H5Dget_space failed!");
             }
 
+            ftype = H5Dget_type(dset);
+            if (ftype < 0) {
+                throw gcnew HDF5Exception("H5Dget_type failed!");
+            }
+
+            size_t size = H5Tget_size(ftype);
+                
             hssize_t npoints = H5Sget_simple_extent_npoints(fspace);
             if (npoints > 0)
             {
-                ftype = H5Dget_type(dset);
-                if (ftype < 0) {
-                    throw gcnew HDF5Exception("H5Dget_type failed!");
-                }
-                
-                size_t size = H5Tget_size(ftype);
-
                 memtype = H5Tcreate(H5T_COMPOUND, size);
                 if (memtype < 0) {
                     throw gcnew HDF5Exception("H5Tcreate failed!");
@@ -65,14 +65,11 @@ namespace PSH5X
                 int mcount = H5Tget_nmembers(ftype);
 
                 array<String^>^ member_name = gcnew array<String^>(mcount);
+                array<H5T_class_t>^ member_class = gcnew array<H5T_class_t>(mcount);
                 array<String^>^ member_type = gcnew array<String^>(mcount);
                 array<int>^ member_size = gcnew array<int>(mcount);
                 array<int>^ member_offset = gcnew array<int>(mcount);
                 array<MethodInfo^>^ member_info = gcnew array<MethodInfo^>(mcount);
-                array<__wchar_t>^ member_tcode = gcnew array<__wchar_t>(mcount);
-
-                StringBuilder^ sbname = gcnew StringBuilder();
-                StringBuilder^ sbconstr = gcnew StringBuilder("(");
 
                 for (int i = 0; i < mcount; ++i)
                 {
@@ -84,12 +81,16 @@ namespace PSH5X
                     if (mtype < 0) {
                         throw gcnew HDF5Exception("H5Tget_member_type failed!");
                     }
+                    member_class[i] = H5Tget_class(mtype);
 
-                    if (H5Tget_class(mtype) == H5T_BITFIELD) {
+                    if (member_class[i]) {
                         ntype = H5Tget_native_type(mtype, H5T_DIR_DESCEND);
                     }
                     else {
                         ntype = H5Tget_native_type(mtype, H5T_DIR_ASCEND);
+                    }
+                    if (ntype < 0) {
+                        throw gcnew HDF5Exception("H5Tget_native_type failed!");
                     }
 
                     if (H5Tinsert(memtype, mname, offset, ntype) < 0) {
@@ -103,17 +104,9 @@ namespace PSH5X
                     if (t != nullptr)
                     {
                         member_type[i]  = t->ToString();
-                        member_tcode[i] = ProviderUtils::TypeCode(t);
-                        sbname->Append(member_tcode[i]);
-                        member_name[i]  = member_tcode[i] + Convert::ToString(i);
                     }
                     else {
                         throw gcnew PSH5XException("Unsupported member type in compound!");
-                    }
-
-                    sbconstr->Append(member_type[i] + " " + "param" + Convert::ToString(i));
-                    if (i < mcount-1) {
-                        sbconstr->Append(", ");
                     }
 
                     if (H5Tclose(ntype) < 0) {
@@ -127,57 +120,12 @@ namespace PSH5X
                     mtype = -1;
                 }
 
-#pragma region code generation
-
-                sbconstr->Append(") {");
-
-                String^ class_name = sbname->ToString();
-
-                StringBuilder^ sbcode = gcnew StringBuilder();
-                sbcode->Append("public class " + class_name + " { ");
-
-                StringBuilder^ sb_def_constr = gcnew StringBuilder();
-                sb_def_constr->Append(" public " + class_name + "() {");
-                
-                for (int i = 0; i < mcount; ++i)
-                {
-                    sbcode->Append(" public " + member_type[i] + " " + member_name[i] + " {get;set;} ");
-                    
-                    if (member_tcode[i] == 's') {
-                        sb_def_constr->Append(" " + member_name[i] + " = \"\"; ");
-                    }
-
-                    sbconstr->Append(member_name[i] + " = param" + Convert::ToString(i) + ";");
-                }
-
-                sb_def_constr->Append(" }");
-                sbconstr->Append(" }");
-
-                //sbcode->Append(sb_def_constr->ToString());
-                sbcode->Append(" public " + class_name + sbconstr->ToString());
-
-                String^ code = sbcode->ToString() + "}";
-
-                //Console::WriteLine(code);
-
-                CompilerParameters^ params = gcnew CompilerParameters();
-                params->GenerateInMemory = true;
-                params->TreatWarningsAsErrors = false;
-                params->GenerateExecutable = false;
-                params->CompilerOptions = "/optimize";
-
-                CSharpCodeProvider^ provider = gcnew CSharpCodeProvider();
-                CompilerResults^ compilate = provider->CompileAssemblyFromSource(params, code);
-
-                Assembly^ assembly = compilate->CompiledAssembly;
-                m_type = assembly->GetType(sbname->ToString());
+                m_type = ProviderUtils::GetCompundDotNetType(ftype);
 
                 array<ConstructorInfo^>^ cinfo = m_type->GetConstructors();
-                if (cinfo->Length != 1) {
+                if (cinfo->Length != 2) {
                     throw gcnew PSH5XException("Constructor code generation error!");
                 }
-
-#pragma endregion
 
                 array<unsigned char>^ mbuf = gcnew array<unsigned char>(npoints*size);
 
@@ -208,13 +156,17 @@ namespace PSH5X
                             if (member_type[m] == "System.Byte") {
                                 args[m] = System::Byte(row[member_offset[m]]);
                             }
+                            else if(member_class[m] == H5T_STRING)
+                            {
+                                args[m] = Marshal::PtrToStringAnsi(IntPtr(buf+size*i+member_offset[m]));
+                            }
                             else {
                                 args[m] = "\"" + BitConverter::ToString(row, member_offset[m], member_size[m]) + "\""; 
                             }
                         }
                     }
 
-                    m_array->SetValue(cinfo[0]->Invoke(args), i);
+                    m_array->SetValue(cinfo[1]->Invoke(args), i);
                 }
             }
             else
@@ -253,28 +205,6 @@ namespace PSH5X
 
     IList^ CompoundDatasetReader::Read(long long readCount)
     {
-        /*
-        array<Object^>^ result = nullptr;
-        
-        long long remaining = m_array->LongLength - m_position;
-        if (remaining > 0)
-        {
-            long long length = 0;
-            if (readCount > remaining) { length = remaining; }
-            else { length = readCount; }
-
-            result = gcnew array<Object^>(length);
-            
-            long long pos = m_position;
-            for (long long i = 0; i < length; ++i)
-            {
-                result[i] = m_array[pos++];
-            }
-
-            m_position += length;
-        }
-        */
-
         array<Object^>^ result = nullptr;
 
         long long remaining = m_array->LongLength - m_position;
@@ -304,9 +234,6 @@ namespace PSH5X
 
             m_position += length;
         }
-
-        return result;
-
 
         return result;
     }

@@ -172,6 +172,43 @@ namespace PSH5X
                 result = gcnew CompoundDatasetReader(drive->FileHandle, h5path);
                 break;
 
+            case H5T_ENUM:
+
+#pragma region HDF5 enumeration
+
+                t = ProviderUtils::H5Type2DotNet(ftype);
+                if (t == SByte::typeid) {
+                    result = gcnew DatasetReaderT<SByte>(drive->FileHandle, h5path);
+                }
+                else if (t == Int16::typeid) {
+                    result = gcnew DatasetReaderT<Int16>(drive->FileHandle, h5path);
+                }
+                else if (t == Int32::typeid) {
+                    result = gcnew DatasetReaderT<Int32>(drive->FileHandle, h5path);
+                }
+                else if (t == Int64::typeid) {
+                    result = gcnew DatasetReaderT<Int64>(drive->FileHandle, h5path);
+                }
+                else if (t == Byte::typeid) {
+                    result = gcnew DatasetReaderT<Byte>(drive->FileHandle, h5path);
+                }
+                else if (t == UInt16::typeid) {
+                    result = gcnew DatasetReaderT<UInt16>(drive->FileHandle, h5path);
+                }
+                else if (t ==  UInt32::typeid) {
+                    result = gcnew DatasetReaderT<UInt32>(drive->FileHandle, h5path);
+                }
+                else if (t ==  UInt64::typeid) {
+                    result = gcnew DatasetReaderT<UInt64>(drive->FileHandle, h5path);
+                }
+                else {
+                    throw gcnew PSH5XException("Unsupported enum type!");
+                }
+
+#pragma endregion
+                
+                break;
+
             case H5T_VLEN:
 
                 result = gcnew VlenDatasetReader(drive->FileHandle, h5path);
