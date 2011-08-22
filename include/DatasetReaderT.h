@@ -67,8 +67,7 @@ namespace PSH5X
                             throw gcnew HDF5Exception("H5Dread failed!");
                         }
                     }
-                    else
-                    {
+                    else {
                         m_array = gcnew array<T>(0);
                     }
                 }

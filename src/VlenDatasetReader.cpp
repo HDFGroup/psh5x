@@ -42,7 +42,7 @@ namespace PSH5X
             hssize_t npoints = H5Sget_simple_extent_npoints(fspace);
             if (npoints > 0)
             {
-                m_array = gcnew array<PSObject^>(npoints);
+                m_array = gcnew array<Array^>(npoints);
 
                 ftype = H5Dget_type(dset);
                 if (ftype < 0) {
@@ -66,6 +66,9 @@ namespace PSH5X
                     else {
                         ntype = H5Tget_native_type(base_type, H5T_DIR_ASCEND);
                     }
+                    if (ntype < 0) {
+                        throw gcnew HDF5Exception("H5Tget_native_type failed!");
+                    }
 
                     mtype = H5Tvlen_create(ntype);
                     if (mtype < 0) {
@@ -78,7 +81,7 @@ namespace PSH5X
 
                     for (size_t i = 0; i < npoints; ++i)
                     {
-                        m_array[i] = gcnew PSObject(ProviderUtils::GetArray(rdata[i].p, rdata[i].len, base_type));
+                        m_array[i] = ProviderUtils::GetArray(rdata[i].p, rdata[i].len, base_type);
                     }
 
                     if (H5Dvlen_reclaim(mtype, fspace, H5P_DEFAULT, rdata) < 0) {
@@ -92,7 +95,7 @@ namespace PSH5X
             }
             else
             {
-                m_array = gcnew array<PSObject^>(0);
+                m_array = gcnew array<Array^>(0);
             }
         }
         finally
@@ -126,22 +129,32 @@ namespace PSH5X
 
     IList^ VlenDatasetReader::Read(long long readCount)
     {
-        array<PSObject^>^ result = nullptr;
+        array<Object^>^ result = nullptr;
 
         long long remaining = m_array->LongLength - m_position;
         if (remaining > 0)
         {
             long long length = 0;
-            if (readCount > remaining) { length = remaining; }
-            else { length = readCount; }
 
-            result = gcnew array<PSObject^>(length);
-    
-            long long pos = m_position;
-            for (long long i = 0; i < length; ++i)
+            if (readCount > remaining)
             {
-                result[i] = m_array[pos++];
+                length = remaining;
             }
+            else
+            {
+                if (readCount > 0)
+                {
+                    length = readCount;
+                }
+                else
+                {
+                    length = m_array->LongLength;
+                }
+            }
+
+            result = gcnew array<Object^>(length);
+
+            Array::Copy((Array^) m_array, m_position, (Array^) result, (long long) 0, length);
 
             m_position += length;
         }
