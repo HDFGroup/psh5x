@@ -1,4 +1,3 @@
-
 $t = @{
   Class    = 'String';
   CharSet  = 'Ascii';

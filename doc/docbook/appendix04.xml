@@ -6,12 +6,13 @@
     <para> Throughout the text we use a sample HDF5 file whose <command>h5dump</command> output is
         shown below.
         <programlisting>
-            <xi:include parse="text" href="examples/BNF.txt"/>
+<xi:include parse="text" href="examples/BNF.txt"/>
         </programlisting>
     </para>
-    <para> Below, a PowerShell script is shown that would recreate the HDF5 objects in <filename>h5tmp:\</filename>
+    <para> Below, a PowerShell script is shown that would recreate the HDF5 objects in
+            <filename>h5tmp:\</filename>
         <programlisting>
-            <xi:include parse="text" href="examples/Create-BNFSample.ps1"/>
+<xi:include parse="text" href="examples/Create-BNFSample.ps1"/>
         </programlisting>
     </para>
 </appendix>

@@ -1,4 +1,3 @@
-
 HDF5 "example.h5" {
 GROUP "/" {
    ATTRIBUTE "attr1" {

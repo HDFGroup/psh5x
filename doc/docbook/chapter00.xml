@@ -9,11 +9,11 @@
     <para> Below is a simple Python script which uses the h5py module to create a chunked,
         compressed dataset.
         <programlisting>
-            <xi:include parse="text" href="examples/dataset.py"/>
+<xi:include parse="text" href="examples/dataset.py"/>
         </programlisting>
         Here is a PowerShell script that performs the same task.
         <programlisting>
-            <xi:include parse="text" href="examples/dataset.ps1"/>
+<xi:include parse="text" href="examples/dataset.ps1"/>
         </programlisting>
     </para>
 
