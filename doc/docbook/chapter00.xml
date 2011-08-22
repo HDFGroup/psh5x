@@ -34,8 +34,106 @@
 
     <note>
         <para>This guide is not an introduction to Windows PowerShell. Excellent introductions are
-            available in print <citation/> and online <citation/>.</para>
+            available in print <citation/> and online <citation/>. </para>
     </note>
+
+    <sect1>
+        <title>Buyers Beware</title>
+        <subtitle>Caveats and Considerations</subtitle>
+        <para>It shouldn't come as a big surprise that PowerShell was not invented and introduced by
+            Microsoft with the goal to give Windows users the most convenient access to HDF5 files.
+            The Powershell provider interface represents a general model for interacting with data
+            stores in PowerShell on the Windows platform. Some data stores are better matches than
+            others. I believe that HDF5 is, if not a perfect match, a match in which a few
+            shortcomings are far outweighed by the benefits to the user. In this section, I would
+            like to describe the areas where the match is not ideal. There are a few forward
+            references in the discussion that may make it less accessible to novice users. You may
+            skip it for now, but you should return after you've had some playtime and you are
+            contemplating to use this interface for real. It's a <emphasis>must-read</emphasis> for
+            experts. Don't waste your time only to find out later that a certain assumption or
+            requirement is an absolute showstopper for you. Read this! I told you so beforehand.</para>
+
+        <sect2>
+            <title>Implementation</title>
+            <para>PSH5X is written in C++/CLI [] which allows for a unique blend of (.NET) managed
+                and unmanaged code. Since interoperability with other .NET languages is not a
+                requirement, calls into the native HDF5 C library can be made directly and there is no
+                need for P/Invoke [] or the HDF5DotNet wrapper []. With pinning pointers [], for the
+                simplest data types, one can almost forget about the simultaneous presence of
+                managed and unmanaged heaps, and copy operations between the two can be mostly
+                avoided. </para>
+        </sect2>
+
+        <sect2>
+            <title>Some Strings Attached....</title>
+            <para>PowerShell strings are implemented as 16-bit Unicode characters and mapped
+                directly to the .NET <literal>System.String</literal> type. Currently, HDF5 only
+                supports strings based on ASCII or UTF-8 endcoded characters. PSH5X automatically
+                maps between the different representations, but it can't hide the fact that at the
+                HDF5 level it all comes down to ASCII or UTF-8.</para>
+        </sect2>
+
+        <sect2>
+            <title>Arrays in PowerShell</title>
+            <para>The story of arrays in PowerShell is best summarized in the words of Bruce Payette
+                [PSBible].</para>
+            <blockquote>
+                <para>Here's how array literals are defined in PowerShell:</para>
+                <para><emphasis>They're not. There's no array literal notation in
+                        PowerShell.</emphasis></para>
+                <para>Yes, you read that correctly. There's no notation for an array literal in
+                    PowerShell. So how exactly does this work? How do you define an inline array in
+                    a PowerShell script? Here's the answer: instead of having array literals,
+                    there's a set of operations that create collections as needed.</para>
+            </blockquote>
+            <para>Add to that the fact that PowerShell arrays are polymorphic by default (arrays of
+                    <literal>System.Object</literal> .NET objects, e.g., <literal>$a = @(-4711,
+                    'foo', 1.23, 0xDeadBeef)</literal>) and you may start having doubts about the
+                seriousness of this proposal. Of course, it's possible to create typed (.NET) arrays
+                the same way you'd create other .NET or COM objects in PowerShell, with the
+                    <literal>New-Object</literal> cmdlet. At the moment, this is what PSH5X does
+                under the covers, it creates typed .NET arrays. But, despite its best effort,
+                matters may appear confusing on the PowerShell surface, at least at first sight. For
+                example, let's say you'd like to read the elements on a hyperslab of a
+                two-dimensional dataset <literal>/A/dset</literal>. In PSH5X, you'd say something
+                like this:</para>
+            <screen>
+Get-Content h5:/A/dest -Start 0,0 -Stride 4,3 -Count 15,24 -Block 8,16
+            </screen>
+            <para>Internally, PSH5X creates a dataset reader object that does a partial read on the
+                dataset and returns the result to PowerShell as a two-dimensional array of an
+                appropriate native type. However, things take a different turn from here. The
+                    <literal>Get-Content</literal> cmdlet is a row- or stream-oriented interface
+                (imagine, you are fetching user objects from Active Directory) and PowerShell treats
+                our beautiful array as a shabby list of objects which it dutifully sends down the
+                PowerShell pipeline, one record at a time (by default). If you're processing the
+                data in a stream-oriented fashion then that may be exactly what you want. For
+                example, say you are looking for all elements (of a compound type) where the
+                    <literal>temperature</literal> member exceeds a certain value:</para>
+            <screen>
+$a = (Get-Content h5:/A/dest -Start 0,0 -Stride 4,3 -Count 15,24 -Block 8,16 `
+     | Where-Object {$_.temperature -gt 80})
+                </screen>
+            <para> In case you were looking for the original array created by the dataset reader,
+                it's gone for good. This is a stream-oriented interface after all.</para>
+            <para> The message is this: there is nothing in the PowerShell provider interface that
+                treats typed arrays with the dignity afforded to them by other interfaces such as
+                    <literal>NumPy</literal> []. Of course, I could implement additional cmdlets in
+                PSH5X that would do exactly that, but, in this first version, I've focused on
+                implementing the capabilities covered in the PowerShell provider interface
+                specification. </para>
+            <para>While writing the first version of this guide, Enthought [] produced a first
+                version of NumPy and SciPy for IronPython which may open the door for bringing
+                numarrays to PSH5X. Stay tuned for more... (Did I mention LINQ?)</para>
+        </sect2>
+
+
+        <sect2>
+            <title>Beyond Simple HDF5 Datatypes</title>
+            <para/>
+        </sect2>
+
+    </sect1>
 
 
 
