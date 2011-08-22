@@ -152,20 +152,31 @@ namespace PSH5X
         if (remaining > 0)
         {
             long long length = 0;
-            if (readCount > remaining) { length = remaining; }
-            else { length = readCount; }
+
+            if (readCount > remaining)
+            {
+                length = remaining;
+            }
+            else
+            {
+                if (readCount > 0)
+                {
+                    length = readCount;
+                }
+                else
+                {
+                    length = m_array->LongLength;
+                }
+            }
 
             result = gcnew array<String^>(length);
-    
-            long long pos = m_position;
-            for (long long i = 0; i < length; ++i)
-            {
-                result[i] = m_array[pos++];
-            }
+
+            Array::Copy((Array^) m_array, m_position, (Array^) result, (long long) 0, length);
 
             m_position += length;
         }
 
         return result;
+
     }
 }
