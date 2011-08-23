@@ -1,4 +1,5 @@
 
+#include "HDF5Exception.h"
 #include "ProviderUtils.h"
 
 extern "C" {
@@ -197,8 +198,11 @@ namespace PSH5X
 
     bool ProviderUtils::IsValidH5Path(hid_t loc, System::String^ h5path)
     {
-        char *path = NULL, *name = NULL;
+        bool result = true;
 
+        hid_t group = -1, peek = -1;
+
+        char *path = NULL, *name = NULL;
 
         if (!IsWellFormedH5Path(h5path)) { return false; }
 
@@ -229,22 +233,22 @@ namespace PSH5X
 
         if (linkNames->Length == 0) { return true; }
 
-        bool result = true;
-
-        hid_t group = -1, peek = -1;
-
-        String^ currentPath = ".";
-
-        bool doBreak = false;
-
-        for (int i = 0; i < linkNames->Length; ++i)
+        try
         {
-            path = (char*)(Marshal::StringToHGlobalAnsi(currentPath)).ToPointer();
-            name = (char*)(Marshal::StringToHGlobalAnsi(linkNames[i])).ToPointer();
+            String^ currentPath = ".";
 
-            group = H5Gopen2(loc, path, H5P_DEFAULT);
-            if (group >= 0)
+            bool doBreak = false;
+
+            for (int i = 0; i < linkNames->Length; ++i)
             {
+                path = (char*)(Marshal::StringToHGlobalAnsi(currentPath)).ToPointer();
+                name = (char*)(Marshal::StringToHGlobalAnsi(linkNames[i])).ToPointer();
+
+                group = H5Gopen2(loc, path, H5P_DEFAULT);
+                if (group < 0) {
+                    throw gcnew HDF5Exception("H5Gopen2 failed!");
+                }
+
                 if (H5Lexists(group, name, H5P_DEFAULT) > 0)
                 {
                     H5L_info_t info;
@@ -253,33 +257,33 @@ namespace PSH5X
                         if (info.type == H5L_TYPE_HARD)
                         {
                             peek = H5Oopen(group, name, H5P_DEFAULT);
-                            if (peek >= 0)
-                            {
-                                H5I_type_t t = H5Iget_type(peek);
-                                if ((t == H5I_GROUP || t == H5I_FILE)) {
-                                    currentPath += "/" + linkNames[i];
-                                }
-                                else if ((t == H5I_DATASET || t == H5I_DATATYPE)) {
-                                    if (i == linkNames->Length-1) {
-                                        result = true;
-                                    }
-                                    else {
-                                        result = false;
-                                    }
-                                    doBreak = true;
+                            if (peek < 0) {
+                                throw gcnew HDF5Exception("H5Oopen failed!");
+                            }
+
+
+                            H5I_type_t t = H5Iget_type(peek);
+                            if ((t == H5I_GROUP || t == H5I_FILE)) {
+                                currentPath += "/" + linkNames[i];
+                            }
+                            else if ((t == H5I_DATASET || t == H5I_DATATYPE)) {
+                                if (i == linkNames->Length-1) {
+                                    result = true;
                                 }
                                 else {
                                     result = false;
-                                    doBreak = true;
                                 }
-
-                                if (H5Oclose(peek) < 0) { // TODO
-                                }
+                                doBreak = true;
                             }
                             else {
                                 result = false;
                                 doBreak = true;
                             }
+
+                            if (H5Oclose(peek) < 0) {
+                                throw gcnew HDF5Exception("H5Oclose failed!");
+                            }
+                            peek = -1;
                         }
                         else if (info.type == H5L_TYPE_SOFT || info.type == H5L_TYPE_EXTERNAL) {
                             // the first time we encounter a symlink we tell it to stop
@@ -307,30 +311,36 @@ namespace PSH5X
                     doBreak = true;
                 }
 
-                if (H5Gclose(group) < 0) { // TODO
+                if (H5Gclose(group) < 0) {
+                    throw gcnew HDF5Exception("H5Gclose failed!");
+                }
+                group = -1;
+
+                Marshal::FreeHGlobal(IntPtr(path));
+                path = NULL;
+                Marshal::FreeHGlobal(IntPtr(name));
+                name = NULL;
+
+                if (doBreak) {
+                    break;
                 }
             }
-            else {
-                result = false;
-                break;
+        }
+        finally
+        {
+            if (path != NULL) {
+                Marshal::FreeHGlobal(IntPtr(path));
             }
 
-            if (doBreak) {
-                break;
+            if (name != NULL) {
+                Marshal::FreeHGlobal(IntPtr(name));
             }
-
-            Marshal::FreeHGlobal(IntPtr(path));
-            path = NULL;
-            Marshal::FreeHGlobal(IntPtr(name));
-            name = NULL;
-        }
-
-        if (path != NULL) {
-            Marshal::FreeHGlobal(IntPtr(path));
-        }
-
-        if (name != NULL) {
-            Marshal::FreeHGlobal(IntPtr(name));
+            if (group >= 0) {
+                H5Gclose(group);
+            }
+            if (peek >= 0) {
+                H5Oclose(peek);
+            }
         }
 
         return result;

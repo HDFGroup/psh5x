@@ -144,8 +144,13 @@ namespace PSH5X
                                 }
                             }
                             else {
-                                throw gcnew HDF5Exception("H5Oget_info failed!!!");
+                                throw gcnew HDF5Exception("H5Oget_info failed!");
                             }
+
+                            if (H5Oclose(oid) < 0) {
+                                throw gcnew HDF5Exception("H5Oclose failed!");
+                            }
+                            oid = -1;
 
 #pragma endregion
 

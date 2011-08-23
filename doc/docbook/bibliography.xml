@@ -14,11 +14,12 @@
     </publisher>
     <pubdate>December 2005</pubdate>
   </biblioentry>
-  
+
   <biblioentry xml:id="Enthought">
     <abbrev>Enthought</abbrev>
-    <title><link xlink:href="http://pytools.codeplex.com/wikipage?title=NumPy%20and%20SciPy%20for%20.Net"
-      >NumPy and SciPy for IronPython / .Net</link></title>
+    <title><link
+        xlink:href="http://pytools.codeplex.com/wikipage?title=NumPy%20and%20SciPy%20for%20.Net"
+        >NumPy and SciPy for IronPython / .Net</link></title>
     <publisher>
       <publishername>Enthought</publishername>
     </publisher>
@@ -27,15 +28,15 @@
 
   <biblioentry xml:id="h5py">
     <abbrev>h5py</abbrev>
-    <title><link xlink:href="http://code.google.com/p/h5py/">h5py</link></title>
-    <subtitle>A Python interface to the HDF5 library</subtitle>
+    <title><link xlink:href="http://h5py.alfven.org/">h5py</link></title>
+    <subtitle>HDF5 for Python</subtitle>
     <author>
       <personname>
         <firstname>Andrew</firstname>
         <surname>Colelette</surname>
       </personname>
     </author>
-    <pubdate>2011</pubdate>
+    <pubdate>2008</pubdate>
   </biblioentry>
 
   <biblioentry xml:id="HDF5_UG">
@@ -79,6 +80,17 @@
     <pubdate>2011</pubdate>
   </biblioentry>
 
+  <biblioentry xml:id="HDF5-Forum">
+    <abbrev>HDF-Forum</abbrev>
+    <title><link
+        xlink:href="http://hdf-forum.184993.n3.nabble.com/combining-several-datasets-to-make-one-large-dataset-td3265988.html"
+      >Combining several datasets to make one large dataset</link></title>
+    <publisher>
+      <publishername>HDF-Forum</publishername>
+    </publisher>
+    <pubdate>August 2011</pubdate>
+  </biblioentry>
+
   <biblioentry xml:id="HDFView">
     <abbrev>HDFView</abbrev>
     <title><link xlink:href="http://www.hdfgroup.org/hdf-java-html/hdfview/index.html"
@@ -103,7 +115,8 @@
 
   <biblioentry xml:id="NumPy">
     <abbrev>NumPy</abbrev>
-    <title><link xlink:href="http://numpy.scipy.org/">Scientific Computing Tools for Python &#x2014; NumPy</link></title>
+    <title><link xlink:href="http://numpy.scipy.org/">Scientific Computing Tools for Python &#x2014;
+        NumPy</link></title>
     <pubdate>2009</pubdate>
   </biblioentry>
 
