@@ -8,8 +8,8 @@
 
     <para> Below is a simple Python script which uses the h5py module to create a chunked,
         compressed dataset.
-        <programlisting><xi:include parse="text" href="examples/dataset.py"/></programlisting>
-        Here is a PowerShell script that performs the same task.
+        <programlisting><xi:include parse="text" href="examples/dataset.py"/></programlisting> Here
+        is a PowerShell script that performs the same task.
         <programlisting><xi:include parse="text" href="examples/dataset.ps1"/></programlisting>
     </para>
 
@@ -47,17 +47,19 @@
             skip it for now, but you should return after you've had some playtime and you are
             contemplating to use this interface for real. It's a <emphasis>must-read</emphasis> for
             experts. Don't waste your time only to find out later that a certain assumption or
-            requirement is an absolute showstopper for you. Read this! I told you so beforehand.</para>
+            requirement is an absolute showstopper for you. Read this! I told you so
+            beforehand.</para>
 
         <sect2>
             <title>Implementation</title>
-            <para>PSH5X is written in C++/CLI [] which allows for a unique blend of (.NET) managed
-                and unmanaged code. Since interoperability with other .NET languages is not a
-                requirement, calls into the native HDF5 C library can be made directly and there is no
-                need for P/Invoke [] or the HDF5DotNet wrapper []. With pinning pointers [], for the
-                simplest data types, one can almost forget about the simultaneous presence of
-                managed and unmanaged heaps, and copy operations between the two can be mostly
-                avoided. </para>
+            <para>PSH5X is written in C++/CLI <citation>CPPCLI</citation> which allows for a unique
+                blend of (.NET) managed and unmanaged code. Since interoperability with other .NET
+                languages is not a requirement, calls into the native HDF5 C library can be made
+                directly and there is no need for P/Invoke <citation>PInvoke</citation> or the
+                HDF5DotNet wrapper <citation>HDF5DotNet</citation>. With pinning pointers
+                    <citation>pin_ptr</citation>, for the simplest data types, one can almost forget
+                about the simultaneous presence of managed and unmanaged heaps, and copy operations
+                between the two can be mostly avoided. </para>
         </sect2>
 
         <sect2>
@@ -72,7 +74,7 @@
         <sect2>
             <title>Arrays in PowerShell</title>
             <para>The story of arrays in PowerShell is best summarized in the words of Bruce Payette
-                [PSBible].</para>
+                    <citation>PSBible</citation>.</para>
             <blockquote>
                 <para>Here's how array literals are defined in PowerShell:</para>
                 <para><emphasis>They're not. There's no array literal notation in
@@ -110,13 +112,14 @@
                 it's gone for good. This is a stream-oriented interface after all.</para>
             <para> The message is this: there is nothing in the PowerShell provider interface that
                 treats typed arrays with the dignity afforded to them by other interfaces such as
-                    <literal>NumPy</literal> []. Of course, I could implement additional cmdlets in
-                PSH5X that would do exactly that, but, in this first version, I've focused on
-                implementing the capabilities covered in the PowerShell provider interface
-                specification. </para>
-            <para>While writing the first version of this guide, Enthought [] produced a first
-                version of NumPy and SciPy for IronPython which may open the door for bringing
-                numarrays to PSH5X. Stay tuned for more... (Did I mention LINQ?)</para>
+                    <literal>NumPy</literal>
+                <citation>NumPy</citation>. Of course, I could implement additional cmdlets in PSH5X
+                that would do exactly that, but, in this first version, I've focused on implementing
+                the capabilities covered in the PowerShell provider interface specification. </para>
+            <para>While writing the first version of this guide, Enthought
+                    <citation>Enthought</citation> produced a first version of NumPy and SciPy for
+                IronPython which may open the door for bringing numarrays to PSH5X. Stay tuned for
+                more... (Did I mention LINQ?)</para>
         </sect2>
 
         <sect2>

@@ -4,7 +4,42 @@
 <bibliography xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink"
   version="5.0">
 
+  <biblioentry xml:id="CPPCLI">
+    <abbrev>CPPCLI</abbrev>
+    <title><link xlink:href="http://www.ecma-international.org/publications/standards/Ecma-372.htm"
+        >Standard ECMA-372</link></title>
+    <subtitle>C++/CLI Language Specification</subtitle>
+    <publisher>
+      <publishername>Ecma International</publishername>
+    </publisher>
+    <pubdate>December 2005</pubdate>
+  </biblioentry>
+  
+  <biblioentry xml:id="Enthought">
+    <abbrev>Enthought</abbrev>
+    <title><link xlink:href="http://pytools.codeplex.com/wikipage?title=NumPy%20and%20SciPy%20for%20.Net"
+      >NumPy and SciPy for IronPython / .Net</link></title>
+    <publisher>
+      <publishername>Enthought</publishername>
+    </publisher>
+    <pubdate>December 2011</pubdate>
+  </biblioentry>
+
+  <biblioentry xml:id="h5py">
+    <abbrev>h5py</abbrev>
+    <title><link xlink:href="http://code.google.com/p/h5py/">h5py</link></title>
+    <subtitle>A Python interface to the HDF5 library</subtitle>
+    <author>
+      <personname>
+        <firstname>Andrew</firstname>
+        <surname>Colelette</surname>
+      </personname>
+    </author>
+    <pubdate>2011</pubdate>
+  </biblioentry>
+
   <biblioentry xml:id="HDF5_UG">
+    <abbrev>HDF5_UG</abbrev>
     <title><link xlink:href="http://www.hdfgroup.org/HDF5/doc/UG/index.html">HDF5 User's
         Guide</link></title>
     <subtitle>HDF5 Release 1.8.7 </subtitle>
@@ -17,7 +52,8 @@
     <pubdate>May 2011</pubdate>
   </biblioentry>
 
-  <biblioentry xml:id="HDF_RM">
+  <biblioentry xml:id="HDF5_RM">
+    <abbrev>HDF5_RM</abbrev>
     <title><link xlink:href="http://www.hdfgroup.org/HDF5/doc/RM/RM_H5Front.html">HDF5: API
         Specification</link></title>
     <subtitle>Reference Manual</subtitle>
@@ -30,7 +66,79 @@
     <pubdate>May 2011</pubdate>
   </biblioentry>
 
+  <biblioentry xml:id="HDF5DotNet">
+    <abbrev>HDF5DotNet</abbrev>
+    <title><link xlink:href="http://hdf5.net/">HDF5DotNet</link></title>
+    <subtitle>C++/CLI Wrapper of the HDF5 Library</subtitle>
+    <publisher>
+      <publishername>The HDF Group</publishername>
+      <address>
+      <email>help@hdfgroup.org</email>
+    </address>
+    </publisher>
+    <pubdate>2011</pubdate>
+  </biblioentry>
+
+  <biblioentry xml:id="HDFView">
+    <abbrev>HDFView</abbrev>
+    <title><link xlink:href="http://www.hdfgroup.org/hdf-java-html/hdfview/index.html"
+        >HDFView</link></title>
+    <publisher>
+      <publishername>The HDF Group</publishername>
+      <address>
+      <email>help@hdfgroup.org</email>
+    </address>
+    </publisher>
+    <pubdate>February 2011</pubdate>
+  </biblioentry>
+
+  <biblioentry xml:id="IronPython">
+    <abbrev>IronPython</abbrev>
+    <title><link xlink:href="http://www.ironpython.net/">IronPython.net</link></title>
+    <publisher>
+      <publishername>IronPython Community</publishername>
+    </publisher>
+    <pubdate>2011</pubdate>
+  </biblioentry>
+
+  <biblioentry xml:id="NumPy">
+    <abbrev>NumPy</abbrev>
+    <title><link xlink:href="http://numpy.scipy.org/">Scientific Computing Tools for Python &#x2014; NumPy</link></title>
+    <pubdate>2009</pubdate>
+  </biblioentry>
+
+  <biblioentry xml:id="Pash">
+    <abbrev>Pash</abbrev>
+    <title><link xlink:href="http://pash.sourceforge.net/">igor.moochnik - Pash</link></title>
+    <pubdate>2008</pubdate>
+  </biblioentry>
+
+  <biblioentry xml:id="pin_ptr">
+    <abbrev>pin_ptr</abbrev>
+    <title><link xlink:href="http://www.codeproject.com/KB/books/CppCliInActionCh4Ex1.aspx">C++/CLI
+        in Action</link></title>
+    <subtitle>Using interior and pinning pointers</subtitle>
+    <author>
+      <personname>
+        <firstname>Nishant</firstname>
+        <surname>Sivakumar</surname>
+      </personname>
+    </author>
+    <pubdate>28 February 2007</pubdate>
+  </biblioentry>
+
+  <biblioentry xml:id="PInvoke">
+    <abbrev>PInvoke</abbrev>
+    <title><link xlink:href="http://en.wikipedia.org/wiki/Platform_Invocation_Services">Platform
+        Invocation Services</link></title>
+    <publisher>
+      <publishername>Wikipedia</publishername>
+    </publisher>
+    <pubdate>January 2011</pubdate>
+  </biblioentry>
+
   <biblioentry xml:id="PSBible">
+    <abbrev>PSBible</abbrev>
     <title>Windows Powershell in Action</title>
     <edition>Second Edition</edition>
     <author>
@@ -46,6 +154,7 @@
   </biblioentry>
 
   <biblioentry xml:id="PSProgramming">
+    <abbrev>PSProgramming</abbrev>
     <title>Windows PowerShell Programming</title>
     <subtitle>Snap-ins, Cmdlets, Hosts, and Providers</subtitle>
     <authorgroup>
@@ -94,6 +203,7 @@
   </biblioentry>
 
   <biblioentry xml:id="PSPractices">
+    <abbrev>PSPractices</abbrev>
     <title>Windows PowerShell 2.0</title>
     <subtitle>Best Practices</subtitle>
     <authorgroup>
@@ -111,6 +221,20 @@
       <publishername>Microsoft Press</publishername>
     </publisher>
     <pubdate>2010</pubdate>
+  </biblioentry>
+
+  <biblioentry xml:id="PyTables">
+    <abbrev>PyTables</abbrev>
+    <title>PyTables</title>
+    <subtitle><link xlink:href="http://www.pytables.org/moin">Getting the most *out* of your
+        data</link></subtitle>
+    <author>
+      <personname>
+        <firstname>Francesc</firstname>
+        <surname>Alted</surname>
+      </personname>
+    </author>
+    <pubdate>2011</pubdate>
   </biblioentry>
 
 </bibliography>

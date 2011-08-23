@@ -72,9 +72,7 @@ H5T_IEEE_F32BE                 {SignBitPos, MantBitPos, ExpBias, ByteOrder...}
 H5T_NATIVE_DOUBLE              {SignBitPos, MantBitPos, ExpBias, ByteOrder...}
 H5T_NATIVE_LDOUBLE             {SignBitPos, MantBitPos, ExpBias, ByteOrder...}
 H5T_IEEE_F32LE                 {SignBitPos, MantBitPos, ExpBias, ByteOrder...}
-H5T_NATIVE_FLOAT               {SignBitPos, MantBitPos, ExpBias, ByteOrder...}
-
- </screen>
+H5T_NATIVE_FLOAT               {SignBitPos, MantBitPos, ExpBias, ByteOrder...}</screen>
       </example>
 
       <example>
