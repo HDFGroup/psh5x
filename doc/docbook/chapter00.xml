@@ -12,13 +12,13 @@
         <programlisting><xi:include parse="text" href="examples/dataset.ps1"/></programlisting> Ok,
         now show me somthing that I haven't seen before. How about counting the number of groups and
         datasets in a file?</para>
-    <screen><prompt>PS:1 ></prompt><command> dir h5:\ -Recurse | % { switch($_.Itemtype) { 'Group' {$groups++} `
-'Dataset' {$datasets++} } }; "Groups: $groups - Datsets: $datasets"</command>
+    <screen><prompt>PS:1 ></prompt><command> dir h5:\ -Recurse -Filter dg | %{ switch($_.Itemtype) `
+{ 'Group' {$groups++} 'Dataset' {$datasets++} } }; `
+"Groups: $groups - Datsets: $datasets"</command>
 Groups: 100006 - Datsets: 50000 # Yikes!</screen>
     <para> How much data in an HDF5 file is stored in datasets vs. the total file size?
-        <screen><prompt>PS:1 ></prompt><command> dir h5:\ -Recurse | ? { $_.ItemType -eq 'Dataset' } | `
-% { $datasetBytes += $_.StorageSizeBytes }; `
-"In datasets: $datasetBytes - File: $((Get-PSDrive h5).FileSizeBytes)"</command>
+        <screen><prompt>PS:1 ></prompt><command> dir h5:\ -Recurse -Filter d | %{ $dsetBytes += $_.StorageSizeBytes }; `
+"In datasets: $dsetBytes - File: $((Get-PSDrive h5).FileSizeBytes)"</command>
 In datasets: 108000000 - File: 264069080</screen>
     </para>
 

@@ -5,6 +5,7 @@ namespace PSH5X
 {
 
     [System::Management::Automation::Provider::CmdletProvider("HDF5",
+        System::Management::Automation::Provider::ProviderCapabilities::Filter|
         System::Management::Automation::Provider::ProviderCapabilities::ShouldProcess)]
     public ref class Provider
         : System::Management::Automation::Provider::NavigationCmdletProvider,

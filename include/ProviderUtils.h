@@ -231,7 +231,6 @@ namespace PSH5X
 
 #pragma endregion
 
-
     private:
 
         static ProviderUtils();

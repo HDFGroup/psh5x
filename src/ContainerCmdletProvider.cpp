@@ -17,6 +17,7 @@ extern "C" {
 }
 
 using namespace System;
+using namespace System::Collections;
 using namespace System::Collections::Generic;
 using namespace System::Collections::ObjectModel;
 using namespace System::Management::Automation;
@@ -54,6 +55,77 @@ namespace PSH5X
 
         char *gpath = NULL, *link_name = NULL;
 
+#pragma region item type filter
+
+        Hashtable dropItem = gcnew Hashtable();
+        dropItem["D"] = false;
+        dropItem["EL"] = false;
+        dropItem["G"] = false;
+        dropItem["SL"] = false;
+        dropItem["T"] = false;
+
+        if (Filter != nullptr)
+        {
+            String^ s = String::Copy(Filter)->Trim()->ToUpper();
+
+            if (!s->StartsWith("-") && s->Contains("-")) {
+                throw gcnew PSH5XException("Invalid filter expression!");
+            }
+
+            if (s->StartsWith("-"))
+            {                
+                array<wchar_t>^ a = s->Substring(1)->ToCharArray();
+                for (int i = 0; i < a->Length; ++i)
+                {
+                    if (a[i] == 'D') {
+                        dropItem["D"] = true;
+                    }
+                    else if (a[i] == 'E') {
+                        dropItem["EL"] = true;
+                    }
+                    else if (a[i] == 'G') {
+                        dropItem["G"] = true;
+                    }
+                    else if (a[i] == 'S') {
+                        dropItem["SL"] = true;
+                    }
+                    else if (a[i] == 'T') {
+                        dropItem["T"] = true;
+                    }
+                }
+            }
+            else
+            {
+                dropItem["D"] = true;
+                dropItem["EL"] = true;
+                dropItem["G"] = true;
+                dropItem["SL"] = true;
+                dropItem["T"] = true;
+
+                array<wchar_t>^ a = s->ToCharArray();
+                for (int i = 0; i < a->Length; ++i)
+                {
+                    if (a[i] == 'D') {
+                        dropItem["D"] = false;
+                    }
+                    else if (a[i] == 'E') {
+                        dropItem["EL"] = false;
+                    }
+                    else if (a[i] == 'G') {
+                        dropItem["G"] = false;
+                    }
+                    else if (a[i] == 'S') {
+                        dropItem["SL"] = false;
+                    }
+                    else if (a[i] == 'T') {
+                        dropItem["T"] = false;
+                    }
+                }
+            }
+        }
+
+#pragma endregion
+
         try
         {
             DriveInfo^ drive = nullptr;
@@ -70,6 +142,7 @@ namespace PSH5X
             {
                 detailed = dynamicParameters["Detailed"]->IsSet;
             }
+            
 
             if (ProviderUtils::IsH5Group(drive->FileHandle, h5path))
             {
@@ -111,6 +184,10 @@ namespace PSH5X
                                 {
                                 case H5O_TYPE_GROUP:
                                     
+                                    if ((bool) dropItem["G"]) {
+                                        break;
+                                    }
+
                                     if (!detailed) {
                                         WriteItemObject(gcnew GroupInfoLite(oid), childPath,
                                             true);
@@ -121,6 +198,10 @@ namespace PSH5X
                                     break;
 
                                 case H5O_TYPE_DATASET:
+
+                                    if ((bool) dropItem["D"]) {
+                                        break;
+                                    }
 
                                     if (!detailed) {
                                         WriteItemObject(gcnew DatasetInfoLite(oid), childPath,
@@ -133,6 +214,10 @@ namespace PSH5X
                                     break;
 
                                 case H5O_TYPE_NAMED_DATATYPE:
+
+                                    if ((bool) dropItem["T"]) {
+                                        break;
+                                    }
 
                                     WriteItemObject(gcnew DatatypeInfo(oid), childPath, false);
                                     break;
@@ -157,24 +242,39 @@ namespace PSH5X
                             break;
 
                         case H5L_TYPE_SOFT:
+
+                            if ((bool) dropItem["SL"]) {
+                                break;
+                            }
+
                             WriteItemObject(gcnew LinkInfo(gid, linkName, "SoftLink"),
                                 childPath, false);
+                            
                             break;
 
                         case H5L_TYPE_EXTERNAL:
+                            
+                            if ((bool) dropItem["EL"]) {
+                                break;
+                            }
+
                             WriteItemObject(gcnew LinkInfo(gid, linkName, "ExtLink"),
                                 childPath, false);
+                            
                             break;
 
                         default:
 
-                            throw gcnew PSH5XException("Unable to determine the item type for this path!!!");
+                            throw gcnew PSH5XException("Unable to determine the item type for this path!");
                             break;
                         }
                     }
                     else {
                         throw gcnew HDF5Exception("H5Lget_info failed!!!");
                     }
+
+                    Marshal::FreeHGlobal(IntPtr(link_name));
+                    link_name = NULL;
                 }
             }
         }
@@ -208,13 +308,6 @@ namespace PSH5X
 
         RuntimeDefinedParameterDictionary^ dynamicParameters =
             gcnew RuntimeDefinedParameterDictionary();
-
-        Collection<Attribute^>^ atts = gcnew Collection<Attribute^>();
-        ParameterAttribute^ paramAttr = gcnew ParameterAttribute();
-        paramAttr->Mandatory = false;
-        atts->Add(paramAttr);
-        dynamicParameters->Add("ItemType",
-            gcnew RuntimeDefinedParameter("ItemType", String::typeid, atts));
 
         Collection<Attribute^>^ atts1 = gcnew Collection<Attribute^>();
         ParameterAttribute^ paramAttr1 = gcnew ParameterAttribute();
