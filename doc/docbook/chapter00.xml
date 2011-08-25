@@ -169,7 +169,7 @@ In datasets: 108000000 - File: 264069080</screen>
                 element dataset. Alltogether, this leads to thw following behavior: </para>
             <screen><prompt>PS:1 ></prompt><command>$a = Get-Content int:/DS1; $a.Count</command> 
 28
-<prompt>PS:2 ></prompt><command>$a = Get-Content int:/DS1 -ReadCount 2; $a.Count</command> 
+<prompt>PS:2 ></prompt><command>$a = Get-Content int:/DS1 -ReadCount 3; $a.Count</command> 
 10
 <prompt>PS:3 ></prompt><command>$a = Get-Content int:/DS1 -ReadCount 0; $a.Count</command> 
 28</screen>

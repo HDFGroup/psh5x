@@ -28,6 +28,8 @@ namespace PSH5X
 
         hid_t dset = -1, ftype = -1, ntype = -1, mtype = -1, base_type = -1, fspace = -1;
 
+        hssize_t npoints = -1;
+
         try
         {
             dset = H5Dopen2(h5file, name, H5P_DEFAULT);
@@ -40,7 +42,7 @@ namespace PSH5X
                 throw gcnew HDF5Exception("H5Dget_space failed!");
             }
 
-            hssize_t npoints = H5Sget_simple_extent_npoints(fspace);
+            npoints = H5Sget_simple_extent_npoints(fspace);
             if (npoints > 0)
             {
                 int rank = H5Sget_simple_extent_ndims(fspace);
@@ -59,7 +61,6 @@ namespace PSH5X
                 }
 
                 Type^ t = ProviderUtils::H5Type2DotNet(base_type);
-
                 if (t != nullptr)
                 {
                     m_type = ProviderUtils::GetArrayType(base_type);

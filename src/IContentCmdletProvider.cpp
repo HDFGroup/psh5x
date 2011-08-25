@@ -12,6 +12,7 @@
 #include "StringDatasetReader.h"
 #include "StringDatasetWriter.h"
 #include "VlenDatasetReader.h"
+#include "VlenDatasetWriter.h"
 
 extern "C" {
 #include "H5public.h"
@@ -387,12 +388,14 @@ namespace PSH5X
 
                 result = gcnew CompoundDatasetWriter(drive->FileHandle, h5path);
                 break;
+            */
 
             case H5T_VLEN:
 
                 result = gcnew VlenDatasetWriter(drive->FileHandle, h5path);
                 break;
 
+            /*
             case H5T_ARRAY:
 
                 result = gcnew ArrayDatasetWriter(drive->FileHandle, h5path);
