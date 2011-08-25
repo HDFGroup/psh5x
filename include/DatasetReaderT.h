@@ -1,5 +1,6 @@
 #pragma once
 
+#include "H5ArrayT.h"
 #include "HDF5Exception.h"
 #include "PSH5XException.h"
 
@@ -19,6 +20,7 @@ namespace PSH5X
     public:
 
         DatasetReaderT(hid_t h5file, System::String^ h5path)
+            : m_array(nullptr), m_ienum(nullptr), m_position(0)
         {
             char* name = (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
 
@@ -60,15 +62,24 @@ namespace PSH5X
                     hssize_t npoints = H5Sget_simple_extent_npoints(fspace);
                     if (npoints > 0)
                     {
-                        m_array = gcnew array<T>(npoints);
-                        pin_ptr<T> ptr = &m_array[0];
+                        int rank = H5Sget_simple_extent_ndims(fspace);
+                        array<hsize_t>^ dims = gcnew array<hsize_t>(rank);
+                        pin_ptr<hsize_t> dims_ptr = &dims[0];
+                        rank = H5Sget_simple_extent_dims(fspace, dims_ptr, NULL);
+
+                        H5Array<T>^ h5a = gcnew H5Array<T>(dims);
+                        m_array = h5a->GetArray();
+                        pin_ptr<T> ptr = h5a->GetHandle();
 
                         if (H5Dread(dset, ntype, H5S_ALL, H5S_ALL, H5P_DEFAULT, ptr) < 0) {
                             throw gcnew HDF5Exception("H5Dread failed!");
                         }
+
+                        m_ienum = m_array->GetEnumerator();
+                        m_ienum->MoveNext();
                     }
                     else {
-                        m_array = gcnew array<T>(0);
+                        m_array = nullptr;
                     }
                 }
                 else {
@@ -121,26 +132,33 @@ namespace PSH5X
             {
                 long long length = 0;
 
-                if (readCount > remaining)
-                {
+                if (readCount > remaining) {
                     length = remaining;
                 }
                 else
                 {
-                    if (readCount > 0)
-                    {
+                    if (readCount > 0) {
                         length = readCount;
                     }
-                    else
-                    {
-                        length = m_array->LongLength;
+                    else {
+                        // return the full array w/o copying
+                        m_position = m_array->LongLength;
+                        return m_array;
                     }
                 }
 
                 result = gcnew array<T>(length);
 
-                Array::Copy((Array^) m_array, m_position, (Array^) result, (long long) 0, length);
-                
+                // I have no idea how to efficiently copy a multidimensional array
+                // into a onedimensional array
+
+                IEnumerator^ ienum = m_array->GetEnumerator();
+
+                for (long long i = 0; i < length; ++i) {
+                    result[i] = safe_cast<T>(m_ienum->Current);
+                    m_ienum->MoveNext();
+                }
+
                 m_position += length;
             }
 
@@ -154,10 +172,12 @@ namespace PSH5X
 
     private:
 
-        array<T>^ m_array;
+        System::Array^ m_array;
+
+        System::Collections::IEnumerator^ m_ienum;
 
         long long m_position;
-        
+
     };
 
 }

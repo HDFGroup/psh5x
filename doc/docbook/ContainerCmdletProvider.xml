@@ -23,6 +23,8 @@
             <arg choice="req">-Path <replaceable>string[]</replaceable></arg>
             <arg choice="opt">-Name</arg>
             <arg choice="opt">-Recurse</arg>
+            <arg choice="opt">-Detailed</arg>
+            <arg choice="opt">-Filter [-][degst]</arg>
         </cmdsynopsis>
         <variablelist>
             <varlistentry>
@@ -50,13 +52,32 @@
                         and not when it points to items that do not have child items.</para>
                 </listitem>
             </varlistentry>
-        </variablelist>
-        <variablelist>
             <varlistentry>
-                <term><literal>-Path</literal></term>
+                <term>-Detailed</term>
                 <listitem>
-                    <para>Specifies a path to one or more locations. Wildcards are permitted. The
-                        default location is the current directory (.).</para>
+                    <para>Retrieve detailed information about each child item.</para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>-Filter</term>
+                <listitem>
+                    <para>This parameter can be used to specify a filter on the types of items to be
+                        retrieved or to be suppressed. <emphasis>Filters are more
+                            efficient</emphasis> than other parameters, because the provider applies
+                        them when retrieving the objects, rather than having Windows PowerShell
+                        filter the objects after they are retrieved.</para>
+                    <para>The PSH5X item filter either includes items of the types listed (e.g.,
+                        only groups and datasets) to the exclusion of all other item types, or it
+                        suppresses all items of types listed and includes all types not listed. The
+                        items type abbreviations are as follows: <simplelist>
+                            <member><literal>d</literal> - datasets</member>
+                            <member><literal>e</literal> - external links</member>
+                            <member><literal>g</literal> - groups</member>
+                            <member><literal>s</literal> - soft links</member>
+                            <member><literal>t</literal> - named datatypes</member>
+                        </simplelist> For example, <literal>-Filter g</literal> retrieves only
+                        groups to the exclusion of all other item types, and <literal>-Filter
+                            -dg</literal> suppresses all datasets and groups.</para>
                 </listitem>
             </varlistentry>
         </variablelist>
@@ -89,24 +110,7 @@ dset3                    Dataset    8/8/2011 4:05:00 PM    0</screen>
         <example>
             <title>Recursively getting the children of the PSDrive with root
                     <literal>h5tmp:\</literal></title>
-            <screen><prompt>PS:1 ></prompt> <command>Get-ChildItem h5tmp:\ -Recurse</command>
-
-   PSParentPath: HDF5\HDF5::h5tmp:
-
-LinkName                 ItemType   LastWriteTime          #Attr.
---------                 --------   -------------          ------
-dset1                    Dataset    8/8/2011 4:07:21 PM    0
-dset2                    Dataset    8/8/2011 4:05:00 PM    0
-dset3                    Dataset    8/8/2011 4:05:00 PM    0
-group1                   Group      1/1/1970 12:00:00 AM   0
-
-
-   PSParentPath: HDF5\HDF5::h5tmp:\group1
-
-LinkName                 ItemType   LastWriteTime          #Attr.
---------                 --------   -------------          ------
-dset3                    Dataset    8/8/2011 4:05:00 PM    0
-
+            <screen><prompt>PS:1 ></prompt> <command>Get-ChildItem h5tmp:\ -Recurse | Sort-Object PSParentPath</command>
 
    PSParentPath: HDF5\HDF5::h5tmp:
 
@@ -114,7 +118,51 @@ LinkName                 ItemType   LastWriteTime          #Attr.
 --------                 --------   -------------          ------
 group2                   Group      1/1/1970 12:00:00 AM   0
 slink1                   SoftLink
-type1                    Datatyp... 1/1/1970 12:00:00 AM   0</screen>
+type1                    Datatyp... 1/1/1970 12:00:00 AM   0
+group1                   Group      1/1/1970 12:00:00 AM   0
+dset2                    Dataset    8/24/2011 12:11:37 PM  0
+dset1                    Dataset    8/24/2011 12:11:37 PM  0
+dset3                    Dataset    8/24/2011 12:11:37 PM  0
+
+
+   PSParentPath: HDF5\HDF5::h5tmp:\group1
+
+LinkName                 ItemType   LastWriteTime          #Attr.
+--------                 --------   -------------          ------
+dset3                    Dataset    8/24/2011 12:11:37 PM  0</screen>
+        </example>
+        <example>
+            <title>Recursively getting the children of a PSDrive which are symbolic links or named
+                datatypes</title>
+            <screen><prompt>PS:1 ></prompt> <command>Get-ChildItem h5tmp:\ -Recurse -Filter st | Sort-Object PSParentPath</command>
+
+   PSParentPath: HDF5\HDF5::h5tmp:
+
+LinkName                 ItemType   LastWriteTime          #Attr.
+--------                 --------   -------------          ------
+type1                    Datatyp... 1/1/1970 12:00:00 AM   0
+slink1                   SoftLink</screen>
+        </example>
+        <example>
+            <title>Recursively getting the children of a PSDrive which are not symbolic links or
+                named datatypes</title>
+            <screen><prompt>PS:1 ></prompt> <command>Get-ChildItem h5tmp:\ -Recurse -Filter -st | Sort-Object PSParentPath</command>
+   PSParentPath: HDF5\HDF5::h5tmp:
+
+LinkName                 ItemType   LastWriteTime          #Attr.
+--------                 --------   -------------          ------
+group1                   Group      1/1/1970 12:00:00 AM   0
+group2                   Group      1/1/1970 12:00:00 AM   0
+dset3                    Dataset    8/24/2011 12:11:37 PM  0
+dset1                    Dataset    8/24/2011 12:11:37 PM  0
+dset2                    Dataset    8/24/2011 12:11:37 PM  0
+
+
+   PSParentPath: HDF5\HDF5::h5tmp:\group1
+
+LinkName                 ItemType   LastWriteTime          #Attr.
+--------                 --------   -------------          ------
+dset3                    Dataset    8/24/2011 12:11:37 PM  0</screen>
         </example>
     </sect2>
 
@@ -236,7 +284,7 @@ type1                    Datatyp... 1/1/1970 12:00:00 AM   0</screen>
                 </arg>
             </cmdsynopsis>
         </sect3>
-        
+
         <sect3>
             <title>HDF5 Soft Link</title>
             <para>No additional options need to be specified for creating a new HDF5 soft link. The

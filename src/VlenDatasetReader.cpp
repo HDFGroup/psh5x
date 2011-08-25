@@ -1,8 +1,9 @@
 
-#include "VlenDatasetReader.h"
+#include "ArrayUtils.h"
 #include "HDF5Exception.h"
 #include "ProviderUtils.h"
 #include "PSH5XException.h"
+#include "VlenDatasetReader.h"
 
 extern "C" {
 #include "H5Dpublic.h"
@@ -42,8 +43,11 @@ namespace PSH5X
             hssize_t npoints = H5Sget_simple_extent_npoints(fspace);
             if (npoints > 0)
             {
-                m_array = gcnew array<Array^>(npoints);
-
+                int rank = H5Sget_simple_extent_ndims(fspace);
+                array<hsize_t>^ dims = gcnew array<hsize_t>(rank);
+                pin_ptr<hsize_t> dims_ptr = &dims[0];
+                rank = H5Sget_simple_extent_dims(fspace, dims_ptr, NULL);
+                
                 ftype = H5Dget_type(dset);
                 if (ftype < 0) {
                     throw gcnew HDF5Exception("H5Dget_type failed!");
@@ -55,8 +59,12 @@ namespace PSH5X
                 }
 
                 Type^ t = ProviderUtils::H5Type2DotNet(base_type);
+
                 if (t != nullptr)
                 {
+                    m_type = ProviderUtils::GetArrayType(base_type);
+                    m_array = Array::CreateInstance(m_type, (array<long long>^) dims);
+
                     size_t size = H5Tget_size(base_type);
                     rdata = new hvl_t [npoints];
 
@@ -79,14 +87,20 @@ namespace PSH5X
                         throw gcnew HDF5Exception("H5Dread failed!");
                     }
 
-                    for (size_t i = 0; i < npoints; ++i)
+                    array<long long>^ index = gcnew array<long long>(rank);
+
+                    for (long long i = 0; i < npoints; ++i)
                     {
-                        m_array[i] = ProviderUtils::GetArray(rdata[i].p, rdata[i].len, base_type);
+                        index = ArrayUtils::GetIndex((array<long long>^)dims, i);
+                        m_array->SetValue(ProviderUtils::GetArray(rdata[i].p, rdata[i].len, base_type), index);
                     }
 
                     if (H5Dvlen_reclaim(mtype, fspace, H5P_DEFAULT, rdata) < 0) {
                         throw gcnew HDF5Exception("H5Dvlen_reclaim failed!");
                     }
+
+                    m_ienum = m_array->GetEnumerator();
+                    m_ienum->MoveNext();
                 }
                 else
                 {
@@ -95,7 +109,7 @@ namespace PSH5X
             }
             else
             {
-                m_array = gcnew array<Array^>(0);
+                m_array = nullptr;
             }
         }
         finally
@@ -129,7 +143,7 @@ namespace PSH5X
 
     IList^ VlenDatasetReader::Read(long long readCount)
     {
-        array<Object^>^ result = nullptr;
+        Array^ result = nullptr;
 
         long long remaining = m_array->LongLength - m_position;
         if (remaining > 0)
@@ -148,13 +162,20 @@ namespace PSH5X
                 }
                 else
                 {
-                    length = m_array->LongLength;
+                    // return the full array w/o copying
+                    m_position = m_array->LongLength;
+                    return m_array;
                 }
             }
 
-            result = gcnew array<Object^>(length);
+            result = Array::CreateInstance(m_type, length);
 
-            Array::Copy((Array^) m_array, m_position, (Array^) result, (long long) 0, length);
+            IEnumerator^ ienum = m_array->GetEnumerator();
+
+            for (long long i = 0; i < length; ++i) {
+                result->SetValue(m_ienum->Current, i);
+                m_ienum->MoveNext();
+            }
 
             m_position += length;
         }

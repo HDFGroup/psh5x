@@ -84,7 +84,7 @@
     <abbrev>HDF-Forum</abbrev>
     <title><link
         xlink:href="http://hdf-forum.184993.n3.nabble.com/combining-several-datasets-to-make-one-large-dataset-td3265988.html"
-      >Combining several datasets to make one large dataset</link></title>
+        >Combining several datasets to make one large dataset</link></title>
     <publisher>
       <publishername>HDF-Forum</publishername>
     </publisher>
@@ -166,6 +166,36 @@
     <pubdate>May 18, 2011</pubdate>
   </biblioentry>
 
+  <biblioentry xml:id="PSEmergency">
+    <abbrev>PSEmergency</abbrev>
+    <title><link
+        xlink:href="http://blogs.technet.com/b/heyscriptingguy/archive/2011/03/24/learn-powershell-live-with-scripting-guy-ed-wilson.aspx"
+        >Learn PowerShell Live with Scripting Guy Ed Wilson</link></title>
+    <pubdate>2011</pubdate>
+  </biblioentry>
+
+  <biblioentry xml:id="PSPractices">
+    <abbrev>PSPractices</abbrev>
+    <title>Windows PowerShell 2.0</title>
+    <subtitle>Best Practices</subtitle>
+    <authorgroup>
+      <author>
+        <personname>
+          <firstname>Ed</firstname>
+          <surname>Wilson</surname>
+        </personname>
+      </author>
+      <author>
+        <personname> Windows PowerShell Teams </personname>
+      </author>
+    </authorgroup>
+    <publisher>
+      <publishername>Microsoft Press</publishername>
+    </publisher>
+    <pubdate>2010</pubdate>
+  </biblioentry>
+
+
   <biblioentry xml:id="PSProgramming">
     <abbrev>PSProgramming</abbrev>
     <title>Windows PowerShell Programming</title>
@@ -215,26 +245,6 @@
     <pubdate> 2008 </pubdate>
   </biblioentry>
 
-  <biblioentry xml:id="PSPractices">
-    <abbrev>PSPractices</abbrev>
-    <title>Windows PowerShell 2.0</title>
-    <subtitle>Best Practices</subtitle>
-    <authorgroup>
-      <author>
-        <personname>
-          <firstname>Ed</firstname>
-          <surname>Wilson</surname>
-        </personname>
-      </author>
-      <author>
-        <personname> Windows PowerShell Teams </personname>
-      </author>
-    </authorgroup>
-    <publisher>
-      <publishername>Microsoft Press</publishername>
-    </publisher>
-    <pubdate>2010</pubdate>
-  </biblioentry>
 
   <biblioentry xml:id="PyTables">
     <abbrev>PyTables</abbrev>

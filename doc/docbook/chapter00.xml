@@ -10,41 +10,96 @@
         <programlisting><xi:include parse="text" href="examples/dataset.py"/></programlisting> Here
         is a PowerShell script that performs the same task.
         <programlisting><xi:include parse="text" href="examples/dataset.ps1"/></programlisting> Ok,
-        now show me somthing that I haven't seen before. How about counting the number of groups and
+        now show me somthing that I haven't seen before! How about counting the number of groups and
         datasets in a file?</para>
-    <screen><prompt>PS:1 ></prompt><command> dir h5:\ -Recurse -Filter dg | %{ switch($_.Itemtype) `
+    <screen><prompt>PS:1 ></prompt><command> dir h5:\ -Recurse -Filter dg | %{ switch($_.ItemType) `
 { 'Group' {$groups++} 'Dataset' {$datasets++} } }; `
 "Groups: $groups - Datsets: $datasets"</command>
 Groups: 100006 - Datsets: 50000 # Yikes!</screen>
-    <para> How much data in an HDF5 file is stored in datasets vs. the total file size?
+    <para><literal>dir</literal> is just an alias for PowerShell's <literal>Get-ChildItem</literal>
+        cmdlet. It is done in a recursive fashion and we inform the provider (via the filter
+        expression) that we are interested in datasets and groups only. As it finds them, the
+        provider sends all dataset and group items down the PowerShell pipeline where a head count
+        is taken for each item type.</para>
+    <para>Here's a variation on that theme: How much data in an HDF5 file is stored in datasets vs.
+        the total file size?
         <screen><prompt>PS:1 ></prompt><command> dir h5:\ -Recurse -Filter d | %{ $dsetBytes += $_.StorageSizeBytes }; `
 "In datasets: $dsetBytes - File: $((Get-PSDrive h5).FileSizeBytes)"</command>
 In datasets: 108000000 - File: 264069080</screen>
-    </para>
+        The filter really helps to speed this up. PowerShell users know that they can use the
+            <literal>-Include</literal> and <literal>-Exclude</literal> parameters to filter objects
+        in the pipeline (e.g., files whose name starts with an 'a'). The problem is that they
+        operate on objects that are in the pipeline already and the provider wasted time and
+        resources to put them there. For example, when the PSH5X provider creates an object
+        representing an HDF5 dataset, it parses its HDF5 datatype, reads its dimensional layout,
+        reads its HDF5 attributes etc. Unlike <literal>-Include</literal> and
+            <literal>-Exclude</literal>, the provider sees the <literal>-Filter</literal> argument
+        before creating and sending any objects to the pipeline. It doesn't create them to begin
+        with, if they aren't needed.</para>
 
-    <variablelist>
-        <varlistentry>
-            <term><literal>-WhatIf</literal></term>
-            <listitem>
-                <para/>
-            </listitem>
-        </varlistentry>
-        <varlistentry>
-            <term><literal>-Confirm</literal></term>
-            <listitem>
-                <para/>
-            </listitem>
-        </varlistentry>
-    </variablelist>
-
-    <note>
+    <sect1>
+        <title>What You Can('t) Expect from this Guide</title>
         <para>This guide is not an introduction to Windows PowerShell. Excellent introductions are
-            available in print <citation/> and online <citation/>. </para>
-    </note>
+            available in print <citation>PSBible</citation>, <citation>PSPractices</citation> and
+            online <citation>PSEmergency</citation>. If you can answer the following questions
+            correctly, you are well on your way: </para>
+        <itemizedlist>
+            <listitem>
+                <para>How do I get help?</para>
+            </listitem>
+            <listitem>
+                <para>Is PowerShell case-sensitive?</para>
+            </listitem>
+            <listitem>
+                <para>What's that <literal>-WhatIf</literal> switch?</para>
+            </listitem>
+            <listitem>
+                <para>I like the <literal>Do-It</literal> cmdlet, but it has that
+                        <literal>-VeryLongParameterName</literal> parameter. Do I really have to
+                    type that all the time?</para>
+            </listitem>
+            <listitem>
+                <para>Is an alias an alien?</para>
+            </listitem>
+            <listitem>
+                <para>How do I find out what members an object has?</para>
+            </listitem>
+            <listitem>
+                <para>What's in your pipeline?</para>
+            </listitem>
+        </itemizedlist>
+        <para>If you know whether the PowerShell pipeline is multithreaded, you are overqualified
+            and should consider doing something useful with your life. (Just kidding...)</para>
+        <para> This guide is an introduction to a PowerShell extension for accessing and
+            manipulating HDF5 files. In <xref linkend="what_is_psh5x"/>, an overview of PowerShell
+            providers in general and PSH5X in particular is given. <xref linkend="psh5x_layers"/>,
+            is the heart of this guide. It decribes in detail the different provider layers and what
+            functionality and/or which cmdlets they support. Strictly speaking, there is no logical
+            reason to present it in a layered fashion. Why would an end-user care about the guts of
+            an implementation? Consider it either a bonus, in case you are thinking about
+            implementing your own provider, or as an aid that may help you understand the 'Why?'. </para>
+        <para><xref linkend="other_psh5x_cmdlets"/>, is devoted to cmdlets that are not governed by
+            the provider interfaces, but that we found useful to have around, for example, looking
+            up information about built-in HDF5 datatypes.</para>
+        <para> Released in July of 2009, PowerShell version 2.0, brought a raft of new features. Two
+            of the more interesting ones, <emphasis>modules</emphasis> and
+                <emphasis>remoting</emphasis> (see <citation>PSBible</citation> or
+                <citation>PSPractices</citation>), are not covered in this guide, although they
+            would greatly enhance the capabilities of PSH5X. (There's also PowerShell
+                <emphasis>eventing</emphasis> in case you've used HDF5 packet tables.
+                <citation>PSBible</citation>) I can imagine a nice PowerShell module which would
+            wrap the generic PSH5X provider cmdlets and make them appear more HDF5 specific. (This
+            is better done in a module rather than using aliases.) Would you like to interact with
+            remote HDF5 files/stores in PowerShell? Enter PowerShell remoting... </para>
+        <para>Before diving into PSH5X, I would like to say a few words about the inner workings and
+            compromises made in the current implementation.</para>
+
+    </sect1>
 
     <sect1>
         <title>Buyers Beware</title>
         <subtitle>Caveats and Considerations</subtitle>
+
         <para>It shouldn't come as a big surprise that PowerShell was not invented and introduced by
             Microsoft with the goal to give Windows users the most convenient access to HDF5 files.
             The Powershell provider interface represents a general model for interacting with data
@@ -54,10 +109,10 @@ In datasets: 108000000 - File: 264069080</screen>
             like to describe the areas where the match is not ideal. There are a few forward
             references in the discussion that may make it less accessible to novice users. You may
             skip it for now, but you should return after you've had some playtime and you are
-            contemplating to use this interface for real. It's a <emphasis>must-read</emphasis> for
-            experts. Don't waste your time only to find out later that a certain assumption or
-            requirement is an absolute showstopper for you. Read this! I told you so
-            beforehand.</para>
+            contemplating to use this interface to get some real work done. It's a
+                <emphasis>must-read</emphasis> for experts. Don't waste your time only to find out
+            later that a certain assumption or requirement is an absolute showstopper for you. Read
+            on! I told you so beforehand.</para>
 
         <sect2>
             <title>Implementation</title>

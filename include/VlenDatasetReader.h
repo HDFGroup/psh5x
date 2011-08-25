@@ -43,7 +43,13 @@ namespace PSH5X
 
     private:
 
-        array<System::Array^>^ m_array;
+        //array<System::Array^>^ m_array;
+
+        System::Array^ m_array;
+
+        System::Type^ m_type;
+
+        System::Collections::IEnumerator^ m_ienum;
 
         long long m_position;
         

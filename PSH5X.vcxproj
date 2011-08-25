@@ -145,6 +145,7 @@
   <ItemGroup>
     <ClInclude Include="include\ArrayDatasetReader.h" />
     <ClInclude Include="include\ArrayDatasetWriter.h" />
+    <ClInclude Include="include\ArrayUtils.h" />
     <ClInclude Include="include\AttributeInfo.h" />
     <ClInclude Include="include\CompoundDatasetReader.h" />
     <ClInclude Include="include\CompoundDatasetWriter.h" />
@@ -159,6 +160,7 @@
     <ClInclude Include="include\DriveInfo.h" />
     <ClInclude Include="include\GroupInfo.h" />
     <ClInclude Include="include\GroupInfoLite.h" />
+    <ClInclude Include="include\H5ArrayT.h" />
     <ClInclude Include="include\HDF5Exception.h" />
     <ClInclude Include="include\ItemInfo.h" />
     <ClInclude Include="include\LinkInfo.h" />

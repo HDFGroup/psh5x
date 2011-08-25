@@ -33,7 +33,7 @@ namespace PSH5X
             array<unsigned char>^ tmp = gcnew array<unsigned char>(size);
 
             H5T_class_t cls = H5Tget_class(type_id);
-            
+
             switch (cls)
             {
             case H5T_INTEGER:
@@ -255,6 +255,158 @@ namespace PSH5X
                         a[i] = BitConverter::ToUInt64(tmp, 0);
                     }
                     result = a;
+                }
+                else
+                {
+                    throw gcnew PSH5XException("Unknown bitfield type!");
+                }
+
+#pragma endregion
+
+                break;
+
+            default:
+
+                throw gcnew PSH5XException("Unsupported datatype class!");
+                break;
+            }
+
+
+        }
+        finally
+        {
+            if (ntype >= 0) {
+                H5Tclose(ntype);
+            }
+        }
+
+        return result;
+    }
+
+    Type^ ProviderUtils::GetArrayType(hid_t type_id)
+    {
+        Type^ result = nullptr;
+
+        hid_t ntype = -1;
+
+        htri_t is_vlen = -1;
+
+        try
+        {
+            size_t size = H5Tget_size(type_id);
+
+            H5T_class_t cls = H5Tget_class(type_id);
+
+            switch (cls)
+            {
+            case H5T_INTEGER:
+
+#pragma region HDF5 integer
+
+                ntype = H5Tget_native_type(type_id, H5T_DIR_ASCEND);
+                if (ntype < 0) {
+                    throw gcnew HDF5Exception("H5Tget_native_type failed!");
+                }
+
+                if (H5Tequal(ntype, H5T_NATIVE_CHAR) > 0) {
+                    result = array<char>::typeid;
+                }
+                else if (H5Tequal(ntype, H5T_NATIVE_SHORT) > 0) {
+                    result = array<short>::typeid;
+                }
+                else if (H5Tequal(ntype, H5T_NATIVE_INT) > 0) {
+                    result = array<int>::typeid;
+                }
+                else if (H5Tequal(ntype, H5T_NATIVE_LONG) > 0) {
+                    result = array<int>::typeid;
+                }
+                else if (H5Tequal(ntype, H5T_NATIVE_LLONG) > 0) {
+                    result = array<long long>::typeid;
+                }
+                else if (H5Tequal(ntype, H5T_NATIVE_UCHAR) > 0) {
+                    result = array<unsigned char>::typeid;
+                }
+                else if (H5Tequal(ntype, H5T_NATIVE_USHORT) > 0) {
+                    result = array<unsigned short>::typeid;
+                }
+                else if (H5Tequal(ntype, H5T_NATIVE_UINT) > 0) {
+                    result = array<unsigned int>::typeid;
+                }
+                else if (H5Tequal(ntype, H5T_NATIVE_ULONG) > 0) {
+                    result = array<unsigned int>::typeid;
+                }
+                else if (H5Tequal(ntype, H5T_NATIVE_ULLONG) > 0) {
+                    result = array<unsigned long long>::typeid;
+                }
+                else {
+                    throw gcnew PSH5XException("Unknown integer type!");
+                }
+
+#pragma endregion
+
+                break;
+
+            case H5T_FLOAT:
+
+#pragma region HDF5 float
+
+                ntype = H5Tget_native_type(type_id, H5T_DIR_ASCEND);
+                if (ntype < 0) {
+                    throw gcnew HDF5Exception("H5Tget_native_type failed!");
+                }
+
+                if (H5Tequal(ntype, H5T_NATIVE_FLOAT) > 0) {
+                    result = array<float>::typeid;
+                }
+                else if (H5Tequal(ntype, H5T_NATIVE_DOUBLE) > 0) {
+                    result = array<double>::typeid;
+                }
+                else if (H5Tequal(ntype, H5T_NATIVE_LDOUBLE) > 0)
+                {
+                    result = array<double>::typeid;
+                }
+                else {
+                    throw gcnew PSH5XException("Unknown float type!");
+                }
+
+#pragma endregion
+
+                break;
+
+
+            case H5T_STRING:
+
+#pragma region HDF5 string
+
+                if (true)
+                {
+                    result = array<String^>::typeid;
+                }
+
+#pragma endregion
+
+                break;
+
+            case H5T_BITFIELD:
+
+#pragma region HDF5 bitfield
+
+                ntype = H5Tget_native_type(type_id, H5T_DIR_DESCEND);
+                if (ntype < 0) {
+                    throw gcnew HDF5Exception("H5Tget_native_type failed!");
+                }
+
+                if (H5Tequal(ntype, H5T_NATIVE_B8) > 0) {
+                    result = array<unsigned char>::typeid;
+                }
+                else if (H5Tequal(ntype, H5T_NATIVE_B16) > 0) {
+                    result = array<unsigned short>::typeid;
+                }
+                else if (H5Tequal(ntype, H5T_NATIVE_B32) > 0) {
+                    result = array<unsigned int>::typeid;
+                }
+                else if (H5Tequal(ntype, H5T_NATIVE_B64) > 0) {
+                    result = array<unsigned long long>::typeid;
                 }
                 else
                 {
