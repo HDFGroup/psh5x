@@ -1,4 +1,5 @@
 
+#include "ArrayUtils.h"
 #include "CompoundDatasetReader.h"
 #include "HDF5Exception.h"
 #include "ProviderUtils.h"
@@ -58,6 +59,11 @@ namespace PSH5X
             hssize_t npoints = H5Sget_simple_extent_npoints(fspace);
             if (npoints > 0)
             {
+                int rank = H5Sget_simple_extent_ndims(fspace);
+                array<hsize_t>^ dims = gcnew array<hsize_t>(rank);
+                pin_ptr<hsize_t> dims_ptr = &dims[0];
+                rank = H5Sget_simple_extent_dims(fspace, dims_ptr, NULL);
+
                 memtype = H5Tcreate(H5T_COMPOUND, size);
                 if (memtype < 0) {
                     throw gcnew HDF5Exception("H5Tcreate failed!");
@@ -144,11 +150,13 @@ namespace PSH5X
                     throw gcnew HDF5Exception("H5Dread failed!");
                 }
 
-                m_array = gcnew array<Object^>(npoints);
+                m_array = Array::CreateInstance(m_type, (array<long long>^) dims);
 
                 array<Object^>^ args = gcnew array<Object^>(mcount);
                 
                 array<unsigned char>^ row = gcnew array<unsigned char>(size);
+
+                array<long long>^ index = gcnew array<long long>(rank);
 
                 for (long long i = 0; i < npoints; ++i)
                 {
@@ -188,12 +196,16 @@ namespace PSH5X
                         }
                     }
 
-                    m_array->SetValue(cinfo[1]->Invoke(args), i);
+                    index = ArrayUtils::GetIndex((array<long long>^)dims, i);
+                    m_array->SetValue(cinfo[1]->Invoke(args), index);
                 }
+
+                m_ienum = m_array->GetEnumerator();
+                m_ienum->MoveNext();
             }
             else
             {
-                m_array = gcnew array<Object^>(0);
+                m_array = nullptr;
             }
         }
         finally
@@ -227,32 +239,34 @@ namespace PSH5X
 
     IList^ CompoundDatasetReader::Read(long long readCount)
     {
-        array<Object^>^ result = nullptr;
+        Array^ result = nullptr;
 
         long long remaining = m_array->LongLength - m_position;
         if (remaining > 0)
         {
             long long length = 0;
 
-            if (readCount > remaining)
-            {
+            if (readCount > remaining) {
                 length = remaining;
             }
             else
             {
-                if (readCount > 0)
-                {
+                if (readCount > 0) {
                     length = readCount;
                 }
-                else
-                {
-                    length = m_array->LongLength;
+                else {
+                    // return the full array w/o copying
+                    m_position = m_array->LongLength;
+                    return m_array;
                 }
             }
 
-            result = gcnew array<Object^>(length);
+            result = Array::CreateInstance(m_type, length);
 
-            Array::Copy((Array^) m_array, m_position, (Array^) result, (long long) 0, length);
+            for (long long i = 0; i < length; ++i) {
+                result->SetValue(m_ienum->Current, i);
+                m_ienum->MoveNext();
+            }
 
             m_position += length;
         }

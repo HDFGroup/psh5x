@@ -44,7 +44,9 @@ namespace PSH5X
 
     private:
 
-        array<System::String^>^ m_array;
+        System::Array^ m_array;
+
+        System::Collections::IEnumerator^ m_ienum;
 
         long long m_position;
         

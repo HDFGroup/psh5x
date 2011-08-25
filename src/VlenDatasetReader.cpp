@@ -88,7 +88,6 @@ namespace PSH5X
                     }
 
                     array<long long>^ index = gcnew array<long long>(rank);
-
                     for (long long i = 0; i < npoints; ++i)
                     {
                         index = ArrayUtils::GetIndex((array<long long>^)dims, i);
@@ -150,18 +149,15 @@ namespace PSH5X
         {
             long long length = 0;
 
-            if (readCount > remaining)
-            {
+            if (readCount > remaining) {
                 length = remaining;
             }
             else
             {
-                if (readCount > 0)
-                {
+                if (readCount > 0) {
                     length = readCount;
                 }
-                else
-                {
+                else {
                     // return the full array w/o copying
                     m_position = m_array->LongLength;
                     return m_array;
@@ -169,8 +165,6 @@ namespace PSH5X
             }
 
             result = Array::CreateInstance(m_type, length);
-
-            IEnumerator^ ienum = m_array->GetEnumerator();
 
             for (long long i = 0; i < length; ++i) {
                 result->SetValue(m_ienum->Current, i);

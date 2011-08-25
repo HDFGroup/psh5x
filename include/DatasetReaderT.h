@@ -152,8 +152,6 @@ namespace PSH5X
                 // I have no idea how to efficiently copy a multidimensional array
                 // into a onedimensional array
 
-                IEnumerator^ ienum = m_array->GetEnumerator();
-
                 for (long long i = 0; i < length; ++i) {
                     result[i] = safe_cast<T>(m_ienum->Current);
                     m_ienum->MoveNext();
