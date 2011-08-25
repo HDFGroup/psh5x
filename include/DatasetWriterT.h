@@ -36,8 +36,6 @@ namespace PSH5X
 
         virtual System::Collections::IList^ Write(System::Collections::IList^ content)
         {
-            System::Exception^ ex = nullptr;
-
             char* name = (char*)(Marshal::StringToHGlobalAnsi(m_h5path)).ToPointer();
 
             hid_t dset = -1, fspace = -1, ftype = -1, ntype = -1;

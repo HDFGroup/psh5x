@@ -245,6 +245,16 @@
     <pubdate> 2008 </pubdate>
   </biblioentry>
 
+  <biblioentry xml:id="PythonArray">
+    <abbrev>PythonArray</abbrev>
+    <title><literal>array</literal></title>
+    <subtitle><link xlink:href="http://docs.python.org/library/array.html">Efficient arrays of
+        numeric values</link></subtitle>
+    <publisher>
+      <publishername>Python v2.7.2 documentation</publishername>
+    </publisher>
+    <pubdate>2011</pubdate>
+  </biblioentry>
 
   <biblioentry xml:id="PyTables">
     <abbrev>PyTables</abbrev>

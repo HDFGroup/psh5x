@@ -14,7 +14,7 @@ namespace PSH5X
     {
     public:
 
-        StringDatasetWriter(hid_t h5file, System::String^ h5path) {}
+        StringDatasetWriter(hid_t h5file, System::String^ h5path);
 
         /*
         DatasetWriter(hid_t h5file, System::String^ h5path,
@@ -30,8 +30,7 @@ namespace PSH5X
 
         virtual void Close() {}
 
-        virtual System::Collections::IList^ Write(
-            System::Collections::IList^ content) { return nullptr; }
+        virtual System::Collections::IList^ Write(System::Collections::IList^ content);
 
         virtual void Seek(long long offset, System::IO::SeekOrigin origin)
         {
