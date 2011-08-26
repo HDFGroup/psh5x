@@ -56,6 +56,8 @@ namespace PSH5X
             DriveInfo^ drive = gcnew DriveInfo(tmpFile, false, info, false);
             coll->Add(drive);
             Environment::SetEnvironmentVariable("PSH5XTmpFile", tmpFile);
+
+            ProviderInfo->Home = "h5tmp:\\";
         }
         finally
         {

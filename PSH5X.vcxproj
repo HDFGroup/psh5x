@@ -140,6 +140,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>

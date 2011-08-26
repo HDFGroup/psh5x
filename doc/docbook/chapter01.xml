@@ -99,18 +99,62 @@
 
   <sect1>
     <title>A Collection of Windows PowerShell Cmdlets</title>
-    <para>PSH5X also includes a set of utility cmdlets, for example, to look up type information
-    or to construct an array of a certain element type.</para>
+    <para>PSH5X also includes a set of utility cmdlets, for example, to look up HDF5 datatype
+      information or to construct .NET arrays of a certain element type. These cmdlets are not
+      governed by the PowerShell provider interface. See <xref linkend="other_psh5x_cmdlets"/>, for
+      an overview. </para>
+    <para> </para>
   </sect1>
 
-  <sect1>
+  <sect1 xml:id="pathology">
     <title>Path-ology</title>
-    <para>Providers use paths to locate items in a data source.</para>
-  </sect1>
+    <para>Usually, we access an HDF5 item in two steps: we locate (and open) the HDF5 file that
+      contains the item and then use a magic token, an HDF5 path name, to refer to it. In a similar
+      vein, paths or path names are used to locate items in data stores managed by a PowerShell
+      provider. PSH5X eliminates the 'HDF5 file open' part from the process by presenting HDF5 files
+      as drives. Type <literal>Get-PSDrive</literal> in a PowerShell console and you'll recognize a
+      few familiar faces.</para>
+    <screen><prompt>PS:1 ></prompt><command>Get-PSDrive</command>
 
-  <sect1>
-    <title>Conventions</title>
-    <para/>
+Name           Used (GB)     Free (GB) Provider      Root
+----           ---------     --------- --------      ----
+Alias                                  Alias
+C                 125.32        172.67 FileSystem    C:\
+cert                                   Certificate   \
+D                    .23           .51 FileSystem    D:\
+E                  48.32         10.53 FileSystem    E:\
+Env                                    Environment
+F                   7.20               FileSystem    F:\
+Function                               Function
+G                  13.23          1.60 FileSystem    G:\
+H                                      FileSystem    H:\
+h5tmp                                  HDF5          h5tmp:\
+HKCU                                   Registry      HKEY_CURRENT_USER
+HKLM                                   Registry      HKEY_LOCAL_MACHINE
+Variable                               Variable
+WSMan                                  WSMan</screen>
+    <para> A drive managed by PSH5X represents an open HDF5 file (you can even <literal>cd</literal>
+      into it) and, given the drive name, we can use HDF5 path names to refer to HDF5 items. This is
+      what PowerShell calls a <emphasis>drive-qualified</emphasis> path. For example, let's say we
+      have an HDF5 file stored at <literal>C:\home\file.h5</literal> mapped as a PowerShell drive
+      called <literal>h5</literal>. <literal>h5:/group1</literal> would be a drive-qualified path
+      referring to the HDF5 group linked as <literal>/group1</literal> in
+        <literal>C:\home\file.h5</literal>. PowerShell providers support forward slashes ('/') and
+      backslashes ('\') as path separators. For PSH5X,
+      <simplelist>
+        <member><literal>h5:/group1/group2/dset3</literal></member>
+        <member><literal>h5:\group1/group2\dset3</literal></member>
+        <member><literal>h5:\group1\group2\dset3</literal></member>
+      </simplelist>
+      are all equivalent.</para>
+    <warning>
+      <para>PSH5X treats forward slashes ('/') and backslashes ('\') as equivalent path separators.
+        Although HDF5 allows it, in PSH5X, you won't be able to create link names containing
+        backslashes. Moreover, you cannot refer to an HDF5 item with a path name that contains link
+        names that contain backslashes.</para>
+    </warning>
+    
+    
   </sect1>
 
 </chapter>

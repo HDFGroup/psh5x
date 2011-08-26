@@ -77,7 +77,7 @@ namespace PSH5X
         {
             throw gcnew PSH5XException("Ill-formed HDF5 path name and/or unable to obtain drive name!");
         }
-
+        
         return ProviderUtils::IsValidH5Path(drive->FileHandle, h5path);
     }
 

@@ -23,17 +23,26 @@ namespace PSH5X
 {
     DriveInfo^ ProviderUtils::GetDriveFromPath(String^ path, ProviderInfo^ provider)
     {
-        // two formats possible
+        DriveInfo^ result = nullptr;
+
+        // three formats possible?
         // provider::drive:\path
         // drive:\path
+        // //drive/path
         array<String^>^ paths = path->Split(ProviderUtils::DriveSeparator, 2);
-        String^ drivepath = paths[0];
-        for each (System::Management::Automation::PSDriveInfo^ drive in provider->Drives)
+
+        if (paths->Length > 0)
         {
-            if (drive->Name == drivepath)
-                return (DriveInfo^) drive;
+            String^ drivepath = paths[0];
+            for each (System::Management::Automation::PSDriveInfo^ drive in provider->Drives)
+            {
+                if (drive->Name == drivepath) {
+                    result = (DriveInfo^) drive;
+                }
+            }
         }
-        return nullptr;
+
+        return result;
     }
 
     // TODO: This is not quite right. A well-formed HDF5 path may contain back slashes,
