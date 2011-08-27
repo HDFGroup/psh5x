@@ -11,14 +11,14 @@
     the advent of tools such as HDFView <citation>HDFView</citation>, various command line tools,
     Francesc Alted's PyTables <citation>PyTables</citation>, and Andrew Collette's h5py module
       <citation>h5py</citation>. The user experience offered by these tools is consistent across
-    platforms and aligns with the operating system-agnostic character of HDF5. On the extremes,
-    purists may argue that this kind of agnosticism must be maintained unconditionally, and cynics
-    may argue that all this attitude achieves is a perpetuation of a least common denominator. </para>
+    platforms and aligns with the system-agnostic character of HDF5. On the extremes, purists may
+    argue that this kind of agnosticism must be maintained unconditionally, and cynics may argue
+    that all this attitude achieves is a perpetuation of a least common denominator. </para>
   <para>The user interface for HDF5 proposed in this document is not about an ideological debate. It
     recognizes that a profound change of the Windows user-interface took place in 2006 with the
     arrival of Windows PowerShell version 1. The PowerShell provider architecture (see <xref
       xlink:href="#windows_powershell_providers"/>) is a blueprint for and an invitation to an HDF5
-    shell experience that may help make easy things easy for HDF5 users on Windows.<footnote>
+    shell experience that may help make easy things easy for users of HDF5 on Windows.<footnote>
       <para>At least that's the impression that I had ever since I first saw it during the Monad
         beta program. In 2007/8, I wrote a first PSH5X prototype which, because of other
         professional committments, never saw the light of day.</para>
@@ -44,6 +44,20 @@
   </blockquote>
   <para>Platform independence aside, choosing the right tool for the HDF5 job on Windows has just
     gotten more complicated. Welcome to PSH5X!</para>
+
+  <sect1 xml:id="disclaimer">
+    <title>Disclaimer</title>
+
+    <para> No liability for the contents of this document can be accepted. Use the concepts,
+      examples and information at your own risk. There may be errors and inaccuracies, that could be
+      damaging to your system. Proceed with caution, and although this is highly unlikely, the
+      author(s) do not take any responsibility. </para>
+
+    <para> All copyrights are held by their by their respective owners, unless specifically noted
+      otherwise. Use of a term in this document should not be regarded as affecting the validity of
+      any trademark or service mark. Naming of particular products or brands should not be seen as
+      endorsements. </para>
+  </sect1>
 
 
 </preface>

@@ -1,6 +1,5 @@
 import h5py
 from h5py import *
-
 import numpy
 from numpy import zeros, float64
 

@@ -11,6 +11,10 @@ extern "C" {
 #include "H5Tpublic.h"
 }
 
+#include <vector>
+
+using namespace std;
+
 using namespace System;
 using namespace System::Collections;
 using namespace System::Management::Automation;
@@ -24,11 +28,11 @@ namespace PSH5X
     {
         char* name = (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
 
-        unsigned char* rdata = NULL;
+        vector<unsigned char> rdata;
 
         hid_t dset = -1, ftype = -1, ntype = -1, mtype = -1, base_type = -1, fspace = -1;
 
-        hsize_t* mdims = NULL;
+        vector<hsize_t> mdims;
 
         try
         {
@@ -62,8 +66,8 @@ namespace PSH5X
                     throw gcnew HDF5Exception("H5Tget_array_ndims failed!");
                 }
 
-                mdims = new hsize_t [rank];
-                if (H5Tget_array_dims2(ftype, mdims) < 0) {
+                mdims = vector<hsize_t>(rank);
+                if (H5Tget_array_dims2(ftype, &mdims[0]) < 0) {
                     throw gcnew HDF5Exception("H5Tget_array_dims2 failed!");
                 }
                 hsize_t count = 1;
@@ -84,7 +88,6 @@ namespace PSH5X
                     m_array = Array::CreateInstance(m_type, (array<long long>^) dims);
 
                     size_t size = H5Tget_size(base_type);
-                    rdata = new unsigned char [npoints*count*size];
 
                     if (H5Tget_class(base_type) == H5T_BITFIELD) {
                         ntype = H5Tget_native_type(base_type, H5T_DIR_DESCEND);
@@ -93,19 +96,21 @@ namespace PSH5X
                         ntype = H5Tget_native_type(base_type, H5T_DIR_ASCEND);
                     }
 
-                    mtype = H5Tarray_create(ntype, rank, mdims);
+                    mtype = H5Tarray_create(ntype, rank, &mdims[0]);
                     if (mtype < 0) {
                         throw gcnew HDF5Exception("H5Tarray_create failed!");
                     }
 
-                    if(H5Dread(dset, mtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, rdata) < 0) {
+                    rdata = vector<unsigned char>(npoints*count*size);
+
+                    if(H5Dread(dset, mtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, &rdata[0]) < 0) {
                         throw gcnew HDF5Exception("H5Dread failed!");
                     }
 
                     array<long long>^ index = gcnew array<long long>(rank);
                     for (size_t i = 0; i < npoints; ++i)
                     {
-                        void* buffer = (void*) (rdata+i*count*size);
+                        void* buffer = (void*) (&rdata[0]+i*count*size);
                         index = ArrayUtils::GetIndex((array<long long>^)dims, i);
                         m_array->SetValue(ProviderUtils::GetArray(buffer, count, base_type), index);
                     }
@@ -125,12 +130,6 @@ namespace PSH5X
         }
         finally
         {
-            if (rdata != NULL) {
-                delete [] rdata;
-            }
-            if (mdims != NULL) {
-                delete [] mdims;
-            }
             if (fspace >= 0) {
                 H5Sclose(fspace);
             }

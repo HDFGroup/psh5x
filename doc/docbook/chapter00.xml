@@ -5,13 +5,17 @@
     version="5.0">
     <title>Preliminaries</title>
 
-    <para> Below is a simple Python script which uses the h5py module <citation>h5py</citation> to
-        create an extendible, compressed dataset.
-        <programlisting><xi:include parse="text" href="examples/dataset.py"/></programlisting> Here
-        is a PowerShell script that performs the same task.
-        <programlisting><xi:include parse="text" href="examples/dataset.ps1"/></programlisting> Ok,
-        now show me somthing that I haven't seen before! How about counting the number of groups and
-        datasets in a file?</para>
+    <para> How difficult can it be to create an extendible, compressed HDF5 dataset? Below is a
+        simple Python script which uses the h5py module <citation>h5py</citation> to do excatly
+        that. <programlisting><xi:include parse="text" href="examples/dataset.py"/></programlisting>
+        Here is a PowerShell script that performs the same task.
+        <programlisting><xi:include parse="text" href="examples/dataset.ps1"/></programlisting>For
+        this simple example, even the C-code wouldn't be too bad. Granted, we'd have to compile it
+        and with all the variable definitions, semicolons, and resource management the code gets
+        pretty noisy. (For me, any code, including PowerShell, looks noisy compared to
+        Python.)</para>
+    <para> Ok, now show me somthing that I haven't seen before! How about counting the number of
+        groups and datasets in a file?</para>
     <screen><prompt>PS:1 ></prompt><command> dir h5:\ -Recurse -Filter dg | %{ switch($_.ItemType) `
 { 'Group' {$groups++} 'Dataset' {$datasets++} } }; `
 "Groups: $groups - Datsets: $datasets"</command>
@@ -26,16 +30,15 @@ Groups: 100006 - Datsets: 50000 # Yikes!</screen>
         <screen><prompt>PS:1 ></prompt><command> dir h5:\ -Recurse -Filter d | %{ $dsetBytes += $_.StorageSizeBytes }; `
 "In datasets: $dsetBytes - File: $((Get-PSDrive h5).FileSizeBytes)"</command>
 In datasets: 108000000 - File: 264069080</screen>
-        The filter really helps to speed this up. PowerShell users know that they can use the
+        The filter really helps to speed this up. PowerShell users know that they have the
             <literal>-Include</literal> and <literal>-Exclude</literal> parameters to filter objects
-        in the pipeline (e.g., files whose name starts with an 'a'). The problem is that they
-        operate on objects that are in the pipeline already and the provider wasted time and
-        resources to put them there. For example, when the PSH5X provider creates an object
-        representing an HDF5 dataset, it parses its HDF5 datatype, reads its dimensional layout,
-        reads its HDF5 attributes etc. Unlike <literal>-Include</literal> and
-            <literal>-Exclude</literal>, the provider sees the <literal>-Filter</literal> argument
-        before creating and sending any objects to the pipeline. It doesn't create them to begin
-        with, if they aren't needed.</para>
+        in the pipeline (e.g., file objects whose name starts with an 'a'). The problem is that they
+        operate on objects that are in the pipeline already and a provider wasted time and resources
+        to put them there. For example, when the PSH5X provider creates an object representing an
+        HDF5 dataset, it parses its HDF5 datatype, reads its dimensional layout, reads its HDF5
+        attributes etc. Unlike <literal>-Include</literal> and <literal>-Exclude</literal>, the
+        provider sees the <literal>-Filter</literal> argument before creating and sending any
+        objects to the pipeline. It doesn't create them to begin with, if they aren't needed.</para>
 
     <sect1>
         <title>What You Can('t) Expect from this Guide</title>
@@ -137,8 +140,8 @@ In datasets: 108000000 - File: 264069080</screen>
 
         <sect2>
             <title>Arrays in PowerShell</title>
-            <para>The story of arrays in PowerShell is best summarized in the words of Bruce Payette
-                    <citation>PSBible</citation>.</para>
+            <para>The somewhat sad story of arrays in PowerShell is best summarized in the words of
+                Bruce Payette <citation>PSBible</citation>.</para>
             <blockquote>
                 <para>Here's how array literals are defined in PowerShell:</para>
                 <para><emphasis>They're not. There's no array literal notation in
@@ -156,27 +159,34 @@ In datasets: 108000000 - File: 264069080</screen>
                     <literal>New-Object</literal> cmdlet. At the moment, this is what PSH5X does
                 under the covers, it creates typed .NET arrays. But, despite its best effort,
                 matters may appear confusing on the PowerShell surface, at least at first sight. For
-                example, let's say you'd like to read the elements on two-dimensional 4x7 dataset of
-                integer <literal>/DS1</literal>. The way you'd do this in PowerShell is to use the
-                    <literal>Get-Content</literal> cmdlet. <literal>Get-Content</literal> is a row-
-                or stream-oriented interface, that is, it returns the content of a dataset (its
-                value) in batches of rows, one at a time (by default). If you read the help for
-                    <literal>Get-Content</literal>, you'll find that there's a parameter called
-                    <literal>-ReadCount</literal> that let's you set the batch size of objects being
-                sent to the pipeline in one shot. <literal>ReadCount</literal> must be non-negative.
-                In most cases, you want this to be 0 (= all in one shot). Again, remember that the
-                default value is 1 and this can be terribly slow when stepping through a million
-                element dataset. Alltogether, this leads to thw following behavior: </para>
+                example, let's say you'd like to read the elements of a dataset. The way you'd do
+                this in PSH5X is to use the <literal>Get-Content</literal> cmdlet.
+                    <literal>Get-Content</literal> is a row- or stream-oriented interface, that is,
+                it returns the content of a dataset (its value) in batches of rows, one at a time
+                (by default). If you read the help for <literal>Get-Content</literal>, you'll find
+                that there's a parameter called <literal>-ReadCount</literal> that let's you set the
+                batch size of objects being sent to the pipeline in one shot.
+                    <literal>ReadCount</literal> must be non-negative. In most cases, you want this
+                to be 0 (= all in one shot). Again, remember that the default value is 1. (This can
+                be terribly slow when stepping through a million element dataset.) Alltogether, this
+                leads to the following behavior when reading the elements of a two-dimensional 4x7
+                dataset of integer <literal>/DS1</literal>: </para>
             <screen><prompt>PS:1 ></prompt><command>$a = Get-Content int:/DS1; $a.Count</command> 
 28
 <prompt>PS:2 ></prompt><command>$a = Get-Content int:/DS1 -ReadCount 3; $a.Count</command> 
 10
 <prompt>PS:3 ></prompt><command>$a = Get-Content int:/DS1 -ReadCount 0; $a.Count</command> 
 28</screen>
-            <para>The fundamental difference between the first and third command is that, in the
-                first instance, the value of <literal>$a</literal> is a one-dimensional array. It is
-                a two-dimensional array in the third case, i.e., we could refer to element
-                    <literal>$a[3,5]</literal>. What's the value in the second instance?</para>
+            <para> In all instances, <literal>Get-Content</literal> returns the entire content. How
+                do we explain the discrepancy in the counts? Showing just the
+                    <literal>Count</literal> is somewhat misleading, for it shows only the total
+                number of elements in an array, but doesn't indicate anything about its structure.
+                The fundamental difference between the first and third commands is that, in the first
+                instance, the value of <literal>$a</literal> is a one-dimensional array. It is a
+                two-dimensional array in the third case, i.e., we could refer to element
+                    <literal>$a[3,5]</literal>. In the second instance, we are dealing with an array
+                of 9 arrays of length 3 (<literal>-ReadCount 3</literal>) and one array of length
+                1. (28 = 9x3 + 1x1) </para>
             <para> The message is this: there is nothing in the PowerShell provider interface that
                 treats typed arrays with the dignity afforded to them by other interfaces such as
                     <literal>NumPy</literal>
@@ -196,8 +206,8 @@ In datasets: 108000000 - File: 264069080</screen>
             <para>The great flexibility in creating HDF5 datatypes can be a challenge in dynamic
                 environments like h5py or PowerShell. When PowerShell discovers an HDF5 dataset or
                 attribute, it parses the HDF5 datatype and creates a (JSON-like) hashtable
-                representing it. Creating an HDF5 dataset with that type information is pretty
-                straightforward. The real challenge is to create and map between in-memory
+                representing it. Creating any HDF5 dataset from that kind of type information is
+                pretty straightforward. The real challenge is to create and map between in-memory
                 representations (plural!) of elements of such a type <emphasis>at
                 runtime</emphasis>. In the case of PSH5X, there are at least two representations,
                 the unmanaged C API's view of affairs and the .NET view.</para>
@@ -212,9 +222,10 @@ In datasets: 108000000 - File: 264069080</screen>
                 of a C# class. To circumvent this problem, I've adopted the Python
                     <literal>array</literal> type codes <citation>PythonArray</citation> and
                 construct a member name as the concatenation of the type code and the compound
-                member index. For example, the C# code generated for a compound type which has a
-                    <literal>H5T_NATIVE_LLONG</literal>, a <literal>H5T_C_S1</literal>, and two
-                    <literal>H5T_NATIVE_DOUBLE</literal> members looks like this:</para>
+                member index. For example, the C# code generated for a compound type which has an
+                    <literal>H5T_NATIVE_LLONG</literal>, an <literal>H5T_C_S1</literal>-based
+                variable-length string, and two <literal>H5T_NATIVE_DOUBLE</literal> members looks
+                like this:</para>
             <programlisting>using System.Runtime.InteropServices;
 [StructLayout(LayoutKind.Explicit,Size= 36,CharSet=CharSet.Ansi)]
 public class lsdd {

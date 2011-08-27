@@ -33,8 +33,6 @@ namespace PSH5X
         char* name = (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
         char* mname = NULL;
 
-        unsigned char* rdata = NULL;
-
         hid_t dset = -1, ftype = -1, ntype = -1, mtype = -1, memtype = -1, fspace = -1;
 
         try
@@ -210,9 +208,6 @@ namespace PSH5X
         }
         finally
         {
-            if (rdata != NULL) {
-                delete [] rdata;
-            }
             if (fspace >= 0) {
                 H5Sclose(fspace);
             }
