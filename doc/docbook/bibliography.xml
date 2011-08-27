@@ -79,18 +79,7 @@
     </publisher>
     <pubdate>2011</pubdate>
   </biblioentry>
-
-  <biblioentry xml:id="HDF5-Forum">
-    <abbrev>HDF-Forum</abbrev>
-    <title><link
-        xlink:href="http://hdf-forum.184993.n3.nabble.com/combining-several-datasets-to-make-one-large-dataset-td3265988.html"
-        >Combining several datasets to make one large dataset</link></title>
-    <publisher>
-      <publishername>HDF-Forum</publishername>
-    </publisher>
-    <pubdate>August 2011</pubdate>
-  </biblioentry>
-
+  
   <biblioentry xml:id="HDFView">
     <abbrev>HDFView</abbrev>
     <title><link xlink:href="http://www.hdfgroup.org/hdf-java-html/hdfview/index.html"

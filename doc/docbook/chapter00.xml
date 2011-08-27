@@ -169,24 +169,36 @@ In datasets: 108000000 - File: 264069080</screen>
                     <literal>ReadCount</literal> must be non-negative. In most cases, you want this
                 to be 0 (= all in one shot). Again, remember that the default value is 1. (This can
                 be terribly slow when stepping through a million element dataset.) Alltogether, this
-                leads to the following behavior when reading the elements of a two-dimensional 4x7
-                dataset of integer <literal>/DS1</literal>: </para>
-            <screen><prompt>PS:1 ></prompt><command>$a = Get-Content int:/DS1; $a.Count</command> 
-28
-<prompt>PS:2 ></prompt><command>$a = Get-Content int:/DS1 -ReadCount 3; $a.Count</command> 
-10
-<prompt>PS:3 ></prompt><command>$a = Get-Content int:/DS1 -ReadCount 0; $a.Count</command> 
-28</screen>
-            <para> In all instances, <literal>Get-Content</literal> returns the entire content. How
-                do we explain the discrepancy in the counts? Showing just the
+                leads to the following behavior when reading the elements of a two-dimensional 10x10
+                dataset of integer <literal>/dset1</literal>: </para>
+            <screen><prompt>PS:1 ></prompt><command>$a = Get-Content h5tmp:/dset1; $a.Count</command> 
+100
+<prompt>PS:2 ></prompt><command>$a[0]</command> 
+0
+<prompt>PS:3 ></prompt><command>$a = Get-Content h5tmp:/dset1 -ReadCount 3; $a.Count</command> 
+34
+<prompt>PS:4 ></prompt><command>$a[0]</command> 
+0
+1
+2
+<prompt>PS:5 ></prompt><command>$a = Get-Content h5tmp:/dset1 -ReadCount 0; $a.Count</command> 
+100
+<prompt>PS:6 ></prompt><command>$a[0]</command> 
+You cannot index into a 2 dimensional array with index [0].
+At line:1 char:4
++ $a[ &lt;&lt;&lt;&lt; 0]
+    + CategoryInfo          : InvalidOperation: (0:Int32) [], RuntimeException
+    + FullyQualifiedErrorId : NeedMultidimensionalIndex</screen>
+            <para> In all instances, <literal>Get-Content</literal> returns the entire dataset
+                content. How do we explain the discrepancy in the counts? Showing just the
                     <literal>Count</literal> is somewhat misleading, for it shows only the total
                 number of elements in an array, but doesn't indicate anything about its structure.
-                The fundamental difference between the first and third commands is that, in the first
-                instance, the value of <literal>$a</literal> is a one-dimensional array. It is a
-                two-dimensional array in the third case, i.e., we could refer to element
+                The fundamental difference between the first and third commands is that, in the
+                first instance, the value of <literal>$a</literal> is a one-dimensional array. It is
+                a two-dimensional array in the third case, i.e., we could refer to element
                     <literal>$a[3,5]</literal>. In the second instance, we are dealing with an array
-                of 9 arrays of length 3 (<literal>-ReadCount 3</literal>) and one array of length
-                1. (28 = 9x3 + 1x1) </para>
+                of 33 arrays of length 3 (<literal>-ReadCount 3</literal>) and one array of length
+                1. (100 = 33x3 + 1x1) </para>
             <para> The message is this: there is nothing in the PowerShell provider interface that
                 treats typed arrays with the dignity afforded to them by other interfaces such as
                     <literal>NumPy</literal>

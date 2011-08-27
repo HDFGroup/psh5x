@@ -296,13 +296,13 @@ dset3                    Dataset    8/24/2011 12:11:37 PM  0</screen>
 
     <sect2 xml:id="remove_item">
         <title><literal>Remove-Item</literal></title>
-        <para> The <literal>Remove-Item</literal> cmdlet deletes one or more items. Because it is
-            supported by many providers, it can delete many different types of items. </para>
         <cmdsynopsis>
             <command>Remove-Item</command>
             <arg choice="req">-Path <replaceable>string[]</replaceable></arg>
             <arg choice="opt">-Recurse</arg>
         </cmdsynopsis>
+        <para> The <literal>Remove-Item</literal> cmdlet deletes one or more items. Because it is
+            supported by many providers, it can delete many different types of items. </para>
         <variablelist>
             <varlistentry>
                 <term><literal>-Path</literal></term>
@@ -320,9 +320,39 @@ dset3                    Dataset    8/24/2011 12:11:37 PM  0</screen>
 
     <sect2 xml:id="rename_item">
         <title><literal>Rename-Item</literal></title>
-        <note>
-            <para>Not implemented. (Coming soon...)</para>
-        </note>
+        <cmdsynopsis>
+            <command>Rename-Item</command>
+            <arg choice="req">-Path <replaceable>string</replaceable></arg>
+            <arg choice="req">-NewName <replaceable>string</replaceable></arg>
+        </cmdsynopsis>
+        <para>The <literal>Rename-Item</literal> cmdlet changes the name of a specified item. This
+            cmdlet does not affect the content of the item being renamed. You cannot use Rename-Item
+            to move an item, such as by specifying a path along with the new name. To move and
+            rename an item, use the <literal>Move-Item</literal> cmdlet.</para>
+        <variablelist>
+            <varlistentry>
+                <term><literal>-Path</literal></term>
+                <listitem>
+                    <para>Specifies the path to the item to rename.</para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term><literal>-NewName</literal></term>
+                <listitem>
+                    <para>Specifies the new name of the item. Enter only a name, not a path and
+                        name. If you enter a path that is different from the path that is specified
+                        in the Path parameter, <literal>Rename-Item</literal> generates an error. To
+                        rename and move an item, use the <literal>Move-Item</literal> cmdlet. You
+                        cannot use wildcard characters in the value of <literal>NewName</literal>.
+                        To specify a name for multiple files, use the <literal>Replace</literal>
+                        operator in a regular expression.</para>
+                </listitem>
+            </varlistentry>
+        </variablelist>
+        <example>
+            <title>Remove items with a wildcard</title>
+            <screen><prompt>PS:1 ></prompt> <command>Remove-Item h5tmp:\dset*</command></screen>
+        </example>
     </sect2>
 
     <sect2 xml:id="set_location">
