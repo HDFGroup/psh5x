@@ -107,6 +107,10 @@ namespace PSH5X
 
         virtual System::String^ MakePath(System::String^ parent, System::String^ child) override;
 
+        virtual void MoveItem(System::String^ path, System::String^ destination) override;
+
+        virtual System::Object^ MoveItemDynamicParameters(System::String^ path, System::String^ destination) override;
+
 #pragma endregion
 
     public:
