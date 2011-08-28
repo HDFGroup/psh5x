@@ -135,25 +135,23 @@ Variable                               Variable
 WSMan                                  WSMan</screen>
     <para> A drive managed by PSH5X represents an open HDF5 file (you can even <literal>cd</literal>
       into it) and, given the drive name, we can use HDF5 path names to refer to HDF5 items. This is
-      what PowerShell calls a <emphasis>drive-qualified</emphasis> path. For example, let's say we
-      have an HDF5 file stored at <literal>C:\home\file.h5</literal> mapped as a PowerShell drive
-      called <literal>h5</literal>. <literal>h5:/group1</literal> would be a drive-qualified path
-      referring to the HDF5 group linked as <literal>/group1</literal> in
+      what in PowerShell parlance is called a <emphasis>drive-qualified</emphasis> path. For
+      example, let's say we have an HDF5 file stored at <literal>C:\home\file.h5</literal> mapped as
+      a PowerShell drive called <literal>h5</literal>. <literal>h5:/group1</literal> would be a
+      drive-qualified path referring to the HDF5 group linked as <literal>/group1</literal> in
         <literal>C:\home\file.h5</literal>. PowerShell providers support forward slashes ('/') and
-      backslashes ('\') as path separators. For PSH5X,
-      <simplelist>
+      backslashes ('\') as path separators. For PSH5X, <simplelist>
         <member><literal>h5:/group1/group2/dset3</literal></member>
         <member><literal>h5:\group1/group2\dset3</literal></member>
         <member><literal>h5:\group1\group2\dset3</literal></member>
-      </simplelist>
-      are all equivalent.</para>
+      </simplelist> are all equivalent.</para>
     <warning>
       <para>PSH5X treats forward slashes ('/') and backslashes ('\') as equivalent path separators.
         Although HDF5 allows it, in PSH5X, you won't be able to create link names containing
-        backslashes. Moreover, you cannot refer to an HDF5 item with a path name that contains link
-        names that contain backslashes.</para>
+        backslashes. Moreover, you cannot refer to an HDF5 item with a path name that has link names
+        containing backslashes.</para>
     </warning>
-    
+
   </sect1>
 
 </chapter>

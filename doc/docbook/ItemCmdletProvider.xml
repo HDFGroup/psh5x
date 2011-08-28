@@ -20,6 +20,7 @@
 
     <sect2 xml:id="get_item">
         <title><literal>Get-Item</literal></title>
+        <para>Gets the HDF5 item at the specified location.</para>
         <cmdsynopsis>
             <command>Get-Item</command>
             <arg choice="req">-Path <replaceable>string[]</replaceable></arg>
@@ -102,6 +103,7 @@ True</screen>
 
     <sect2 xml:id="set_item">
         <title><literal>Set-Item</literal></title>
+        <para>Changes the value of an HDF5 item to the value specified in the command.</para>
         <cmdsynopsis>
             <command>Set-Item</command>
             <arg choice="req">-Path <replaceable>string[]</replaceable></arg>
@@ -150,19 +152,19 @@ True</screen>
 
     <sect2 xml:id="clear_item">
         <title><literal>Clear-Item</literal></title>
-        <para>The <literal>Clear-Item</literal> cmdlet deletes the value of an item, but it does not
+        <para>The <literal>Clear-Item</literal> cmdlet deletes the value of an HDF5 item, but it does not
             delete the item.</para>
         <note>
-            <para>Not implemented.</para>
+            <para>This cmdlet is currently not implemented.</para>
         </note>
     </sect2>
 
     <sect2 xml:id="invoke_item">
         <title><literal>Invoke-Item</literal></title>
         <para>The <literal>Invoke-Item</literal> cmdlet performs the default action on the specified
-            item. For example, for and HDF5 image this cmdlet may invoke an image viewer.</para>
+            HDF5 item. For example, for and HDF5 image this cmdlet may invoke an image viewer.</para>
         <note>
-            <para>Not implemented.</para>
+            <para>This cmdlet is currently not implemented.</para>
         </note>
     </sect2>
 

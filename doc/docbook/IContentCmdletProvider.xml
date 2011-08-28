@@ -11,6 +11,7 @@
 
     <sect2 xml:id="get_content">
         <title><literal>Get-Content</literal></title>
+        <para>Gets the content of the item at the specified location.</para>
         <cmdsynopsis>
             <command>Get-Content</command>
             <arg choice="req">-Path <replaceable>string[]</replaceable></arg>
@@ -20,6 +21,9 @@
             <arg choice="opt">-Hyperslab <replaceable>Int64[4]</replaceable></arg>
             <arg choice="opt">-PointSet <replaceable>Int64[,]</replaceable></arg>
         </cmdsynopsis>
+        <para>The <literal>Get-Content</literal> cmdlet gets the content of the item at the location
+            specified by the path, such as the text in a file. It reads the content one line at a
+            time and returns an object for each line.</para>
         <variablelist>
             <varlistentry>
                 <term><literal>-Path</literal></term>
@@ -50,19 +54,20 @@
             <screen><prompt>PS:1 ></prompt> <command>Get-Content h5tmp:\dset1 -TotalCount 10</command>
 0
 1
+2
+3
 4
-9
-16
-25
-36
-49
-64
-81</screen>
+5
+6
+7
+8
+9</screen>
         </example>
     </sect2>
 
     <sect2 xml:id="set_content">
         <title><literal>Set-Content</literal></title>
+        <para>Writes or replaces the content in an item with new content.</para>
         <cmdsynopsis>
             <command>Set-Content</command>
             <arg choice="req">-Path <replaceable>string[]</replaceable></arg>
@@ -71,6 +76,12 @@
             <arg choice="opt">-Hyperslab <replaceable>Int64[4]</replaceable></arg>
             <arg choice="opt">-PointSet <replaceable>Int64[,]</replaceable></arg>
         </cmdsynopsis>
+        <para>The <literal>Set-Content</literal> cmdlet is a string-processing cmdlet that writes or
+            replaces the content in the specified item, such as a file. Whereas the
+                <literal>Add-Content</literal> cmdlet appends content to a file,
+                <literal>Set-Content</literal> replaces the existing content. You can type the
+            content in the command or send content through the pipeline to
+                <literal>Set-Content</literal>.</para>
         <variablelist>
             <varlistentry>
                 <term><literal>-Path</literal></term>
@@ -115,8 +126,40 @@ Size                           4
 
     <sect2 xml:id="add_content">
         <title><literal>Add-Content</literal></title>
+        <para>Adds content to the specified items, such as adding words to a file.</para>
+        <cmdsynopsis>
+            <command>Add-Content</command>
+            <arg choice="req">-Path <replaceable>string[]</replaceable></arg>
+            <arg choice="req">-Value <replaceable>Object[]</replaceable></arg>
+        </cmdsynopsis>
+
+        <para>The Add-Content cmdlet appends content to a specified item or file. You can specify
+            the content by typing the content in the command or by specifying an object that
+            contains the content.</para>
+        <variablelist>
+            <varlistentry>
+                <term><literal>-Path</literal></term>
+                <listitem>
+                    <para>Specifies the path to the items that receive the additional content.
+                        Wildcards are permitted. If you specify multiple paths, use commas to
+                        separate the paths.</para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term><literal>-Value</literal></term>
+                <listitem>
+                    <para>Specifies the content to be added. Type a quoted string, such as "This
+                        data is for internal use only", or specify an object that contains content,
+                        such as the DateTime object that Get-Date generates. You cannot specify the
+                        contents of a file by typing its path, because t he path is just a string,
+                        but you can use a <literal>Get-Content</literal> command to get the content
+                        and pass it to the <literal>Value</literal> parameter. </para>
+                </listitem>
+            </varlistentry>
+        </variablelist>
+
         <note>
-            <para>Not implemented.</para>
+            <para>Under development.</para>
         </note>
     </sect2>
 

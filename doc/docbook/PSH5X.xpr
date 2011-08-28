@@ -16,7 +16,7 @@
                                     <String>XSL</String>
                                 </field>
                                 <field name="url">
-                                    <String>chapter00.xml</String>
+                                    <String>book.xml</String>
                                 </field>
                             </scenarioAssociation>
                             <scenarioAssociation>
@@ -38,7 +38,7 @@
                                     <String>XSL</String>
                                 </field>
                                 <field name="url">
-                                    <String>appendix06.xml</String>
+                                    <String>chapter00.xml</String>
                                 </field>
                             </scenarioAssociation>
                             <scenarioAssociation>
@@ -49,7 +49,7 @@
                                     <String>XSL</String>
                                 </field>
                                 <field name="url">
-                                    <String>book.xml</String>
+                                    <String>appendix06.xml</String>
                                 </field>
                             </scenarioAssociation>
                             <scenarioAssociation>
@@ -72,17 +72,6 @@
                                 </field>
                                 <field name="url">
                                     <String>preface.xml</String>
-                                </field>
-                            </scenarioAssociation>
-                            <scenarioAssociation>
-                                <field name="name">
-                                    <String>Docbook PDF duplicate</String>
-                                </field>
-                                <field name="type">
-                                    <String>XSL</String>
-                                </field>
-                                <field name="url">
-                                    <String>bookinfo.xml</String>
                                 </field>
                             </scenarioAssociation>
                             <scenarioAssociation>
@@ -193,17 +182,6 @@
                                 </field>
                                 <field name="url">
                                     <String>ContainerCmdletProvider.xml</String>
-                                </field>
-                            </scenarioAssociation>
-                            <scenarioAssociation>
-                                <field name="name">
-                                    <String>Docbook PDF duplicate</String>
-                                </field>
-                                <field name="type">
-                                    <String>XSL</String>
-                                </field>
-                                <field name="url">
-                                    <String>appendix02.xml</String>
                                 </field>
                             </scenarioAssociation>
                         </scenarioAssociation-array>
@@ -576,6 +554,48 @@
                                             <field name="paramDescription">
                                                 <paramDescriptor>
                                                     <field name="localName">
+                                                        <String>monospace.font.family</String>
+                                                    </field>
+                                                    <field name="prefix">
+                                                        <null/>
+                                                    </field>
+                                                    <field name="namespace">
+                                                        <null/>
+                                                    </field>
+                                                </paramDescriptor>
+                                            </field>
+                                            <field name="value">
+                                                <String>Consolas</String>
+                                            </field>
+                                            <field name="hasXPathValue">
+                                                <Boolean>false</Boolean>
+                                            </field>
+                                        </transformationParameter>
+                                        <transformationParameter>
+                                            <field name="paramDescription">
+                                                <paramDescriptor>
+                                                    <field name="localName">
+                                                        <String>monospace.font.size</String>
+                                                    </field>
+                                                    <field name="prefix">
+                                                        <null/>
+                                                    </field>
+                                                    <field name="namespace">
+                                                        <null/>
+                                                    </field>
+                                                </paramDescriptor>
+                                            </field>
+                                            <field name="value">
+                                                <String>9pt</String>
+                                            </field>
+                                            <field name="hasXPathValue">
+                                                <Boolean>false</Boolean>
+                                            </field>
+                                        </transformationParameter>
+                                        <transformationParameter>
+                                            <field name="paramDescription">
+                                                <paramDescriptor>
+                                                    <field name="localName">
                                                         <String>paper.type</String>
                                                     </field>
                                                     <field name="prefix">
@@ -609,6 +629,27 @@
                                             </field>
                                             <field name="value">
                                                 <String>1</String>
+                                            </field>
+                                            <field name="hasXPathValue">
+                                                <Boolean>false</Boolean>
+                                            </field>
+                                        </transformationParameter>
+                                        <transformationParameter>
+                                            <field name="paramDescription">
+                                                <paramDescriptor>
+                                                    <field name="localName">
+                                                        <String>use.extensions</String>
+                                                    </field>
+                                                    <field name="prefix">
+                                                        <null/>
+                                                    </field>
+                                                    <field name="namespace">
+                                                        <null/>
+                                                    </field>
+                                                </paramDescriptor>
+                                            </field>
+                                            <field name="value">
+                                                <String>0</String>
                                             </field>
                                             <field name="hasXPathValue">
                                                 <Boolean>false</Boolean>

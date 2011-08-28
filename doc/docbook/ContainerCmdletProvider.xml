@@ -12,12 +12,8 @@
         items supported in PSH5X.</para>
 
     <sect2 xml:id="get_child_item">
-        <title><literal>Get-ChildItem</literal>
-        </title>
-        <para> The <literal>Get-ChildItem</literal> cmdlet gets the items in one or more specified
-            locations. If the item is an HDF5 group, it gets the items inside the container, known
-            as child items. You can use the Recurse parameter to get items in all child
-            containers.</para>
+        <title><literal>Get-ChildItem</literal></title>
+        <para>Gets the HDF5 items and HDF5 child items in one or more specified locations.</para>
         <cmdsynopsis>
             <command>Get-ChildItem</command>
             <arg choice="req">-Path <replaceable>string[]</replaceable></arg>
@@ -26,6 +22,10 @@
             <arg choice="opt">-Detailed</arg>
             <arg choice="opt">-Filter [-][degst]</arg>
         </cmdsynopsis>
+        <para> The <literal>Get-ChildItem</literal> cmdlet gets the items in one or more specified
+            locations. If the item is an HDF5 group, it gets the items inside the container, known
+            as child items. You can use the Recurse parameter to get items in all child
+            containers.</para>
         <variablelist>
             <varlistentry>
                 <term>-Path</term>
@@ -64,8 +64,8 @@
                     <para>This parameter can be used to specify a filter on the types of items to be
                         retrieved or to be suppressed. <emphasis>Filters are more
                             efficient</emphasis> than other parameters, because the provider applies
-                        them when retrieving the objects, rather than having Windows PowerShell
-                        filter the objects after they are retrieved.</para>
+                        them when retrieving the objects, rather than having PowerShell filter the
+                        objects after they are retrieved.</para>
                     <para>The PSH5X item filter either includes items of the types listed (e.g.,
                         only groups and datasets) to the exclusion of all other item types, or it
                         suppresses all items of types listed and includes all types not listed. The
@@ -168,10 +168,7 @@ dset3                    Dataset    8/24/2011 12:11:37 PM  0</screen>
 
     <sect2 xml:id="new_item">
         <title><literal>New-Item</literal></title>
-        <para> The <literal>New-Item</literal> cmdlet creates a new item and sets its value (if
-            applicable). The basic syntax of <literal>New-Item</literal> is shown. It consists of
-            the new item's name, its type, and its value. Depending on the item type additional
-            options may be required and are shown separated by item type.</para>
+        <para>Creates a new HDF5 item.</para>
         <cmdsynopsis>
             <command>New-Item</command>
             <arg choice="req">-Path <replaceable>string[]</replaceable></arg>
@@ -189,6 +186,10 @@ dset3                    Dataset    8/24/2011 12:11:37 PM  0</screen>
             </arg>
             <arg choice="opt">-Value <replaceable>Object</replaceable></arg>
         </cmdsynopsis>
+        <para> The <literal>New-Item</literal> cmdlet creates a new item and sets its value (if
+            applicable). The basic syntax of <literal>New-Item</literal> is shown. It consists of
+            the new item's name, its type, and its value. Depending on the item type additional
+            options may be required and are shown separated by item type.</para>
         <variablelist>
             <varlistentry>
                 <term><literal>-Name</literal></term>
@@ -254,22 +255,21 @@ dset3                    Dataset    8/24/2011 12:11:37 PM  0</screen>
 
         <sect3>
             <title>HDF5 External Link</title>
-            <para>No additional options need to be specified for creating a new HDF5 external link.
-                The <literal>-Value</literal> argument must be a string array of length two. The
+            <para>The <literal>-Value</literal> argument must be a string array of length two. The
                 first element is used as the file name and the second must be a well-formed HDF5
                 path name.</para>
         </sect3>
 
         <sect3>
             <title>HDF5 Hard Link</title>
-            <para>No additional options need to be specified for creating a new HDF5 external link.
-                The <literal>-Value</literal> argument must be a string containing a valid HDF5 path
-                name.</para>
+            <para> The <literal>-Value</literal> argument must be a string containing a valid HDF5
+                path name.</para>
         </sect3>
 
         <sect3>
             <title>HDF5 Image</title>
-            <para>Refer to the H5Image spec. []...</para>
+            <para>See <citation>HDF5_Image</citation> for the HDF5 Image and Palette
+                specification.</para>
             <para> If the <literal>-Value</literal> argument is specified, it is expected to be the
                 name of an image file. All of the image characteristics (bits, widht, height etc.)
                 will be inferred and no other options need to be specified. Otherwise the following
@@ -287,8 +287,7 @@ dset3                    Dataset    8/24/2011 12:11:37 PM  0</screen>
 
         <sect3>
             <title>HDF5 Soft Link</title>
-            <para>No additional options need to be specified for creating a new HDF5 soft link. The
-                    <literal>-Value</literal> argument must be a string containing a well-formed
+            <para>The <literal>-Value</literal> argument must be a string containing a well-formed
                 HDF5 path name.</para>
         </sect3>
 
@@ -296,6 +295,7 @@ dset3                    Dataset    8/24/2011 12:11:37 PM  0</screen>
 
     <sect2 xml:id="remove_item">
         <title><literal>Remove-Item</literal></title>
+        <para>Deletes the specified HDF5 items.</para>
         <cmdsynopsis>
             <command>Remove-Item</command>
             <arg choice="req">-Path <replaceable>string[]</replaceable></arg>
@@ -320,6 +320,7 @@ dset3                    Dataset    8/24/2011 12:11:37 PM  0</screen>
 
     <sect2 xml:id="rename_item">
         <title><literal>Rename-Item</literal></title>
+        <para>Renames an item in the PSH5X provider namespace.</para>
         <cmdsynopsis>
             <command>Rename-Item</command>
             <arg choice="req">-Path <replaceable>string</replaceable></arg>
@@ -355,14 +356,106 @@ dset3                    Dataset    8/24/2011 12:11:37 PM  0</screen>
         </example>
     </sect2>
 
+    <sect2 xml:id="copy_item">
+        <title><literal>Copy-Item</literal></title>
+        <para>Copies an HDF5 item from one location to another within a namespace.</para>
+        <cmdsynopsis>
+            <command>Get-Location</command>
+            <arg choice="req">-Path <replaceable>string[]</replaceable></arg>
+            <arg choice="req">-Destination <replaceable>string</replaceable></arg>
+            <arg choice="opt">-Container</arg>
+        </cmdsynopsis>
+        <para>The Copy-Item cmdlet copies an item from one location to another in a names pace.
+            Copy-Item does not delete the items being copied. The particular item s that the cmdlet
+            can copy depend on the Windows PowerShell providers avail able. For example, when used
+            with the FileSystem provider, it can copy file s and directories and when used with the
+            Registry provider, it can copy reg istry keys and entries.</para>
+        <variablelist>
+            <varlistentry>
+                <term><literal>-Path</literal></term>
+                <listitem>
+                    <para>Specifies the path to the items to copy.</para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term><literal>-Destination</literal></term>
+                <listitem>
+                    <para>Specifies the path to the location where the items are to be
+                        copied.</para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term><literal>-Container</literal></term>
+                <listitem>
+                    <para>Preserves container objects during the copy operation.</para>
+                </listitem>
+            </varlistentry>
+        </variablelist>
+
+        <note>
+            <para>Under development.</para>
+        </note>
+    </sect2>
+
+    <sect2 xml:id="get_location">
+        <title><literal>Get-Location</literal></title>
+        <para> Gets information about the current working location.</para>
+        <cmdsynopsis>
+            <command>Get-Location</command>
+            <arg choice="opt">-PSDrive <replaceable>string[]</replaceable></arg>
+            <arg choice="opt">-PSProvider <replaceable>string[]</replaceable>
+            </arg>
+        </cmdsynopsis>
+        <para>The <literal>Get-Location</literal> cmdlet gets an object that represents the current
+            directory, much like the pwd (print working directory) command. </para>
+        <para> When you move between PowerShell drives, PowerShell retains your location in each
+            drive. You can use <literal>Get-Location</literal> to find your location in each
+            drive.</para>
+        <variablelist>
+            <varlistentry>
+                <term><literal>-PSDrive</literal></term>
+                <listitem>
+                    <para>This parameter is used to specify the path to a new working
+                        location.</para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term><literal>-PSProvider</literal></term>
+                <listitem>
+                    <para>This parameter is used to specify the path to a new working
+                        location.</para>
+                </listitem>
+            </varlistentry>
+        </variablelist>
+        <example>
+            <title>Working with locations</title>
+            <screen><prompt>PS:1 ></prompt> <command>Get-Location</command>
+
+Path
+----
+C:\
+
+<prompt>PS:2 ></prompt> <command>Set-Location h5tmp:\group1</command>
+<prompt>PS:3 ></prompt> <command>Push-Location</command>
+<prompt>PS:4 ></prompt> <command>Set-Location D:\</command>
+<prompt>PS:5 ></prompt> <command>Pop-Location</command>
+<prompt>PS:6 ></prompt> <command>Get-Location</command>
+                
+Path
+----
+h5tmp:\group1</screen>
+        </example>
+    </sect2>
+
     <sect2 xml:id="set_location">
         <title><literal>Set-Location</literal></title>
-        <para>The <literal>Set-Location</literal> cmdlet sets the working location to a specified
-            location. That location must be an item that corresponds to an HDF5 group.</para>
+        <para>Sets the current working location to a specified location.</para>
         <cmdsynopsis>
             <command>Set-Location</command>
             <arg choice="req">-Path <replaceable>string</replaceable></arg>
         </cmdsynopsis>
+        <para>The <literal>Set-Location</literal> cmdlet sets the working location to a specified
+            location. That location must be an item that corresponds to an HDF5 group.</para>
         <variablelist>
             <varlistentry>
                 <term><literal>-Path</literal></term>
@@ -384,66 +477,82 @@ dset3                    Dataset    8/8/2011 4:05:00 PM    0</screen>
         </example>
     </sect2>
 
-    <sect2 xml:id="pop_location">
-        <title><literal>Pop-Location</literal></title>
-        <para> The <literal>Pop-Location</literal> cmdlet changes the current location to the
-            location most recently pushed onto the stack by using the
-                <literal>Push-Location</literal> cmdlet. You can pop a location from the default
-            stack or from a stack that you create by using a <literal>Push-Location</literal>
-            command. </para>
-    </sect2>
-
     <sect2 xml:id="push_location">
         <title><literal>Push-Location</literal></title>
+        <para>Adds the current location to the top of a list of locations (a "stack").</para>
+        <cmdsynopsis>
+            <command>Push-Location</command>
+            <arg choice="req">-Path <replaceable>string</replaceable></arg>
+            <arg choice="opt">-StackName <replaceable>string</replaceable></arg>
+        </cmdsynopsis>
         <para> The <literal>Push-Location</literal> cmdlet adds ("pushes") the current location to
             the top of a list of locations, called a "stack." You can push the current location onto
             a default stack or onto a stack that you create. If you specify a path,
                 <literal>Push-Location</literal> pushes the current location onto the stack and then
             changes the current location to the location specified by the path. You cannot push a
             location onto the stack unless it is the current location. </para>
-    </sect2>
-
-    <sect2 xml:id="get_location">
-        <title><literal>Get-Location</literal></title>
-        <para>The <literal>Get-Location</literal> cmdlet gets an object that represents the current
-            directory, much like the pwd (print working directory) command. </para>
-        <para> When you move between Windows PowerShell drives, Windows PowerShell retains your
-            location in each drive. You can use <literal>Get-Location</literal> to find your
-            location in each drive.</para>
-        <example>
-            <title>Working with locations</title>
-            <screen><prompt>PS:1 ></prompt> <command>Get-Location</command>
-
-Path
-----
-C:\
-
-<prompt>PS:2 ></prompt> <command>Set-Location h5tmp:\group1</command>
-<prompt>PS:3 ></prompt> <command>Push-Location</command>
-<prompt>PS:4 ></prompt> <command>Set-Location D:\</command>
-<prompt>PS:5 ></prompt> <command>Pop-Location</command>
-<prompt>PS:6 ></prompt> <command>Get-Location</command>
-                
-Path
-----
-h5tmp:\group1</screen>
-        </example>
-    </sect2>
-
-    <sect2 xml:id="resolve_path">
-        <title><literal>Resolve-Path</literal></title>
-        <para> The <literal>Resolve-Path</literal> cmdlet interprets the wildcard characters in a
-            path and displays the items and containers at the location specified by the path, such
-            as the files and folders or registry keys and subkeys.</para>
-        <cmdsynopsis>
-            <command>Resolve-Path</command>
-            <arg choice="req">-Path <replaceable>string[]</replaceable></arg>
-        </cmdsynopsis>
         <variablelist>
             <varlistentry>
                 <term><literal>-Path</literal></term>
                 <listitem>
-                    <para>Specifies the Windows PowerShell path to resolve. This parameter is
+                    <para>Changes your location to the location specified by this path after it adds
+                        (pushes) the current location onto the top of the stack. Enter a path to any
+                        location whose provider supports this cmdlet. Wildcards are permitted. The
+                        parameter name <literal>Path</literal> is optional.</para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term><literal>-StackName</literal></term>
+                <listitem>
+                    <para>Specifies the name of a stack. The current location is pushed onto this
+                        stack, and this stack becomes the current stack. If the stack does not yet
+                        exist, it is created.</para>
+                </listitem>
+            </varlistentry>
+        </variablelist>
+    </sect2>
+
+    <sect2 xml:id="pop_location">
+        <title><literal>Pop-Location</literal></title>
+        <para>Changes the current location to the location most recently pushed onto the stack. You
+            can pop the location from the default stack or from a stack that you create by using the
+            Push-Location cmdlet.</para>
+        <cmdsynopsis>
+            <command>Pop-Location</command>
+            <arg choice="opt">-StackName <replaceable>string</replaceable></arg>
+        </cmdsynopsis>
+        <para> The <literal>Pop-Location</literal> cmdlet changes the current location to the
+            location most recently pushed onto the stack by using the
+                <literal>Push-Location</literal> cmdlet. You can pop a location from the default
+            stack or from a stack that you create by using a <literal>Push-Location</literal>
+            command. </para>
+        <variablelist>
+            <varlistentry>
+                <term><literal>-StackName</literal></term>
+                <listitem>
+                    <para>Specifies an alternate stack. <literal>Pop-Location</literal> pops the
+                        most recently added location from this stack. This stack then becomes the
+                        current stack.</para>
+                </listitem>
+            </varlistentry>
+        </variablelist>
+    </sect2>
+
+    <sect2 xml:id="resolve_path">
+        <title><literal>Resolve-Path</literal></title>
+        <para>Resolves the wildcard characters in a path, and displays the path contents.</para>
+        <cmdsynopsis>
+            <command>Resolve-Path</command>
+            <arg choice="req">-Path <replaceable>string[]</replaceable></arg>
+        </cmdsynopsis>
+        <para> The <literal>Resolve-Path</literal> cmdlet interprets the wildcard characters in a
+            path and displays the items and containers at the location specified by the path, such
+            as the HDF5 datasets and groups.</para>
+        <variablelist>
+            <varlistentry>
+                <term><literal>-Path</literal></term>
+                <listitem>
+                    <para>Specifies the PowerShell path to resolve. This parameter is
                         required.</para>
                 </listitem>
             </varlistentry>
@@ -462,10 +571,7 @@ h5tmp:\dset3</screen>
 
     <sect2 xml:id="test_path">
         <title><literal>Test-Path</literal></title>
-        <para> The <literal>Test-Path</literal> cmdlet determines whether all elements of the path
-            exist. It returns TRUE ($true) if all elements exist and FALSE ($false) if any are
-            missing. It can also tell whether the path syntax is valid and whether the path leads to
-            a container or a terminal (leaf) element.</para>
+        <para>Determines whether all elements of a path exist.</para>
         <cmdsynopsis>
             <command>Test-Path</command>
             <arg choice="req">-Path <replaceable>string[]</replaceable></arg>
@@ -477,6 +583,10 @@ h5tmp:\dset3</screen>
                 </group>
             </arg>
         </cmdsynopsis>
+        <para> The <literal>Test-Path</literal> cmdlet determines whether all elements of the path
+            exist. It returns TRUE ($true) if all elements exist and FALSE ($false) if any are
+            missing. It can also tell whether the path syntax is valid and whether the path leads to
+            a container or a terminal (leaf) element.</para>
         <variablelist>
             <varlistentry>
                 <term><literal>-Path</literal></term>
@@ -539,13 +649,6 @@ True
 <prompt>PS:3 ></prompt> <command>Test-Path h5tmp:\dset* -PathType Container</command>
 False</screen>
         </example>
-    </sect2>
-
-    <sect2 xml:id="copy_item">
-        <title><literal>Copy-Item</literal></title>
-        <note>
-            <para>Not implemented.</para>
-        </note>
     </sect2>
 
 </sect1>

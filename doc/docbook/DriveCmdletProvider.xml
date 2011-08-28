@@ -43,20 +43,7 @@ C:\Users\gheber\AppData\Local\Temp\tmpC798.tmp</screen>
 
     <sect2 xml:id="new_psdrive">
         <title><literal>New-PSDrive</literal></title>
-        <para>The <literal>New-PSDrive</literal> cmdlet creates a Windows PowerShell drive in the
-            current session. The name of the new drive is provided via the <literal>-Name</literal>
-            argument and the name of the HDF5 file backing the new drive is specified via the
-                <literal>-Path</literal> argument. The file access mode is controlled via the
-                <literal>-Mode</literal> argument and can be set to read-only (default) or
-            read/write. Typically, the directory hierarchy of the new drive begins at the HDF5
-            file's HDF5 root group. This behavior can be changed by providing an HDF5 path name to
-            an HDF5 group in the file via the <literal>-Root</literal> argument. </para>
-        <para>You can use the Windows PowerShell drives that you create to access the data in the
-            associated HDF5 file, just like you would do with any mapped drive. You can change
-            locations into the drive (using <literal>Set-Location</literal>, <literal>cd</literal>,
-            or <literal>chdir</literal>) and access the contents of the drive (using
-                <literal>Get-Item</literal>, <literal>Get-Childitem</literal>, or
-                <literal>dir</literal>).</para>
+        <para>Creates a Windows PowerShell drive in the current session.</para>
         <cmdsynopsis>
             <command>New-PSDrive</command>
             <arg choice="req">-Name <replaceable>string</replaceable></arg>
@@ -71,6 +58,20 @@ C:\Users\gheber\AppData\Local\Temp\tmpC798.tmp</screen>
                 </group></arg>
             <arg>-Force</arg>
         </cmdsynopsis>
+        <para>The <literal>New-PSDrive</literal> cmdlet creates a Windows PowerShell drive in the
+            current session. The name of the new drive is provided via the <literal>-Name</literal>
+            argument and the name of the HDF5 file backing the new drive is specified via the
+            <literal>-Path</literal> argument. The file access mode is controlled via the
+            <literal>-Mode</literal> argument and can be set to read-only (default) or
+            read/write. Typically, the directory hierarchy of the new drive begins at the HDF5
+            file's HDF5 root group. This behavior can be changed by providing an HDF5 path name to
+            an HDF5 group in the file via the <literal>-Root</literal> argument. </para>
+        <para>You can use the Windows PowerShell drives that you create to access the data in the
+            associated HDF5 file, just like you would do with any mapped drive. You can change
+            locations into the drive (using <literal>Set-Location</literal>, <literal>cd</literal>,
+            or <literal>chdir</literal>) and access the contents of the drive (using
+            <literal>Get-Item</literal>, <literal>Get-Childitem</literal>, or
+            <literal>dir</literal>).</para>
         <variablelist>
             <varlistentry>
                 <term>-Name</term>
@@ -139,18 +140,19 @@ h5new                              HDF5          h5new:\A\B</screen>
 
     <sect2 xml:id="remove_psdrive">
         <title><literal>Remove-PSDrive</literal></title>
-        <para>The <literal>Remove-PSDrive</literal> cmdlet deletes Windows PowerShell drives that
-            have been created by using <literal>New-PSDrive</literal>. When deleting PowerShell
-            drives mapped to HDF5 the underlying files are automatically closed with <link
-                xlink:href="http://www.hdfgroup.org/HDF5/doc/RM/RM_H5F.html#File-Close"
-                    ><literal>H5close</literal></link>. </para>
-        <para>
-            <literal>Remove-PSDrive</literal> cannot delete Windows drives or mapped network drives
-            created by using other methods and it cannot delete the current working drive.</para>
+        <para>Removes a Windows PowerShell drive from its location.</para>
         <cmdsynopsis>
             <command>Remove-PSDrive</command>
             <arg choice="req">-Name <replaceable>string[]</replaceable></arg>
         </cmdsynopsis>
+        <para>The <literal>Remove-PSDrive</literal> cmdlet deletes Windows PowerShell drives that
+            have been created by using <literal>New-PSDrive</literal>. When deleting PowerShell
+            drives mapped to HDF5 the underlying files are automatically closed with <link
+                xlink:href="http://www.hdfgroup.org/HDF5/doc/RM/RM_H5F.html#File-Close"
+                ><literal>H5close</literal></link>. </para>
+        <para>
+            <literal>Remove-PSDrive</literal> cannot delete Windows drives or mapped network drives
+            created by using other methods and it cannot delete the current working drive.</para>
         <variablelist>
             <varlistentry>
                 <term>-Name</term>
