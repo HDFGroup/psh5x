@@ -95,9 +95,11 @@ dset3                    Dataset    8/8/2011 4:05:00 PM    0
 group1                   Group      1/1/1970 12:00:00 AM   0
 group2                   Group      1/1/1970 12:00:00 AM   0
 slink1                   SoftLink
-type1                    Datatyp... 1/1/1970 12:00:00 AM   0
-
-<prompt>PS:2 ></prompt> <command>Get-ChildItem h5tmp:\dset*</command>
+type1                    Datatyp... 1/1/1970 12:00:00 AM   0</screen>
+        </example>
+        <example>
+            <title>Getting the children of the PSDrive with root <literal>h5tmp:\</literal> using wildcards</title>
+            <screen><prompt>PS:1 ></prompt> <command>Get-ChildItem h5tmp:\dset*</command>
 
    PSParentPath: HDF5\HDF5::h5tmp:
 
@@ -123,7 +125,6 @@ group1                   Group      1/1/1970 12:00:00 AM   0
 dset2                    Dataset    8/24/2011 12:11:37 PM  0
 dset1                    Dataset    8/24/2011 12:11:37 PM  0
 dset3                    Dataset    8/24/2011 12:11:37 PM  0
-
 
    PSParentPath: HDF5\HDF5::h5tmp:\group1
 
@@ -156,7 +157,6 @@ group2                   Group      1/1/1970 12:00:00 AM   0
 dset3                    Dataset    8/24/2011 12:11:37 PM  0
 dset1                    Dataset    8/24/2011 12:11:37 PM  0
 dset2                    Dataset    8/24/2011 12:11:37 PM  0
-
 
    PSParentPath: HDF5\HDF5::h5tmp:\group1
 

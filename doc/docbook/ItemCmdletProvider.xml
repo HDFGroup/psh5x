@@ -152,8 +152,8 @@ True</screen>
 
     <sect2 xml:id="clear_item">
         <title><literal>Clear-Item</literal></title>
-        <para>The <literal>Clear-Item</literal> cmdlet deletes the value of an HDF5 item, but it does not
-            delete the item.</para>
+        <para>The <literal>Clear-Item</literal> cmdlet deletes the value of an HDF5 item, but it
+            does not delete the item.</para>
         <note>
             <para>This cmdlet is currently not implemented.</para>
         </note>
@@ -162,7 +162,8 @@ True</screen>
     <sect2 xml:id="invoke_item">
         <title><literal>Invoke-Item</literal></title>
         <para>The <literal>Invoke-Item</literal> cmdlet performs the default action on the specified
-            HDF5 item. For example, for and HDF5 image this cmdlet may invoke an image viewer.</para>
+            HDF5 item. For example, for and HDF5 image this cmdlet may invoke an image
+            viewer.</para>
         <note>
             <para>This cmdlet is currently not implemented.</para>
         </note>

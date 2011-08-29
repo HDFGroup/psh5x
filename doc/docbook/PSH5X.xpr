@@ -1,187 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project version="12.2">
+<project version="13.0">
     <meta>
         <filters directoryPatterns="" filePatterns="" positiveFilePatterns="" showHiddenFiles="false"/>
         <options>
-            <serialized version="12.2" xml:space="preserve">
+            <serialized version="13.0" xml:space="preserve">
                 <map>
                     <entry>
                         <String>scenario.associations</String>
                         <scenarioAssociation-array>
                             <scenarioAssociation>
                                 <field name="name">
-                                    <String>Docbook PDF duplicate</String>
+                                    <String>Docbook PDF G.H.</String>
                                 </field>
                                 <field name="type">
                                     <String>XSL</String>
                                 </field>
                                 <field name="url">
                                     <String>book.xml</String>
-                                </field>
-                            </scenarioAssociation>
-                            <scenarioAssociation>
-                                <field name="name">
-                                    <String>Docbook PDF duplicate</String>
-                                </field>
-                                <field name="type">
-                                    <String>XSL</String>
-                                </field>
-                                <field name="url">
-                                    <String>chapter01.xml</String>
-                                </field>
-                            </scenarioAssociation>
-                            <scenarioAssociation>
-                                <field name="name">
-                                    <String>Docbook PDF duplicate</String>
-                                </field>
-                                <field name="type">
-                                    <String>XSL</String>
-                                </field>
-                                <field name="url">
-                                    <String>chapter00.xml</String>
-                                </field>
-                            </scenarioAssociation>
-                            <scenarioAssociation>
-                                <field name="name">
-                                    <String>Docbook PDF duplicate</String>
-                                </field>
-                                <field name="type">
-                                    <String>XSL</String>
-                                </field>
-                                <field name="url">
-                                    <String>appendix06.xml</String>
-                                </field>
-                            </scenarioAssociation>
-                            <scenarioAssociation>
-                                <field name="name">
-                                    <String>Docbook PDF duplicate</String>
-                                </field>
-                                <field name="type">
-                                    <String>XSL</String>
-                                </field>
-                                <field name="url">
-                                    <String>chapter03.xml</String>
-                                </field>
-                            </scenarioAssociation>
-                            <scenarioAssociation>
-                                <field name="name">
-                                    <String>Docbook PDF duplicate</String>
-                                </field>
-                                <field name="type">
-                                    <String>XSL</String>
-                                </field>
-                                <field name="url">
-                                    <String>preface.xml</String>
-                                </field>
-                            </scenarioAssociation>
-                            <scenarioAssociation>
-                                <field name="name">
-                                    <String>Docbook PDF duplicate</String>
-                                </field>
-                                <field name="type">
-                                    <String>XSL</String>
-                                </field>
-                                <field name="url">
-                                    <String>bibliography.xml</String>
-                                </field>
-                            </scenarioAssociation>
-                            <scenarioAssociation>
-                                <field name="name">
-                                    <String>Docbook PDF duplicate</String>
-                                </field>
-                                <field name="type">
-                                    <String>XSL</String>
-                                </field>
-                                <field name="url">
-                                    <String>appendix04.xml</String>
-                                </field>
-                            </scenarioAssociation>
-                            <scenarioAssociation>
-                                <field name="name">
-                                    <String>Docbook PDF duplicate</String>
-                                </field>
-                                <field name="type">
-                                    <String>XSL</String>
-                                </field>
-                                <field name="url">
-                                    <String>appendix03.xml</String>
-                                </field>
-                            </scenarioAssociation>
-                            <scenarioAssociation>
-                                <field name="name">
-                                    <String>Docbook PDF duplicate</String>
-                                </field>
-                                <field name="type">
-                                    <String>XSL</String>
-                                </field>
-                                <field name="url">
-                                    <String>NavigationCmdletProvider.xml</String>
-                                </field>
-                            </scenarioAssociation>
-                            <scenarioAssociation>
-                                <field name="name">
-                                    <String>Docbook PDF duplicate</String>
-                                </field>
-                                <field name="type">
-                                    <String>XSL</String>
-                                </field>
-                                <field name="url">
-                                    <String>ItemCmdletProvider.xml</String>
-                                </field>
-                            </scenarioAssociation>
-                            <scenarioAssociation>
-                                <field name="name">
-                                    <String>Docbook PDF duplicate</String>
-                                </field>
-                                <field name="type">
-                                    <String>XSL</String>
-                                </field>
-                                <field name="url">
-                                    <String>IPropertyCmdletProvider.xml</String>
-                                </field>
-                            </scenarioAssociation>
-                            <scenarioAssociation>
-                                <field name="name">
-                                    <String>Docbook PDF duplicate</String>
-                                </field>
-                                <field name="type">
-                                    <String>XSL</String>
-                                </field>
-                                <field name="url">
-                                    <String>IDynamicPropertyCmdletProvider.xml</String>
-                                </field>
-                            </scenarioAssociation>
-                            <scenarioAssociation>
-                                <field name="name">
-                                    <String>Docbook PDF duplicate</String>
-                                </field>
-                                <field name="type">
-                                    <String>XSL</String>
-                                </field>
-                                <field name="url">
-                                    <String>IContentCmdletProvider.xml</String>
-                                </field>
-                            </scenarioAssociation>
-                            <scenarioAssociation>
-                                <field name="name">
-                                    <String>Docbook PDF duplicate</String>
-                                </field>
-                                <field name="type">
-                                    <String>XSL</String>
-                                </field>
-                                <field name="url">
-                                    <String>DriveCmdletProvider.xml</String>
-                                </field>
-                            </scenarioAssociation>
-                            <scenarioAssociation>
-                                <field name="name">
-                                    <String>Docbook PDF duplicate</String>
-                                </field>
-                                <field name="type">
-                                    <String>XSL</String>
-                                </field>
-                                <field name="url">
-                                    <String>ContainerCmdletProvider.xml</String>
                                 </field>
                             </scenarioAssociation>
                         </scenarioAssociation-array>
@@ -191,64 +26,10 @@
                         <scenario-array>
                             <scenario>
                                 <field name="advancedOptionsMap">
-                                    <map>
-                                        <entry>
-                                            <String>Saxon-EE</String>
-                                            <xsltSaxonSAAdvancedOptions>
-                                                <field name="sourceValidation">
-                                                    <String>saxon.source.lax.schema.based.validation</String>
-                                                </field>
-                                                <field name="treatResultValidationErrorsAsWarnings">
-                                                    <Boolean>false</Boolean>
-                                                </field>
-                                                <field name="addCommentsForValidationErrors">
-                                                    <Boolean>true</Boolean>
-                                                </field>
-                                                <field name="allowCallsOnExtensionFunctions">
-                                                    <Boolean>false</Boolean>
-                                                </field>
-                                                <field name="showVersionWarnings">
-                                                    <Boolean>false</Boolean>
-                                                </field>
-                                                <field name="dtdSourceValidation">
-                                                    <Boolean>false</Boolean>
-                                                </field>
-                                                <field name="dtdSourceValidationRecover">
-                                                    <Boolean>false</Boolean>
-                                                </field>
-                                                <field name="lineNumbering">
-                                                    <Boolean>true</Boolean>
-                                                </field>
-                                                <field name="initialMode">
-                                                    <null/>
-                                                </field>
-                                                <field name="initialTemplate">
-                                                    <null/>
-                                                </field>
-                                                <field name="traceXPathExpression">
-                                                    <Boolean>true</Boolean>
-                                                </field>
-                                                <field name="errorRecoverPolicy">
-                                                    <String>saxon.recover.with.warning</String>
-                                                </field>
-                                                <field name="stripWS">
-                                                    <String>saxon.strip.ws.none</String>
-                                                </field>
-                                                <field name="optimizationLevel">
-                                                    <String>10</String>
-                                                </field>
-                                                <field name="useConfigFile">
-                                                    <Boolean>false</Boolean>
-                                                </field>
-                                                <field name="configSystemID">
-                                                    <null/>
-                                                </field>
-                                            </xsltSaxonSAAdvancedOptions>
-                                        </entry>
-                                    </map>
+                                    <null/>
                                 </field>
                                 <field name="name">
-                                    <String>Docbook PDF duplicate</String>
+                                    <String>Docbook PDF G.H.</String>
                                 </field>
                                 <field name="baseURL">
                                     <String></String>
@@ -269,7 +50,7 @@
                                     <String>${frameworks}/docbook/xsl/fo/docbook_custom.xsl</String>
                                 </field>
                                 <field name="inputXMLURL">
-                                    <String>file:/E:/HDF5/ps/PSH5X/doc/docbook/book.xml</String>
+                                    <String>${currentFileURL}</String>
                                 </field>
                                 <field name="defaultScenario">
                                     <Boolean>false</Boolean>
@@ -394,9 +175,9 @@
                                             </field>
                                             <field name="value">
                                                 <String>&lt;xsl:choose>
-  &lt;xsl:when test="$fop1.extensions != 0">0pt&lt;/xsl:when>
+  &lt;xsl:when test="$fop.extensions != 0">0pt&lt;/xsl:when>
   &lt;xsl:when test="$passivetex.extensions != 0">0pt&lt;/xsl:when>
-  &lt;xsl:otherwise>4pc&lt;/xsl:otherwise>
+  &lt;xsl:otherwise>0pt&lt;/xsl:otherwise>
 &lt;/xsl:choose></String>
                                             </field>
                                             <field name="hasXPathValue">
@@ -617,6 +398,27 @@
                                             <field name="paramDescription">
                                                 <paramDescriptor>
                                                     <field name="localName">
+                                                        <String>sans.font.family</String>
+                                                    </field>
+                                                    <field name="prefix">
+                                                        <null/>
+                                                    </field>
+                                                    <field name="namespace">
+                                                        <null/>
+                                                    </field>
+                                                </paramDescriptor>
+                                            </field>
+                                            <field name="value">
+                                                <String>sans-serif</String>
+                                            </field>
+                                            <field name="hasXPathValue">
+                                                <Boolean>false</Boolean>
+                                            </field>
+                                        </transformationParameter>
+                                        <transformationParameter>
+                                            <field name="paramDescription">
+                                                <paramDescriptor>
+                                                    <field name="localName">
                                                         <String>shade.verbatim</String>
                                                     </field>
                                                     <field name="prefix">
@@ -649,7 +451,7 @@
                                                 </paramDescriptor>
                                             </field>
                                             <field name="value">
-                                                <String>0</String>
+                                                <String>1</String>
                                             </field>
                                             <field name="hasXPathValue">
                                                 <Boolean>false</Boolean>
@@ -661,7 +463,7 @@
                                     <String-array/>
                                 </field>
                                 <field name="xslTransformer">
-                                    <String>Saxon-EE</String>
+                                    <String>Saxon6.5.5</String>
                                 </field>
                                 <field name="extensionURLs">
                                     <String-array>

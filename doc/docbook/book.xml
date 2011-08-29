@@ -5,6 +5,8 @@
 
     <title>PSH5X: A Windows PowerShell Extension for HDF5 </title>
     <subtitle>Version 1.0 (Beta 1)</subtitle>
+    
+    <xi:include href="bookinfo.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
 
     <dedication>
         <para>I would like to dedicate this little guide to my esteemed colleagues at The HDF5 Group
@@ -15,9 +17,7 @@
                 environment possible for Microsoft Windows.</quote>
         </para>
     </dedication>
-
-    <xi:include href="bookinfo.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
-
+    
     <xi:include href="preface.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
 
     <xi:include href="chapter00.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
