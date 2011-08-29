@@ -1,6 +1,6 @@
 $t = @{
   Class    = 'String';
-  CharSet  = 'Ascii';
+  Encoding = 'ASCII';
   Length   = 17;
   StrPad   = 'Nullterm'
 }

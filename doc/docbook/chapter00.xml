@@ -10,9 +10,9 @@
         that. <programlisting><xi:include parse="text" href="examples/dataset.py"/></programlisting>
         Here is a PowerShell script that performs the same task.
         <programlisting><xi:include parse="text" href="examples/dataset.ps1"/></programlisting>For
-        this simple example, even the C-code wouldn't be too bad. Granted, we'd have to compile it
+        this simple example even the C-code wouldn't be too bad. Granted, we'd have to compile it
         and with all the variable definitions, semicolons, and resource management the code gets
-        pretty noisy. (For me, any code, including PowerShell, looks noisy compared to
+        pretty noisy. (For me any code, including PowerShell, looks noisy compared to
         Python.)</para>
     <para> Ok, now show me somthing that I haven't seen before! How about counting the number of
         groups and datasets in a file?</para>
@@ -230,13 +230,13 @@ At line:1 char:4
                     <literal>CSharpCodeProvider</literal> in <literal>Microsoft.CSharp</literal> has
                 all the facilities that are needed. However, there is one deficiency having to do
                 with the member naming, which hasn't been addressed in the beta version. Generally,
-                the admissble member names of an HDF5 compound type are not valid names of members
+                the admissble member names of HDF5 compound types are not valid names of members
                 of a C# class. To circumvent this problem, I've adopted the Python
                     <literal>array</literal> type codes <citation>PythonArray</citation> and
                 construct a member name as the concatenation of the type code and the compound
-                member index. For example, the C# code generated for a compound type which has an
+                member index. For example, the C# code generated for a compound type, which has an
                     <literal>H5T_NATIVE_LLONG</literal>, an <literal>H5T_C_S1</literal>-based
-                variable-length string, and two <literal>H5T_NATIVE_DOUBLE</literal> members looks
+                variable-length string, and two <literal>H5T_NATIVE_DOUBLE</literal> members, looks
                 like this:</para>
             <programlisting>using System.Runtime.InteropServices;
 [StructLayout(LayoutKind.Explicit,Size= 36,CharSet=CharSet.Ansi)]

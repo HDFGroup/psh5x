@@ -41,7 +41,8 @@
 
   <biblioentry xml:id="HDF5_Image">
     <abbrev>HDF5_UG</abbrev>
-    <title><link xlink:href="http://www.hdfgroup.org/HDF5/doc/ADGuide/ImageSpec.html">HDF5 Image and Palette Specification</link></title>
+    <title><link xlink:href="http://www.hdfgroup.org/HDF5/doc/ADGuide/ImageSpec.html">HDF5 Image and
+        Palette Specification</link></title>
     <subtitle>Version 1.2</subtitle>
     <publisher>
       <publishername>The HDF Group</publishername>
@@ -51,7 +52,7 @@
     </publisher>
     <pubdate>June 2005</pubdate>
   </biblioentry>
-  
+
   <biblioentry xml:id="HDF5_UG">
     <abbrev>HDF5_UG</abbrev>
     <title><link xlink:href="http://www.hdfgroup.org/HDF5/doc/UG/index.html">HDF5 User's
@@ -92,7 +93,7 @@
     </publisher>
     <pubdate>2011</pubdate>
   </biblioentry>
-  
+
   <biblioentry xml:id="HDFView">
     <abbrev>HDFView</abbrev>
     <title><link xlink:href="http://www.hdfgroup.org/hdf-java-html/hdfview/index.html"
@@ -267,6 +268,19 @@
       <personname>
         <firstname>Francesc</firstname>
         <surname>Alted</surname>
+      </personname>
+    </author>
+    <pubdate>2011</pubdate>
+  </biblioentry>
+
+  <biblioentry xml:id="ZavisekThesis">
+    <abbrev>ZavisekThesis</abbrev>
+    <title><link xlink:href="http://extbrain.felk.cvut.cz/theses/dp-josef-zavisek.pdf">Extensible
+        Provider for Windows PowerShell</link></title>
+    <author>
+      <personname>
+        <firstname>Josef</firstname>
+        <surname>Závišek</surname>
       </personname>
     </author>
     <pubdate>2011</pubdate>

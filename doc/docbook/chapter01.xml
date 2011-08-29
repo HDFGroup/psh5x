@@ -6,12 +6,14 @@
 
   <para><emphasis role="bold">P</emphasis>ower<emphasis role="bold">S</emphasis>hell <emphasis
       role="bold">H</emphasis>DF<emphasis role="bold">5</emphasis> e<emphasis role="bold"
-      >X</emphasis>tension is a PowerShell snap-in (a .NET DLL) that contains a PowerShell provider
-    and other supporting cmdlets for accessing HDF5 files (stores). The PowerShell provider
-    architecture is the "secret sauce" behind the consistent user experience across a diverse set of
-    data stores, such as the Windows Registry, certificate stores, and Active Directory. PSH5X is an
-    attempt to add a member to that ensemble of providers orchestrated by the provider
-    architecture.</para>
+      >X</emphasis>tension is a PowerShell snap-in (packaged in a .NET assembly) that contains a
+    PowerShell provider and other supporting cmdlets for accessing HDF5 files (stores). The
+    PowerShell provider architecture is the "secret sauce" behind the consistent user experience
+    across a diverse set of data stores, such as the Windows Registry, certificate stores, and
+    Active Directory. PSH5X adds a member to that ensemble of providers orchestrated by the provider
+    architecture. Chapter 16 in <citation>PSBible</citation>, chapter 5 in
+      <citation>PSProgramming</citation>, and <citation>ZavisekThesis</citation> have excellent
+    discussions of the Windows PowerShell <emphasis>provider model</emphasis>.</para>
 
   <sect1 xml:id="windows_powershell_providers">
     <title>A Windows PowerShell Provider</title>
@@ -102,8 +104,12 @@
     <para>PSH5X also includes a set of utility cmdlets, for example, to look up HDF5 datatype
       information or to construct .NET arrays of a certain element type. These cmdlets are not
       governed by the PowerShell provider interface. See <xref linkend="other_psh5x_cmdlets"/>, for
-      an overview. </para>
-    <para> </para>
+      an overview. My plan is to develop a PowerShell module that wraps the generic PSH5X cmdlets
+      and gives them more intuitive and HDF5-specific names. For example, instead of using a
+      one-stop <literal>New-Item</literal> cmdlet with a slew of options, many users might find it
+      more convenient to have separate <literal>New-H5Dataset</literal>,
+        <literal>New-H5Group</literal> etc. cmdlets. You'll still be able to do everything with
+        <literal>New-Item</literal>, but you'll have a choice.</para>
   </sect1>
 
   <sect1 xml:id="pathology">
@@ -152,6 +158,20 @@ WSMan                                  WSMan</screen>
         containing backslashes.</para>
     </warning>
 
+  </sect1>
+
+  <sect1>
+    <title>Notation</title>
+    <para>Below we will see many examples of PSH5X cmdlets. The cmdlet synopsis will typically be of
+      the following form:</para>
+    <cmdsynopsis>
+      <command>Do-It</command>
+      <arg choice="req">-MandatoryParameter <replaceable>type</replaceable></arg>
+      <arg choice="opt">-OptionalParameter <replaceable>type</replaceable></arg>
+    </cmdsynopsis>
+    <para><literal>Do-It</literal> (verb-noun) is the name of the cmdlet. Mandatory parameters are
+      enclosed in curly braces and optional parameters are enclosed in brackets. Unless the
+      parameter is a switch, the expected argument type is also shown.</para>
   </sect1>
 
 </chapter>

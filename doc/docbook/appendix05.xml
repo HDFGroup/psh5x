@@ -24,6 +24,7 @@
     Size         = 4
   }</programlisting>
     </sect1>
+    
     <sect1>
         <title>HDF5 Float</title>
         <programlisting>@{
@@ -47,7 +48,25 @@
 
     <sect1>
         <title>HDF5 String</title>
-        <para/>
+        <sect2>
+            <title>HDF5 Variable-Length String</title>
+            <programlisting>@{
+            Class    = 'STRING';
+            # the only valid encodings are 'ASCII' and 'UTF-8'
+            Encoding = 'ASCII'
+}</programlisting>
+        </sect2>
+        <sect2>
+            <title>HDF5 Fixed-Length String</title>
+            <programlisting>@{
+            Class    = 'STRING';
+            # the only valid encodings are 'ASCII' and 'UTF-8'
+            Encoding = 'ASCII';
+            Length   = 17;
+            # the only vaild paddings are 'Nullterm', 'Nullpad', and 'Spacepad'
+            StrPad   = 'Nullterm'
+}</programlisting>
+        </sect2>
     </sect1>
 
     <sect1>
@@ -67,8 +86,9 @@
         <title>HDF5 Opaque</title>
         <programlisting>@{
     Class     = 'OPAQUE';
+    # the only valid byte orders are 'BE' and 'LE'
     ByteOrder = 'BE';
-    Tag       = 'foo'
+    Tag       = &lt;ASCII string&gt;
  }</programlisting>
     </sect1>
 
@@ -103,7 +123,11 @@
 
     <sect1>
         <title>HDF5 Reference Type</title>
-        <para/>
+        <programlisting>@{
+    Class = 'REFERENCE';
+    # the only valid reference types are 'Object' and 'Region'
+    Type  = 'Object';
+ }</programlisting>
     </sect1>
 
     <sect1>
