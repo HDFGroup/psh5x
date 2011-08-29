@@ -13,7 +13,7 @@
             item and sets its value. Typically, this cmdlet is used to create new registry values,
             because registry values are properties of a registry key item.</para>
         <cmdsynopsis>
-            <command>Get-ItemProperty</command>
+            <command>New-ItemProperty</command>
             <arg choice="req">-Path <replaceable>string[]</replaceable></arg>
             <arg choice="req">-Name <replaceable>string[]</replaceable></arg>
             <arg choice="opt">-Value <replaceable>Object</replaceable></arg>
@@ -22,6 +22,9 @@
             <arg choice="opt">-Simple <replaceable>Int64[]</replaceable></arg>
             <arg choice="opt">-Null</arg>
         </cmdsynopsis>
+        <para>The <literal>New-ItemProperty</literal> cmdlet creates a new property for a specified
+            item and sets its value. Typically, this cmdlet is used to create new registry values,
+            because registry values are properties of a registry key item.</para>
         <variablelist>
             <varlistentry>
                 <term><literal>-Path</literal></term>
@@ -47,13 +50,14 @@
 
     <sect2 xml:id="remove_item_property">
         <title><literal>Remove-ItemProperty</literal></title>
-        <para>The <literal>Remove-ItemProperty</literal> cmdlet deletes a property and its value
-            from an item.</para>
+        <para>Deletes an HDF5 attribute and its value from an HDF5 item.</para>
         <cmdsynopsis>
             <command>Remove-ItemProperty</command>
             <arg choice="req">-Path <replaceable>string[]</replaceable></arg>
             <arg choice="req">-Name <replaceable>string[]</replaceable></arg>
         </cmdsynopsis>
+        <para>The <literal>Remove-ItemProperty</literal> cmdlet deletes a property and its value
+            from an item.</para>
         <variablelist>
             <varlistentry>
                 <term><literal>-Path</literal></term>
@@ -73,14 +77,15 @@
 
     <sect2 xml:id="rename_item_property">
         <title><literal>Rename-ItemProperty</literal></title>
-        <para>The <literal>Rename-ItemProperty</literal>cmdlet changes the name of a specified item
-            property. The value of the property is not changed.</para>
+        <para>Renames an HDF5 attribute of an HDF5 item.</para>
         <cmdsynopsis>
             <command>Rename-ItemProperty</command>
             <arg choice="req">-Path <replaceable>string</replaceable></arg>
             <arg choice="req">-Name <replaceable>string</replaceable></arg>
             <arg choice="req">-NewName <replaceable>string</replaceable></arg>
         </cmdsynopsis>
+        <para>The <literal>Rename-ItemProperty</literal>cmdlet changes the name of a specified item
+            property. The value of the property is not changed.</para>
         <variablelist>
             <varlistentry>
                 <term><literal>-Path</literal></term>
@@ -105,13 +110,71 @@
 
     <sect2 xml:id="copy_item_property">
         <title><literal>Copy-ItemProperty</literal></title>
+        <para>Copies an HDF5 attribute from a specified HDF5 item to another HDF5 item.</para>
+        <cmdsynopsis>
+            <command>Copy-ItemProperty</command>
+            <arg choice="req">-Path <replaceable>string[]</replaceable></arg>
+            <arg choice="req">-Destination <replaceable>string</replaceable></arg>
+            <arg choice="req">-Name <replaceable>string</replaceable></arg>
+        </cmdsynopsis>
+        <para/>
+        <variablelist>
+            <varlistentry>
+                <term><literal>-Path</literal></term>
+                <listitem>
+                    <para>Specifies the path to the HDF5 item whose HDF5 attribute is to be
+                        copied.</para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>-Destination</term>
+                <listitem>
+                    <para>Specifies the path to the destination HDF5 item.</para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>-Name</term>
+                <listitem>
+                    <para>Specifies the name of the HDF5 attribute to be copied.</para>
+                </listitem>
+            </varlistentry>
+        </variablelist>
         <note>
-            <para>Not implemented.</para>
+            <para>Under development.</para>
         </note>
     </sect2>
 
     <sect2 xml:id="move_item_property">
         <title><literal>Move-ItemProperty</literal></title>
+        <para>Moves an HDF5 attribute from one HDF5 item to another.</para>
+        <cmdsynopsis>
+            <command>Copy-ItemProperty</command>
+            <arg choice="req">-Path <replaceable>string[]</replaceable></arg>
+            <arg choice="req">-Destination <replaceable>string</replaceable></arg>
+            <arg choice="req">-Name <replaceable>string</replaceable></arg>
+        </cmdsynopsis>
+        <para/>
+        <variablelist>
+            <varlistentry>
+                <term><literal>-Path</literal></term>
+                <listitem>
+                    <para>Specifies the path to the HDF5 item whose HDF5 attribute is to be
+                        moved.</para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>-Destination</term>
+                <listitem>
+                    <para>Specifies the path to the destination HDF5 item.</para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>-Name</term>
+                <listitem>
+                    <para>Specifies the name of the HDF5 attribute to be moved.</para>
+                </listitem>
+            </varlistentry>
+        </variablelist>
         <note>
             <para>Not implemented.</para>
         </note>

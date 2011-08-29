@@ -11,14 +11,9 @@
         for pre-defined types.</para>
     <para>Please refer to <citation>H5RM</citation> for details on HDF5 Datatypes. </para>
 
-
     <sect1>
-        <title>HDF5 Atomic Types</title>
-        <para/>
-
-        <sect2>
-            <title>HDF5 Integer</title>
-            <programlisting>@{
+        <title>HDF5 Integer</title>
+        <programlisting>@{
     BitOffset    = 0;
     ByteOrder    = 'LE'
     Class        = 'INTEGER';
@@ -28,11 +23,10 @@
     SignType     = 2;
     Size         = 4
   }</programlisting>
-        </sect2>
-
-        <sect2>
-            <title>HDF5 Float</title>
-            <programlisting>@{
+    </sect1>
+    <sect1>
+        <title>HDF5 Float</title>
+        <programlisting>@{
     BitOffset      = 0;
     ByteOrder      = 'LE';
     Class          = 'FLOAT';
@@ -49,16 +43,16 @@
     SignBitPos     = 31;
     Size           = 4
   }</programlisting>
-        </sect2>
+    </sect1>
 
-        <sect2>
-            <title>HDF5 String</title>
-            <para/>
-        </sect2>
+    <sect1>
+        <title>HDF5 String</title>
+        <para/>
+    </sect1>
 
-        <sect2>
-            <title>HDF5 Bitfield</title>
-            <programlisting>@{
+    <sect1>
+        <title>HDF5 Bitfield</title>
+        <programlisting>@{
     BitOffset    = 0;
     ByteOrder    = 'BE';
     Class        = 'BITFIELD';
@@ -67,18 +61,17 @@
     Precision    = 32;
     Size         = 4
  }</programlisting>
-        </sect2>
+    </sect1>
 
-        <sect2>
-            <title>HDF5 Opaque</title>
-            <programlisting>@{
+    <sect1>
+        <title>HDF5 Opaque</title>
+        <programlisting>@{
     Class     = 'OPAQUE';
     ByteOrder = 'BE';
     Tag       = 'foo'
  }</programlisting>
-        </sect2>
-
     </sect1>
+
 
     <sect1>
         <title>HDF5 Compound Type</title>

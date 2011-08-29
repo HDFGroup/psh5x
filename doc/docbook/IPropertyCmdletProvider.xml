@@ -9,16 +9,18 @@
 
     <sect2 xml:id="get_item_property">
         <title><literal>Get-ItemProperty</literal></title>
-        <para>The <literal>Get-ItemProperty</literal> cmdlet gets the properties of the specified
-            items. For example, you can use <literal>Get-ItemProperty</literal> to get the value of
-            the LastAccessTime property of a file object. You can also use
-                <literal>Get-ItemProperty</literal> to view registry entries and their
-            values.</para>
+        <para>Gets the properties of a specified item.</para>
         <cmdsynopsis>
             <command>Get-ItemProperty</command>
             <arg choice="req">-Path <replaceable>string[]</replaceable></arg>
             <arg choice="opt">-Name <replaceable>string[]</replaceable></arg>
         </cmdsynopsis>
+
+        <para>The <literal>Get-ItemProperty</literal> cmdlet gets the properties of the specified
+            items. For example, you can use <literal>Get-ItemProperty</literal> to get the value of
+            the LastAccessTime property of a file object. You can also use
+                <literal>Get-ItemProperty</literal> to view registry entries and their
+            values.</para>
         <variablelist>
             <varlistentry>
                 <term><literal>-Path</literal></term>
@@ -37,8 +39,17 @@
 
     <sect2 xml:id="set_item_property">
         <title><literal>Set-ItemProperty</literal></title>
+        <para>Creates or changes the value of a property of an item.</para>
+        <cmdsynopsis>
+            <command>Get-ItemProperty</command>
+            <arg choice="req">-Path <replaceable>string[]</replaceable></arg>
+            <arg choice="opt">-Value <replaceable>Object</replaceable></arg>
+        </cmdsynopsis>
+        <para>The <literal>Set-ItemProperty</literal> cmdlet changes the value of the property of
+            the specified item. You can use the cmdlet to establish or change the properties of
+            items.</para>
         <note>
-            <para>Not implemented. (Coming soon...)</para>
+            <para>Under development.</para>
         </note>
     </sect2>
 
