@@ -7,11 +7,16 @@
     <title>IContentCmdletProvider</title>
     <para> According to <xref linkend="items_et_properties_table"/>, only HDF5 datasets are
         considered to have content. PSH5X implements the <literal>IContentCmdletProvider</literal>
-        interface providing row- or stream-oriented access to a dataset's data elements.</para>
+        interface providing <emphasis>row- or stream-oriented</emphasis> access to a dataset's data
+        elements. This is not the most fortunate way of dealing with multidimensional arrays.
+        Viewing such an array as a stream of rows forgets the array structure: what is the
+        two-dimensional array that represents the first 3 elements of another two-dimensonial array?
+        The PowerShell provider interface has no provisions for multi-dimensional arrays and this
+        can lead to the corner cases we describe below.</para>
 
     <sect2 xml:id="get_content">
         <title><literal>Get-Content</literal></title>
-        <para>Gets the content of the item at the specified location.</para>
+        <para>Gets the content of an HDF5 dataset at the specified location.</para>
         <cmdsynopsis>
             <command>Get-Content</command>
             <arg choice="req">-Path <replaceable>string[]</replaceable></arg>
@@ -21,39 +26,44 @@
             <arg choice="opt">-Hyperslab <replaceable>Int64[4]</replaceable></arg>
             <arg choice="opt">-PointSet <replaceable>Int64[,]</replaceable></arg>
         </cmdsynopsis>
-        <para>The <literal>Get-Content</literal> cmdlet gets the content of the item at the location
-            specified by the path, such as the text in a file. It reads the content one line at a
-            time and returns an object for each line.</para>
-        <variablelist>
-            <varlistentry>
-                <term>-Path</term>
-                <listitem>
-                    <para>An HDF5 path name referring to the HDF5 dataset whose content is to be
-                        accessed</para>
-                </listitem>
-            </varlistentry>
-            <varlistentry>
-                <term>-ReadCount</term>
-                <listitem>
-                    <para>Specifies how many lines of content are sent through the pipeline at a
-                        time. The default value is 1. A value of 0 (zero) sends all of the content
-                        at one time.</para>
-                </listitem>
-            </varlistentry>
-            <varlistentry>
-                <term>-TotalCount</term>
-                <listitem>
-                    <para> Specifies how many lines of content are retrieved. The default is -1 (all
-                        lines).</para>
-                </listitem>
-            </varlistentry>
-        </variablelist>
-        <para/>
+        <para>The <literal>Get-Content</literal> cmdlet gets the content of an HDF5 dataset at the
+            location specified by the path. </para>
         <note>
             <para>The release version of PSH5X will support versions of
                     <literal>Get-Content</literal> that support hyperslabs and point
                 selections.</para>
         </note>
+        <variablelist>
+            <varlistentry>
+                <term>-Path</term>
+                <listitem>
+                    <para>Specifies the path to the location of the HDF5 dataset whose content is to
+                        be accessed.</para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>-ReadCount</term>
+                <listitem>
+                    <para>Specifies how many data elements are sent through the pipeline at a time.
+                        The default value is 1. A value of 0 sends all of the content at one
+                        time.</para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>-TotalCount</term>
+                <listitem>
+                    <para> Specifies how many data elements are retrieved. The default is -1 (all
+                        lines).</para>
+                </listitem>
+            </varlistentry>
+        </variablelist>
+        <warning>
+            <para> By default the <literal>Get-Content</literal> reads the content of an HDF5
+                dataset one element at a time and returns an object for each element. This can be
+                slow for large datasets and is typically <emphasis role="bold">not</emphasis> what
+                you want. Use <literal>-ReadCount 0</literal> to get an n-dimensional array that has
+                the same rank as the dataset whose content you are reading.</para>
+        </warning>
         <example>
             <title>Getting the first 10 elements of a dataset</title>
             <screen><prompt>PS:1 ></prompt> <command>Get-Content h5tmp:\dset1 -TotalCount 10</command>
@@ -68,6 +78,12 @@
 8
 9</screen>
         </example>
+        <para>Typically, you will use the <literal>-TotalCount</literal> parameter only to peek at
+            the "head" of an HDF5 dataset. Using the <literal>-TotalCount</literal> and
+                <literal>-ReadCount</literal> parameters in the same command should be avoided for
+            its confusion potential.</para>
+
+
     </sect2>
 
     <sect2 xml:id="set_content">

@@ -1074,7 +1074,8 @@ namespace PSH5X
             "H5T_STD_U32BE", "H5T_STD_U32LE", "H5T_STD_U64BE",
             "H5T_STD_U64LE", "H5T_STD_B8BE", "H5T_STD_B8LE",
             "H5T_STD_B16BE", "H5T_STD_B16LE", "H5T_STD_B32BE",
-            "H5T_STD_B32LE", "H5T_STD_B64BE", "H5T_STD_B64LE"
+            "H5T_STD_B32LE", "H5T_STD_B64BE", "H5T_STD_B64LE",
+            "H5T_STD_REF_OBJ", "H5T_STD_REF_DSETREG"
         };
 
         for each (String^ s in a) {
