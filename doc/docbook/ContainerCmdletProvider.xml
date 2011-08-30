@@ -28,7 +28,7 @@
             containers.</para>
         <variablelist>
             <varlistentry>
-                <term>-Path</term>
+                <term><literal>-Path</literal></term>
                 <listitem>
                     <para>Specifies a path to one or more locations. Wildcards are permitted. The
                         default location is the current directory (.).</para>
@@ -98,7 +98,8 @@ slink1                   SoftLink
 type1                    Datatyp... 1/1/1970 12:00:00 AM   0</screen>
         </example>
         <example>
-            <title>Getting the children of the PSDrive with root <literal>h5tmp:\</literal> using wildcards</title>
+            <title>Getting the children of the PSDrive with root <literal>h5tmp:\</literal> using
+                wildcards</title>
             <screen><prompt>PS:1 ></prompt> <command>Get-ChildItem h5tmp:\dset*</command>
 
    PSParentPath: HDF5\HDF5::h5tmp:
@@ -172,7 +173,7 @@ dset3                    Dataset    8/24/2011 12:11:37 PM  0</screen>
         <cmdsynopsis>
             <command>New-Item</command>
             <arg choice="req">-Path <replaceable>string[]</replaceable></arg>
-            <arg choice="req">-Name <replaceable>string</replaceable></arg>
+            <arg choice="opt">-Name <replaceable>string</replaceable></arg>
             <arg choice="req">-ItemType <group>
                     <option>Dataset,</option>
                     <option>Datatype,</option>
@@ -188,11 +189,11 @@ dset3                    Dataset    8/24/2011 12:11:37 PM  0</screen>
         </cmdsynopsis>
         <para> The <literal>New-Item</literal> cmdlet creates a new item and sets its value (if
             applicable). The basic syntax of <literal>New-Item</literal> is shown. It consists of
-            the new item's name, its type, and its value. Depending on the item type additional
+            the new item's name, its item type, and its value. Depending on the item type additional
             options may be required and are shown separated by item type.</para>
         <variablelist>
             <varlistentry>
-                <term><literal>-Name</literal></term>
+                <term>-Name</term>
                 <listitem>
                     <para>Specifies the name of the new item. You can use this parameter to specify
                         the name of the new item, or include the name in the value of the
@@ -245,6 +246,9 @@ dset3                    Dataset    8/24/2011 12:11:37 PM  0</screen>
             <cmdsynopsis>
                 <arg choice="req">-Definition <replaceable>Object</replaceable></arg>
             </cmdsynopsis>
+            <para>The object must be either a string, see <xref linkend="psh5x_type_strings"/>, or a
+                full type definition as a hashtable, see <xref linkend="appdx_hdf5_datatypes"/>.
+            </para>
         </sect3>
 
         <sect3>
@@ -271,7 +275,7 @@ dset3                    Dataset    8/24/2011 12:11:37 PM  0</screen>
             <para>See <citation>HDF5_Image</citation> for the HDF5 Image and Palette
                 specification.</para>
             <para> If the <literal>-Value</literal> argument is specified, it is expected to be the
-                name of an image file. All of the image characteristics (bits, widht, height etc.)
+                name of an image file. All of the image characteristics (bits, width, height etc.)
                 will be inferred and no other options need to be specified. Otherwise the following
                 options must be specified for creating a new HDF5 image.</para>
             <cmdsynopsis>
@@ -301,11 +305,10 @@ dset3                    Dataset    8/24/2011 12:11:37 PM  0</screen>
             <arg choice="req">-Path <replaceable>string[]</replaceable></arg>
             <arg choice="opt">-Recurse</arg>
         </cmdsynopsis>
-        <para> The <literal>Remove-Item</literal> cmdlet deletes one or more items. Because it is
-            supported by many providers, it can delete many different types of items. </para>
+        <para> The <literal>Remove-Item</literal> cmdlet deletes one or more HDF5 items.</para>
         <variablelist>
             <varlistentry>
-                <term><literal>-Path</literal></term>
+                <term>-Path</term>
                 <listitem>
                     <para>Specifies a path to the items being removed. Wildcards are
                         permitted.</para>
@@ -320,25 +323,25 @@ dset3                    Dataset    8/24/2011 12:11:37 PM  0</screen>
 
     <sect2 xml:id="rename_item">
         <title><literal>Rename-Item</literal></title>
-        <para>Renames an item in the PSH5X provider namespace.</para>
+        <para>Renames an HDF5 item in the PSH5X provider namespace.</para>
         <cmdsynopsis>
             <command>Rename-Item</command>
             <arg choice="req">-Path <replaceable>string</replaceable></arg>
             <arg choice="req">-NewName <replaceable>string</replaceable></arg>
         </cmdsynopsis>
-        <para>The <literal>Rename-Item</literal> cmdlet changes the name of a specified item. This
-            cmdlet does not affect the content of the item being renamed. You cannot use Rename-Item
-            to move an item, such as by specifying a path along with the new name. To move and
-            rename an item, use the <literal>Move-Item</literal> cmdlet.</para>
+        <para>The <literal>Rename-Item</literal> cmdlet changes the link name of a specified item.
+            This cmdlet does not affect the content of the item being renamed. You cannot use
+            Rename-Item to move an item, such as by specifying a path along with the new name. To
+            move and rename an item, use the <literal>Move-Item</literal> cmdlet.</para>
         <variablelist>
             <varlistentry>
-                <term><literal>-Path</literal></term>
+                <term>-Path</term>
                 <listitem>
                     <para>Specifies the path to the item to rename.</para>
                 </listitem>
             </varlistentry>
             <varlistentry>
-                <term><literal>-NewName</literal></term>
+                <term>-NewName</term>
                 <listitem>
                     <para>Specifies the new name of the item. Enter only a name, not a path and
                         name. If you enter a path that is different from the path that is specified
@@ -364,30 +367,35 @@ dset3                    Dataset    8/24/2011 12:11:37 PM  0</screen>
             <arg choice="req">-Path <replaceable>string[]</replaceable></arg>
             <arg choice="req">-Destination <replaceable>string</replaceable></arg>
             <arg choice="opt">-Container</arg>
+            <arg choice="opt">-Force</arg>
         </cmdsynopsis>
         <para>The Copy-Item cmdlet copies an item from one location to another in a names pace.
-            Copy-Item does not delete the items being copied. The particular item s that the cmdlet
-            can copy depend on the Windows PowerShell providers avail able. For example, when used
-            with the FileSystem provider, it can copy file s and directories and when used with the
-            Registry provider, it can copy reg istry keys and entries.</para>
+            Copy-Item does not delete the items being copied. Use the <literal>-Force</literal>
+            switch to force the creation of missing intermediate HDF5 groups.</para>
         <variablelist>
             <varlistentry>
-                <term><literal>-Path</literal></term>
+                <term>-Path</term>
                 <listitem>
                     <para>Specifies the path to the items to copy.</para>
                 </listitem>
             </varlistentry>
             <varlistentry>
-                <term><literal>-Destination</literal></term>
+                <term>-Destination</term>
                 <listitem>
                     <para>Specifies the path to the location where the items are to be
                         copied.</para>
                 </listitem>
             </varlistentry>
             <varlistentry>
-                <term><literal>-Container</literal></term>
+                <term>-Container</term>
                 <listitem>
                     <para>Preserves container objects during the copy operation.</para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>-Force</term>
+                <listitem>
+                    <para>Force the creation of missing intermediate HDF5 groups.</para>
                 </listitem>
             </varlistentry>
         </variablelist>
@@ -413,14 +421,14 @@ dset3                    Dataset    8/24/2011 12:11:37 PM  0</screen>
             drive.</para>
         <variablelist>
             <varlistentry>
-                <term><literal>-PSDrive</literal></term>
+                <term>-PSDrive</term>
                 <listitem>
                     <para>This parameter is used to specify the path to a new working
                         location.</para>
                 </listitem>
             </varlistentry>
             <varlistentry>
-                <term><literal>-PSProvider</literal></term>
+                <term>-PSProvider</term>
                 <listitem>
                     <para>This parameter is used to specify the path to a new working
                         location.</para>
@@ -455,10 +463,10 @@ h5tmp:\group1</screen>
             <arg choice="req">-Path <replaceable>string</replaceable></arg>
         </cmdsynopsis>
         <para>The <literal>Set-Location</literal> cmdlet sets the working location to a specified
-            location. That location must be an item that corresponds to an HDF5 group.</para>
+            location. That location must be an item that is an HDF5 group.</para>
         <variablelist>
             <varlistentry>
-                <term><literal>-Path</literal></term>
+                <term>-Path</term>
                 <listitem>
                     <para>This parameter is used to specify the path to a new working
                         location.</para>
@@ -493,7 +501,7 @@ dset3                    Dataset    8/8/2011 4:05:00 PM    0</screen>
             location onto the stack unless it is the current location. </para>
         <variablelist>
             <varlistentry>
-                <term><literal>-Path</literal></term>
+                <term>-Path</term>
                 <listitem>
                     <para>Changes your location to the location specified by this path after it adds
                         (pushes) the current location onto the top of the stack. Enter a path to any
@@ -502,7 +510,7 @@ dset3                    Dataset    8/8/2011 4:05:00 PM    0</screen>
                 </listitem>
             </varlistentry>
             <varlistentry>
-                <term><literal>-StackName</literal></term>
+                <term>-StackName</term>
                 <listitem>
                     <para>Specifies the name of a stack. The current location is pushed onto this
                         stack, and this stack becomes the current stack. If the stack does not yet
@@ -528,7 +536,7 @@ dset3                    Dataset    8/8/2011 4:05:00 PM    0</screen>
             command. </para>
         <variablelist>
             <varlistentry>
-                <term><literal>-StackName</literal></term>
+                <term>-StackName</term>
                 <listitem>
                     <para>Specifies an alternate stack. <literal>Pop-Location</literal> pops the
                         most recently added location from this stack. This stack then becomes the
@@ -550,7 +558,7 @@ dset3                    Dataset    8/8/2011 4:05:00 PM    0</screen>
             as the HDF5 datasets and groups.</para>
         <variablelist>
             <varlistentry>
-                <term><literal>-Path</literal></term>
+                <term>-Path</term>
                 <listitem>
                     <para>Specifies the PowerShell path to resolve. This parameter is
                         required.</para>
@@ -589,7 +597,7 @@ h5tmp:\dset3</screen>
             a container or a terminal (leaf) element.</para>
         <variablelist>
             <varlistentry>
-                <term><literal>-Path</literal></term>
+                <term>-Path</term>
                 <listitem>
                     <para>Specifies a path to be tested. Wildcards are permitted. If the path
                         includes spaces, enclose it in quotation marks.</para>
@@ -598,9 +606,9 @@ h5tmp:\dset3</screen>
             <varlistentry>
                 <term>-IsValid</term>
                 <listitem>
-                    <para> Determines whether the syntax of the path is correct, regardless of whe
-                        ther the elements of the path exist. This parameter returns TRUE if the path
-                        syntax is valid and FALSE if it is not.</para>
+                    <para> Determines whether the syntax of the path is correct, regardless of
+                        whether the elements of the path exist. This parameter returns TRUE if the
+                        path syntax is valid and FALSE if it is not.</para>
                 </listitem>
             </varlistentry>
             <varlistentry>
@@ -613,15 +621,15 @@ h5tmp:\dset3</screen>
                             <varlistentry>
                                 <term>Container</term>
                                 <listitem>
-                                    <para>An element that contains other elements, such as a
-                                        directory or registry key.</para>
+                                    <para>An element that contains other elements, i.e., an HDF5
+                                        group.</para>
                                 </listitem>
                             </varlistentry>
                             <varlistentry>
                                 <term>Leaf</term>
                                 <listitem>
-                                    <para>An element that does not contain other elements, such as a
-                                        file.</para>
+                                    <para>An element that does not contain other elements, i.e., not
+                                        an HDF5 group.</para>
                                 </listitem>
                             </varlistentry>
                             <varlistentry>

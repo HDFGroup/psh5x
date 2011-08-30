@@ -85,7 +85,7 @@
         </tgroup>
     </table>
     
-    <table>
+    <table xml:id="psh5x_type_strings">
         <title>PSH5X Type Shorthands (Strings)</title>
         <tgroup cols="3">
             <thead>

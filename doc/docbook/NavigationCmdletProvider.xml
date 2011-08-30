@@ -14,14 +14,14 @@
             <arg choice="req">-Path <replaceable>string[]</replaceable></arg>
             <arg choice="req">-Destination <replaceable>string</replaceable></arg>
         </cmdsynopsis>
-        <para> The <literal>Move-Item</literal> cmdlet moves an item, including its properties,
+        <para> The <literal>Move-Item</literal> cmdlet moves an HDF5 item, including its properties,
             contents, and child items, from one location to another location. The locations must be
-            supported by the same provider. For example, it can move a file or subdirectory from one
-            directory to another or move a registry subkey from one key to another. When you move an
-            item, it is added to the new location and delet ed from its original location. </para>
+            supported by the same provider. For example, it can move an HDF5 dataset or HDF5 group
+            from one HDF5 group to another. When you move an item, it is added to the new location
+            and deleted from its original location. </para>
         <variablelist>
             <varlistentry>
-                <term><literal>-Path</literal></term>
+                <term>-Path</term>
                 <listitem>
                     <para>Specifies the path to the current location of the items. The default is
                         the current directory. Wildcards are permitted.</para>
@@ -56,7 +56,7 @@
             path. The provider supplies the path delimiters.</para>
         <variablelist>
             <varlistentry>
-                <term><literal>-Path</literal></term>
+                <term>-Path</term>
                 <listitem>
                     <para>Specifies the main path (or paths) to which the child-path is appended.
                         Wildcards are permitted.</para>

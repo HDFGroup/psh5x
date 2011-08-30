@@ -1,18 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-model href="http://www.oasis-open.org/docbook/xml/5.0/rng/docbookxi.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
-<chapter xml:id="psh5x_layers" xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude"
-  xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0">
+<chapter xml:id="psh5x_layers" xmlns="http://docbook.org/ns/docbook"
+  xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xlink="http://www.w3.org/1999/xlink"
+  version="5.0">
   <title>PSH5X Provider Layers</title>
 
   <para>The primary reference for writing PowerShell providers is <xref linkend="PSProgramming"/>.
     PowerShell defines a set of five base classes and four interfaces that can be used to implement
     a provider for a custom data source. The PSH5X provider is derived from the most featureful base
-    class, <literal>NavigationCmdletProvider</literal>, and implements three of the four interfaces.<footnote>
-      <para> Currently, there is no standardized notion of Access Control Lists in HDF5, which is
-        why the <literal>ISecurityDescriptorCmdletProvider</literal> interface was not implemented
-        in this version of PSH5X.</para>
-    </footnote>
-  </para>
+    class, <literal>NavigationCmdletProvider</literal>, and implements three of the four possible
+    interfaces. </para>
 
   <sect1 xml:id="cmdlet_provider">
     <title>CmdletProvider</title>
@@ -25,17 +22,17 @@
   </sect1>
 
   <xi:include href="DriveCmdletProvider.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
-  
+
   <xi:include href="ItemCmdletProvider.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
- 
+
   <xi:include href="ContainerCmdletProvider.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
-  
+
   <xi:include href="NavigationCmdletProvider.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
 
   <xi:include href="IContentCmdletProvider.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
-  
+
   <xi:include href="IPropertyCmdletProvider.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
-  
+
   <xi:include href="IDynamicPropertyCmdletProvider.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
 
 </chapter>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-model href="http://www.oasis-open.org/docbook/xml/5.0/rng/docbookxi.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
 <appendix xml:id="drive_object" xmlns="http://docbook.org/ns/docbook">
-    <title>The PSH5X PowerShell Drive Object</title>
+    <title>The PSH5X Drive Object</title>
     <screen linenumbering="numbered"><prompt>PS:1 ></prompt> <command>Get-PSDrive h5new | Get-Member -MemberType Property
     | Format-Table Name,Definition</command>
         

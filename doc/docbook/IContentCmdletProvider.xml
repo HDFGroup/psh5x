@@ -26,14 +26,14 @@
             time and returns an object for each line.</para>
         <variablelist>
             <varlistentry>
-                <term><literal>-Path</literal></term>
+                <term>-Path</term>
                 <listitem>
                     <para>An HDF5 path name referring to the HDF5 dataset whose content is to be
                         accessed</para>
                 </listitem>
             </varlistentry>
             <varlistentry>
-                <term><literal>-ReadCount</literal></term>
+                <term>-ReadCount</term>
                 <listitem>
                     <para>Specifies how many lines of content are sent through the pipeline at a
                         time. The default value is 1. A value of 0 (zero) sends all of the content
@@ -41,7 +41,7 @@
                 </listitem>
             </varlistentry>
             <varlistentry>
-                <term><literal>-TotalCount</literal></term>
+                <term>-TotalCount</term>
                 <listitem>
                     <para> Specifies how many lines of content are retrieved. The default is -1 (all
                         lines).</para>
@@ -49,6 +49,11 @@
             </varlistentry>
         </variablelist>
         <para/>
+        <note>
+            <para>The release version of PSH5X will support versions of
+                    <literal>Get-Content</literal> that support hyperslabs and point
+                selections.</para>
+        </note>
         <example>
             <title>Getting the first 10 elements of a dataset</title>
             <screen><prompt>PS:1 ></prompt> <command>Get-Content h5tmp:\dset1 -TotalCount 10</command>
@@ -84,19 +89,24 @@
                 <literal>Set-Content</literal>.</para>
         <variablelist>
             <varlistentry>
-                <term><literal>-Path</literal></term>
+                <term>-Path</term>
                 <listitem>
                     <para>An HDF5 path name referring to the HDF5 dataset whose content is to be
                         accessed</para>
                 </listitem>
             </varlistentry>
             <varlistentry>
-                <term><literal>-Value</literal></term>
+                <term>-Value</term>
                 <listitem>
                     <para>Specifies the new content for the item.</para>
                 </listitem>
             </varlistentry>
         </variablelist>
+        <note>
+            <para>The release version of PSH5X will support versions of
+                <literal>Get-Content</literal> that support hyperslabs and point
+                selections.</para>
+        </note>
         <example>
             <title>Setting the content of a dataset from a one- or two-dimensional array</title>
             <screen><prompt>PS:1 ></prompt> <command>(Get-Item h5tmp:\dset1).Dimensions</command>
@@ -138,7 +148,7 @@ Size                           4
             contains the content.</para>
         <variablelist>
             <varlistentry>
-                <term><literal>-Path</literal></term>
+                <term>-Path</term>
                 <listitem>
                     <para>Specifies the path to the items that receive the additional content.
                         Wildcards are permitted. If you specify multiple paths, use commas to
@@ -146,7 +156,7 @@ Size                           4
                 </listitem>
             </varlistentry>
             <varlistentry>
-                <term><literal>-Value</literal></term>
+                <term>-Value</term>
                 <listitem>
                     <para>Specifies the content to be added. Type a quoted string, such as "This
                         data is for internal use only", or specify an object that contains content,

@@ -40,7 +40,7 @@
   </biblioentry>
 
   <biblioentry xml:id="HDF5_Image">
-    <abbrev>HDF5_UG</abbrev>
+    <abbrev>HDF5_Image</abbrev>
     <title><link xlink:href="http://www.hdfgroup.org/HDF5/doc/ADGuide/ImageSpec.html">HDF5 Image and
         Palette Specification</link></title>
     <subtitle>Version 1.2</subtitle>

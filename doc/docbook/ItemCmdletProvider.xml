@@ -118,8 +118,9 @@ True</screen>
                 <listitem>
                     <para>For chunked HDF5 datasets, <literal>Set-Item</literal> lets the user
                         reshape a dataset within the limits of its maximum extent. The
-                            <literal>-Value</literal> must be an integer array whose length matches
-                        the rank of the dataset's HDF5 dataspace.</para>
+                            <literal>-Value</literal> must be convertible to an
+                            <literal>Int64</literal> array whose length matches the rank of the
+                        dataset's HDF5 dataspace.</para>
                 </listitem>
             </varlistentry>
             <varlistentry>
@@ -155,7 +156,7 @@ True</screen>
         <para>The <literal>Clear-Item</literal> cmdlet deletes the value of an HDF5 item, but it
             does not delete the item.</para>
         <note>
-            <para>This cmdlet is currently not implemented.</para>
+            <para>Not implemented.</para>
         </note>
     </sect2>
 
@@ -165,7 +166,7 @@ True</screen>
             HDF5 item. For example, for and HDF5 image this cmdlet may invoke an image
             viewer.</para>
         <note>
-            <para>This cmdlet is currently not implemented.</para>
+            <para>Not implemented.</para>
         </note>
     </sect2>
 
