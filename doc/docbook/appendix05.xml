@@ -8,38 +8,39 @@
         exception are pre-defined HDF5 datatypes such as <literal>H5T_IEEE_64BE</literal> which can
         be passed as strings to all cmdlets with HDF5 datatype arguments. The
             <literal>Show-H5Types</literal> cmdlet displays the detailed hashtable representation
-        for pre-defined types.</para>
-    <para>Please refer to <citation>H5RM</citation> for details on HDF5 Datatypes. </para>
+        for pre-defined types. See <xref linkend="psh5x_type_strings"/>, for PSH5X type
+        shorthands.</para>
+    <para>Please refer to <citation>HDF5_RM</citation> for details on HDF5 Datatypes. </para>
 
     <sect1>
         <title>HDF5 Integer</title>
         <programlisting>@{
     BitOffset    = 0;
-    ByteOrder    = 'LE'
+    ByteOrder    = 'LE'          # 'LE' or 'BE'
     Class        = 'INTEGER';
-    LSBitPadding = 'Zero';
-    MSBitPadding = 'Zero';
-    Precision    = '32';
-    SignType     = 2;
+    LSBitPadding = 'Zero';       # 'Zero', 'One', or 'Background'
+    MSBitPadding = 'Zero';       # 'Zero', 'One', or 'Background'
+    Precision    = 32;
+    SignType     = '2';          # 'None' or '2' (twos complement)
     Size         = 4
   }</programlisting>
     </sect1>
-    
+
     <sect1>
         <title>HDF5 Float</title>
         <programlisting>@{
     BitOffset      = 0;
-    ByteOrder      = 'LE';
+    ByteOrder      = 'LE';       # 'LE' or 'BE'
     Class          = 'FLOAT';
     ExpBias        = 127;
     ExpBits        = 8;
-    ExpBitPos      = 23;
-    IntlBitPadding = 'Zero';
-    LSBitPadding   = 'Zero';
+    ExpBitPos      = 23; 
+    IntlBitPadding = 'Zero';     # 'Zero', 'One', or 'Background'
+    LSBitPadding   = 'Zero';     # 'Zero', 'One', or 'Background'
     MantBits       = 23; 
     MantBitPos     = 0;
-    MSBitPadding   = 'Zero';
-    MantNorm       = 'Implied';
+    MSBitPadding   = 'Zero';     # 'Zero', 'One', or 'Background'
+    MantNorm       = 'Implied';  # 'Implied', 'MsbSet', or 'None'
     Precision      = 32;
     SignBitPos     = 31;
     Size           = 4
@@ -51,20 +52,17 @@
         <sect2>
             <title>HDF5 Variable-Length String</title>
             <programlisting>@{
-            Class    = 'STRING';
-            # the only valid encodings are 'ASCII' and 'UTF-8'
-            Encoding = 'ASCII'
+    Class    = 'STRING';
+    Encoding = 'ASCII'           # 'ASCII' or 'UTF-8'
 }</programlisting>
         </sect2>
         <sect2>
             <title>HDF5 Fixed-Length String</title>
             <programlisting>@{
-            Class    = 'STRING';
-            # the only valid encodings are 'ASCII' and 'UTF-8'
-            Encoding = 'ASCII';
-            Length   = 17;
-            # the only vaild paddings are 'Nullterm', 'Nullpad', and 'Spacepad'
-            StrPad   = 'Nullterm'
+    Class    = 'STRING';
+    Encoding = 'ASCII';          # 'ASCII' or 'UTF-8'
+    Length   = 17;
+    StrPad   = 'Nullterm'        # 'Nullterm', 'Nullpad', or 'Spacepad'
 }</programlisting>
         </sect2>
     </sect1>
@@ -73,10 +71,10 @@
         <title>HDF5 Bitfield</title>
         <programlisting>@{
     BitOffset    = 0;
-    ByteOrder    = 'BE';
+    ByteOrder    = 'BE';         # 'LE' or 'BE'
     Class        = 'BITFIELD';
-    LSBitPadding = 'Zero';
-    MSBitPadding = 'Zero';
+    LSBitPadding = 'Zero';       # 'Zero', 'One', or 'Background'
+    MSBitPadding = 'Zero';       # 'Zero', 'One', or 'Background'
     Precision    = 32;
     Size         = 4
  }</programlisting>
@@ -86,8 +84,7 @@
         <title>HDF5 Opaque</title>
         <programlisting>@{
     Class     = 'OPAQUE';
-    # the only valid byte orders are 'BE' and 'LE'
-    ByteOrder = 'BE';
+    ByteOrder = 'BE';            # 'LE' or 'BE'
     Tag       = &lt;ASCII string&gt;
  }</programlisting>
     </sect1>
@@ -96,12 +93,9 @@
     <sect1>
         <title>HDF5 Compound Type</title>
         <programlisting>@{
-    Class = 'COMPOUND';
-    
-    # the members are listed as name/type pairs
-    
+    Class   = 'COMPOUND';
     Members = @{
-    
+                                 # the members are listed as name/type pairs
         &lt;name&gt; = @{
                 Class        = &lt;name&gt;;
                 MemberOffset = &lt;int&gt;;
@@ -114,10 +108,8 @@
         # other components
         ...
     };
-    
-    # compound element size in bytes
-    
-    Size  = &lt;int&gt;;
+
+    Size  = &lt;int&gt;;          # compound type element size in bytes
  }</programlisting>
     </sect1>
 
@@ -125,8 +117,7 @@
         <title>HDF5 Reference Type</title>
         <programlisting>@{
     Class = 'REFERENCE';
-    # the only valid reference types are 'Object' and 'Region'
-    Type  = 'Object';
+    Type  = 'Object';            # 'Object' or 'Region'
  }</programlisting>
     </sect1>
 
@@ -146,11 +137,8 @@
         <title>HDF5 Variable Length Type</title>
         <programlisting>@{
     Class = 'VLEN';
-    
-    # &lt;type&gt; is either a type definition (hashtable) or
-    # a pre-defined HDF5 datatype (string)
-    
-    Type  = &lt;type&gt;;
+    Type  = &lt;type&gt;;        # &lt;type&gt; is either a type definition (hashtable) or
+                           # a pre-defined HDF5 datatype (string)
  }</programlisting>
     </sect1>
 
@@ -158,11 +146,8 @@
         <title>HDF5 Array Type</title>
         <programlisting>@{
     Class = 'ARRAY';
-    
-    # &lt;type&gt; is either a type definition (hashtable) or
-    # a pre-defined HDF5 datatype (string)
-    
-    Type  = &lt;type&gt;;
+    Type  = &lt;type&gt;;        # &lt;type&gt; is either a type definition (hashtable) or
+                           # a pre-defined HDF5 datatype (string)
  }</programlisting>
     </sect1>
 

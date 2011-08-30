@@ -186,6 +186,16 @@
                     <entry><literal>ustringN</literal>, e.g., <literal>ustring17</literal></entry>
                     <entry>Null-terminated, fixed-length (N) UTF-8 string</entry>
                 </row>
+                <row>
+                    <entry><literal>H5T_STD_REF_OBJ</literal></entry>
+                    <entry><literal>objref</literal></entry>
+                    <entry>HDF5 object reference</entry>
+                </row>
+                <row>
+                    <entry><literal>H5T_STD_REF_DATAREG</literal></entry>
+                    <entry><literal>regref</literal></entry>
+                    <entry>HDF5 region reference</entry>
+                </row>
             </tbody>
         </tgroup>
     </table>

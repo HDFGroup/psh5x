@@ -1,8 +1,8 @@
-### create the root group's attr1 attribute
+### create the root group's attr1 attribute ####################################
 
 $ret = New-ItemProperty -Path h5tmp:\ -Name attr1 -ElementType string17
 
-### create and populate /dset1
+### create and populate /dset1 #################################################
 
 $ret = New-Item -Path h5tmp:\dset1 -ItemType Dataset `
     -ElementType H5T_STD_I32BE -Dimensions 10,10
@@ -13,7 +13,7 @@ foreach ($i in 0..99) { $a[$i] = $i%10 }
 
 Set-Content h5tmp:\dset1 $a
 
-### create and populate /dset2
+### create and populate /dset2 #################################################
 
 $t = @{
   Class   = 'Compound';
@@ -35,13 +35,13 @@ foreach ($i in 1..5)
   $a[$i-1].i2 = $i; $a[$i-1].f1 = $i/10; $a[$i-1].d0 = $i/100;
 }
 
-Set-Content h5tmp:\dset1 $a
+Set-Content h5tmp:\dset2 $a
 
-### create group /group1
+### create group /group1 #######################################################
 
 $ret = New-Item -Path h5tmp:\group1 -ItemType Group
 
-### create named datatype /type1
+### create named datatype /type1 ###############################################
 
 $t = @{
   Class   = 'Compound';
@@ -56,7 +56,7 @@ $t = @{
 
 $ret = New-Item -Path h5tmp:\type1 -ItemType Datatype -Definition $t
 
-### create and populate /group1/dset3
+### create and populate /group1/dset3 ##########################################
 
 $ret = New-Item -Path h5tmp:\group1\dset3 -ItemType Dataset `
     -ElementType /type1 -Dimensions 5 
@@ -76,7 +76,7 @@ foreach ($i in 1..5)
 
 Set-Content h5tmp:\group1\dset3 $a
 
-### create and populate /dset3
+### create and populate /dset3 #################################################
 
 $t = @{Class = 'Vlen'; Type = 'H5T_STD_I32LE'}
 
@@ -87,10 +87,10 @@ $a = @(@(0), @(10, 11), @(20, 21, 22), @(30, 31, 32, 33))
 
 Set-Content h5tmp:\dset3 $a
 
-### create hard link /group2 -> /group1
+### create hard link /group2 -> /group1 ########################################
 
 $ret = New-Item -Path h5tmp:\group2 -ItemType HardLink -Value /group1
 
-### create soft link /slink1
+### create soft link /slink1 ###################################################
 
 $ret = New-Item -Path h5tmp:\slink1 -ItemType SoftLink -Value somevalue
