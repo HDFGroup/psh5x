@@ -9,21 +9,18 @@
 
     <sect2 xml:id="get_item_property">
         <title><literal>Get-ItemProperty</literal></title>
-        <para>Gets the properties of a specified item.</para>
+        <para>Gets the HDF5 attributes of a specified item.</para>
         <cmdsynopsis>
             <command>Get-ItemProperty</command>
             <arg choice="req">-Path <replaceable>string[]</replaceable></arg>
             <arg choice="opt">-Name <replaceable>string[]</replaceable></arg>
         </cmdsynopsis>
 
-        <para>The <literal>Get-ItemProperty</literal> cmdlet gets the properties of the specified
-            items. For example, you can use <literal>Get-ItemProperty</literal> to get the value of
-            the LastAccessTime property of a file object. You can also use
-                <literal>Get-ItemProperty</literal> to view registry entries and their
-            values.</para>
+        <para>The <literal>Get-ItemProperty</literal> cmdlet gets the HDF5 attributes of the
+            specified items.</para>
         <variablelist>
             <varlistentry>
-                <term><literal>-Path</literal></term>
+                <term>-Path</term>
                 <listitem>
                     <para>Specifies the path to the item or items.</para>
                 </listitem>
@@ -31,7 +28,7 @@
             <varlistentry>
                 <term>-Name</term>
                 <listitem>
-                    <para>Specifies the name of the property or properties to retrieve.</para>
+                    <para>Specifies the name of the HDF5 attribute or attributes to retrieve.</para>
                 </listitem>
             </varlistentry>
         </variablelist>
@@ -39,15 +36,16 @@
 
     <sect2 xml:id="set_item_property">
         <title><literal>Set-ItemProperty</literal></title>
-        <para>Creates or changes the value of a property of an item.</para>
+        <para>Creates or changes the value of an HDF5 attribute of an HDF5 item.</para>
         <cmdsynopsis>
             <command>Get-ItemProperty</command>
             <arg choice="req">-Path <replaceable>string[]</replaceable></arg>
             <arg choice="opt">-Value <replaceable>Object</replaceable></arg>
+            <arg choice="opt">-Force</arg>
         </cmdsynopsis>
-        <para>The <literal>Set-ItemProperty</literal> cmdlet changes the value of the property of
-            the specified item. You can use the cmdlet to establish or change the properties of
-            items.</para>
+        <para>The <literal>Set-ItemProperty</literal> cmdlet changes the value of an HDF5 attribute
+            of the specified item. You can use the cmdlet to create new HDF5 attributes of an HDF5
+            item or change existing ones.</para>
         <note>
             <para>Under development.</para>
         </note>
@@ -56,7 +54,7 @@
     <sect2 xml:id="clear_item_property">
         <title><literal>Clear-ItemProperty</literal></title>
         <note>
-            <para>Not implemented.</para>
+            <para>Not implemented. Reset an attribute to a default value?</para>
         </note>
     </sect2>
 

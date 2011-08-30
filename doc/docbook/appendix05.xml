@@ -2,7 +2,7 @@
 <?xml-model href="http://www.oasis-open.org/docbook/xml/5.0/rng/docbookxi.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
 <appendix xml:id="appdx_hdf5_datatypes" xmlns="http://docbook.org/ns/docbook"
     xmlns:xi="http://www.w3.org/2001/XInclude">
-    <title>Specifiying HDF5 Datatypes in PowerShell</title>
+    <title>HDF5 Datatypes in PSH5X</title>
 
     <para>Generally, in PSH5X, HDF5 Datatypes are represented as PowerShell hashtables. The
         exception are pre-defined HDF5 datatypes such as <literal>H5T_IEEE_64BE</literal> which can

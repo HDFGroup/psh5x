@@ -4,65 +4,68 @@
   xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0">
   <title>Other PSH5X Cmdlets</title>
 
-  <sect1 xml:id="Lookup">
-    <title>Lookup Cmdlets</title>
-    <para/>
+  <para>The cmdlets described below are not covered by the PowerShell provider interface. They are
+    auxiliary in nature and are aimed at making the interation with the "main" cmdlets more
+    convenient. </para>
 
-    <sect2>
-      <title><literal>Show-H5Types</literal></title>
-      <para>The <literal>Show-H5Types</literal> cmdlet displays all pre-defined HDF5 datatype names
-        and their defintions.</para>
-      <cmdsynopsis>
-        <command>Show-H5Types</command>
-        <arg choice="opt">-Bifield</arg>
-        <arg choice="opt">-Float</arg>
-        <arg choice="opt">-Integer</arg>
-        <arg choice="opt">-Native</arg>
-        <arg choice="opt">-Reference</arg>
-        <arg choice="opt">-Standard</arg>
-      </cmdsynopsis>
-      <variablelist>
-        <varlistentry>
-          <term><literal>-Bifield</literal></term>
-          <listitem>
-            <para>List HDF5 datatypes of class bitfield only.</para>
-          </listitem>
-        </varlistentry>
-        <varlistentry>
-          <term><literal>-Float</literal></term>
-          <listitem>
-            <para>List HDF5 datatypes of class float only.</para>
-          </listitem>
-        </varlistentry>
-        <varlistentry>
-          <term><literal>-Integer</literal></term>
-          <listitem>
-            <para>List HDF5 datatypes of class integer only.</para>
-          </listitem>
-        </varlistentry>
-        <varlistentry>
-          <term><literal>-Native</literal></term>
-          <listitem>
-            <para>List native HDF5 datatypes only.</para>
-          </listitem>
-        </varlistentry>
-        <varlistentry>
-          <term><literal>-Reference</literal></term>
-          <listitem>
-            <para>List HDF5 datatypes of class reference only.</para>
-          </listitem>
-        </varlistentry>
-        <varlistentry>
-          <term><literal>-Standard</literal></term>
-          <listitem>
-            <para>List standard HDF5 datatypes only.</para>
-          </listitem>
-        </varlistentry>
-      </variablelist>
+  <sect1>
+    <title><literal>Show-H5Types</literal></title>
+    <para>Display information on pre-defined HDF5 datatypes.</para>
+    <cmdsynopsis>
+      <command>Show-H5Types</command>
+      <arg choice="opt">-Bifield</arg>
+      <arg choice="opt">-Float</arg>
+      <arg choice="opt">-Integer</arg>
+      <arg choice="opt">-Native</arg>
+      <arg choice="opt">-Reference</arg>
+      <arg choice="opt">-Standard</arg>
+    </cmdsynopsis>
+    <para>The <literal>Show-H5Types</literal> cmdlet displays all pre-defined HDF5 datatype names
+      and their defintions in the detailed form described in <xref linkend="appdx_hdf5_datatypes"/>.
+      The return value is of type <literal>System.Collections.Hashtable</literal>. There's a key for
+      each type and its value is the type definition in hashtable form.</para>
+    <variablelist>
+      <varlistentry>
+        <term>-Bifield</term>
+        <listitem>
+          <para>List HDF5 datatypes of class bitfield only.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>-Float</term>
+        <listitem>
+          <para>List HDF5 datatypes of class float only.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>-Integer</term>
+        <listitem>
+          <para>List HDF5 datatypes of class integer only.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>-Native</term>
+        <listitem>
+          <para>List native HDF5 datatypes only.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>-Reference</term>
+        <listitem>
+          <para>List HDF5 datatypes of class reference only.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>-Standard</term>
+        <listitem>
+          <para>List standard HDF5 datatypes only.</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
 
-      <example>
-        <title>Show all pre-defined HDF5 float datatypes</title>
-        <screen><prompt>PS:1 ></prompt> <command>Show-H5Types -Float</command>
+    <example>
+      <title>Show all pre-defined HDF5 float datatypes</title>
+      <screen><prompt>PS:1 ></prompt> <command>Show-H5Types -Float</command>
 
 Name                           Value
 ----                           -----
@@ -73,11 +76,11 @@ H5T_NATIVE_DOUBLE              {SignBitPos, MantBitPos, ExpBias, ByteOrder...}
 H5T_NATIVE_LDOUBLE             {SignBitPos, MantBitPos, ExpBias, ByteOrder...}
 H5T_IEEE_F32LE                 {SignBitPos, MantBitPos, ExpBias, ByteOrder...}
 H5T_NATIVE_FLOAT               {SignBitPos, MantBitPos, ExpBias, ByteOrder...}</screen>
-      </example>
+    </example>
 
-      <example>
-        <title>Show details for H5T_IEEE_F64LE</title>
-        <screen><prompt>PS:1 ></prompt> <command>(Show-H5Types).H5T_IEEE_F64LE</command>
+    <example>
+      <title>Show details for H5T_IEEE_F64LE</title>
+      <screen><prompt>PS:1 ></prompt> <command>(Show-H5Types).H5T_IEEE_F64LE</command>
 
 Name                           Value
 ----                           -----
@@ -96,10 +99,45 @@ MSBitPadding                   Zero
 ExpBits                        11
 Size                           8
 MantBits                       52</screen>
-      </example>
-
-    </sect2>
+    </example>
 
   </sect1>
+
+  <sect1>
+    <title><literal>New-H5Array</literal></title>
+    <para>Create a .NET array of an element type that can be converted into a given HDF5
+      datatype.</para>
+    <cmdsynopsis>
+      <command>New-H5Array</command>
+      <arg choice="req">-Type <replaceable>Object</replaceable></arg>
+      <arg choice="req">-Dimensions <replaceable>Int64[]</replaceable></arg>
+    </cmdsynopsis>
+    <para>The <literal>New-H5Array</literal> cmdlet creates a .NET array of an element type that can
+      be converted into a given HDF5 datatype. A typical use of this cmdlet is to create an array,
+      initialize it, and then set the content or append to the content of an HDF5 dataset with
+        <literal>Set-Content</literal> or <literal>Add-Content</literal>. </para>
+    <variablelist>
+      <varlistentry>
+        <term>-Type</term>
+        <listitem>
+          <para>Specifies the HDF5 datatype either as a string or a hashtable (see <xref
+              linkend="appdx_hdf5_datatypes"/>).</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>-Dimensions</term>
+        <listitem>
+          <para>Specifies the dimensions of the (multi-dimensional) array.</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <example>
+      <title>Create an array from the type of an existing dataset</title>
+      <screen><prompt>PS:1 ></prompt> <command>$t = (Get-Item h5tmp:\dset2).ElememtType</command>
+<prompt>PS:2 ></prompt> <command>$a = New-H5Array -Type $t -Dimensions 33,44,55</command></screen>
+    </example>
+
+  </sect1>
+
 
 </chapter>

@@ -9,9 +9,8 @@
 
     <sect2 xml:id="new_item_property">
         <title><literal>New-ItemProperty</literal></title>
-        <para>The <literal>New-ItemProperty</literal> cmdlet creates a new property for a specified
-            item and sets its value. Typically, this cmdlet is used to create new registry values,
-            because registry values are properties of a registry key item.</para>
+        <para>The <literal>New-ItemProperty</literal> cmdlet creates a new HDF5 attribute for a
+            specified HDF5 item and sets its value.</para>
         <cmdsynopsis>
             <command>New-ItemProperty</command>
             <arg choice="req">-Path <replaceable>string[]</replaceable></arg>
@@ -22,27 +21,27 @@
             <arg choice="opt">-Simple <replaceable>Int64[]</replaceable></arg>
             <arg choice="opt">-Null</arg>
         </cmdsynopsis>
-        <para>The <literal>New-ItemProperty</literal> cmdlet creates a new property for a specified
-            item and sets its value. Typically, this cmdlet is used to create new registry values,
-            because registry values are properties of a registry key item.</para>
+        <para>The <literal>New-ItemProperty</literal> cmdlet creates a new HDF5 attribute for a
+            specified HDF5 item and sets its value. By default this is a scalar HDF5
+            attribute.</para>
         <variablelist>
             <varlistentry>
-                <term><literal>-Path</literal></term>
+                <term>-Path</term>
                 <listitem>
-                    <para>Specifies the path to the item. This parameter identifies the item to
-                        which the new property will be added.</para>
+                    <para>Specifies the path to the HDF5 item. This parameter identifies the item to
+                        which the new HDF5 attribute will be added.</para>
                 </listitem>
             </varlistentry>
             <varlistentry>
                 <term>-Name</term>
                 <listitem>
-                    <para>Specifies a name for the new property.</para>
+                    <para>Specifies a name for the new HDF5 attribute.</para>
                 </listitem>
             </varlistentry>
             <varlistentry>
                 <term>-Value</term>
                 <listitem>
-                    <para>Specifies the property value.</para>
+                    <para>Specifies the value of the new HDF5 attribute.</para>
                 </listitem>
             </varlistentry>
         </variablelist>
@@ -56,20 +55,20 @@
             <arg choice="req">-Path <replaceable>string[]</replaceable></arg>
             <arg choice="req">-Name <replaceable>string[]</replaceable></arg>
         </cmdsynopsis>
-        <para>The <literal>Remove-ItemProperty</literal> cmdlet deletes a property and its value
-            from an item.</para>
+        <para>The <literal>Remove-ItemProperty</literal> cmdlet an HDF5 attribute and its value from
+            an HDF5 item.</para>
         <variablelist>
             <varlistentry>
-                <term><literal>-Path</literal></term>
+                <term>-Path</term>
                 <listitem>
-                    <para>Specifies the path to the item whose properties are being removed.
-                        Wildcards are permitted.</para>
+                    <para>Specifies the path to the HDF5 item whose HDF5 attributes are being
+                        removed. Wildcards are permitted.</para>
                 </listitem>
             </varlistentry>
             <varlistentry>
                 <term>-Name</term>
                 <listitem>
-                    <para>Specifies the names of the properties to be removed.</para>
+                    <para>Specifies the names of the HDF5 attributes to be removed.</para>
                 </listitem>
             </varlistentry>
         </variablelist>
@@ -84,25 +83,25 @@
             <arg choice="req">-Name <replaceable>string</replaceable></arg>
             <arg choice="req">-NewName <replaceable>string</replaceable></arg>
         </cmdsynopsis>
-        <para>The <literal>Rename-ItemProperty</literal>cmdlet changes the name of a specified item
-            property. The value of the property is not changed.</para>
+        <para>The <literal>Rename-ItemProperty</literal>cmdlet changes the name of a specified HDF5
+            attribute. The value of the HDF5 attribute is not changed.</para>
         <variablelist>
             <varlistentry>
-                <term><literal>-Path</literal></term>
+                <term>-Path</term>
                 <listitem>
-                    <para>Specifies the path to the item whose property is to be renamed.</para>
+                    <para>Specifies the path to the HDF5 item whose HDF5 attribute is to be renamed.</para>
                 </listitem>
             </varlistentry>
             <varlistentry>
                 <term>-Name</term>
                 <listitem>
-                    <para>Specifies the current name of the property to be renamed.</para>
+                    <para>Specifies the current name of the HDF5 attribute to be renamed.</para>
                 </listitem>
             </varlistentry>
             <varlistentry>
                 <term>-NewName</term>
                 <listitem>
-                    <para>Specifies the new name for the property.</para>
+                    <para>Specifies the new name for the HDF5 attribute.</para>
                 </listitem>
             </varlistentry>
         </variablelist>
@@ -120,7 +119,7 @@
         <para/>
         <variablelist>
             <varlistentry>
-                <term><literal>-Path</literal></term>
+                <term>-Path</term>
                 <listitem>
                     <para>Specifies the path to the HDF5 item whose HDF5 attribute is to be
                         copied.</para>
@@ -156,7 +155,7 @@
         <para/>
         <variablelist>
             <varlistentry>
-                <term><literal>-Path</literal></term>
+                <term>-Path</term>
                 <listitem>
                     <para>Specifies the path to the HDF5 item whose HDF5 attribute is to be
                         moved.</para>

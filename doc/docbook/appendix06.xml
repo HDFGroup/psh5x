@@ -104,7 +104,7 @@
                 <row>
                     <entry/>
                     <entry><literal>stringN</literal>, e.g., <literal>string17</literal></entry>
-                    <entry>Fixed-length (N) ASCII string</entry>
+                    <entry>Null-terminated, fixed-length (N) ASCII string</entry>
                 </row>
                 <row>
                     <entry><literal>H5T_NATIVE_FLOAT</literal></entry>
@@ -184,7 +184,7 @@
                 <row>
                     <entry/>
                     <entry><literal>ustringN</literal>, e.g., <literal>ustring17</literal></entry>
-                    <entry>Fixed-length (N) UTF-8 string</entry>
+                    <entry>Null-terminated, fixed-length (N) UTF-8 string</entry>
                 </row>
             </tbody>
         </tgroup>

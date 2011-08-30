@@ -28,4 +28,16 @@ Path                      System.String Path {get;}
 Provider                  System.Management.Automation.Provide...
 ReadOnly                  System.Boolean ReadOnly {get;}
 Root                      System.String Root {get;}</screen>
+    <para>A PSH5X drive opbject represents information about an open HDF5 file. Members whose name
+        starts with 'Mdc' (lines 14-16), e.g., <literal>MdcHitRate</literal>, are metadata cache
+        releated properties. You should consult <citation>HDF5_RM</citation>, especially,
+            <literal>H5Fget_mdc_config</literal>, <literal>H5Fget_mdc_size</literal>, and
+            <literal>H5Fget_mdc_hit_rate</literal> for their interpretation. </para>
+    <para>Members starting with 'Open' (lines 18-22) represent open HDF5 handles for the given
+        PowerShell drive in the current PowerShell session. With the exception of the
+            <literal>OpenFileCount</literal> (which should be equal to 1), under normal operating
+        conditions, you should never encounter a non-zero value. A non-zero value may be the result
+        of a <emphasis>handle leak</emphasis>. If you ever see a non-zero value in a reproducible
+        manner, please, submit a bug report to <email>gheber@hdfgroup.org</email>! </para>
+
 </appendix>

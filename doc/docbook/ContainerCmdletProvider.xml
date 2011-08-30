@@ -28,7 +28,7 @@
             containers.</para>
         <variablelist>
             <varlistentry>
-                <term><literal>-Path</literal></term>
+                <term>-Path</term>
                 <listitem>
                     <para>Specifies a path to one or more locations. Wildcards are permitted. The
                         default location is the current directory (.).</para>
@@ -236,7 +236,12 @@ dset3                    Dataset    8/24/2011 12:11:37 PM  0</screen>
                 <arg choice="opt">-Chunked <replaceable>Int64[]</replaceable></arg>
                 <arg choice="opt">-Compact</arg>
                 <arg choice="opt">-Gzip <replaceable>[0..9]</replaceable></arg>
+                <arg choice="opt">-FillValue <replaceable>Object</replaceable></arg>
             </cmdsynopsis>
+            <note>
+                <para>The <literal>-FillValue</literal> parameter has not been implemented in the beta version
+                    of PSH5X.</para>
+            </note>
         </sect3>
 
         <sect3>
@@ -254,7 +259,7 @@ dset3                    Dataset    8/24/2011 12:11:37 PM  0</screen>
         <sect3>
             <title>HDF5 Group</title>
             <para>No additional options need to be specified for creating a new HDF5 group.
-                Currently, the <literal>-Value</literal> argument has no meaning for groups.</para>
+                The <literal>-Value</literal> argument has no meaning for groups.</para>
         </sect3>
 
         <sect3>
