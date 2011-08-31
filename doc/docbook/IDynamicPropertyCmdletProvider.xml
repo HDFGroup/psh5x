@@ -5,7 +5,9 @@
     version="5.0">
 
     <title>IDynamicPropertyCmdletProvider</title>
-    <para/>
+    <para>The <literal>IDynamicPropertyCmdletProvider</literal> derives from the
+            <literal>IPropertyCmdletProvider</literal> and adds callbacks that let the user
+        dynamically create new HDF5 attributes, copy, rename, or remove them.</para>
 
     <sect2 xml:id="new_item_property">
         <title><literal>New-ItemProperty</literal></title>
@@ -15,9 +17,9 @@
             <command>New-ItemProperty</command>
             <arg choice="req">-Path <replaceable>string[]</replaceable></arg>
             <arg choice="req">-Name <replaceable>string[]</replaceable></arg>
+            <arg choice="req">-ElementType <replaceable>Object</replaceable></arg>
             <arg choice="opt">-Value <replaceable>Object</replaceable></arg>
             <sbr/>
-            <arg choice="opt">-ElementType <replaceable>Object</replaceable></arg>
             <arg choice="opt">-Simple <replaceable>Int64[]</replaceable></arg>
             <arg choice="opt">-Null</arg>
         </cmdsynopsis>
@@ -44,19 +46,63 @@
                     <para>Specifies the value of the new HDF5 attribute.</para>
                 </listitem>
             </varlistentry>
+            <varlistentry>
+                <term>-ElementType</term>
+                <listitem>
+                    <para>Specifies the HDF5 datatype of the new HDF5 attribute. This can be a
+                        string, containing a type abbreviation or HDF5 path name of a named
+                        datatype, or a hashtable with a full-fledged HDF5 datatype
+                        definition.</para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>-Simple</term>
+                <listitem>
+                    <para>Specifies to create a simple HDF5 attribute of the dimensions provided.
+                        This parameter is incompatible with the <literal>-Null</literal>
+                        parameter.</para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>-Null</term>
+                <listitem>
+                    <para>Specifies to create a null HDF5 attribute. This parameter is incompatible
+                        with the <literal>-Simple</literal> parameter.</para>
+                </listitem>
+            </varlistentry>
         </variablelist>
+        <example>
+            <title>Creating a new HDF5 attribute</title>
+            <screen><prompt>PS:1 ></prompt><command>New-ItemProperty h5tmp:\dset1 -Name '~!@#$%^&#38;*()_+' -ElementType int `
+    -Simple 2,2 -Value 1,0,1,0</command>
+
+Name                           Value
+----                           -----
+ElementType                    {SignType, BitOffset, Class, MSBitPadding...}
+DataSizeBytes                  16
+Rank                           2
+ElementTypeClass               Integer
+AttributeName                  ~!@#$%^&#38;*()_+
+Value                          {{1, 0}, {1, 0}}
+CreationOrderIsValid           False
+AttributeNameCharacterSet      ASCII
+CreationOrder                  0
+SimpleExtentType               Simple
+StorageSizeBytes               16
+ElementCount                   4
+Dimensions                     {2, 2}</screen>
+        </example>
+        
     </sect2>
 
     <sect2 xml:id="remove_item_property">
         <title><literal>Remove-ItemProperty</literal></title>
-        <para>Deletes an HDF5 attribute and its value from an HDF5 item.</para>
+        <para>Removes an HDF5 attribute from an HDF5 item.</para>
         <cmdsynopsis>
             <command>Remove-ItemProperty</command>
             <arg choice="req">-Path <replaceable>string[]</replaceable></arg>
             <arg choice="req">-Name <replaceable>string[]</replaceable></arg>
         </cmdsynopsis>
-        <para>The <literal>Remove-ItemProperty</literal> cmdlet an HDF5 attribute and its value from
-            an HDF5 item.</para>
         <variablelist>
             <varlistentry>
                 <term>-Path</term>
@@ -89,7 +135,8 @@
             <varlistentry>
                 <term>-Path</term>
                 <listitem>
-                    <para>Specifies the path to the HDF5 item whose HDF5 attribute is to be renamed.</para>
+                    <para>Specifies the path to the HDF5 item whose HDF5 attribute is to be
+                        renamed.</para>
                 </listitem>
             </varlistentry>
             <varlistentry>
@@ -147,7 +194,7 @@
         <title><literal>Move-ItemProperty</literal></title>
         <para>Moves an HDF5 attribute from one HDF5 item to another.</para>
         <cmdsynopsis>
-            <command>Copy-ItemProperty</command>
+            <command>Move-ItemProperty</command>
             <arg choice="req">-Path <replaceable>string[]</replaceable></arg>
             <arg choice="req">-Destination <replaceable>string</replaceable></arg>
             <arg choice="req">-Name <replaceable>string</replaceable></arg>

@@ -186,7 +186,12 @@ dset3                    Dataset    8/24/2011 12:11:37 PM  0</screen>
                 </group>
             </arg>
             <arg choice="opt">-Value <replaceable>Object</replaceable></arg>
+            <arg choice="opt">-Force</arg>
         </cmdsynopsis>
+        <note>
+            <para>The release version of PSH5X will support HDF5 packet tables
+                    <citation>H5PT</citation></para>
+        </note>
         <para> The <literal>New-Item</literal> cmdlet creates a new item and sets its value (if
             applicable). The basic syntax of <literal>New-Item</literal> is shown. It consists of
             the new item's name, its item type, and its value. Depending on the item type additional
@@ -221,6 +226,12 @@ dset3                    Dataset    8/24/2011 12:11:37 PM  0</screen>
                     <para>Specifies the value of the new item.</para>
                 </listitem>
             </varlistentry>
+            <varlistentry>
+                <term>-Force</term>
+                <listitem>
+                    <para>Force the creation of intermediate groups.</para>
+                </listitem>
+            </varlistentry>
         </variablelist>
 
         <sect3>
@@ -237,10 +248,67 @@ dset3                    Dataset    8/24/2011 12:11:37 PM  0</screen>
                 <arg choice="opt">-Compact</arg>
                 <arg choice="opt">-Gzip <replaceable>[0..9]</replaceable></arg>
                 <arg choice="opt">-FillValue <replaceable>Object</replaceable></arg>
+                <arg choice="opt">-Null</arg>
+                <arg choice="opt">-Scalar</arg>
             </cmdsynopsis>
+            <variablelist>
+                <varlistentry>
+                    <term>-ElementType</term>
+                    <listitem>
+                        <para>Specifies the HDF5 datatype of the new dataset. This can be a string,
+                            containing a type abbreviation (see <xref linkend="psh5x_type_strings"
+                            />) or HDF5 path name of a named datatype, or a hashtable with a
+                            full-fledged HDF5 datatype definition (see <xref
+                                linkend="appdx_hdf5_datatypes"/>).</para>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>-Dimensions</term>
+                    <listitem>
+                        <para>Specifies the dimensions of the new HDF5 dataset. The length of the
+                            array is the rank of the dataspace.</para>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>-MaxDimensions</term>
+                    <listitem>
+                        <para>Specifies the maximum extent of the new HDF5 dataset. The length of
+                            the array is the rank of the dataspace.</para>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>-Chunked</term>
+                    <listitem>
+                        <para>Specifies the chunk size of the new HDF5 dataset. The length of the
+                            array is the rank of the dataspace. This option is incompatible with the
+                                <literal>-Compact</literal>, <literal>-Scalar</literal>, and
+                                <literal>-Null</literal> parameters.</para>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>-Compact</term>
+                    <listitem>
+                        <para>Specifies compact layout for the new HDF5 dataset. This option is
+                            incompatible with the <literal>-Chunked</literal>,
+                                <literal>-Scalar</literal>, and <literal>-Null</literal> parameters.
+                        </para>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>-Gzip</term>
+                    <listitem>
+                        <para>Specifies the compression level for the new HDF5 dataset. Currently
+                            only datasets with chunked layout support compression. This option is
+                            incompatible with the <literal>-Compact</literal>,
+                                <literal>-Scalar</literal>, and <literal>-Null</literal>
+                            parameters.</para>
+                    </listitem>
+                </varlistentry>
+            </variablelist>
             <note>
-                <para>The <literal>-FillValue</literal> parameter has not been implemented in the beta version
-                    of PSH5X.</para>
+                <para>The <literal>-FillValue</literal>, <literal>-Null</literal>, and
+                        <literal>-Scalar</literal> parameters have not been implemented in the beta
+                    version of PSH5X.</para>
             </note>
         </sect3>
 
@@ -251,15 +319,23 @@ dset3                    Dataset    8/24/2011 12:11:37 PM  0</screen>
             <cmdsynopsis>
                 <arg choice="req">-Definition <replaceable>Object</replaceable></arg>
             </cmdsynopsis>
-            <para>The object must be either a string, see <xref linkend="psh5x_type_strings"/>, or a
-                full type definition as a hashtable, see <xref linkend="appdx_hdf5_datatypes"/>.
-            </para>
+            <variablelist>
+                <varlistentry>
+                    <term>-Definition</term>
+                    <listitem>
+                        <para>This can be a string, containing a type abbreviation (see <xref
+                                linkend="psh5x_type_strings"/>) or HDF5 path name of a named
+                            datatype, or a hashtable with a full-fledged HDF5 datatype definition
+                            (see <xref linkend="appdx_hdf5_datatypes"/>).</para>
+                    </listitem>
+                </varlistentry>
+            </variablelist>
         </sect3>
 
         <sect3>
             <title>HDF5 Group</title>
-            <para>No additional options need to be specified for creating a new HDF5 group.
-                The <literal>-Value</literal> argument has no meaning for groups.</para>
+            <para>No additional options need to be specified for creating a new HDF5 group. The
+                    <literal>-Value</literal> argument has no meaning for groups.</para>
         </sect3>
 
         <sect3>
@@ -292,6 +368,58 @@ dset3                    Dataset    8/24/2011 12:11:37 PM  0</screen>
                     </group>
                 </arg>
             </cmdsynopsis>
+            <variablelist>
+                <varlistentry>
+                    <term>-Bits</term>
+                    <listitem>
+                        <para>Specifies the color depth of the new HDF5 image. Currently, only 8-
+                            and 24-bit raster images are supported.</para>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>-WxH</term>
+                    <listitem>
+                        <para>Specifies the width and height (in pixels) of the new HDF5 image.</para>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>-InterlaceMode</term>
+                    <listitem><para>Specifies the interlace mode of the new HDF5 image.</para></listitem>
+                </varlistentry>
+            </variablelist>
+            <example>
+                <title>Creating an HDF5 image from a GIF image</title>
+                <screen><prompt>PS:1 ></prompt>New-Item h5tmp:\gif -ItemType Image -Value .\Pictures\polycrystal1.gif
+
+   PSParentPath: HDF5\HDF5::h5tmp:
+
+LinkName                 ItemType   LastWriteTime          #Attr.
+--------                 --------   -------------          ------
+gif                      Dataset    8/31/2011 9:24:35 PM   4
+
+<prompt>PS:2 ></prompt><command>Get-Item h5tmp:\gif | Format-List</command>
+
+PSPath           : HDF5\HDF5::h5tmp:\gif
+PSParentPath     : HDF5\HDF5::h5tmp:
+PSChildName      : gif
+PSDrive          : h5tmp
+PSProvider       : HDF5\HDF5
+PSIsContainer    : False
+StorageSizeBytes : 492093
+Rank             : 2
+MaxDimensions    : {511, 963}
+Layout           : Contiguous
+ExtentType       : Simple
+ElementType      : {SignType, BitOffset, Class, MSBitPadding...}
+ElementTypeClass : Integer
+ElementCount     : 492093
+Dimensions       : {511, 963}
+Chunk            :
+Timestamps       : {ModificationTime, AccessTime, ChangeTime, BirthTime}
+AttributeNames   : {CLASS, IMAGE_VERSION, IMAGE_SUBCLASS, PALETTE}
+AttributeCount   : 4
+ItemType         : Dataset</screen>
+            </example>
         </sect3>
 
         <sect3>

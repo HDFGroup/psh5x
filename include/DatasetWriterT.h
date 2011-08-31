@@ -13,7 +13,7 @@ namespace PSH5X
     public:
 
         DatasetWriterT(hid_t h5file, System::String^ h5path)
-            : m_h5file(h5file), m_h5path(h5path), m_array(nullptr)
+            : m_h5file(h5file), m_h5path(h5path), m_array(nullptr), m_position(0)
         {
         }
 
@@ -81,6 +81,8 @@ namespace PSH5X
                 if (H5Fflush(dset, H5F_SCOPE_LOCAL) < 0) {
                     throw gcnew ArgumentException("H5Fflush failed!");
                 }
+
+                m_position += content->Count;
             }
             finally
             {
@@ -115,6 +117,8 @@ private:
     System::String^ m_h5path;
 
     array<T>^ m_array;
+
+    long long m_position;
 
 };
 

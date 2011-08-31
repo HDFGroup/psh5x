@@ -251,7 +251,7 @@ namespace PSH5X
         return nullptr;
     }
 
-    IContentWriter^ Provider::GetContentWriter(String ^ path)
+    IContentWriter^ Provider::GetContentWriter(String^ path)
     {
         WriteVerbose(String::Format("HDF5Provider::GetContentWriter(Path = '{0}')", path));
 

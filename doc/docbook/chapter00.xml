@@ -167,10 +167,10 @@ In datasets: 108000000 - File: 264069080</screen>
                 that there's a parameter called <literal>-ReadCount</literal> that let's you set the
                 batch size of objects being sent to the pipeline in one shot.
                     <literal>ReadCount</literal> must be non-negative. In most cases, you want this
-                to be 0 (= all in one shot). Again, remember that the default value is 1. (This can
-                be terribly slow when stepping through a million element dataset.) Alltogether, this
-                leads to the following behavior when reading the elements of a two-dimensional 10x10
-                dataset of integer <literal>/dset1</literal>: </para>
+                to be 0 (= all in one shot). (The default value is 1 which can be terribly slow when
+                stepping through a million element dataset.) Alltogether, this leads to the following
+                behavior when reading the elements of a two-dimensional 10x10 dataset of integer
+                    <literal>/dset1</literal>: </para>
             <screen><prompt>PS:1 ></prompt><command>$a = Get-Content h5tmp:/dset1; $a.Count</command> 
 100
 <prompt>PS:2 ></prompt><command>$a[0]</command> 
@@ -230,8 +230,8 @@ At line:1 char:4
                     <literal>CSharpCodeProvider</literal> in <literal>Microsoft.CSharp</literal> has
                 all the facilities that are needed. However, there is one deficiency having to do
                 with the member naming, which hasn't been addressed in the beta version. Generally,
-                the admissble member names of HDF5 compound types are not valid names of members
-                of a C# class. To circumvent this problem, I've adopted the Python
+                the admissble member names of HDF5 compound types are not valid names of members of
+                a C# class. To circumvent this problem, I've adopted the Python
                     <literal>array</literal> type codes <citation>PythonArray</citation> and
                 construct a member name as the concatenation of the type code and the compound
                 member index. For example, the C# code generated for a compound type, which has an

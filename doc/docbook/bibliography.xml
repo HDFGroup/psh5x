@@ -19,7 +19,7 @@
     <abbrev>Enthought</abbrev>
     <title><link
         xlink:href="http://pytools.codeplex.com/wikipage?title=NumPy%20and%20SciPy%20for%20.Net"
-      >NumPy and SciPy for IronPython / .Net</link></title>
+        >NumPy and SciPy for IronPython / .Net</link></title>
     <publisher>
       <publishername>Enthought</publishername>
     </publisher>
@@ -28,7 +28,8 @@
 
   <biblioentry xml:id="h5dump">
     <abbrev>h5dump</abbrev>
-    <title><link xlink:href="http://www.hdfgroup.org/HDF5/doc/RM/Tools.html#Tools-Dump"><literal>h5dump</literal></link></title>
+    <title><link xlink:href="http://www.hdfgroup.org/HDF5/doc/RM/Tools.html#Tools-Dump"
+          ><literal>h5dump</literal></link></title>
     <subtitle>A tool to display HDF5 file content</subtitle>
     <publisher>
       <publishername>The HDF Group</publishername>
@@ -37,6 +38,19 @@
     </address>
     </publisher>
     <pubdate>2011</pubdate>
+  </biblioentry>
+
+  <biblioentry xml:id="H5PT">
+    <abbrev>H5PT</abbrev>
+    <title><link xlink:href="http://www.hdfgroup.org/HDF5/doc/HL/H5PT_Intro.html">Introduction to
+        the HDF5 Packet Table API</link></title>
+    <publisher>
+      <publishername>The HDF Group</publishername>
+      <address>
+      <email>help@hdfgroup.org</email>
+    </address>
+    </publisher>
+    <pubdate>February 2005</pubdate>
   </biblioentry>
 
   <biblioentry xml:id="h5py">
