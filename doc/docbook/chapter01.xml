@@ -15,6 +15,18 @@
       <citation>PSProgramming</citation>, and <citation>ZavisekThesis</citation> have excellent
     discussions of the Windows PowerShell <emphasis>provider model</emphasis>.</para>
 
+  <para>As a shell user in general and a PowerShell user in particular, you know already that shell
+    interfaces derive most of their power from combinations of monadic units in pipelines. (By
+    introducing objects to the pipeline, PowerShell laid a rational foundation to pipeline
+    processing and put an end to those pagan "string orgies".) Identifying a balanced mixture of
+    such units, that is, a set of cmdlets for which users would use attributes like 'intuitive' and
+    'consistent', is a tremendous challenge. Fortunately, the creators of PowerShell solved that
+    problem for us with the PowerShell provider interface. The alternative idea of creating from
+    scratch a loosely affiliated set of cmdlets that perform certain simple tasks sounds attractive
+    and so simple that it should be frightening. I believe that, in the case of a data store as
+    complex as HDF5, this approach would be more work short-term and long-term because of not
+    leveraging standardized facilities and the increasing risk of inconsistency and feature creep. </para>
+
   <sect1 xml:id="windows_powershell_providers">
     <title>A Windows PowerShell Provider</title>
     <para>The Windows PowerShell provider architecture consists of a set of <emphasis>core
@@ -87,6 +99,14 @@
       content. In turn, a cmdlet such as <literal>Set-Item</literal> can be used to set and/or
       change that value, but a cmdlet like <literal>Get-Content</literal> will not return anything
       for an HDF5 symbolic link.</para>
+    <note>
+      <para>Throughout the text we will use a strange mixture of HDF5 and PowerShell jargon. We will
+        refer to HDF5 items, properties, and content. When in doubt, refer to <xref
+          linkend="items_et_properties_table"/>, or <xref linkend="appdx_psh5x_layers"/>, or have a
+        beer. My hope is that in the future we will suppress the PowerShell jargon and dress-up the
+        core cmdlets in an HDF5-centric PowerShell module that includes cmdlets like
+          <literal>New-H5Dataset</literal>, <literal>New-H5Attribute</literal> etc. </para>
+    </note>
     <para> In software, the provider architecture is represented as a hierarchy of five classes and
       a set of four interfaces. In <xref linkend="appdx_psh5x_layers"/>, a cartoon of these classes
       and the cmdlets they support is shown. The structure of an HDF5 store is sufficiently rich to

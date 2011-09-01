@@ -209,7 +209,7 @@ At line:1 char:4
             <para>While writing the first version of this guide, Enthought
                     <citation>Enthought</citation> produced a first version of NumPy and SciPy for
                 IronPython which may open the door for bringing numarrays to PSH5X. Stay tuned for
-                more... (Did I mention LINQ?)</para>
+                more...</para>
         </sect2>
 
         <sect2>
@@ -218,7 +218,7 @@ At line:1 char:4
             <para>The great flexibility in creating HDF5 datatypes can be a challenge in dynamic
                 environments like h5py or PowerShell. When PowerShell discovers an HDF5 dataset or
                 attribute, it parses the HDF5 datatype and creates a (JSON-like) hashtable
-                representing it. Creating any HDF5 dataset from that kind of type information is
+                representing it. Creating an HDF5 dataset from that kind of type information is
                 pretty straightforward. The real challenge is to create and map between in-memory
                 representations (plural!) of elements of such a type <emphasis>at
                 runtime</emphasis>. In the case of PSH5X, there are at least two representations,
