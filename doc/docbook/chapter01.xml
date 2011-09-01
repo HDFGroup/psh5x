@@ -24,8 +24,8 @@
     problem for us with the PowerShell provider interface. The alternative idea of creating from
     scratch a loosely affiliated set of cmdlets that perform certain simple tasks sounds attractive
     and so simple that it should be frightening. I believe that, in the case of a data store as
-    complex as HDF5, this approach would be more work short-term and long-term because of not
-    leveraging standardized facilities and the increasing risk of inconsistency and feature creep. </para>
+    complex as HDF5, this approach would be more work short-term and long, because of not leveraging
+    standardized facilities and the increasing risk of inconsistency and feature creep. </para>
 
   <sect1 xml:id="windows_powershell_providers">
     <title>A Windows PowerShell Provider</title>
@@ -40,9 +40,9 @@
       <tgroup cols="3">
         <thead>
           <row>
-            <entry>Item</entry>
-            <entry>Value</entry>
-            <entry>Content</entry>
+            <entry align="center">Item</entry>
+            <entry align="center">Value</entry>
+            <entry align="center">Content</entry>
           </row>
         </thead>
         <tbody>
@@ -81,9 +81,9 @@
       <tgroup cols="3">
         <thead>
           <row>
-            <entry>Property</entry>
-            <entry>Value</entry>
-            <entry>Content</entry>
+            <entry align="center">Property</entry>
+            <entry align="center">Value</entry>
+            <entry align="center">Content</entry>
           </row>
         </thead>
         <tbody>
@@ -102,10 +102,11 @@
     <note>
       <para>Throughout the text we will use a strange mixture of HDF5 and PowerShell jargon. We will
         refer to HDF5 items, properties, and content. When in doubt, refer to <xref
-          linkend="items_et_properties_table"/>, or <xref linkend="appdx_psh5x_layers"/>, or have a
-        beer. My hope is that in the future we will suppress the PowerShell jargon and dress-up the
-        core cmdlets in an HDF5-centric PowerShell module that includes cmdlets like
-          <literal>New-H5Dataset</literal>, <literal>New-H5Attribute</literal> etc. </para>
+          linkend="items_et_properties_table"/>, or the terminology branch in <xref
+          linkend="appdx_psh5x_layers"/>, or have a beer. My hope is that in the future we will
+        suppress the PowerShell jargon and dress-up the core cmdlets in an HDF5-centric PowerShell
+        module that includes cmdlets like <literal>New-H5Dataset</literal>,
+          <literal>New-H5Attribute</literal> etc. </para>
     </note>
     <para> In software, the provider architecture is represented as a hierarchy of five classes and
       a set of four interfaces. In <xref linkend="appdx_psh5x_layers"/>, a cartoon of these classes

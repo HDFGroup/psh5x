@@ -12,8 +12,7 @@
         <programlisting><xi:include parse="text" href="examples/dataset.ps1"/></programlisting>For
         this simple example even the C-code wouldn't be too bad. Granted, we'd have to compile it
         and with all the variable definitions, semicolons, and resource management the code gets
-        pretty noisy. (For me any code, including PowerShell, looks noisy compared to
-        Python.)</para>
+        pretty noisy. (On the other hand, any code not written in Python looks noisy...)</para>
     <para> Ok, now show me somthing that I haven't seen before! How about counting the number of
         groups and datasets in a file?</para>
     <screen><prompt>PS:1 ></prompt><command> dir h5:\ -Recurse -Filter dg | %{ switch($_.ItemType) `
