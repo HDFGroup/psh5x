@@ -246,6 +246,7 @@ dset3                    Dataset    8/24/2011 12:11:37 PM  0</screen>
                 <sbr/>
                 <arg choice="opt">-Chunked <replaceable>Int64[]</replaceable></arg>
                 <arg choice="opt">-Compact</arg>
+                <arg choice="opt">-External <replaceable>Object[]</replaceable></arg>
                 <arg choice="opt">-Gzip <replaceable>[0..9]</replaceable></arg>
                 <arg choice="opt">-FillValue <replaceable>Object</replaceable></arg>
                 <arg choice="opt">-Null</arg>
@@ -295,6 +296,20 @@ dset3                    Dataset    8/24/2011 12:11:37 PM  0</screen>
                     </listitem>
                 </varlistentry>
                 <varlistentry>
+                    <term>-External</term>
+                    <listitem>
+                        <para>Specifies external layout for the new HDF5 dataset. The parameter
+                            value must be an an array of arrays of length three of the form
+                                <literal>(name, offset, size)</literal>, where
+                                <literal>name</literal> is a file name, and
+                                <literal>offset</literal> and <literal>size</literal> are offset and
+                            size in the file, respectively. This option is incompatible with the
+                                <literal>-Compact</literal>, <literal>-Chunked</literal>,
+                                <literal>-Scalar</literal>, and <literal>-Null</literal> parameters.
+                        </para>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
                     <term>-Gzip</term>
                     <listitem>
                         <para>Specifies the compression level for the new HDF5 dataset. Currently
@@ -310,6 +325,32 @@ dset3                    Dataset    8/24/2011 12:11:37 PM  0</screen>
                         <literal>-Scalar</literal> parameters have not been implemented in the beta
                     version of PSH5X.</para>
             </note>
+            <example>
+                <title>Creating an HDF5 dataset with external layout</title>
+                <screen><prompt>PS:1 ></prompt>New-Item h5tmp:\extdat -ItemType Dataset -ElementType int -Dimensions 60 `
+    -External @(@('ext1.dat', 0, 40), @('ext2.dat', 40, 80), @('ext3.dat', 80, 120))
+
+PSPath            : HDF5\HDF5::h5tmp:\extdat
+PSParentPath      : HDF5\HDF5::h5tmp:
+PSChildName       : External Data
+PSDrive           : h5tmp
+PSProvider        : HDF5\HDF5
+PSIsContainer     : False
+ExternalFileCount : 3
+MaxDimensions     : {60}
+Dimensions        : {60}
+StorageSizeBytes  : 240
+Rank              : 1
+Layout            : Contiguous
+ExtentType        : Simple
+ElementType       : {SignType, BitOffset, Class, MSBitPadding...}
+ElementTypeClass  : Integer
+ElementCount      : 60
+Timestamps        : {ModificationTime, AccessTime, ChangeTime, BirthTime}
+AttributeNames    : {}
+AttributeCount    : 0
+ItemType          : Dataset</screen>
+            </example>
         </sect3>
 
         <sect3>
@@ -379,12 +420,15 @@ dset3                    Dataset    8/24/2011 12:11:37 PM  0</screen>
                 <varlistentry>
                     <term>-WxH</term>
                     <listitem>
-                        <para>Specifies the width and height (in pixels) of the new HDF5 image.</para>
+                        <para>Specifies the width and height (in pixels) of the new HDF5
+                            image.</para>
                     </listitem>
                 </varlistentry>
                 <varlistentry>
                     <term>-InterlaceMode</term>
-                    <listitem><para>Specifies the interlace mode of the new HDF5 image.</para></listitem>
+                    <listitem>
+                        <para>Specifies the interlace mode of the new HDF5 image.</para>
+                    </listitem>
                 </varlistentry>
             </variablelist>
             <example>
