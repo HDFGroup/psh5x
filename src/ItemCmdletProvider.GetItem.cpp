@@ -130,7 +130,7 @@ namespace PSH5X
                                     WriteItemObject(ProviderUtils::GetDatasetInfoLite(obj_id), path, false);
                                 }
                                 else {
-                                    WriteItemObject(gcnew DatasetInfo(obj_id), path, false);
+                                    WriteItemObject(ProviderUtils::GetDatasetInfo(obj_id), path, false);
                                 }
                                 break;
 
