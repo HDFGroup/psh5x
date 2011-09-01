@@ -1,7 +1,6 @@
 #pragma once
 
 #include "ItemInfo.h"
-#include "ProviderUtils.h"
 
 extern "C" {
 #include "H5Opublic.h"
@@ -26,15 +25,7 @@ namespace PSH5X
 
         property System::Collections::Hashtable^ Timestamps
         {
-            System::Collections::Hashtable^ get()
-            {
-                System::Collections::Hashtable^ ht = gcnew System::Collections::Hashtable();
-                ht["AccessTime"] = ProviderUtils::UnixTime2DateTime(m_atime);
-                ht["BirthTime"] = ProviderUtils::UnixTime2DateTime(m_btime);
-                ht["ChangeTime"] = ProviderUtils::UnixTime2DateTime(m_ctime);
-                ht["ModificationTime"] = ProviderUtils::UnixTime2DateTime(m_mtime);
-                return ht;
-            }
+            System::Collections::Hashtable^ get();
         }
 
         ObjectInfoLite(hid_t obj_id);

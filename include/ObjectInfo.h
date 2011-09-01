@@ -2,7 +2,6 @@
 
 
 #include "ObjectInfoLite.h"
-#include "ProviderUtils.h"
 
 extern "C" {
 #include "H5Opublic.h"

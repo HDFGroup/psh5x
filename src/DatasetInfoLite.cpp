@@ -1,5 +1,7 @@
 
 #include "DatasetInfoLite.h"
+#include "HDF5Exception.h"
+#include "ProviderUtils.h"
 
 extern "C" {
 #include "H5Dpublic.h"
@@ -7,6 +9,10 @@ extern "C" {
 #include "H5Spublic.h"
 #include "H5Tpublic.h"
 }
+
+#include <vector>
+
+using namespace std;
 
 using namespace System;
 using namespace System::IO;
@@ -17,13 +23,19 @@ namespace PSH5X
 {
     DatasetInfoLite::DatasetInfoLite(hid_t dset) : ObjectInfoLite(dset)
     {
+        hid_t dtype = -1, dspace = -1, plist = -1;
+
         m_storage_size = H5Dget_storage_size(dset);
 
+        try
+        {
 #pragma region H5Dget_type
 
-        hid_t dtype = H5Dget_type(dset);
-        if (dtype >= 0)
-        {
+            dtype = H5Dget_type(dset);
+            if (dtype < 0) {
+                throw gcnew HDF5Exception("H5Dget_type failed!");
+            }
+
             switch (H5Tget_class(dtype))
             {
             case H5T_INTEGER:
@@ -62,19 +74,16 @@ namespace PSH5X
             }
 
             m_elem_type = ProviderUtils::ParseH5Type(dtype);
-        }
-        else { // TODO
-        }
-
-        H5Tclose(dtype);
 
 #pragma endregion
 
 #pragma region H5Dget_space
 
-        hid_t dspace = H5Dget_space(dset);
-        if (dspace >= 0)
-        {
+            dspace = H5Dget_space(dset);
+            if (dspace < 0) {
+                throw gcnew HDF5Exception("H5Dget_space failed!");
+            }
+
             switch (H5Sget_simple_extent_type(dspace))
             {
             case H5S_SCALAR:
@@ -90,44 +99,19 @@ namespace PSH5X
                 m_simple_extent_type = gcnew String("UNKNOWN");
                 break;
             }
-        }
-        else { // TODO
-        }
 
-        m_rank = H5Sget_simple_extent_ndims(dspace);
-        m_npoints = H5Sget_simple_extent_npoints(dspace);
-
-        hsize_t* dims = new hsize_t [m_rank];
-        hsize_t* maxdims = new hsize_t [m_rank];
-
-        int rank = H5Sget_simple_extent_dims(dspace, dims, maxdims);
-        if (rank > 0)
-        {
-            m_dims    = gcnew array<hsize_t>(m_rank);
-            m_maxdims = gcnew array<long long>(m_rank);
-
-            for (int i = 0; i < m_rank; ++i)
-            {
-                m_dims[i]    = dims[i];
-                m_maxdims[i] = safe_cast<long long>(maxdims[i]);
-            }
-        }
-        else { // TODO
-        }
-        
-        delete [] maxdims;
-        delete [] dims;
-
-        H5Sclose(dspace);
-
+            m_rank = H5Sget_simple_extent_ndims(dspace);
+            m_npoints = H5Sget_simple_extent_npoints(dspace);
+            
 #pragma endregion
 
 #pragma region H5Dget_create_plist
 
-        hid_t plist = H5Dget_create_plist(dset);
+            plist = H5Dget_create_plist(dset);
+            if (plist < 0) {
+                throw gcnew HDF5Exception("H5Dget_create_plist failed!");
+            }
 
-        if (plist >= 0)
-        {
             switch(H5Pget_layout(plist))
             {
             case H5D_COMPACT:
@@ -144,27 +128,21 @@ namespace PSH5X
                 break;
             }
 
-            m_chunk = nullptr;
-            if (m_layout == "Chunked")
-            {
-                hsize_t* dims = new hsize_t [m_rank];
-                int rank = H5Pget_chunk(plist, m_rank, dims);
-                if (rank == m_rank)
-                {
-                    m_chunk = gcnew array<hsize_t>(m_rank);
-                    for (int i = 0; i < m_rank; ++i)
-                        m_chunk[i] = dims[i];
-                }
-                delete [] dims;
+#pragma endregion
+        }
+        finally
+        {
+            if (dtype >= 0) {
+                H5Tclose(dtype);
+            }
+
+            if (dspace >= 0) {
+                H5Sclose(dspace);
+            }
+
+            if (plist >= 0) {
+                H5Pclose(plist);
             }
         }
-        else { // TODO
-        }
-
-        if (H5Pclose(plist) < 0) { // TODO
-        }
-
-#pragma endregion
-
     }
 }

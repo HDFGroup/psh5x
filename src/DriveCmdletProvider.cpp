@@ -2,6 +2,7 @@
 #include "DriveInfo.h"
 #include "HDF5Exception.h"
 #include "Provider.h"
+#include "PSH5XException.h"
 
 extern "C" {
 #include "H5Fpublic.h"
@@ -35,14 +36,12 @@ namespace PSH5X
             file_name = (char*)(Marshal::StringToHGlobalAnsi(tmpFile)).ToPointer();
 
             file_id = H5Fcreate(file_name, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
-            if (file_id < 0)
-            {
+            if (file_id < 0) {
                 String^ msg = String::Format(
                     "H5Fcreate failed with status {0} for file '{1}'", file_id, tmpFile);
                 throw gcnew HDF5Exception(msg);
             }
-            else
-            {
+            else {
                 if (H5Fclose(file_id) < 0) {
                     throw gcnew HDF5Exception("H5Fclose failed!"); 
                 }
@@ -53,11 +52,23 @@ namespace PSH5X
                 __super::ProviderInfo, "h5tmp:\\", "HDF5 sandbox drive (no dogs allowed)",
                 __super::Credential);
 
-            DriveInfo^ drive = gcnew DriveInfo(tmpFile, false, info, false);
-            coll->Add(drive);
-            Environment::SetEnvironmentVariable("PSH5XTmpFile", tmpFile);
+            if (info != nullptr)
+            {
+                DriveInfo^ drive = gcnew DriveInfo(tmpFile, false, info, false);
+                if (drive != nullptr)
+                {
+                    coll->Add(drive);
+                    Environment::SetEnvironmentVariable("PSH5XTmpFile", tmpFile);
 
-            ProviderInfo->Home = "h5tmp:\\";
+                    ProviderInfo->Home = "h5tmp:\\";
+                }
+                else {
+                    throw gcnew PSH5XException("Unable to create DriveInfo!");
+                }
+            }
+            else {
+                throw gcnew PSH5XException("Failed to construct System::Management::Automation::PSDriveInfo!");
+            }
         }
         finally
         {

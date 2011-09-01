@@ -1,6 +1,8 @@
 #pragma once
 
 #include "DriveInfo.h"
+#include "DatasetInfo.h"
+#include "DatasetInfoLite.h"
 
 extern "C" {
 #include "H5public.h"
@@ -128,6 +130,14 @@ namespace PSH5X
         static array<System::String^>^ GetObjectAttributeNames(hid_t obj_id);
 
         static array<System::String^>^ GetGroupLinkNames(hid_t group_id, bool recurse);
+
+#pragma region HDF5 Dataset
+
+        static DatasetInfoLite^ GetDatasetInfoLite(hid_t obj_id);
+
+        static DatasetInfo^ GetDatasetInfo(hid_t obj_id);
+
+#pragma endregion
 
 #pragma region HDF5 Datatype
 

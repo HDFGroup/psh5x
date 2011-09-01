@@ -48,4 +48,14 @@ namespace PSH5X
             throw gcnew HDF5Exception("H5Oget_info failed!");
         }
     }
+
+    Hashtable^ ObjectInfoLite::Timestamps::get()
+    {
+        System::Collections::Hashtable^ ht = gcnew System::Collections::Hashtable();
+        ht["AccessTime"] = ProviderUtils::UnixTime2DateTime(m_atime);
+        ht["BirthTime"] = ProviderUtils::UnixTime2DateTime(m_btime);
+        ht["ChangeTime"] = ProviderUtils::UnixTime2DateTime(m_ctime);
+        ht["ModificationTime"] = ProviderUtils::UnixTime2DateTime(m_mtime);
+        return ht;
+    }
 }

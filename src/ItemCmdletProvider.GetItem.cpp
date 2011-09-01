@@ -127,7 +127,7 @@ namespace PSH5X
                             case H5O_TYPE_DATASET:
 
                                 if (!detailed) {
-                                    WriteItemObject(gcnew DatasetInfoLite(obj_id), path, false);
+                                    WriteItemObject(ProviderUtils::GetDatasetInfoLite(obj_id), path, false);
                                 }
                                 else {
                                     WriteItemObject(gcnew DatasetInfo(obj_id), path, false);

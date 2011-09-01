@@ -51,24 +51,9 @@ namespace PSH5X
             long long get() { return safe_cast<long long>(m_npoints);  }
         }
 
-        property array<long long>^ Dimensions
-        {
-            array<long long>^ get() { return m_dims; }
-        }
-        
-        property array<long long>^ MaxDimensions
-        {
-            array<long long>^ get() { return m_maxdims; }
-        }
-
         property System::String^ Layout
         {
             System::String^ get() { return m_layout; }
-        }
-
-        property array<long long>^ Chunk
-        {
-            array<long long>^ get() { return m_chunk; }
         }
 
         property System::String^ FillValueDefinition
@@ -91,25 +76,21 @@ namespace PSH5X
             int get() { return m_nfilters; }
         }
 
-        property int ExternalFileCount
-        {
-            int get() { return m_external_count; }
-        }
-
         ~DatasetInfo()
         {
             delete m_elem_type_class;
             delete m_elem_type;
             delete m_dataspace_alloc_status;
             delete m_simple_extent_type;
-            delete m_dims;
-            delete m_maxdims;
             delete m_layout;
-            delete m_chunk;
             delete m_fill_value_def;
             delete m_fill_time;
             delete m_alloc_time;
         }
+
+    protected:
+
+        int               m_rank;
 
     private:
 
@@ -125,17 +106,9 @@ namespace PSH5X
 
         System::String^   m_simple_extent_type;
 
-        int               m_rank;
-
         hssize_t          m_npoints;
 
-        array<long long>^ m_dims;
-
-        array<long long>^ m_maxdims;
-
         System::String^   m_layout;
-
-        array<long long>^ m_chunk;
 
         System::String^   m_fill_value_def;
 
@@ -145,7 +118,6 @@ namespace PSH5X
 
         int               m_nfilters;
 
-        int               m_external_count;
     };
 
 }
