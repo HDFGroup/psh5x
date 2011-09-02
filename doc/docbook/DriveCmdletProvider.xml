@@ -121,8 +121,9 @@ C:\Users\gheber\AppData\Local\Temp\tmpC798.tmp</screen>
         </variablelist>
         <example>
             <title>Creating a new PowerShell drive from an HDF5 file</title>
-            <screen><prompt>PS:1 ></prompt> <command>New-PSDrive -Name h5new -PSProvider HDF5 `
-    -Path E:\HDF5\h5\sample.h5 -Root h5new:\</command>
+            <screen><prompt>PS:1 ></prompt> <command>New-PSDrive -Name h5new -PSProvider HDF5 -Root h5new:\ `
+    -Path E:\HDF5\h5\sample.h5 </command>
+                
 Name       Used (GB)     Free (GB) Provider      Root
 ----       ---------     --------- --------      ----
 h5new                              HDF5          h5new:\</screen>
@@ -130,12 +131,23 @@ h5new                              HDF5          h5new:\</screen>
         <example>
             <title>Creating a new PowerShell drive with a different root and read/write
                 access</title>
-            <screen><prompt>PS:1 ></prompt> <command>New-PSDrive -Name h5new -PSProvider HDF5 `
-    -Path E:\HDF5\h5\sample.h5 -Root h5new:\A\B -Mode RW</command>
+            <screen><prompt>PS:1 ></prompt> <command>New-PSDrive -Name h5new -PSProvider HDF5 -Root h5new:\A\B `
+    -Path E:\HDF5\h5\sample.h5  -Mode RW</command>
+                
 Name       Used (GB)     Free (GB) Provider      Root
 ----       ---------     --------- --------      ----
 h5new                              HDF5          h5new:\A\B</screen>
         </example>
+        <example>
+            <title>Creating a new PowerShell drive and forcing the creation of a new HDF5 file as a side-effect</title>
+            <screen><prompt>PS:1 ></prompt> <command>New-PSDrive -Name h5new -PSProvider HDF5 -Root h5new:\ `
+    -Path C:\tmp\force.h5 -Force</command>
+                
+Name       Used (GB)     Free (GB) Provider      Root
+----       ---------     --------- --------      ----
+h5new                              HDF5          h5new:\</screen>
+        </example>
+        
         <para>A PowerShell drive is represented as a PowerShell object. See <xref
                 linkend="drive_object"/> for a detailed description of its properties.</para>
 

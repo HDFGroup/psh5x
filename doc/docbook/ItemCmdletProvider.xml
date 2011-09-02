@@ -33,7 +33,7 @@
         <para>The <literal>-Detailed</literal> switch can be used to retrieve additional information
             about an item.</para>
         <example>
-            <title>Retrieving the root group of the HDF5 scratch PSDrive</title>
+            <title>Retrieving information about the root group of the HDF5 scratch PSDrive</title>
             <screen><prompt>PS:1 ></prompt> <command>Get-Item h5tmp:\ | Format-List</command>
 
 PSPath         : HDF5\HDF5::h5tmp:\
@@ -142,7 +142,7 @@ True</screen>
         </variablelist>
         <example>
             <title>Adjusting the shape of an extendible dataset</title>
-            <screen><prompt>PS:1 ></prompt> <command>Set-Item h5tmp:\group1\dset3 @(44,55,66)</command></screen>
+            <screen><prompt>PS:1 ></prompt> <command>Set-Item h5tmp:\group1\dset4 @(44,55,66)</command></screen>
         </example>
         <example>
             <title>Assigning a new value to a soft link</title>

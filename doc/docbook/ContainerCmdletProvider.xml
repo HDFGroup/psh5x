@@ -82,7 +82,7 @@
             </varlistentry>
         </variablelist>
         <example>
-            <title>Getting the children of the PSDrive with root <literal>h5tmp:\</literal></title>
+            <title>Retrieving the children on a PSDrive with root <literal>h5tmp:\</literal></title>
             <screen><prompt>PS:1 ></prompt> <command>Get-ChildItem h5tmp:\</command>
                 
    PSParentPath: HDF5\HDF5::h5tmp:
@@ -98,7 +98,7 @@ slink1                   SoftLink
 type1                    Datatyp... 1/1/1970 12:00:00 AM   0</screen>
         </example>
         <example>
-            <title>Getting the children of the PSDrive with root <literal>h5tmp:\</literal> using
+            <title>Retrieving children on a PSDrive with root <literal>h5tmp:\</literal> using
                 wildcards</title>
             <screen><prompt>PS:1 ></prompt> <command>Get-ChildItem h5tmp:\dset*</command>
 
@@ -111,8 +111,8 @@ dset2                    Dataset    8/8/2011 4:05:00 PM    0
 dset3                    Dataset    8/8/2011 4:05:00 PM    0</screen>
         </example>
         <example>
-            <title>Recursively getting the children of the PSDrive with root
-                    <literal>h5tmp:\</literal></title>
+            <title>Recursively retrieving children on a PSDrive with root
+                <literal>h5tmp:\</literal></title>
             <screen><prompt>PS:1 ></prompt> <command>Get-ChildItem h5tmp:\ -Recurse | Sort-Object PSParentPath</command>
 
    PSParentPath: HDF5\HDF5::h5tmp:
@@ -134,7 +134,7 @@ LinkName                 ItemType   LastWriteTime          #Attr.
 dset3                    Dataset    8/24/2011 12:11:37 PM  0</screen>
         </example>
         <example>
-            <title>Recursively getting the children of a PSDrive which are symbolic links or named
+            <title>Recursively retrieving children that are symbolic links or named
                 datatypes</title>
             <screen><prompt>PS:1 ></prompt> <command>Get-ChildItem h5tmp:\ -Recurse -Filter st | Sort-Object PSParentPath</command>
 
@@ -146,8 +146,8 @@ type1                    Datatyp... 1/1/1970 12:00:00 AM   0
 slink1                   SoftLink</screen>
         </example>
         <example>
-            <title>Recursively getting the children of a PSDrive which are not symbolic links or
-                named datatypes</title>
+            <title>Recursively retrieving children that are not symbolic links or named
+                datatypes</title>
             <screen><prompt>PS:1 ></prompt> <command>Get-ChildItem h5tmp:\ -Recurse -Filter -st | Sort-Object PSParentPath</command>
    PSParentPath: HDF5\HDF5::h5tmp:
 
@@ -182,6 +182,7 @@ dset3                    Dataset    8/24/2011 12:11:37 PM  0</screen>
                     <option>ExtLink,</option>
                     <option>HardLink,</option>
                     <option>Image,</option>
+                    <option>PacketTable</option>
                     <option>SoftLink</option>
                 </group>
             </arg>
@@ -464,6 +465,41 @@ AttributeNames   : {CLASS, IMAGE_VERSION, IMAGE_SUBCLASS, PALETTE}
 AttributeCount   : 4
 ItemType         : Dataset</screen>
             </example>
+        </sect3>
+
+        <sect3>
+            <title>HDF5 Packet Table</title>
+            <para>The <literal>-Value</literal> argument has no meaning for packet tables.</para>
+            <cmdsynopsis>
+                <arg choice="req">-ElementType <replaceable>Object</replaceable></arg>
+                <arg choice="req">-Chunk <replaceable>Int64</replaceable></arg>
+                <arg choice="req">-Gzip <replaceable>[-1,0..9]</replaceable></arg>
+            </cmdsynopsis>
+            <variablelist>
+                <varlistentry>
+                    <term>-ElementType</term>
+                    <listitem>
+                        <para>Specifies the HDF5 datatype of the new packet table. This can be a
+                            string, containing a type abbreviation (see <xref
+                                linkend="psh5x_type_strings"/>) or HDF5 path name of a named
+                            datatype, or a hashtable with a full-fledged HDF5 datatype definition
+                            (see <xref linkend="appdx_hdf5_datatypes"/>).</para>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>-Chunk</term>
+                    <listitem>
+                        <para>Specifies the chunk size of the new HDF5 packet table.</para>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>-Gzip</term>
+                    <listitem>
+                        <para>Specifies the compression level for the new HDF5 packet table. -1
+                            indicates no compression.</para>
+                    </listitem>
+                </varlistentry>
+            </variablelist>
         </sect3>
 
         <sect3>

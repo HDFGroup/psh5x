@@ -106,19 +106,22 @@ namespace PSH5X
         {
         case H5S_SCALAR:
             m_simple_extent_type = gcnew String("Scalar");
+            m_rank = 0;
             break;
         case H5S_SIMPLE:
             m_simple_extent_type = gcnew String("Simple");
+            m_rank = H5Sget_simple_extent_ndims(dspace);
             break;
         case H5S_NULL:
             m_simple_extent_type = gcnew String("Null");
+            m_rank = -1;
             break;
         default:
             m_simple_extent_type = gcnew String("UNKNOWN");
             break;
         }
         
-        m_rank = H5Sget_simple_extent_ndims(dspace);
+        
         m_npoints = H5Sget_simple_extent_npoints(dspace);
 
 #pragma endregion
