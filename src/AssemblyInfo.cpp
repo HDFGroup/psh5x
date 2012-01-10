@@ -14,11 +14,11 @@ using namespace System::Security::Permissions;
 #endif
 [assembly:AssemblyCompanyAttribute("The HDF Group")];
 [assembly:AssemblyProductAttribute("PSH5X")];
-[assembly:AssemblyCopyrightAttribute("Copyright (C) The HDF Group 2008-2011. All rights reserved.")];
+[assembly:AssemblyCopyrightAttribute("Copyright (C) The HDF Group 2008-2012. All rights reserved.")];
 [assembly:AssemblyTrademarkAttribute("")];
 [assembly:AssemblyCultureAttribute("en")];
 
-[assembly:AssemblyVersionAttribute("0.2.*")];
+[assembly:AssemblyVersionAttribute("0.3.*")];
 
 [assembly:ComVisible(false)];
 
