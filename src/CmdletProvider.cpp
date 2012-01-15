@@ -13,16 +13,13 @@ using namespace System::Reflection;
 
 namespace PSH5X
 {
-
     System::Management::Automation::ProviderInfo^ Provider::Start(
         System::Management::Automation::ProviderInfo^ providerInfo)
     {
         WriteVerbose("HDF5Provider::Start()");
 
         String^ version = Assembly::GetExecutingAssembly()->GetName()->Version->ToString();
-        String^ description = nullptr;
-        String^ copyright = nullptr;
-
+        
         Assembly^ assy = Assembly::GetExecutingAssembly();
         bool isdef = assy->IsDefined(AssemblyDescriptionAttribute::typeid, false);
         if (isdef)
@@ -31,7 +28,9 @@ namespace PSH5X
                 (AssemblyDescriptionAttribute^)Attribute::GetCustomAttribute(
                 assy, AssemblyDescriptionAttribute::typeid);
             if (adAttr != nullptr)
-                description = adAttr->Description;
+			{
+				Console::WriteLine("\n" + adAttr->Description + " " + version);
+			}
         }
 
         isdef = assy->IsDefined(AssemblyCopyrightAttribute::typeid, false);
@@ -41,12 +40,11 @@ namespace PSH5X
                 (AssemblyCopyrightAttribute^)Attribute::GetCustomAttribute(
                 assy, AssemblyCopyrightAttribute::typeid);
             if (adAttr != nullptr)
-                copyright = adAttr->Copyright;
+			{
+				Console::WriteLine(adAttr->Copyright);
+			}
         }
         
-        Console::WriteLine("\n" + description + " " + version);
-        Console::WriteLine(copyright);
-
         herr_t status = H5open();
         if (status < 0)
         {
@@ -72,7 +70,7 @@ namespace PSH5X
 
     void Provider::Stop()
     {
-        WriteVerbose("HDF5Provider::Start()");
+        WriteVerbose("HDF5Provider::Stop()");
 
         Console::WriteLine("\nThank you for using HDF5.\n");
 

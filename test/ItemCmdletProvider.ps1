@@ -3,6 +3,7 @@ Write-Host "$($MyInvocation.MyCommand.Path)" -BackgroundColor Yellow
 
 $ScriptDir = Split-Path $MyInvocation.MyCommand.Path
 . $ScriptDir\Check-HDF5SnapinFunction.ps1
+. $ScriptDir\Check-OpenHandlesFunction.ps1
 . $ScriptDir\Print-MessagesFunctions.ps1
 
 Check-HDF5Snapin
@@ -25,3 +26,5 @@ Get-Item h5tmp:\* | % { $count++ }
 
 ShowValues 7 $count; CreateFooter
 
+
+Check-OpenHandles
