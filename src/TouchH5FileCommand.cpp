@@ -1,4 +1,5 @@
 
+#include "HDF5Exception.h"
 #include "TouchH5FileCommand.h"
 
 extern "C" {
@@ -42,8 +43,9 @@ namespace PSH5X
         if (m_fileInfo != nullptr)
         {
             if (!m_fileInfo->Exists)
+			{
                 CreateH5File(m_fileInfo);
-
+			}
             UpdateLastWriteTime(m_fileInfo);
             return;
         }
@@ -84,7 +86,9 @@ namespace PSH5X
 
             System::IO::FileInfo^ info = gcnew System::IO::FileInfo(fullPath);
             if (!info->Exists)
+			{
                 CreateH5File(info);
+			}
             UpdateLastWriteTime(info);
         }
         else
@@ -94,7 +98,9 @@ namespace PSH5X
                     gcnew System::IO::FileInfo(resolvedPaths[i]);
 
                 if (!info->Exists)
+				{
                     CreateH5File(info);
+				}
                 UpdateLastWriteTime(info);
             }
     }
@@ -115,7 +121,7 @@ namespace PSH5X
                         String^ msg = String::Format(
                             "H5Fcreate failed with status {0} for file '{1}'",
                             status, info->FullName);
-                        throw gcnew Exception(msg); 
+                        throw gcnew HDF5Exception(msg); 
                     }
                     else
                     {
@@ -125,7 +131,7 @@ namespace PSH5X
                             String^ msg = String::Format(
                                 "H5Fclose failed with status {0} for name {1}",
                                 ierr, info->FullName);
-                            throw gcnew Exception(msg);
+                            throw gcnew HDF5Exception(msg);
                         }
                     }
                 }

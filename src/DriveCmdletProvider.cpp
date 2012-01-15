@@ -29,7 +29,7 @@ namespace PSH5X
 
         try
         {
-            // create a writeable sandbox drive h5tmp:
+            // create a writable sandbox drive h5tmp:
 
             String^ tmpFile = System::IO::Path::GetTempFileName();
 
@@ -127,15 +127,13 @@ namespace PSH5X
         dynamicParameters->Add("Mode",
             gcnew RuntimeDefinedParameter("Mode", String::typeid, atts1));
 
-        ParameterAttribute^ attr5 = gcnew ParameterAttribute();
-        attr5->Mandatory = false;
-        attr5->ValueFromPipeline = false;
-
+        ParameterAttribute^ atts2 = gcnew ParameterAttribute();
+        atts2->Mandatory = false;
+        atts2->ValueFromPipeline = false;
         RuntimeDefinedParameter^ paramForce = gcnew RuntimeDefinedParameter();
         paramForce->Name = "Force";
         paramForce->ParameterType = SwitchParameter::typeid;
-        paramForce->Attributes->Add(attr5);
-
+        paramForce->Attributes->Add(atts2);
         dynamicParameters->Add("Force", paramForce);
         
         return dynamicParameters;

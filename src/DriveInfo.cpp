@@ -1,5 +1,7 @@
 
 #include "DriveInfo.h"
+#include "HDF5Exception.h"
+#include "PSH5XException.h"
 
 extern "C" {
 #include "H5ACpublic.h"
@@ -18,190 +20,171 @@ namespace PSH5X
     DriveInfo::DriveInfo(String^ path, bool readonly, PSDriveInfo^ drive, bool force)
         : PSDriveInfo(drive)
     {
-        Exception^ ex = nullptr;
-
         m_path = path;
         m_readonly = readonly;
 
         char *name = NULL, *filename = NULL;
 
         unsigned flags = H5F_ACC_RDONLY;
-        if (!m_readonly)
-        {
-            flags = H5F_ACC_RDWR;
-        }
 
-        if (File::Exists(m_path))
-        {
-           name = (char*)(Marshal::StringToHGlobalAnsi(m_path)).ToPointer();
-           if (H5Fis_hdf5(name) <= 0) {
-               String^ msg = String::Format(
-                   "File '{0}' is not an HDF5 file", path);
-               ex = gcnew ArgumentException(msg);
-               goto error;
-           }
+		try
+		{
+			if (!m_readonly)
+			{
+				flags = H5F_ACC_RDWR;
+			}
 
-           m_handle = H5Fopen(name, flags, H5P_DEFAULT);
-           if (m_handle < 0) {
-               String^ msg = String::Format(
-                   "H5Fopen failed with status {0} for name {1}", m_handle, path);
-               ex = gcnew ArgumentException(msg);
-               goto error;
-           }
-        }
-        else if (force)
-        {
-            FileInfo^ info = gcnew FileInfo(path);
-            filename = (char*)(Marshal::StringToHGlobalAnsi(info->FullName)).ToPointer();
+			if (File::Exists(m_path))
+			{
+				name = (char*)(Marshal::StringToHGlobalAnsi(m_path)).ToPointer();
+				if (H5Fis_hdf5(name) <= 0) {
+					String^ msg = String::Format(
+						"File '{0}' is not an HDF5 file", path);
+					throw gcnew PSH5XException(msg);
+				}
 
-            hid_t file = H5Fcreate(filename, H5F_ACC_EXCL, H5P_DEFAULT, H5P_DEFAULT);
-            if (file >= 0) {
-                if (H5Fclose(file) < 0) {
-                    ex = gcnew Exception("H5Fclose failed!!!");
-                    goto error;
-                }
-            }
-            else {
-                String^ msg = String::Format(
-                    "H5Fcreate failed with status {0} for name {1}", file, info->FullName);
-                ex = gcnew ArgumentException(msg);
-                goto error;
-            }
-            
-            m_path = info->FullName;
-            m_readonly = false;
+				m_handle = H5Fopen(name, flags, H5P_DEFAULT);
+				if (m_handle < 0) {
+					String^ msg = String::Format(
+						"H5Fopen failed with status {0} for name {1}", m_handle, path);
+					throw gcnew HDF5Exception(msg);
+				}
+			}
+			else if (force)
+			{
+				FileInfo^ info = gcnew FileInfo(path);
+				filename = (char*)(Marshal::StringToHGlobalAnsi(info->FullName)).ToPointer();
 
-            m_handle = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
-            if (m_handle < 0) {
-                String^ msg = String::Format(
-                    "H5Fopen failed with status {0} for name {1}", m_handle, info->FullName);
-                ex = gcnew ArgumentException(msg);
-                goto error;
-            }
-        }
-        else {
-            ex = gcnew Exception(String::Format("File '{0}' not found", path));
-            goto error;
-        }
+				hid_t file = H5Fcreate(filename, H5F_ACC_EXCL, H5P_DEFAULT, H5P_DEFAULT);
+				if (file >= 0) {
+					if (H5Fclose(file) < 0) {
+						throw gcnew HDF5Exception("H5Fclose failed!!!");
+					}
+				}
+				else {
+					String^ msg = String::Format(
+						"H5Fcreate failed with status {0} for name {1}", file, info->FullName);
+					throw gcnew HDF5Exception(msg);
+				}
 
-error:
-        if (name != NULL) {
-            Marshal::FreeHGlobal(IntPtr(name));
-        }
+				m_path = info->FullName;
+				m_readonly = false;
 
-        if (filename != NULL) {
-            Marshal::FreeHGlobal(IntPtr(filename));
-        }
+				m_handle = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
+				if (m_handle < 0) {
+					String^ msg = String::Format(
+						"H5Fopen failed with status {0} for name {1}", m_handle, info->FullName);
+					throw gcnew HDF5Exception(msg);
+				}
+			}
+			else {
+				throw gcnew PSH5XException(String::Format("File '{0}' not found", path));
+			}
+		}
+		finally
+		{
+			if (name != NULL) {
+				Marshal::FreeHGlobal(IntPtr(name));
+			}
 
-        if (ex != nullptr) {
-            throw ex;
-        }
-
+			if (filename != NULL) {
+				Marshal::FreeHGlobal(IntPtr(filename));
+			}
+		}
     }
 
     Hashtable^ DriveInfo::CreationProperties::get()
     {
-        Exception^ ex = nullptr;
-
         Hashtable^ ht = gcnew Hashtable();
 
         hid_t plist = -1;
-        
-        plist = H5Fget_create_plist(m_handle);
-        if (plist < 0) {
-            ex = gcnew Exception("H5Fget_create_plist failed!!!");
-            goto error;
-        }
+     
+		try
+		{
+			plist = H5Fget_create_plist(m_handle);
+			if (plist < 0) {
+				throw gcnew HDF5Exception("H5Fget_create_plist failed!!!");
+			}
 
-        unsigned super, freelist, stab, shhdr;
-        if (H5Pget_version(plist, &super, &freelist, &stab, &shhdr) >= 0)
-        {
-            Hashtable^ ht1 = gcnew Hashtable();
-            ht1["SuperBlockVersion"] = super;
-            ht1["FreeListVersion"] = freelist;
-            ht1["SymbolTableVersion"] = stab;
-            ht1["SharedObjectHeaderVersion"] = shhdr;
-            ht["Version"] = ht1;
-        }
-        else {
-            ex = gcnew Exception("H5Pget_version failed!!!");
-            goto error;
-        }
+			unsigned super, freelist, stab, shhdr;
+			if (H5Pget_version(plist, &super, &freelist, &stab, &shhdr) >= 0)
+			{
+				Hashtable^ ht1 = gcnew Hashtable();
+				ht1["SuperBlockVersion"] = super;
+				ht1["FreeListVersion"] = freelist;
+				ht1["SymbolTableVersion"] = stab;
+				ht1["SharedObjectHeaderVersion"] = shhdr;
+				ht["Version"] = ht1;
+			}
+			else {
+				throw gcnew HDF5Exception("H5Pget_version failed!!!");
+			}
 
-        hsize_t size;
-        if (H5Pget_userblock(plist, &size) >= 0)
-        {
-            ht["UserBlockBytes"] = size;
-        }
-        else {
-            ex = gcnew Exception("H5Pget_userblock failed!!!");
-            goto error;
-        }
+			hsize_t size;
+			if (H5Pget_userblock(plist, &size) >= 0)
+			{
+				ht["UserBlockBytes"] = size;
+			}
+			else {
+				throw gcnew HDF5Exception("H5Pget_userblock failed!!!");
+			}
 
-        unsigned ik, lk;
-        if (H5Pget_sym_k(plist, &ik, &lk))
-        {
-            Hashtable^ ht1 = gcnew Hashtable();
-            ht1["BTreeHalfRank"] = ik;
-            ht1["LeafNodeHalfSize"] = ik;
-            ht["SymbolTable"] = ht1;
-        }
-        else {
-            ex = gcnew Exception("H5Pget_sym_k failed!!!");
-            goto error;
-        }
+			unsigned ik, lk;
+			if (H5Pget_sym_k(plist, &ik, &lk))
+			{
+				Hashtable^ ht1 = gcnew Hashtable();
+				ht1["BTreeHalfRank"] = ik;
+				ht1["LeafNodeHalfSize"] = ik;
+				ht["SymbolTable"] = ht1;
+			}
+			else {
+				throw gcnew HDF5Exception("H5Pget_sym_k failed!!!");
+			}
 
-        if (H5Pget_istore_k(plist, &ik) >= 0)
-        {
-            ht["ChunkBTreeHalfRank"] = ik;
-        }
-        else {
-            ex = gcnew Exception("H5Pget_istore_k failed!!!");
-            goto error;
-        }
+			if (H5Pget_istore_k(plist, &ik) >= 0)
+			{
+				ht["ChunkBTreeHalfRank"] = ik;
+			}
+			else {
+				throw gcnew HDF5Exception("H5Pget_istore_k failed!!!");
+			}
 
-        unsigned nindexes;
-        if (H5Pget_shared_mesg_nindexes(plist, &nindexes ) >= 0)
-        {
-            ht["SohmIndexCount"] = nindexes;
+			unsigned nindexes;
+			if (H5Pget_shared_mesg_nindexes(plist, &nindexes ) >= 0)
+			{
+				ht["SohmIndexCount"] = nindexes;
 
-            if (nindexes > 0)
-            {
-                // TODO
-            }
-        }
-        else {
-            ex = gcnew Exception("H5Pget_shared_mesg_nindexes failed!!!");
-            goto error;
-        }
+				if (nindexes > 0)
+				{
+					// TODO
+				}
+			}
+			else {
+				throw gcnew HDF5Exception("H5Pget_shared_mesg_nindexes failed!!!");
+			}
 
-        unsigned max_list, min_btree;
-        if (H5Pget_shared_mesg_phase_change(plist, &max_list, &min_btree ) >= 0)
-        {
-            Hashtable^ ht1 = gcnew Hashtable();
-            ht1["List2BTree"] = max_list;
-            ht1["BTree2List"] = min_btree;
-            ht["SohmPhaseChange"] = ht1;
-        }
-        else {
-            ex = gcnew Exception("H5Pget_shared_mesg_phase_change failed!!!");
-            goto error;
-        }
-
-error:
-
-        if (plist >= 0) {
-            H5Pclose(plist);
-        }
-
-        if (ex != nullptr) {
-            throw ex;
-        }
+			unsigned max_list, min_btree;
+			if (H5Pget_shared_mesg_phase_change(plist, &max_list, &min_btree ) >= 0)
+			{
+				Hashtable^ ht1 = gcnew Hashtable();
+				ht1["List2BTree"] = max_list;
+				ht1["BTree2List"] = min_btree;
+				ht["SohmPhaseChange"] = ht1;
+			}
+			else {
+				throw gcnew HDF5Exception("H5Pget_shared_mesg_phase_change failed!!!");
+			}
+		}
+		finally
+		{
+			if (plist >= 0) {
+				H5Pclose(plist);
+			}
+		}
 
         return ht;
     }
 
-    
     hid_t DriveInfo::FileHandle::get()
     {
         return m_handle;
@@ -333,7 +316,7 @@ error:
             ht["MdcEmptyReserve"] = config.empty_reserve;
         }
         else {
-            throw gcnew Exception("H5Fget_mdc_config failed!!!");
+            throw gcnew HDF5Exception("H5Fget_mdc_config failed!!!");
         }
 
         return ht;
@@ -344,7 +327,7 @@ error:
         double hit_rate = -1;
 
         if (H5Fget_mdc_hit_rate(m_handle, &hit_rate) < 0) {
-            throw gcnew Exception("H5Fget_mdc_hit_rate failed!!!");
+            throw gcnew HDF5Exception("H5Fget_mdc_hit_rate failed!!!");
         }
 
         return hit_rate;
@@ -365,7 +348,7 @@ error:
             ht["MdcNumberOfEntries"] = cur_num_entries;
         }
         else {
-            throw gcnew Exception("H5Fget_mdc_size failed!!!");
+            throw gcnew HDF5Exception("H5Fget_mdc_size failed!!!");
         }
 
         return ht;
