@@ -112,7 +112,7 @@ namespace PSH5X
             String^ linkName = ProviderUtils::ChildName(h5path);
             name = (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
 
-            if (itemTypeName->ToUpper() == "GROUP")
+			if (itemTypeName->ToUpper() == "GROUP")
             {
 
 #pragma region HDF5 group

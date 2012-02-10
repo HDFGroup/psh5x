@@ -1,6 +1,6 @@
 
 #include "HDF5Exception.h"
-#include "TouchH5FileCommand.h"
+#include "FormatH5FileCommand.h"
 
 extern "C" {
 #include "H5Fpublic.h"
@@ -14,31 +14,31 @@ using namespace System::Runtime::InteropServices;
 
 namespace PSH5X
 {
-    TouchH5FileCommand::TouchH5FileCommand()
+    FormatH5FileCommand::FormatH5FileCommand()
         : System::Management::Automation::PSCmdlet(), 
         m_path(nullptr), m_fileInfo(nullptr) {}
 
-    String^ TouchH5FileCommand::Path::get()
+    String^ FormatH5FileCommand::Path::get()
     {
         return m_path;
     }
 
-    void TouchH5FileCommand::Path::set(String^ value)
+    void FormatH5FileCommand::Path::set(String^ value)
     {
         m_path = value;
     }
 
-    System::IO::FileInfo^ TouchH5FileCommand::FileInfo::get()
+    System::IO::FileInfo^ FormatH5FileCommand::FileInfo::get()
     {
         return m_fileInfo;
     }
 
-    void TouchH5FileCommand::FileInfo::set(System::IO::FileInfo^ value)
+    void FormatH5FileCommand::FileInfo::set(System::IO::FileInfo^ value)
     {
         m_fileInfo = value;
     }
 
-    void TouchH5FileCommand::ProcessRecord()
+    void FormatH5FileCommand::ProcessRecord()
     {
         if (m_fileInfo != nullptr)
         {
@@ -47,6 +47,7 @@ namespace PSH5X
                 CreateH5File(m_fileInfo);
 			}
             UpdateLastWriteTime(m_fileInfo);
+			WriteObject(m_fileInfo);
             return;
         }
 
@@ -90,8 +91,10 @@ namespace PSH5X
                 CreateH5File(info);
 			}
             UpdateLastWriteTime(info);
+			WriteObject(info);
         }
         else
+		{
             for (int i = 0; i < resolvedPaths->Count; ++i)
             {
                 System::IO::FileInfo^ info =
@@ -102,12 +105,15 @@ namespace PSH5X
                     CreateH5File(info);
 				}
                 UpdateLastWriteTime(info);
+				WriteObject(info);
             }
+		}
     }
 
-    void TouchH5FileCommand::CreateH5File(System::IO::FileInfo^ info)
+    void FormatH5FileCommand::CreateH5File(System::IO::FileInfo^ info)
     {
         if (!info->Exists)
+		{
             if (this->ShouldProcess(info->FullName,
                 "file does not exist, create it"))
             {
@@ -145,19 +151,21 @@ namespace PSH5X
                     return;
                 }
             }
+		}
     }
 
-    void TouchH5FileCommand::UpdateLastWriteTime(System::IO::FileInfo^ info)
+    void FormatH5FileCommand::UpdateLastWriteTime(System::IO::FileInfo^ info)
     {
         try
         {
             if (info != nullptr)
+			{
                 if (this->ShouldProcess(info->FullName,
                     "set last write time to be " + DateTime::Now))
                 {
                     info->LastWriteTime = DateTime::Now;
-                    WriteObject(info);
                 }
+			}
         }
         catch (UnauthorizedAccessException^ ex)
         {

@@ -159,6 +159,7 @@
     <ClInclude Include="include\DataspaceInfo.h" />
     <ClInclude Include="include\DatatypeInfo.h" />
     <ClInclude Include="include\DriveInfo.h" />
+    <ClInclude Include="include\FormatH5FileCommand.h" />
     <ClInclude Include="include\GroupInfo.h" />
     <ClInclude Include="include\GroupInfoLite.h" />
     <ClInclude Include="include\H5ArrayT.h" />
@@ -181,7 +182,7 @@
     <ClInclude Include="include\Snapin.h" />
     <ClInclude Include="include\StringDatasetReader.h" />
     <ClInclude Include="include\StringDatasetWriter.h" />
-    <ClInclude Include="include\TouchH5FileCommand.h" />
+    <ClInclude Include="include\TestH5FileCommand.h" />
     <ClInclude Include="include\VlenDatasetReader.h" />
     <ClInclude Include="include\VlenDatasetWriter.h" />
   </ItemGroup>
@@ -200,6 +201,7 @@
     <ClCompile Include="src\DriveInfo.cpp" />
     <ClCompile Include="src\CmdletProvider.cpp" />
     <ClCompile Include="src\ContainerCmdletProvider.cpp" />
+    <ClCompile Include="src\FormatH5FileCommand.cpp" />
     <ClCompile Include="src\IContentCmdletProvider.cpp" />
     <ClCompile Include="src\IDynamicPropertyCmdletProvider.cpp" />
     <ClCompile Include="src\IPropertyCmdletProvider.cpp" />
@@ -229,7 +231,7 @@
     <ClCompile Include="src\Snapin.cpp" />
     <ClCompile Include="src\StringDatasetReader.cpp" />
     <ClCompile Include="src\StringDatasetWriter.cpp" />
-    <ClCompile Include="src\TouchH5FileCommand.cpp" />
+    <ClCompile Include="src\TestH5FileCommand.cpp" />
     <ClCompile Include="src\VlenDatasetReader.cpp" />
     <ClCompile Include="src\VlenDatasetWriter.cpp" />
   </ItemGroup>

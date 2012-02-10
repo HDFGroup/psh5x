@@ -2,15 +2,15 @@
 
 namespace PSH5X
 {
-    [System::Management::Automation::Cmdlet("Touch", "H5File",
+    [System::Management::Automation::Cmdlet("Test", "H5File",
         DefaultParameterSetName = "PathSet",
         SupportsShouldProcess=true,
         ConfirmImpact=System::Management::Automation::ConfirmImpact::Medium)]
-    public ref class TouchH5FileCommand : System::Management::Automation::PSCmdlet
+    public ref class TestH5FileCommand : System::Management::Automation::PSCmdlet
     {
     public:
 
-        TouchH5FileCommand();
+        TestH5FileCommand();
 
         [System::Management::Automation::Parameter(
             ParameterSetName="PathSet", Mandatory=true, Position=1,
@@ -37,10 +37,6 @@ namespace PSH5X
         virtual void ProcessRecord() override;
 
     private:
-
-        void CreateH5File(System::IO::FileInfo^ info);
-
-        void UpdateLastWriteTime(System::IO::FileInfo^ info);
 
         System::String^ m_path;
 

@@ -150,9 +150,6 @@
     <ClCompile Include="src\ShowH5TypesCommand.cpp">
       <Filter>Source Files\Cmdlets</Filter>
     </ClCompile>
-    <ClCompile Include="src\TouchH5FileCommand.cpp">
-      <Filter>Source Files\Cmdlets</Filter>
-    </ClCompile>
     <ClCompile Include="src\DatasetInfo.cpp">
       <Filter>Source Files\Info</Filter>
     </ClCompile>
@@ -189,12 +186,15 @@
     <ClCompile Include="src\Provider.cpp">
       <Filter>Source Files\Provider</Filter>
     </ClCompile>
+    <ClCompile Include="src\FormatH5FileCommand.cpp">
+      <Filter>Source Files\Cmdlets</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TestH5FileCommand.cpp">
+      <Filter>Source Files\Cmdlets</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Snapin.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\TouchH5FileCommand.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\ItemInfo.h">
@@ -309,6 +309,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\SimpleExternalDatasetInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\FormatH5FileCommand.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\TestH5FileCommand.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
