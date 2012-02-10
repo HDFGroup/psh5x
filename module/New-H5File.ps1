@@ -1,6 +1,6 @@
 
 Function New-H5File(
-                   $path=($paramMissing=$true)
+                   [string] $path=($paramMissing=$true)
                    )
 {
 <#
