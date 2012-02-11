@@ -1,7 +1,5 @@
 
-Function New-H5File(
-                   [string] $path=($paramMissing=$true)
-                   )
+Function New-H5File
 {
 <#
     .SYNOPSIS
@@ -11,29 +9,35 @@ Function New-H5File(
       It returns an error if a file or directory exists at the specified
       location, or the user does not have write permissions.
     .EXAMPLE
-      New-H5File -path C:\tmp\foo.h5
+      New-H5File -Path C:\tmp\foo.h5
  #>
-    If($local:paramMissing)
+    param
+    (
+        [Parameter(Mandatory=$true,
+                   ValueFromPipeline=$false,
+                   HelpMessage='The path name of the new HDF5 file.')]
+        [string]
+        $Path
+    )
+
+    "`nAttempting to create new HDF5 file '$Path' ..."
+
+    if(!(Test-Path $path))
     {
-        throw "USAGE: New-H5File -path <file path>"
-    }
-    "`nAttempting to create new HDF5 file $path ..."
-    If(!(Test-Path $path))
-    {
-        $file = (Format-H5File -Path $path)
-        $status = (Test-H5File $path)
-        If ($status)
+        $file = (Format-H5File -Path $Path)
+        $status = (Test-H5File $Path)
+        if ($status)
         {
-            Write-Host "`nSuccess: HDF5 file $path created."
-            return $file
+            "`nSuccess: HDF5 file '$Path' created."
+            $file
         }
-        Else
+        else
         {
-            Write-Error "`nError: file creation failed."
+            throw "`nError: file creation failed."
         }
     }
-    Else
+    else
     {
-        Write-Error "`nError: $path file exists."
+        throw "`nError: $Path file exists."
     }
 }

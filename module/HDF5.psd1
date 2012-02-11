@@ -12,7 +12,7 @@
 ModuleToProcess = 'HDF5.psm1'
 
 # Version number of this module.
-ModuleVersion = '1.0'
+ModuleVersion = '0.1'
 
 # ID used to uniquely identify this module
 GUID = '4afc4ce1-bff3-46ea-9b64-8b5e2455755c'
@@ -24,19 +24,19 @@ Author = 'Gerd Heber'
 CompanyName = 'The HDF Group'
 
 # Copyright statement for this module
-Copyright = '(c) 2012 The HDF Group. All rights reserved.'
+Copyright = '(c) 2008-2012 The HDF Group. All rights reserved.'
 
 # Description of the functionality provided by this module
-Description = 'This is a template that can be used to create other module manifests.'
+Description = 'This is the coolest HDF5 module for the Windows PowerShell.'
 
 # Minimum version of the Windows PowerShell engine required by this module
 PowerShellVersion = '2.0'
 
 # Name of the Windows PowerShell host required by this module
-PowerShellHostName = ''
+PowerShellHostName = 'ConsoleHost'
 
 # Minimum version of the Windows PowerShell host required by this module
-PowerShellHostVersion = ''
+PowerShellHostVersion = '2.0'
 
 # Minimum version of the .NET Framework required by this module
 DotNetFrameworkVersion = '4.0.30319'

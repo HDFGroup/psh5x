@@ -1,31 +1,45 @@
 
-Function Remove-H5Drive(
-                   [string] $name=($paramMissing=$true)
-                   )
+Function Remove-H5Drive
 {
 <#
     .SYNOPSIS
-      Remove an HDF5 Drive 
+      Remove an H5Drive (=PSDrive backed by an HDF5 file)
     .DESCRIPTION
-      The Remove-H5Drive function removes an PSDrive backed by an
-      HDF5 file. It returns an error if the drive name is invalid.
+      The Remove-H5Drive function removes a PSDrive backed by an
+      HDF5 file. It returns an error if the drive name is invalid
+      or the drive is busy, e.g., your current location is on the drive.
     .EXAMPLE
-      Remove-H5Drive -name h5
+      Remove-H5Drive -Name h5
+    .LINK
+      Remove-PSDrive
+      about_Scopes
  #>
-    If($local:paramMissing)
-    {
-        throw "USAGE: Remove-H5Drive -name <drive name>"
-    }
-    "`nAttempting to remove HDF5 drive $name ..."
+    param
+    (
+        [Parameter(Mandatory=$true,
+                   ValueFromPipeline=$false,
+                   HelpMessage='The name of the H5Drive.')]
+        [string]
+        $Name,
+        [Parameter(Mandatory=$false,
+                   ValueFromPipeline=$false,
+                   HelpMessage='The scope of the H5Drive. See about_Scopes.')]
+        [int]
+        $Scope = 2
+    )
+
+    "`nAttempting to remove HDF5 drive '$Name' ..."
+
     $count = 0
-    Get-PSDrive -PSProvider HDF5 -Scope 2 | ?{$_.Name -eq $name} | %{$count++}
-    If ($count -eq 1)
+    Get-PSDrive -PSProvider HDF5 -Scope $Scope | ?{$_.Name -eq $Name} | %{$count++}
+
+    if ($count -eq 1)
     {
-        Remove-PSDrive -Name $name -Scope 2
-        "`nSuccess: HDF5 drive $name removed."
+        Remove-PSDrive -Name $Name -Scope $Scope 
+        "`nSuccess: HDF5 drive '$Name' removed."
     }
-    Else
+    else
     {
-        "`nError: HDF5 drive $name not found."
+        "`nError: HDF5 drive '$Name' not found."
     }
 }

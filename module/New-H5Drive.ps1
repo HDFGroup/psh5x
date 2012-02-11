@@ -1,48 +1,78 @@
 
-Function New-H5Drive(
-                   [string] $name=($paramMissing=$true),
-                   [string] $file=($paramMissing=$true),
-                   [switch] $rw,
-                   [string] $root
-                   )
+Function New-H5Drive
 {
 <#
     .SYNOPSIS
-      Create a new HDF5 Drive 
+      Create a new H5Drive (=PSDrive backed by an HDF5 file)
     .DESCRIPTION
       The New-H5Drive function creates a new PSDrive backed by the specified
       HDF5 file. It returns an error if the drive name is in use, the file
       doesn't exist, or the user has insufficient permissions.
     .EXAMPLE
-      New-H5Drive -name h5 -file C:\tmp\foo.h5
+      New-H5Drive -Name h5 -File C:\tmp\foo.h5
+    .EXAMPLE
+      New-H5Drive -Name h5 -File C:\tmp\foo.h5 -rw
+    .LINK
+      New-PSDrive
+      about_Scopes
  #>
-    If($local:paramMissing)
+    param
+    (
+        [Parameter(Mandatory=$true,
+                   ValueFromPipeline=$false,
+                   HelpMessage='The name of the H5Drive.')]
+        [string]
+        $Name=($paramMissing=$true),
+        [Parameter(Mandatory=$true,
+                   ValueFromPipeline=$false,
+                   HelpMessage='The name of an HDF5 file.')]
+        [string]
+        $File,
+        [Parameter(Mandatory=$false,
+                   ValueFromPipeline=$false,
+                   HelpMessage='Make the H5Drive writeable?')]
+        [switch]
+        $RW,
+        [Parameter(Mandatory=$false,
+                   ValueFromPipeline=$false,
+                   HelpMessage='The root of the H5Drive.')]
+        [string] $Root,
+        [Parameter(Mandatory=$false,
+                   ValueFromPipeline=$false,
+                   HelpMessage='The scope of the H5Drive. See about_Scopes.')]
+        [int]    $Scope=2
+    )
+
+    if (!(Test-H5File $File))
     {
-        throw "USAGE: New-H5Drive -name <drive name> -file <file path> [-rw] [-root <root path>]"
+        throw "Error: File '$File' is not an HDF5 file."
     }
-    If (!$root)
+
+    if (!$Root)
     {
-        $root = "$($name):\"
+        $Root = "$($Name):\"
     }
-    If ($rw)
+
+    if ($RW)
     {
-        "`nAttempting to create new writeable HDF5 drive $name with file $file, and root $root ..."
-        $status = (New-PSDrive -Name $name -PSProvider HDF5 -Path $file -Root $root -Mode RW -Scope 2)
+        "`nAttempting to create new WRITEABLE H5Drive '$Name' with file '$File', and root '$Root' ..."
+        $status = (New-PSDrive -Name $Name -PSProvider HDF5 -Path $File -Root $Root -Mode RW -Scope $Scope)
     }
     else
     {
-        "`nAttempting to create new read-only HDF5 drive $name with file $file, and root $root ..."
-        $status = (New-PSDrive -Name $name -PSProvider HDF5 -Path $file -Root $root -Scope 2)
+        "`nAttempting to create new READ-ONLY HDF5 drive '$Name' with file '$File', and root '$Root' ..."
+        $status = (New-PSDrive -Name $Name -PSProvider HDF5 -Path $File -Root $Root -Scope $Scope)
     }
+
     $count = 0
-    Get-PSDrive -PSProvider HDF5 -Scope 1 | ?{$_.Name -eq $name} | %{ $count++ }
-    If ($count -eq 1)
+    Get-PSDrive -PSProvider HDF5 -Scope $Scope | ?{$_.Name -eq $name} | %{ $count++ }
+    if ($count -eq 1)
     {
-        "`nSuccess: HDF5 drive $name created."
-        return $status
+        "`nSuccess: HDF5 drive '$Name' created."
+        $status
     }
-    Else
+    else
     {
-        "`nError: Creation of HDF5 drive $name failed."
+        "`nError: Creation of HDF5 drive '$Name' failed."
     }
 }
