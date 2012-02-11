@@ -57,7 +57,6 @@ namespace PSH5X
         
         try
         {
-            Console::WriteLine(GetUnresolvedProviderPathFromPSPath(m_path));
             resolvedPaths = GetResolvedProviderPathFromPSPath(m_path, provider);
         }
         catch (ItemNotFoundException^)

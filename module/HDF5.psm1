@@ -24,3 +24,5 @@ $ScriptDir = Split-Path $MyInvocation.MyCommand.Path
 
 . $ScriptDir\New-H5Drive.ps1
 . $ScriptDir\New-H5File.ps1
+. $ScriptDir\Remove-H5Drive.ps1
+. $ScriptDir\Test-H5Drive.ps1
