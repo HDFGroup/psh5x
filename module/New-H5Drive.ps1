@@ -22,7 +22,7 @@ Function New-H5Drive
                    ValueFromPipeline=$false,
                    HelpMessage='The name of the H5Drive.')]
         [string]
-        $Name=($paramMissing=$true),
+        $Name,
         [Parameter(Mandatory=$true,
                    ValueFromPipeline=$false,
                    HelpMessage='The name of an HDF5 file.')]
