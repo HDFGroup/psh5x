@@ -19,6 +19,8 @@ Function New-H5Drive
       The HDF5 root group is the default.
     .PARAMETER Scope
       The scope in which the drive is to be created. See about_Scopes.
+    .PARAMETER WhatIf
+      What if?
     .EXAMPLE
       New-H5Drive -Name h5 -File C:\tmp\foo.h5
     .EXAMPLE
@@ -47,7 +49,11 @@ Function New-H5Drive
         [string] $Root,
         [Parameter(Mandatory=$false,
                    HelpMessage='The scope of the H5Drive. See about_Scopes.')]
-        [int]    $Scope=2
+        [int]    $Scope=2,
+        [Parameter(Mandatory=$false,
+                   HelpMessage='What if?')]
+        [switch]
+        $WhatIf
     )
 
     if (!(Test-H5File $File))
@@ -73,13 +79,27 @@ Function New-H5Drive
     {
         if ($RW)
         {
-            Write-Output (New-PSDrive -Name $Name -PSProvider HDF5 -Path $File -Root $Root -Mode RW -Scope $Scope)
-            Write-Host "`nSuccess: WRITEABLE H5Drive '$Name' created."
+            if (!$WhatIf)
+            {
+                Write-Output (New-PSDrive -Name $Name -PSProvider HDF5 -Path $File -Root $Root -Mode RW -Scope $Scope)
+                Write-Host "`nSuccess: WRITEABLE H5Drive '$Name' created."
+            }
+            else
+            {
+                Write-Output (New-PSDrive -Name $Name -PSProvider HDF5 -Path $File -Root $Root -Mode RW -Scope $Scope -WhatIf)
+            }
         }
         else
         {
-            Write-Output (New-PSDrive -Name $Name -PSProvider HDF5 -Path $File -Root $Root -Scope $Scope)
-            Write-Host "`nSuccess: READ-ONLY H5Drive '$Name' created."
+            if (!$WhatIf)
+            {
+                Write-Output (New-PSDrive -Name $Name -PSProvider HDF5 -Path $File -Root $Root -Scope $Scope)
+                Write-Host "`nSuccess: READ-ONLY H5Drive '$Name' created."
+            }
+            else
+            {
+                Write-Output (New-PSDrive -Name $Name -PSProvider HDF5 -Path $File -Root $Root -Scope $Scope -WhatIf)
+            }
         }
     }
     catch {

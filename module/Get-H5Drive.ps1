@@ -34,10 +34,10 @@ Function Get-H5Drive
 
     if ($Name)
     {
-        Get-PSDrive -PSProvider HDF5 -Name $Name -Scope $Scope
+        Write-Output(Get-PSDrive -PSProvider HDF5 -Name $Name -Scope $Scope)
     }
     else
     {
-        Get-PSDrive -PSProvider HDF5 -Scope $Scope
+        Write-Output(Get-PSDrive -PSProvider HDF5 -Scope $Scope)
     }
 }

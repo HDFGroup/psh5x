@@ -10,6 +10,8 @@ Function New-H5File
       have sufficient permissions.
     .PARAMETER Path
       The path name(s) of the new HDF5 file(s).
+    .PARAMETER WhatIf
+      What if?
     .EXAMPLE
       New-H5File -Path C:\tmp\foo.h5
     .EXAMPLE
@@ -20,7 +22,11 @@ Function New-H5File
         [Parameter(Mandatory=$true,
                    HelpMessage='The path name of the new HDF5 file.')]
         [string[]]
-        $Path
+        $Path,
+        [Parameter(Mandatory=$false,
+                   HelpMessage='What if?')]
+        [switch]
+        $WhatIf
     )
 
     foreach ($p in $Path)
@@ -29,9 +35,15 @@ Function New-H5File
         {
             try
             {
-                $file = (Format-H5File -Path $p)
-                Write-Host "`nSuccess: HDF5 file '$p' created."
-                Write-Output $file
+                if (!$WhatIf)
+                {
+                    Write-Output(Format-H5File -Path $p)
+                    Write-Host "`nSuccess: HDF5 file '$p' created."
+                }
+                else
+                {
+                    Write-Host(Format-H5File -Path $p -WhatIf)
+                }
             }
             catch
             {
