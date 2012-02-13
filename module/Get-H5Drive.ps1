@@ -9,6 +9,10 @@ Function Get-H5Drive
       The Get-H5Drive function gets the Windows PowerShell drives backed by
       HDF5 files in the current session. You can a particular drive or all
       drives in the console.
+    .PARAMETER Name
+      The name(s) of the H5Drive(s) to be removed.
+    .PARAMETER Scope 
+      The scope in which the H5Drive is defined. See about_Scopes.
     .EXAMPLE
       Get-H5Drive
     .EXAMPLE
@@ -19,12 +23,10 @@ Function Get-H5Drive
     param
     (
         [Parameter(Mandatory=$false,
-                   ValueFromPipeline=$false,
-                   HelpMessage='The name of the H5Drive.')]
+                   HelpMessage='The name(s) of the H5Drive(s).')]
         [string[]]
         $Name,
         [Parameter(Mandatory=$false,
-                   ValueFromPipeline=$false,
                    HelpMessage='The scope of the H5Drives. See about_Scopes.')]
         [int]
         $Scope = 2

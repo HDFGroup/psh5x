@@ -3,41 +3,45 @@ Function New-H5File
 {
 <#
     .SYNOPSIS
-      Create a new HDF5 file
+      Creates new HDF5 files
     .DESCRIPTION
-      The New-H5File function creates a new HDF5 at the specified location.
-      It returns an error if a file or directory exists at the specified
-      location, or the user does not have write permissions.
+      The New-H5File function creates new HDF5 files at the specified locations.
+      It returns an error if a file or directory exists or the user does not 
+      have sufficient permissions.
+    .PARAMETER Path
+      The path name(s) of the new HDF5 file(s).
     .EXAMPLE
       New-H5File -Path C:\tmp\foo.h5
+    .EXAMPLE
+      New-H5File C:\tmp\foo.h5,C:\tmp\bar.h5
  #>
     param
     (
         [Parameter(Mandatory=$true,
-                   ValueFromPipeline=$false,
                    HelpMessage='The path name of the new HDF5 file.')]
-        [string]
+        [string[]]
         $Path
     )
 
-    "`nAttempting to create new HDF5 file '$Path' ..."
-
-    if(!(Test-Path $path))
+    foreach ($p in $Path)
     {
-        $file = (Format-H5File -Path $Path)
-        $status = (Test-H5File $Path)
-        if ($status)
+        if(!(Test-Path $p))
         {
-            "`nSuccess: HDF5 file '$Path' created."
-            $file
+            try
+            {
+                $file = (Format-H5File -Path $p)
+                Write-Host "`nSuccess: HDF5 file '$p' created."
+                Write-Output $file
+            }
+            catch
+            {
+                Write-Debug ($_|Out-String)
+                Write-Host "`nError: creation of HDF5 file '$p' failed."
+            }
         }
         else
         {
-            throw "`nError: file creation failed."
+            Write-Host "`nError: '$p' file exists."
         }
-    }
-    else
-    {
-        throw "`nError: $Path file exists."
     }
 }
