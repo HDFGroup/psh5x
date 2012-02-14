@@ -89,16 +89,24 @@ Function New-H5Dataset
         [Parameter(Mandatory=$false,
                    HelpMessage='Force the creation of intermediates?')]
         [switch]
-        $Force,
-        [Parameter(Mandatory=$false,
-                   HelpMessage='What if?')]
-        [switch]
-        $WhatIf
+        $Force
     )
+
+    if ($Chunked -and $Compact)
+    {
+        Write-Error "`nThe -Chunked and -Compact options are not compatible."
+        return
+    }
+
+    if (!$Chunked -and $Gzip)
+    {
+        Write-Error "`nThe -Gzip option requires chunked layout. (-Chunked...)."
+        return
+    }
 
     if ((Test-Path $Path))
     {
-        Write-Host "`nError: The path name '$Path' is in use."
+        Write-Error "`nThe path name '$Path' is in use."
         return
     }
 
@@ -106,39 +114,126 @@ Function New-H5Dataset
     if (!(($typedef -eq 'System.String') `
           -or ($typedef -eq 'System.Collections.Hashtable')))
     {
-        Write-Host "`nError: Invalid type specification '$Type' found."
+        Write-Error "`nInvalid type specification '$Type' found."
         return
     }
 
     if ($Nulll)
     {
-        #Write-Output(New-Item $Path -ItemType Dataset -ElementType $Type -Null)
-        Write-Host "`nError: Support for null datasets unimplemented!!!"
+        Write-Error "`nSupport for null datasets unimplemented!!!"
         return
+
+        if ($Compact)
+        {
+        }
+        else
+        {
+        }
     }
     elseif ($Scalar)
     {
-        #Write-Output(New-Item $Path -ItemType Dataset -ElementType $Type -Scalar)
-        Write-Host "`nError: Support for scalar datasets unimplemented!!!"
+        Write-Error "`nSupport for scalar datasets unimplemented!!!"
         return
+
+        if ($Compact)
+        {
+        }
+        else
+        {
+        }
     }
     else # Simple
     {
+        for ($i = 0; $i -lt $Dimensions.Length; $i++)
+        {
+            if (!($Dimensions[$i] -gt 0))
+            {
+                Write-Error "`nDimensions must be positive."
+                return
+            }
+        }
+
         if ($MaxDimensions)
         {
             if ($Dimensions.Length -ne $MaxDimensions.Length)
             {
-                Write-Host "`nError: Length mismatch between dimension ($($Dimensions.Length)) and max. dimension ($($MaxDimensions.Length)) arrays"
+                Write-Error "`nLength mismatch between dimension ($($Dimensions.Length)) and max. dimension ($($MaxDimensions.Length)) arrays"
                 return
             }
+
+            $equal = $true
+            for ($i = 0; $i -lt $Dimensions.Length; $i++)
+            {
+                if (!(($MaxDimensions[$i] -lt 0) `
+                      -or ($MaxDimensions[$i] -ge $Dimensions[$i])))
+                {
+                    Write-Error "`nMax. dimensions must be either unlimited or greater or equal than the dimensions"
+                    return
+                }
+                if ($MaxDimensions[$i] -ne $Dimensions[$i]) {
+                    $equal = $false
+                }
+            }
+
+            if (!($equal -or $Chunked))
+            {
+                Write-Error "`nExtendible datasets must be chunked. Use -Chunked ... !"
+                return
+            }
+        }
+        else {
+            $MaxDimensions = $Dimensions
         }
 
         if ($Chunked)
         {
             if ($Dimensions.Length -ne $Chunked.Length)
             {
-                Write-Host "`nError: Length mismatch between dimension ($($Dimensions.Length)) and chunk dimension ($($Chunked.Length)) arrays"
+                Write-Error "`nLength mismatch between dimension ($($Dimensions.Length)) and chunk dimension ($($Chunked.Length)) arrays"
                 return
+            }
+
+            for ($i = 0; $i -lt $Dimensions.Length; $i++)
+            {
+                if (!($Chunked[$i] -gt 0))
+                {
+                    Write-Error "`nChunk dimensions must be positive."
+                    return
+                }
+                if (($MaxDimensions[$i] -gt 0) -and
+                    !($MaxDimensions[$i] -ge $Chunked[$i]))
+                {
+                    Write-Error "`nFor limited maximum dimensions the chunk dimension must not exceed the maximum dimension."
+                    return
+                }
+            }
+
+            if ($Gzip)
+            {
+                if ($Force) {
+                    Write-Output(New-Item $Path -ItemType Dataset -ElementType $type -Dimensions $Dimensions -MaxDimensions $MaxDimensions -Chunked $Chunked -Gzip $Gzip -Force)
+                }
+                else {
+                    Write-Output(New-Item $Path -ItemType Dataset -ElementType $type -Dimensions $Dimensions -MaxDimensions $MaxDimensions -Chunked $Chunked -Gzip $Gzip)
+                }
+            }
+            else
+            {
+                if ($Force) {
+                    Write-Output(New-Item $Path -ItemType Dataset -ElementType $type -Dimensions $Dimensions -MaxDimensions $MaxDimensions -Chunked $Chunked -Force)
+                }
+                else {
+                    Write-Output(New-Item $Path -ItemType Dataset -ElementType $type -Dimensions $Dimensions -MaxDimensions $MaxDimensions -Chunked $Chunked)
+                }
+            }
+        }
+        else
+        {
+            if ($Compact) {
+                Write-Output(New-Item $Path -ItemType Dataset -ElementType $type -Dimensions $Dimensions -Compact)
+            }
+            else {
+                Write-Output(New-Item $Path -ItemType Dataset -ElementType $type -Dimensions $Dimensions)
             }
         }
     }
