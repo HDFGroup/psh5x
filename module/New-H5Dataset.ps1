@@ -284,5 +284,6 @@ Function New-H5Dataset
                 }
             }
         }
+        Write-Host "`nSuccess: HDF5 dataset '$Path' created."
     }
 }
