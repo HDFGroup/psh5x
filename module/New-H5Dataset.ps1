@@ -120,9 +120,7 @@ Function New-H5Dataset
         return
     }
 
-    $typedef = $Type.GetType().FullName
-    if (!(($typedef -eq 'System.String') `
-          -or ($typedef -eq 'System.Collections.Hashtable')))
+    if (!(($Type -is [string]) -or ($Type -is [hashtable])))
     {
         Write-Error "`nInvalid type specification '$Type' found."
         return

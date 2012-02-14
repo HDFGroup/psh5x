@@ -38,11 +38,6 @@ Function New-H5Softlink
         Write-Error "`nThe source path '$Destination' is in use."
         return
     }
-    if (!(Test-Path $Destination))
-    {
-        Write-Error "`nThe destination '$Destination' is invalid."
-        return
-    }
 
     if ($PSCmdlet.ShouldProcess($Source, "New HDF5 Softlink -> '$Destination'"))
     { 
