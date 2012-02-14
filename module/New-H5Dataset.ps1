@@ -10,25 +10,37 @@ Function New-H5Dataset
       groups. Unless the current location is on the targeted H5Drive,
       the path(s) must be drive-qualified.
    .PARAMETER Path
-     The path of the new HDF5 group(s).
+     The path of the new HDF5 Dataset.
+   .PARAMETER Type
+     The element type of the HDF5 Dataset. The type can be specified as
+     1) A pre-defined HDF5 datatype (string)
+     2) An HDF5 datatype definition (hashtable)
+     3) The HDF5 path name of a linked HDF5 datatype
+   .PARAMETER Nulll
+     Create an HDF5 dataset with a null dataspace (empty set).
+   .PARAMETER Scalar
+     Create an HDF5 dataset with a scalar dataspace (singleton).
+   .PARAMETER Dimensions
+     Create an HDF5 dataset with a simple dataspace.
+   .PARAMETER MaxDimensions
+     Create an HDF5 dataset with a simple extendible dataspace.
+   .PARAMETER Chunked 
+     Create an HDF5 dataset with chunked layout.
+   .PARAMETER Gzip 
+     Create an HDF5 dataset with chunked layout and gzip compression enabled.
+   .PARAMETER Compact 
+     Create an HDF5 dataset with compact layout.
    .PARAMETER Force
      Force the creation of intermediates.
-   .PARAMETER WhatIf
-     What if?
    .EXAMPLE
-     New-H5Group -Path h5:\group1
-   .EXAMPLE
-     New-H5Group -Path h5:\group2\group3 -Force
-   .EXAMPLE
-     New-H5Group -Path h5:/group1
-   .EXAMPLE
-     New-H5Group -Path h5:/group1/group2
    .LINK
      New-Item
    .NOTES
      Forward- (/) and backslash (\) seprators are supported in path names.
      The must not be used as part of link names.
  #>
+    [CmdletBinding(SupportsShouldProcess=$true,
+                   DefaultParametersetName='Simple')]
     param
     (
         [Parameter(Mandatory=$true,
@@ -92,21 +104,19 @@ Function New-H5Dataset
         $Force
     )
 
+    if ((Test-Path $Path))
+    {
+        Write-Error "`nThe path name '$Path' is in use."
+        return
+    }
     if ($Chunked -and $Compact)
     {
         Write-Error "`nThe -Chunked and -Compact options are not compatible."
         return
     }
-
     if (!$Chunked -and $Gzip)
     {
         Write-Error "`nThe -Gzip option requires chunked layout. (-Chunked...)."
-        return
-    }
-
-    if ((Test-Path $Path))
-    {
-        Write-Error "`nThe path name '$Path' is in use."
         return
     }
 
@@ -122,27 +132,13 @@ Function New-H5Dataset
     {
         Write-Error "`nSupport for null datasets unimplemented!!!"
         return
-
-        if ($Compact)
-        {
-        }
-        else
-        {
-        }
     }
     elseif ($Scalar)
     {
         Write-Error "`nSupport for scalar datasets unimplemented!!!"
         return
-
-        if ($Compact)
-        {
-        }
-        else
-        {
-        }
     }
-    else # Simple
+    else #simple dataspace
     {
         for ($i = 0; $i -lt $Dimensions.Length; $i++)
         {
@@ -207,33 +203,87 @@ Function New-H5Dataset
                     return
                 }
             }
+        }
+    }
 
+    if ($PSCmdlet.ShouldProcess($Path, 'New HDF5 Dataset'))
+    { 
+        if ($Chunked)
+        {
             if ($Gzip)
             {
                 if ($Force) {
-                    Write-Output(New-Item $Path -ItemType Dataset -ElementType $type -Dimensions $Dimensions -MaxDimensions $MaxDimensions -Chunked $Chunked -Gzip $Gzip -Force)
+                    Write-Output(
+                        New-Item $Path -ItemType Dataset -ElementType $type `
+                                 -Dimensions $Dimensions -MaxDimensions `
+                                 $MaxDimensions -Chunked $Chunked -Gzip $Gzip `
+                                 -Force)
                 }
                 else {
-                    Write-Output(New-Item $Path -ItemType Dataset -ElementType $type -Dimensions $Dimensions -MaxDimensions $MaxDimensions -Chunked $Chunked -Gzip $Gzip)
+                    Write-Output(
+                        New-Item $Path -ItemType Dataset -ElementType $type `
+                                 -Dimensions $Dimensions -MaxDimensions `
+                                 $MaxDimensions -Chunked $Chunked -Gzip $Gzip)
                 }
             }
             else
             {
                 if ($Force) {
-                    Write-Output(New-Item $Path -ItemType Dataset -ElementType $type -Dimensions $Dimensions -MaxDimensions $MaxDimensions -Chunked $Chunked -Force)
+                    Write-Output(
+                        New-Item $Path -ItemType Dataset -ElementType $type `
+                                 -Dimensions $Dimensions -MaxDimensions `
+                                 $MaxDimensions -Chunked $Chunked -Force)
                 }
                 else {
-                    Write-Output(New-Item $Path -ItemType Dataset -ElementType $type -Dimensions $Dimensions -MaxDimensions $MaxDimensions -Chunked $Chunked)
+                    Write-Output(
+                        New-Item $Path -ItemType Dataset -ElementType $type `
+                                 -Dimensions $Dimensions -MaxDimensions `
+                                 $MaxDimensions -Chunked $Chunked)
                 }
             }
         }
-        else
+        elseif ($Compact)
         {
-            if ($Compact) {
-                Write-Output(New-Item $Path -ItemType Dataset -ElementType $type -Dimensions $Dimensions -Compact)
+            if ($Null)
+            {
             }
-            else {
-                Write-Output(New-Item $Path -ItemType Dataset -ElementType $type -Dimensions $Dimensions)
+            elseif ($Scalar)
+            {
+            }
+            else
+            {
+                if ($Force) {
+                    Write-Output( `
+                        New-Item $Path -ItemType Dataset -ElementType $type `
+                                 -Dimensions $Dimensions -Compact -Force)
+                }
+                else {
+                    Write-Output( `
+                        New-Item $Path -ItemType Dataset -ElementType $type `
+                                 -Dimensions $Dimensions -Compact)
+                }
+            }
+        }
+        else #contiguous layout
+        {
+            if ($Null)
+            {
+            }
+            elseif ($Scalar)
+            {
+            }
+            else
+            {
+                if ($Force) {
+                    Write-Output( `
+                        New-Item $Path -ItemType Dataset -ElementType $type `
+                                 -Dimensions $Dimensions -Force)
+                }
+                else {
+                    Write-Output( `
+                        New-Item $Path -ItemType Dataset -ElementType $type `
+                                 -Dimensions $Dimensions)
+                }
             }
         }
     }

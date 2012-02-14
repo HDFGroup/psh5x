@@ -20,6 +20,7 @@ Function Remove-H5Drive
       Remove-PSDrive
       about_Scopes
  #>
+    [CmdletBinding(SupportsShouldProcess=$true)]
     param
     (
         [Parameter(Mandatory=$true,
@@ -38,15 +39,18 @@ Function Remove-H5Drive
         Get-PSDrive -PSProvider HDF5 | ?{$_.Name -eq $n} | %{$count++}
         if ($count -eq 1)
         {
-            try
+            if ($PSCmdlet.ShouldProcess($n, 'Remove HDF5 Drive'))
             {
-                Write-Output(Remove-PSDrive -Name $Name -Scope $Scope)
-                Write-Host "`nSuccess: H5Drive '$n' removed."
-            }
-            catch
-            {
-                Write-Debug($_|Out-String)
-                Write-Error "`nCannot remove drive '$n'. Check current location!"
+                try
+                {
+                    Write-Output(Remove-PSDrive -Name $Name -Scope $Scope)
+                    Write-Host "`nSuccess: H5Drive '$n' removed."
+                }
+                catch
+                {
+                    Write-Debug($_|Out-String)
+                    Write-Error "`nCannot remove drive '$n'. Check current location!"
+                }
             }
         }
         else

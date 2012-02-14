@@ -28,6 +28,7 @@ Function New-H5Drive
       New-PSDrive
       about_Scopes
  #>
+    [CmdletBinding(SupportsShouldProcess=$true)]
     param
     (
         [Parameter(Mandatory=$true,
@@ -71,21 +72,28 @@ Function New-H5Drive
         $Root = "$($Name):\"
     }
 
-    try
-    {
-        if ($RW)
+    if ($PSCmdlet.ShouldProcess($File, "New HDF5 Drive '$Name'"))
+    { 
+        try
         {
-            Write-Output (New-PSDrive -Name $Name -PSProvider HDF5 -Path $File -Root $Root -Mode RW -Scope $Scope)
-            Write-Host "`nSuccess: WRITEABLE H5Drive '$Name' created."
+            if ($RW)
+            {
+                Write-Output(
+                    New-PSDrive -Name $Name -PSProvider HDF5 -Path $File `
+                                -Root $Root -Mode RW -Scope $Scope)
+                Write-Host "`nSuccess: WRITEABLE H5Drive '$Name' created."
+            }
+            else
+            {
+                Write-Output(
+                    New-PSDrive -Name $Name -PSProvider HDF5 -Path $File `
+                                -Root $Root -Scope $Scope)
+                Write-Host "`nSuccess: READ-ONLY H5Drive '$Name' created."
+            }
         }
-        else
-        {
-            Write-Output (New-PSDrive -Name $Name -PSProvider HDF5 -Path $File -Root $Root -Scope $Scope)
-            Write-Host "`nSuccess: READ-ONLY H5Drive '$Name' created."
+        catch {
+            Write-Debug ($_| Out-String)
+            Write-Error "`nCreation of HDF5 drive '$Name' failed."
         }
-    }
-    catch {
-        Write-Debug ($_| Out-String)
-        Write-Error "`nCreation of HDF5 drive '$Name' failed."
     }
 }

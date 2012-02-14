@@ -27,6 +27,7 @@ Function New-H5Group
      Forward- (/) and backslash (\) seprators are supported in path names.
      The must not be used as part of link names.
  #>
+    [CmdletBinding(SupportsShouldProcess=$true)]
     param
     (
         [Parameter(Mandatory=$true,
@@ -43,22 +44,25 @@ Function New-H5Group
     {
         if (!(Test-Path $p))
         {
-            try
-            {
-                if ($Force)
+            if ($PSCmdlet.ShouldProcess($p, 'New HDF5 Group'))
+            { 
+                try
                 {
-                    Write-Output(New-Item -Path $p -ItemType Group -Force)
-                    Write-Host "`nSuccess: HDF5 group '$p' created."
+                    if ($Force)
+                    {
+                        Write-Output(New-Item -Path $p -ItemType Group -Force)
+                        Write-Host "`nSuccess: HDF5 group '$p' created."
+                    }
+                    else
+                    {
+                        Write-Output(New-Item -Path $p -ItemType Group)
+                        Write-Host "`nSuccess: HDF5 group '$p' created."
+                    }
                 }
-                else
-                {
-                    Write-Output(New-Item -Path $p -ItemType Group)
-                    Write-Host "`nSuccess: HDF5 group '$p' created."
+                catch {
+                    Write-Debug($_|Out-String)
+                    Write-Error "`nUnable to create HDF5 group '$p'. Intermediates missing? Is your current location an H5Drive?"
                 }
-            }
-            catch {
-                Write-Debug($_|Out-String)
-                Write-Error "`nUnable to create HDF5 group '$p'. Intermediates missing?"
             }
         }
         else

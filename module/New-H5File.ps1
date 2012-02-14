@@ -15,6 +15,7 @@ Function New-H5File
     .EXAMPLE
       New-H5File C:\tmp\foo.h5,C:\tmp\bar.h5
  #>
+    [CmdletBinding(SupportsShouldProcess=$true)]
     param
     (
         [Parameter(Mandatory=$true,
@@ -27,15 +28,18 @@ Function New-H5File
     {
         if(!(Test-Path $p))
         {
-            try
-            {
-                Write-Output(Format-H5File -Path $p)
-                Write-Host "`nSuccess: HDF5 file '$p' created."
-            }
-            catch
-            {
-                Write-Debug ($_|Out-String)
-                Write-Error "`nCreation of HDF5 file '$p' failed."
+            if ($PSCmdlet.ShouldProcess($p, 'New HDF5 File'))
+            { 
+                try
+                {
+                    Write-Output(Format-H5File -Path $p)
+                    Write-Host "`nSuccess: HDF5 file '$p' created."
+                }
+                catch
+                {
+                    Write-Debug ($_|Out-String)
+                    Write-Error "`nCreation of HDF5 file '$p' failed."
+                }
             }
         }
         else
