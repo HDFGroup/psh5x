@@ -10,6 +10,7 @@ Import-Module $ScriptDir\PSH5X.dll
 . $ScriptDir\New-H5File.ps1
 . $ScriptDir\New-H5Group.ps1
 . $ScriptDir\New-H5Hardlink.ps1
+. $ScriptDir\New-H5Image.ps1
 . $ScriptDir\New-H5LinkedDatatype.ps1
 . $ScriptDir\New-H5Softlink.ps1
 . $ScriptDir\Remove-H5Drive.ps1
