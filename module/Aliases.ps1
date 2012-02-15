@@ -1,14 +1,14 @@
 
-Set-Alias Get-H5Attribute Get-ItemProperty -Scope 1
+New-Alias Get-H5Attribute Get-ItemProperty
 
-Set-Alias Get-H5Object Get-Item -Scope 1
+New-Alias Get-H5Object Get-Item
 
-Set-Alias Remove-H5Attribute Remove-ItemProperty -Scope 1
+New-Alias Remove-H5Attribute Remove-ItemProperty
 
-Set-Alias Rename-H5Attribute Rename-ItemProperty -Scope 1
+New-Alias Rename-H5Attribute Rename-ItemProperty
 
-Set-Alias Remove-H5Object Remove-Item -Scope 1
+New-Alias Remove-H5Object Remove-Item
 
-Set-Alias Rename-H5Object Rename-Item -Scope 1
+New-Alias Rename-H5Object Rename-Item
 
-Set-Alias Unlink-H5Object Remove-Item -Scope 1
+New-Alias Unlink-H5Object Remove-Item
