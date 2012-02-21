@@ -1,0 +1,18 @@
+TOPIC
+    about_H5Reference
+
+SYNTAX
+
+    <ref_kind> ::= Object | Region
+    
+    @{
+        Class = Reference ;
+        Kind  = <ref_kind> ;
+    }
+
+RELATED LINKS
+    about_H5Datatypes
+    New-H5Datatype
+    http://www.hdfgroup.org/HDF5/doc/UG/UG_frame11Datatypes.html
+    http://www.hdfgroup.org/HDF5/doc/RM/RM_H5T.html
+

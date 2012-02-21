@@ -1,0 +1,25 @@
+TOPIC
+    about_H5String
+
+SYNTAX
+
+    <encoding> ::= ASCII | UTF-8
+
+    <str_pad> ::= Nullterm | Nullpad | Spacepad
+    
+    @{
+        Class    = String ;
+        Encoding = <encoding> ;
+
+        (: fixed-length string only :)
+
+        Length   = <positive integer> ;
+        StrPad   = <str_pad> ;
+    }
+
+RELATED LINKS
+    about_H5Datatypes
+    New-H5Datatype
+    http://www.hdfgroup.org/HDF5/doc/UG/UG_frame11Datatypes.html
+    http://www.hdfgroup.org/HDF5/doc/RM/RM_H5T.html
+

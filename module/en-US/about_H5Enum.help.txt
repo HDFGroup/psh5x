@@ -1,0 +1,24 @@
+TOPIC
+    about_H5Enum
+
+SYNTAX
+
+    <member_name> ::= <string> 
+    
+    <member_value> ::= <integer> 
+    
+    <enum_member> ::= <member_name> '=' <member_value> ';' |
+                      <member_name> '=' <member_value> ';' , <enum_member>
+    
+    @{
+        Base    = <native HDF5 integer type> ;
+        Class   = Enum ;
+        Members = @ { <enum_member> } ;
+    }
+    
+RELATED LINKS
+    about_H5Datatypes
+    New-H5Datatype
+    http://www.hdfgroup.org/HDF5/doc/UG/UG_frame11Datatypes.html
+    http://www.hdfgroup.org/HDF5/doc/RM/RM_H5T.html
+

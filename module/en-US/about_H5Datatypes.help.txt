@@ -1,0 +1,35 @@
+TOPIC
+    about_H5Datatypes
+
+SHORT DESCRIPTION
+    An HDF5 datatype can be specified as
+    
+        1) A predefined HDF5 datatype (string)
+    
+        2) An HDF5 datatype definition (hashtable)
+    
+        3) The HDF5 path name of a linked HDF5 datatype (string)
+
+    Frequently, one can get away with the compact notation of predefined
+    datatypes. For a list of pre-defined HDF5 datatypes see about_H5Predefined. 
+    
+    For user-defined types, a slightly more complex notation is necessary.
+    The notation is based on PowerShell hastables (@{...}) and arrays (@(...)).
+    See the files below for the different HDF5 datatypes:
+    
+    HDF5 integer               - see about_H5Integer
+    
+    HDF5 float                 - see about_H5Float
+    
+    HDF5 bitfield              - see about_H5Bitfield
+    
+    HDF5 opaque                - see about_H5Opaque
+    
+    HDF5 reference             - see about_H5Reference
+    
+    HDF5 variable-length array - see about_H5Vlen
+    
+    HDF5 array                 - see about_H5Array
+    
+    HDF5 compound              - see about_H5Compound
+    

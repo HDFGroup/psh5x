@@ -1,0 +1,42 @@
+TOPIC
+    about_H5Array
+
+SHORT DESCRIPTION
+
+     An HDF5 array type defines instances that are fixed-size,
+     multi-dimensional arrays of elements of another HDF5 datatype.
+
+     The array rank must not exceed 32 and all dimensions must be positive.
+
+     The element type can be specified as the name of a predefined HDF5
+     datatype, the HDF5 path name of a linked HDF5 datatype object, or a
+     hashtable definition. 
+
+SYNTAX
+
+    <positive integer list> ::= <positive integer> |
+                                <positive integer> , <positive integer list>
+
+    <type> ::= <string> | <hastable>
+
+    @{
+        Base  = <type> ;
+        Class = Array ;
+        Dims  = @(<positive integer>) ;
+    }
+
+    ------------------------------ EXAMPLE 1 ------------------------------
+
+    C:\PS>$t = @{ Base = H5T_STD_I32LE; Class = Array; Dims = @(2,3,4) }
+
+    ------------------------------ EXAMPLE 2 ------------------------------
+
+    C:\PS>$t = @{ Base = '/groupA/groupB/My Cool Type'; Class = Array; `
+                  Dims = @(2,3,4) }
+
+RELATED LINKS
+    about_H5Datatypes
+    New-H5Datatype
+    http://www.hdfgroup.org/HDF5/doc/UG/UG_frame11Datatypes.html
+    http://www.hdfgroup.org/HDF5/doc/RM/RM_H5T.html
+
