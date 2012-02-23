@@ -1114,9 +1114,11 @@ namespace PSH5X
         m_known_types["CHAR"] = H5T_NATIVE_CHAR;
         m_known_types["H5T_NATIVE_CHAR"] = H5T_NATIVE_CHAR;
         
+		m_known_types["F64"] = H5T_NATIVE_DOUBLE;
         m_known_types["DOUBLE"] = H5T_NATIVE_DOUBLE;
         m_known_types["H5T_NATIVE_DOUBLE"] = H5T_NATIVE_DOUBLE;
         
+		m_known_types["F32"] = H5T_NATIVE_FLOAT;
         m_known_types["SINGLE"] = H5T_NATIVE_FLOAT;
         m_known_types["FLOAT"] = H5T_NATIVE_FLOAT;
         m_known_types["H5T_NATIVE_FLOAT"] = H5T_NATIVE_FLOAT;
@@ -1125,7 +1127,7 @@ namespace PSH5X
         m_known_types["H5T_IEEE_F32BE"] = H5T_IEEE_F32BE;
         m_known_types["F32LE"] = H5T_IEEE_F32LE;
         m_known_types["H5T_IEEE_F32LE"] = H5T_IEEE_F32LE;
-        m_known_types["F64BE"] = H5T_IEEE_F64BE;
+		m_known_types["F64BE"] = H5T_IEEE_F64BE;
         m_known_types["H5T_IEEE_F64BE"] = H5T_IEEE_F64BE;
         m_known_types["F64LE"] = H5T_IEEE_F64LE;
         m_known_types["H5T_IEEE_F64LE"] = H5T_IEEE_F64LE;
@@ -1190,6 +1192,7 @@ namespace PSH5X
         m_known_types["REF_DSETREG"] = H5T_STD_REF_DSETREG;
         m_known_types["H5T_STD_REF_DSETREG"] = H5T_STD_REF_DSETREG;
 
+		m_known_types["I32"] = H5T_NATIVE_INT;
         m_known_types["INT"] = H5T_NATIVE_INT;
         m_known_types["H5T_NATIVE_INT"] = H5T_NATIVE_INT;
 
@@ -1197,20 +1200,24 @@ namespace PSH5X
         m_known_types["H5T_NATIVE_LDOUBLE"] = H5T_NATIVE_LDOUBLE;
         m_known_types["LLONG"] = H5T_NATIVE_LLONG;
         m_known_types["H5T_NATIVE_LLONG"] = H5T_NATIVE_LLONG;
-        m_known_types["LONG"] = H5T_NATIVE_LONG;
+		m_known_types["LONG"] = H5T_NATIVE_LONG;
         m_known_types["H5T_NATIVE_LONG"] = H5T_NATIVE_LONG;
-            
+        
+		m_known_types["I16"] = H5T_NATIVE_SHORT;
         m_known_types["SHORT"] = H5T_NATIVE_SHORT;
         m_known_types["H5T_NATIVE_SHORT"] = H5T_NATIVE_SHORT;
 
+		m_known_types["U8"] = H5T_NATIVE_UCHAR;
         m_known_types["UCHAR"] = H5T_NATIVE_UCHAR;
         m_known_types["H5T_NATIVE_UCHAR"] = H5T_NATIVE_UCHAR;
-        m_known_types["UINT"] = H5T_NATIVE_UINT;
+        m_known_types["U32"] = H5T_NATIVE_UINT;
+		m_known_types["UINT"] = H5T_NATIVE_UINT;
         m_known_types["H5T_NATIVE_UINT"] = H5T_NATIVE_UINT;
         m_known_types["ULLONG"] = H5T_NATIVE_ULLONG;
         m_known_types["H5T_NATIVE_ULLONG"] = H5T_NATIVE_ULLONG;
         m_known_types["ULONG"] = H5T_NATIVE_ULONG;
         m_known_types["H5T_NATIVE_ULONG"] = H5T_NATIVE_ULONG;
+		m_known_types["U16"] = H5T_NATIVE_USHORT;
         m_known_types["USHORT"] = H5T_NATIVE_USHORT;
         m_known_types["H5T_NATIVE_USHORT"] = H5T_NATIVE_USHORT;
 

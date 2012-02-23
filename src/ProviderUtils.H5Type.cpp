@@ -1579,15 +1579,28 @@ namespace PSH5X
         }
         else if (t->StartsWith("S"))
         {
-            if (t == "STRING") // default is variable-length C-string
+            if (t == "STRING") // variable-length C-string
             {
-                result = H5Tcopy(H5T_C_S1);
+                result = H5Tcreate(H5T_STRING, H5T_VARIABLE);
                 if (result < 0) {
-                    throw gcnew HDF5Exception("H5Tcopy failed!");
+                    throw gcnew HDF5Exception("H5Tcreate failed!");
                 }
-                if (H5Tset_size(result, H5T_VARIABLE) < 0) {
-                    throw gcnew HDF5Exception("H5Tset_size failed!");
+				if (H5Tset_cset(result, H5T_CSET_ASCII) < 0) {
+					throw gcnew HDF5Exception("H5Tset_cset failed!");
+				}
+            }
+        }
+		else if (t->StartsWith("U"))
+        {
+            if (t == "USTRING") // variable-length UTF-8 string
+            {
+                result = H5Tcreate(H5T_STRING, H5T_VARIABLE);
+                if (result < 0) {
+                    throw gcnew HDF5Exception("H5Tcreate failed!");
                 }
+				if (H5Tset_cset(result, H5T_CSET_UTF8) < 0) {
+					throw gcnew HDF5Exception("H5Tset_cset failed!");
+				}
             }
         }
 
