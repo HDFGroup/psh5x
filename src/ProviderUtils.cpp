@@ -802,6 +802,20 @@ namespace PSH5X
         return result;
     }
 
+	bool ProviderUtils::TryGetValue(Object^ obj, array<Object^>^% arr)
+    {
+        bool result = false;
+
+        try
+        {
+            arr = safe_cast<array<Object^>^>(obj);
+            result = true;
+        }
+        catch (...) {}
+
+        return result;
+    }
+
 #pragma endregion
 
 

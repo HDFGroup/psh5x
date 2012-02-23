@@ -4,6 +4,7 @@
 #include "PSH5XException.h"
 
 extern "C" {
+#include "H5Spublic.h"
 #include "H5Tpublic.h"
 }
 
@@ -680,392 +681,412 @@ namespace PSH5X
                     if (Array::BinarySearch(m_type_classes, type_class) >= 0)
                     {
                         if (type_class == "INTEGER")
-                        {
+						{
 #pragma region INTEGER
-                            if (ht->ContainsKey("Type")) {
-                                result = ProviderUtils::ParseH5Type(ht["Type"]);
-                                if (H5Tget_class(result) != H5T_INTEGER) {
-                                    throw gcnew PSH5XException("INTEGER: The type specified is not of class INTEGER.");
-                                }
-                            }
-                            else
-                            {
-                                size_t precision = 0;
-                                if (ht->ContainsKey("Precision")) {
-                                    if (!TryGetValue(ht["Precision"], precision)) {
-                                        throw gcnew PSH5XException("INTEGER: Unable to convert the 'Precision' value into size_t.");
-                                    }
-                                }
-                                else {
-                                    throw gcnew PSH5XException("INTEGER: No 'Precision' key found.");
-                                }
 
-                                String^ s = nullptr;
+							size_t precision = 0;
+							if (ht->ContainsKey("Precision")) {
+								if (!TryGetValue(ht["Precision"], precision)) {
+									throw gcnew PSH5XException("INTEGER: Unable to convert the 'Precision' value into size_t.");
+								}
+							}
+							else {
+								throw gcnew PSH5XException("INTEGER: No 'Precision' key found.");
+							}
 
-                                H5T_order_t order = H5T_ORDER_LE;
-                                if (ht->ContainsKey("ByteOrder")) {
-                                    if (!TryGetValue(ht["ByteOrder"], s)) {
-                                        throw gcnew PSH5XException("INTEGER: Unable to convert the 'ByteOrder' value into a string.");
-                                    }
+							String^ s = nullptr;
 
-                                    if (s != nullptr)
-                                    {
-                                        s = s->Trim()->ToUpper();
-                                        if (s != "BE" && s != "LE") {
-                                            throw gcnew PSH5XException("INTEGER: Invalid 'ByteOrder' value. Must be 'BE' or 'LE'!");
-                                        }
-                                        if (s == "BE") {
-                                            order = H5T_ORDER_BE;
-                                        }
-                                    }
-                                    else {
-                                        throw gcnew PSH5XException("INTEGER: Invalid 'ByteOrder' value. Must be 'BE' or 'LE'!");
-                                    }
-                                }
+							H5T_order_t order = H5T_ORDER_LE;
+							if (ht->ContainsKey("ByteOrder")) {
+								if (!TryGetValue(ht["ByteOrder"], s)) {
+									throw gcnew PSH5XException("INTEGER: Unable to convert the 'ByteOrder' value into a string.");
+								}
 
-                                size_t offset = 0;
-                                if (ht->ContainsKey("BitOffset")) {
-                                    if (!TryGetValue(ht["BitOffset"], offset)) {
-                                        throw gcnew PSH5XException("INTEGER: Unable to convert the 'BitOffset' value into size_t.");
-                                    }
-                                }
+								if (s != nullptr)
+								{
+									s = s->Trim()->ToUpper();
+									if (s != "BE" && s != "LE") {
+										throw gcnew PSH5XException("INTEGER: Invalid 'ByteOrder' value. Must be 'BE' or 'LE'!");
+									}
+									if (s == "BE") {
+										order = H5T_ORDER_BE;
+									}
+								}
+								else {
+									throw gcnew PSH5XException("INTEGER: Invalid 'ByteOrder' value. Must be 'BE' or 'LE'!");
+								}
+							}
 
-                                H5T_sign_t sign = H5T_SGN_2;
-                                if (ht->ContainsKey("SignType")) {
-                                    if (!TryGetValue(ht["SignType"], s)) {
-                                        throw gcnew PSH5XException("INTEGER: Unable to convert the 'SignType' value into a string.");
-                                    }
+							size_t offset = 0;
+							if (ht->ContainsKey("BitOffset")) {
+								if (!TryGetValue(ht["BitOffset"], offset)) {
+									throw gcnew PSH5XException("INTEGER: Unable to convert the 'BitOffset' value into size_t.");
+								}
+							}
 
-                                    if (s != nullptr)
-                                    {
-                                        s = s->Trim()->ToUpper();
-                                        if (s != "NONE" && s != "2") {
-                                            throw gcnew PSH5XException("INTEGER: Invalid 'SignType' value. Must be '2' or 'None'!");
-                                        }
-                                        if (s == "NONE") {
-                                            sign = H5T_SGN_NONE;
-                                        }
-                                    }
-                                    else {
-                                        throw gcnew PSH5XException("INTEGER: Invalid 'SignType' value. Must be '2' or 'None'!");
-                                    }
-                                }
+							H5T_sign_t sign = H5T_SGN_2;
+							if (ht->ContainsKey("SignType")) {
+								if (!TryGetValue(ht["SignType"], s)) {
+									throw gcnew PSH5XException("INTEGER: Unable to convert the 'SignType' value into a string.");
+								}
 
-                                H5T_pad_t lsb = H5T_PAD_ZERO, msb = H5T_PAD_ZERO;
-                                if (ht->ContainsKey("MSBitPadding")) {
-                                    if (!TryGetValue(ht["MSBitPadding"], s)) {
-                                        throw gcnew PSH5XException("INTEGER: Unable to convert the 'MSBitPadding' value into a string.");
-                                    }
+								if (s != nullptr)
+								{
+									s = s->Trim()->ToUpper();
+									if (s != "NONE" && s != "2") {
+										throw gcnew PSH5XException("INTEGER: Invalid 'SignType' value. Must be '2' or 'None'!");
+									}
+									if (s == "NONE") {
+										sign = H5T_SGN_NONE;
+									}
+								}
+								else {
+									throw gcnew PSH5XException("INTEGER: Invalid 'SignType' value. Must be '2' or 'None'!");
+								}
+							}
 
-                                    if (s != nullptr)
-                                    {
-                                        s = s->Trim()->ToUpper();
-                                        if (s != "ZERO" && s != "ONE" && s != "BACKGROUND") {
-                                            throw gcnew PSH5XException("INTEGER: Invalid 'MSBitPadding' value. Must be 'Zero' or 'One' or 'Background'!");
-                                        }
+							H5T_pad_t lsb = H5T_PAD_ZERO, msb = H5T_PAD_ZERO;
+							if (ht->ContainsKey("MSBitPadding")) {
+								if (!TryGetValue(ht["MSBitPadding"], s)) {
+									throw gcnew PSH5XException("INTEGER: Unable to convert the 'MSBitPadding' value into a string.");
+								}
 
-                                        if (s == "ONE") {
-                                            msb = H5T_PAD_ONE;
-                                        }
-                                        else if (s == "BACKGROUND") {
-                                            msb = H5T_PAD_BACKGROUND;
-                                        }
-                                    }
-                                    else {
-                                        throw gcnew PSH5XException("INTEGER: Invalid 'MSBitPadding' value. Must be 'Zero' or 'One' or 'Background'!");
-                                    }
-                                }
-                                if (ht->ContainsKey("LSBitPadding")) {
-                                    if (!TryGetValue(ht["LSBitPadding"], s)) {
-                                        throw gcnew PSH5XException("INTEGER: Unable to convert the 'LSBitPadding' value into a string.");
-                                    }
+								if (s != nullptr)
+								{
+									s = s->Trim()->ToUpper();
+									if (s != "ZERO" && s != "ONE" && s != "BACKGROUND") {
+										throw gcnew PSH5XException("INTEGER: Invalid 'MSBitPadding' value. Must be 'Zero' or 'One' or 'Background'!");
+									}
 
-                                    if (s != nullptr)
-                                    {
-                                        s = s->Trim()->ToUpper();
-                                        if (s != "ZERO" && s != "ONE" && s != "BACKGROUND") {
-                                            throw gcnew PSH5XException("INTEGER: Invalid 'LSBitPadding' value. Must be 'Zero' or 'One' or 'Background'!");
-                                        }
+									if (s == "ONE") {
+										msb = H5T_PAD_ONE;
+									}
+									else if (s == "BACKGROUND") {
+										msb = H5T_PAD_BACKGROUND;
+									}
+								}
+								else {
+									throw gcnew PSH5XException("INTEGER: Invalid 'MSBitPadding' value. Must be 'Zero' or 'One' or 'Background'!");
+								}
+							}
+							if (ht->ContainsKey("LSBitPadding")) {
+								if (!TryGetValue(ht["LSBitPadding"], s)) {
+									throw gcnew PSH5XException("INTEGER: Unable to convert the 'LSBitPadding' value into a string.");
+								}
 
-                                        if (s == "ONE") {
-                                            msb = H5T_PAD_ONE;
-                                        }
-                                        else if (s == "BACKGROUND") {
-                                            msb = H5T_PAD_BACKGROUND;
-                                        }
-                                    }
-                                    else {
-                                        throw gcnew PSH5XException("INTEGER: Invalid 'LSBitPadding' value. Must be 'Zero' or 'One' or 'Background'!");
-                                    }
-                                }
+								if (s != nullptr)
+								{
+									s = s->Trim()->ToUpper();
+									if (s != "ZERO" && s != "ONE" && s != "BACKGROUND") {
+										throw gcnew PSH5XException("INTEGER: Invalid 'LSBitPadding' value. Must be 'Zero' or 'One' or 'Background'!");
+									}
 
-                                if (sign == H5T_SGN_2) {
-                                    result = H5Tcopy(H5T_NATIVE_CHAR);
-                                    if (result < 0) {
-                                        throw gcnew HDF5Exception("H5Tcopy failed!");
-                                    }
-                                }
-                                else {
-                                    result = H5Tcopy(H5T_NATIVE_UCHAR);
-                                    if (result < 0) {
-                                        throw gcnew HDF5Exception("H5Tcopy failed!");
-                                    }
-                                }
+									if (s == "ONE") {
+										msb = H5T_PAD_ONE;
+									}
+									else if (s == "BACKGROUND") {
+										msb = H5T_PAD_BACKGROUND;
+									}
+								}
+								else {
+									throw gcnew PSH5XException("INTEGER: Invalid 'LSBitPadding' value. Must be 'Zero' or 'One' or 'Background'!");
+								}
+							}
 
-                                if (H5Tset_precision(result, precision) < 0) {
-                                    throw gcnew HDF5Exception("H5Tset_precision failed!");
-                                }
-                                if (H5Tset_offset(result, offset) < 0) {
-                                    throw gcnew HDF5Exception("H5Tset_offset failed!");
-                                }
-                                if (H5Tset_order(result, order) < 0) {
-                                    throw gcnew HDF5Exception("H5Tset_order failed!");
-                                }
-                                if (H5Tset_pad(result, lsb, msb) < 0) {
-                                    throw gcnew HDF5Exception("H5Tset_pad failed!");
-                                }
-                            }
+							if (sign == H5T_SGN_2) {
+								result = H5Tcopy(H5T_NATIVE_CHAR);
+								if (result < 0) {
+									throw gcnew HDF5Exception("H5Tcopy failed!");
+								}
+							}
+							else {
+								result = H5Tcopy(H5T_NATIVE_UCHAR);
+								if (result < 0) {
+									throw gcnew HDF5Exception("H5Tcopy failed!");
+								}
+							}
+
+							if (H5Tset_precision(result, precision) < 0) {
+								throw gcnew HDF5Exception("H5Tset_precision failed!");
+							}
+							if (H5Tset_offset(result, offset) < 0) {
+								throw gcnew HDF5Exception("H5Tset_offset failed!");
+							}
+							if (H5Tset_order(result, order) < 0) {
+								throw gcnew HDF5Exception("H5Tset_order failed!");
+							}
+							if (H5Tset_pad(result, lsb, msb) < 0) {
+								throw gcnew HDF5Exception("H5Tset_pad failed!");
+							}
 
 #pragma endregion
-                        }
+						}
                         else if (type_class == "FLOAT")
-                        {
+						{
 #pragma region FLOAT
-                            if (ht->ContainsKey("Type")) {
-                                result = ProviderUtils::ParseH5Type(ht["Type"]);
-                                if (H5Tget_class(result) != H5T_FLOAT) {
-                                    throw gcnew PSH5XException("FLOAT: The type specified is not of class FLOAT.");
-                                }
-                            }
-                            else
-                            {
 
-                                size_t offset = 0;
-                                if (ht->ContainsKey("BitOffset")) {
-                                    if (!TryGetValue(ht["BitOffset"], offset)) {
-                                        throw gcnew PSH5XException("FLOAT: Unable to convert the 'BitOffset' value into size_t.");
-                                    }
-                                }
+							size_t offset = 0;
+							if (ht->ContainsKey("BitOffset")) {
+								if (!TryGetValue(ht["BitOffset"], offset)) {
+									throw gcnew PSH5XException("FLOAT: Unable to convert the 'BitOffset' value into size_t.");
+								}
+							}
 
-                                size_t precision = 0;
-                                if (ht->ContainsKey("Precision")) {
-                                    if (!TryGetValue(ht["Precision"], precision)) {
-                                        throw gcnew PSH5XException("FLOAT: Unable to convert the 'Precision' value into size_t.");
-                                    }
-                                }
-                                else {
-                                    throw gcnew PSH5XException("FLOAT: No 'Precision' key found.");
-                                }
+							size_t precision = 0;
+							if (ht->ContainsKey("Precision")) {
+								if (!TryGetValue(ht["Precision"], precision)) {
+									throw gcnew PSH5XException("FLOAT: Unable to convert the 'Precision' value into size_t.");
+								}
+							}
+							else {
+								throw gcnew PSH5XException("FLOAT: No 'Precision' key found.");
+							}
 
-                                String^ s = nullptr;
+							String^ s = nullptr;
 
-                                H5T_order_t order = H5T_ORDER_LE;
-                                if (ht->ContainsKey("ByteOrder")) {
-                                    if (!TryGetValue(ht["ByteOrder"], s)) {
-                                        throw gcnew PSH5XException("FLOAT: Unable to convert the 'ByteOrder' value into a string.");
-                                    }
+							H5T_order_t order = H5T_ORDER_LE;
+							if (ht->ContainsKey("ByteOrder")) {
+								if (!TryGetValue(ht["ByteOrder"], s)) {
+									throw gcnew PSH5XException("FLOAT: Unable to convert the 'ByteOrder' value into a string.");
+								}
 
-                                    if (s != nullptr)
-                                    {
-                                        s = s->Trim()->ToUpper();
-                                        if (s != "BE" && s != "LE") {
-                                            throw gcnew PSH5XException("FLOAT: Invalid 'ByteOrder' value. Must be 'BE' or 'LE'!");
-                                        }
-                                        if (s == "BE") {
-                                            order = H5T_ORDER_BE;
-                                        }
-                                    }
-                                    else {
-                                        throw gcnew PSH5XException("FLOAT: Invalid 'ByteOrder' value. Must be 'BE' or 'LE'!");
-                                    }
-                                }
+								if (s != nullptr)
+								{
+									s = s->Trim()->ToUpper();
+									if (s != "BE" && s != "LE") {
+										throw gcnew PSH5XException("FLOAT: Invalid 'ByteOrder' value. Must be 'BE' or 'LE'!");
+									}
+									if (s == "BE") {
+										order = H5T_ORDER_BE;
+									}
+								}
+								else {
+									throw gcnew PSH5XException("FLOAT: Invalid 'ByteOrder' value. Must be 'BE' or 'LE'!");
+								}
+							}
 
-                                H5T_pad_t lsb = H5T_PAD_ZERO, msb = H5T_PAD_ZERO, inp = H5T_PAD_ZERO;
-                                if (ht->ContainsKey("MSBitPadding")) {
-                                    if (!TryGetValue(ht["MSBitPadding"], s)) {
-                                        throw gcnew PSH5XException("FLOAT: Unable to convert the 'MSBitPadding' value into a string.");
-                                    }
+							H5T_pad_t lsb = H5T_PAD_ZERO, msb = H5T_PAD_ZERO, inp = H5T_PAD_ZERO;
+							if (ht->ContainsKey("MSBitPadding")) {
+								if (!TryGetValue(ht["MSBitPadding"], s)) {
+									throw gcnew PSH5XException("FLOAT: Unable to convert the 'MSBitPadding' value into a string.");
+								}
 
-                                    if (s != nullptr)
-                                    {
-                                        s = s->Trim()->ToUpper();
-                                        if (s != "ZERO" && s != "ONE" && s != "BACKGROUND") {
-                                            throw gcnew PSH5XException("FLOAT: Invalid 'MSBitPadding' value. Must be 'Zero' or 'One' or 'Background'!");
-                                        }
+								if (s != nullptr)
+								{
+									s = s->Trim()->ToUpper();
+									if (s != "ZERO" && s != "ONE" && s != "BACKGROUND") {
+										throw gcnew PSH5XException("FLOAT: Invalid 'MSBitPadding' value. Must be 'Zero' or 'One' or 'Background'!");
+									}
 
-                                        if (s == "ONE") {
-                                            msb = H5T_PAD_ONE;
-                                        }
-                                        else if (s == "BACKGROUND") {
-                                            msb = H5T_PAD_BACKGROUND;
-                                        }
-                                    }
-                                    else {
-                                        throw gcnew PSH5XException("FLOAT: Invalid 'MSBitPadding' value. Must be 'Zero' or 'One' or 'Background'!");
-                                    }
-                                }
-                                if (ht->ContainsKey("LSBitPadding")) {
-                                    if (!TryGetValue(ht["LSBitPadding"], s)) {
-                                        throw gcnew PSH5XException("FLOAT: Unable to convert the 'LSBitPadding' value into a string.");
-                                    }
+									if (s == "ONE") {
+										msb = H5T_PAD_ONE;
+									}
+									else if (s == "BACKGROUND") {
+										msb = H5T_PAD_BACKGROUND;
+									}
+								}
+								else {
+									throw gcnew PSH5XException("FLOAT: Invalid 'MSBitPadding' value. Must be 'Zero' or 'One' or 'Background'!");
+								}
+							}
+							if (ht->ContainsKey("LSBitPadding")) {
+								if (!TryGetValue(ht["LSBitPadding"], s)) {
+									throw gcnew PSH5XException("FLOAT: Unable to convert the 'LSBitPadding' value into a string.");
+								}
 
-                                    if (s != nullptr)
-                                    {
-                                        s = s->Trim()->ToUpper();
-                                        if (s != "ZERO" && s != "ONE" && s != "BACKGROUND") {
-                                            throw gcnew PSH5XException("FLOAT: Invalid 'LSBitPadding' value. Must be 'Zero' or 'One' or 'Background'!");
-                                        }
+								if (s != nullptr)
+								{
+									s = s->Trim()->ToUpper();
+									if (s != "ZERO" && s != "ONE" && s != "BACKGROUND") {
+										throw gcnew PSH5XException("FLOAT: Invalid 'LSBitPadding' value. Must be 'Zero' or 'One' or 'Background'!");
+									}
 
-                                        if (s == "ONE") {
-                                            msb = H5T_PAD_ONE;
-                                        }
-                                        else if (s == "BACKGROUND") {
-                                            msb = H5T_PAD_BACKGROUND;
-                                        }
-                                    }
-                                    else {
-                                        throw gcnew PSH5XException("FLOAT: Invalid 'LSBitPadding' value. Must be 'Zero' or 'One' or 'Background'!");
-                                    }
-                                }
-                                if (ht->ContainsKey("IntlBitPadding")) {
-                                    if (!TryGetValue(ht["IntlBitPadding"], s)) {
-                                        throw gcnew PSH5XException("FLOAT: Unable to convert the 'IntlBitPadding' value into a string.");
-                                    }
+									if (s == "ONE") {
+										msb = H5T_PAD_ONE;
+									}
+									else if (s == "BACKGROUND") {
+										msb = H5T_PAD_BACKGROUND;
+									}
+								}
+								else {
+									throw gcnew PSH5XException("FLOAT: Invalid 'LSBitPadding' value. Must be 'Zero' or 'One' or 'Background'!");
+								}
+							}
+							if (ht->ContainsKey("IntlBitPadding")) {
+								if (!TryGetValue(ht["IntlBitPadding"], s)) {
+									throw gcnew PSH5XException("FLOAT: Unable to convert the 'IntlBitPadding' value into a string.");
+								}
 
-                                    if (s != nullptr)
-                                    {
-                                        s = s->Trim()->ToUpper();
-                                        if (s != "ZERO" && s != "ONE" && s != "BACKGROUND") {
-                                            throw gcnew PSH5XException("FLOAT: Invalid 'IntlBitPadding' value. Must be 'Zero' or 'One' or 'Background'!");
-                                        }
+								if (s != nullptr)
+								{
+									s = s->Trim()->ToUpper();
+									if (s != "ZERO" && s != "ONE" && s != "BACKGROUND") {
+										throw gcnew PSH5XException("FLOAT: Invalid 'IntlBitPadding' value. Must be 'Zero' or 'One' or 'Background'!");
+									}
 
-                                        if (s == "ONE") {
-                                            msb = H5T_PAD_ONE;
-                                        }
-                                        else if (s == "BACKGROUND") {
-                                            msb = H5T_PAD_BACKGROUND;
-                                        }
-                                    }
-                                    else {
-                                        throw gcnew PSH5XException("FLOAT: Invalid 'IntlBitPadding' value. Must be 'Zero' or 'One' or 'Background'!");
-                                    }
-                                }
+									if (s == "ONE") {
+										msb = H5T_PAD_ONE;
+									}
+									else if (s == "BACKGROUND") {
+										msb = H5T_PAD_BACKGROUND;
+									}
+								}
+								else {
+									throw gcnew PSH5XException("FLOAT: Invalid 'IntlBitPadding' value. Must be 'Zero' or 'One' or 'Background'!");
+								}
+							}
 
-                                size_t spos = 31;
-                                if (ht->ContainsKey("SignBitPos")) {
-                                    if (!TryGetValue(ht["SignBitPos"], spos)) {
-                                        throw gcnew PSH5XException("FLOAT: Unable to convert the 'SignBitPos' value into size_t.");
-                                    }
-                                }
-                                size_t epos = 23;
-                                if (ht->ContainsKey("ExpBitPos")) {
-                                    if (!TryGetValue(ht["ExpBitPos"], epos)) {
-                                        throw gcnew PSH5XException("FLOAT: Unable to convert the 'ExpBitPos' value into size_t.");
-                                    }
-                                }
-                                size_t esize = 8;
-                                if (ht->ContainsKey("ExpBits")) {
-                                    if (!TryGetValue(ht["ExpBits"], esize)) {
-                                        throw gcnew PSH5XException("FLOAT: Unable to convert the 'ExpBits' value into size_t.");
-                                    }
-                                }
-                                size_t mpos = 0;
-                                if (ht->ContainsKey("MantBitPos")) {
-                                    if (!TryGetValue(ht["MantBitPos"], mpos)) {
-                                        throw gcnew PSH5XException("FLOAT: Unable to convert the 'MantBitPos' value into size_t.");
-                                    }
-                                }
-                                size_t msize = 23;
-                                if (ht->ContainsKey("MantBits")) {
-                                    if (!TryGetValue(ht["MantBits"], msize)) {
-                                        throw gcnew PSH5XException("FLOAT: Unable to convert the 'MantBits' value into size_t.");
-                                    }
-                                }
+							size_t spos = 31;
+							if (ht->ContainsKey("SignBitPos")) {
+								if (!TryGetValue(ht["SignBitPos"], spos)) {
+									throw gcnew PSH5XException("FLOAT: Unable to convert the 'SignBitPos' value into size_t.");
+								}
+							}
+							size_t epos = 23;
+							if (ht->ContainsKey("ExpBitPos")) {
+								if (!TryGetValue(ht["ExpBitPos"], epos)) {
+									throw gcnew PSH5XException("FLOAT: Unable to convert the 'ExpBitPos' value into size_t.");
+								}
+							}
+							size_t esize = 8;
+							if (ht->ContainsKey("ExpBits")) {
+								if (!TryGetValue(ht["ExpBits"], esize)) {
+									throw gcnew PSH5XException("FLOAT: Unable to convert the 'ExpBits' value into size_t.");
+								}
+							}
+							size_t mpos = 0;
+							if (ht->ContainsKey("MantBitPos")) {
+								if (!TryGetValue(ht["MantBitPos"], mpos)) {
+									throw gcnew PSH5XException("FLOAT: Unable to convert the 'MantBitPos' value into size_t.");
+								}
+							}
+							size_t msize = 23;
+							if (ht->ContainsKey("MantBits")) {
+								if (!TryGetValue(ht["MantBits"], msize)) {
+									throw gcnew PSH5XException("FLOAT: Unable to convert the 'MantBits' value into size_t.");
+								}
+							}
 
-                                size_t ebias = 127;
-                                if (ht->ContainsKey("ExpBias")) {
-                                    if (!TryGetValue(ht["ExpBias"], ebias)) {
-                                        throw gcnew PSH5XException("FLOAT: Unable to convert the 'ExpBias' value into size_t.");
-                                    }
-                                }
+							size_t ebias = 127;
+							if (ht->ContainsKey("ExpBias")) {
+								if (!TryGetValue(ht["ExpBias"], ebias)) {
+									throw gcnew PSH5XException("FLOAT: Unable to convert the 'ExpBias' value into size_t.");
+								}
+							}
 
-                                H5T_norm_t norm = H5T_NORM_IMPLIED;
-                                if (ht->ContainsKey("MantNorm")) {
-                                    if (!TryGetValue(ht["MantNorm"], s)) {
-                                        throw gcnew PSH5XException("FLOAT: Unable to convert the 'MantNorm' value into a string.");
-                                    }
+							H5T_norm_t norm = H5T_NORM_IMPLIED;
+							if (ht->ContainsKey("MantNorm")) {
+								if (!TryGetValue(ht["MantNorm"], s)) {
+									throw gcnew PSH5XException("FLOAT: Unable to convert the 'MantNorm' value into a string.");
+								}
 
-                                    if (s != nullptr)
-                                    {
-                                        s = s->Trim()->ToUpper();
-                                        if (s != "IMPLIED" && s != "MSBSET" && s != "NONE") {
-                                            throw gcnew PSH5XException("FLOAT: Invalid 'MantNorm' value. Must be 'Implied', 'MsbSet' or 'None'!");
-                                        }
+								if (s != nullptr)
+								{
+									s = s->Trim()->ToUpper();
+									if (s != "IMPLIED" && s != "MSBSET" && s != "NONE") {
+										throw gcnew PSH5XException("FLOAT: Invalid 'MantNorm' value. Must be 'Implied', 'MsbSet' or 'None'!");
+									}
 
-                                        if (s == "IMPLIED") {
-                                            norm = H5T_NORM_IMPLIED;
-                                        }
-                                        else if (s == "MSBSET") {
-                                            norm = H5T_NORM_MSBSET;
-                                        }
-                                        else {
-                                            norm = H5T_NORM_NONE;
-                                        }
-                                    }
-                                    else {
-                                        throw gcnew PSH5XException("FLOAT: Invalid 'MantNorm' value. Must be 'Implied', 'MsbSet' or 'None'!");
-                                    }
-                                }
+									if (s == "IMPLIED") {
+										norm = H5T_NORM_IMPLIED;
+									}
+									else if (s == "MSBSET") {
+										norm = H5T_NORM_MSBSET;
+									}
+									else {
+										norm = H5T_NORM_NONE;
+									}
+								}
+								else {
+									throw gcnew PSH5XException("FLOAT: Invalid 'MantNorm' value. Must be 'Implied', 'MsbSet' or 'None'!");
+								}
+							}
 
-                                // TODO: check constraints
+							// TODO: check constraints
 
-                                result = H5Tcopy(H5T_NATIVE_FLOAT);
-                                if (result < 0) {
-                                    throw gcnew HDF5Exception("H5Tcopy failed!");
-                                }
+							result = H5Tcopy(H5T_NATIVE_FLOAT);
+							if (result < 0) {
+								throw gcnew HDF5Exception("H5Tcopy failed!");
+							}
 
-                                if (H5Tset_precision(result, precision) < 0) {
-                                    throw gcnew HDF5Exception("H5Tset_precision failed!");
-                                }
-                                if (H5Tset_offset(result, offset) < 0) {
-                                    throw gcnew HDF5Exception("H5Tset_offset failed!");
-                                }
-                                if (H5Tset_order(result, order) < 0) {
-                                    throw gcnew HDF5Exception("H5Tset_order failed!");
-                                }
-                                if (H5Tset_pad(result, lsb, msb) < 0) {
-                                    throw gcnew HDF5Exception("H5Tset_pad failed!");
-                                }
-                                if (H5Tset_inpad(result, inp) < 0) {
-                                    throw gcnew HDF5Exception("H5Tset_inpad failed!");
-                                }
-                                if (H5Tset_fields(result, spos, epos, esize, mpos, msize) < 0) {
-                                    throw gcnew HDF5Exception("H5Tset_fields failed!");
-                                }
-                                if (H5Tset_ebias(result, ebias) < 0) {
-                                    throw gcnew HDF5Exception("H5Tset_ebias failed!");
-                                }
-                                if (H5Tset_norm(result, norm) < 0) {
-                                    throw gcnew HDF5Exception("H5Tset_norm failed!");
-                                }
-                            }
+							if (H5Tset_precision(result, precision) < 0) {
+								throw gcnew HDF5Exception("H5Tset_precision failed!");
+							}
+							if (H5Tset_offset(result, offset) < 0) {
+								throw gcnew HDF5Exception("H5Tset_offset failed!");
+							}
+							if (H5Tset_order(result, order) < 0) {
+								throw gcnew HDF5Exception("H5Tset_order failed!");
+							}
+							if (H5Tset_pad(result, lsb, msb) < 0) {
+								throw gcnew HDF5Exception("H5Tset_pad failed!");
+							}
+							if (H5Tset_inpad(result, inp) < 0) {
+								throw gcnew HDF5Exception("H5Tset_inpad failed!");
+							}
+							if (H5Tset_fields(result, spos, epos, esize, mpos, msize) < 0) {
+								throw gcnew HDF5Exception("H5Tset_fields failed!");
+							}
+							if (H5Tset_ebias(result, ebias) < 0) {
+								throw gcnew HDF5Exception("H5Tset_ebias failed!");
+							}
+							if (H5Tset_norm(result, norm) < 0) {
+								throw gcnew HDF5Exception("H5Tset_norm failed!");
+							}
 
 #pragma endregion
-                        }
+						}
                         else if (type_class == "STRING")
                         {
 #pragma region STRING
 
-                            if (ht->ContainsKey("CharSet") && ht["CharSet"]->ToString()->ToUpper() != "ASCII") {
-                                throw gcnew PSH5XException(
-                                    String::Format("STRING: Invalid character set '{0}'. ASCII only!",
-                                    ht["CharSet"]->ToString()));
+							if (ht->ContainsKey("Length"))
+                            {
+                                size_t length = 0;
+                                if (TryGetValue(ht["Length"], length))
+								{
+									result = H5Tcreate(H5T_STRING, length);
+									if (result < 0) {
+										throw gcnew HDF5Exception("STRING: H5Tcreate failed.");
+									}
+								}
+                                else {
+                                    throw gcnew PSH5XException("STRING: Invalid string length!");
+                                }
                             }
+                            else  // variable length string
+							{
+								result = H5Tcreate(H5T_STRING, H5T_VARIABLE);
+								if (result < 0) {
+									throw gcnew HDF5Exception("STRING: H5Tcreate failed.");
+								}
+							}
 
-                            result = H5Tcopy(H5T_C_S1);
-                            if (result < 0) {
-                                throw gcnew HDF5Exception("STRING: H5Tcopy failed.");
-                            }
+                            if (ht->ContainsKey("Encoding"))
+							{
+								String^ cset = ht["Encoding"]->ToString()->ToUpper();
+								if (cset != "ASCII" && cset != "UTF-8") {
+									throw gcnew PSH5XException(
+										String::Format("STRING: Invalid encoding '{0}'. ASCII or UTF-8 only!",
+										ht["Encoding"]->ToString()));
+								}
+								else
+								{
+									if (cset == "UTF-8") {
+										if (H5Tset_cset(result, H5T_CSET_UTF8) < 0) {
+											throw gcnew HDF5Exception("STRING: H5Tset_cset failed.");
+										}
+									}
+									else {
+										if (H5Tset_cset(result, H5T_CSET_ASCII) < 0) {
+											throw gcnew HDF5Exception("STRING: H5Tset_cset failed.");
+										}
+									}
+								}
+							}
+							else {
+								throw gcnew HDF5Exception("STRING: No character set specified.");
+							}
 
                             if (ht->ContainsKey("StrPad"))
                             {
@@ -1092,155 +1113,127 @@ namespace PSH5X
                                 }
                             }
 
-                            if (ht->ContainsKey("Length"))
-                            {
-                                size_t length = 0;
-                                if (TryGetValue(ht["Length"], length))
-                                {
-                                    if (H5Tset_size(result, length) < 0) {
-                                        throw gcnew HDF5Exception("STRING: H5Tset_size failed.");
-                                    }
-                                }
-                                else {
-                                    throw gcnew PSH5XException("STRING: Invalid string length!");
-                                }
-                            }
-                            else  // variable length string
-                            {
-                                if (H5Tset_size(result, H5T_VARIABLE) < 0) {
-                                    throw gcnew HDF5Exception("STRING: H5Tset_size failed.");
-                                }
-                            }
-
 #pragma endregion
                         }
                         else if (type_class == "BITFIELD")
-                        {
+						{
 #pragma region BITFIELD
 
-                            if (ht->ContainsKey("Type")) {
-                                result = ProviderUtils::ParseH5Type(ht["Type"]);
-                                if (H5Tget_class(result) != H5T_BITFIELD) {
-                                    throw gcnew PSH5XException("BITFIELD: The type specified is not of class BITFIELD.");
-                                }
-                            }
-                            else
-                            {
-                                size_t precision = 0;
-                                if (ht->ContainsKey("Precision")) {
-                                    if (!TryGetValue(ht["Precision"], precision)) {
-                                        throw gcnew PSH5XException("BITFIELD: Unable to convert the 'Precision' value into size_t.");
-                                    }
-                                }
-                                else {
-                                    throw gcnew PSH5XException("BITFIELD: No 'Precision' key found.");
-                                }
+							size_t precision = 0;
+							if (ht->ContainsKey("Precision")) {
+								if (!TryGetValue(ht["Precision"], precision)) {
+									throw gcnew PSH5XException("BITFIELD: Unable to convert the 'Precision' value into size_t.");
+								}
+							}
+							else {
+								throw gcnew PSH5XException("BITFIELD: No 'Precision' key found.");
+							}
 
-                                String^ s = nullptr;
+							String^ s = nullptr;
 
-                                H5T_order_t order = H5T_ORDER_LE;
-                                if (ht->ContainsKey("ByteOrder")) {
-                                    if (!TryGetValue(ht["ByteOrder"], s)) {
-                                        throw gcnew PSH5XException("BITFIELD: Unable to convert the 'ByteOrder' value into a string.");
-                                    }
+							H5T_order_t order = H5T_ORDER_LE;
+							if (ht->ContainsKey("ByteOrder")) {
+								if (!TryGetValue(ht["ByteOrder"], s)) {
+									throw gcnew PSH5XException("BITFIELD: Unable to convert the 'ByteOrder' value into a string.");
+								}
 
-                                    if (s != nullptr)
-                                    {
-                                        s = s->Trim()->ToUpper();
-                                        if (s != "BE" && s != "LE") {
-                                            throw gcnew PSH5XException("BITFIELD: Invalid 'ByteOrder' value. Must be 'BE' or 'LE'!");
-                                        }
-                                        if (s == "BE") {
-                                            order = H5T_ORDER_BE;
-                                        }
-                                    }
-                                    else {
-                                        throw gcnew PSH5XException("BITFIELD: Invalid 'ByteOrder' value. Must be 'BE' or 'LE'!");
-                                    }
-                                }
+								if (s != nullptr)
+								{
+									s = s->Trim()->ToUpper();
+									if (s != "BE" && s != "LE") {
+										throw gcnew PSH5XException("BITFIELD: Invalid 'ByteOrder' value. Must be 'BE' or 'LE'!");
+									}
+									if (s == "BE") {
+										order = H5T_ORDER_BE;
+									}
+								}
+								else {
+									throw gcnew PSH5XException("BITFIELD: Invalid 'ByteOrder' value. Must be 'BE' or 'LE'!");
+								}
+							}
 
-                                size_t offset = 0;
-                                if (ht->ContainsKey("BitOffset")) {
-                                    if (!TryGetValue(ht["BitOffset"], offset)) {
-                                        throw gcnew PSH5XException("BITFIELD: Unable to convert the 'BitOffset' value into size_t.");
-                                    }
-                                }
+							size_t offset = 0;
+							if (ht->ContainsKey("BitOffset")) {
+								if (!TryGetValue(ht["BitOffset"], offset)) {
+									throw gcnew PSH5XException("BITFIELD: Unable to convert the 'BitOffset' value into size_t.");
+								}
+							}
 
-                                H5T_pad_t lsb = H5T_PAD_ZERO, msb = H5T_PAD_ZERO;
-                                if (ht->ContainsKey("MSBitPadding")) {
-                                    if (!TryGetValue(ht["MSBitPadding"], s)) {
-                                        throw gcnew PSH5XException("BITFIELD: Unable to convert the 'MSBitPadding' value into a string.");
-                                    }
+							H5T_pad_t lsb = H5T_PAD_ZERO, msb = H5T_PAD_ZERO;
+							if (ht->ContainsKey("MSBitPadding")) {
+								if (!TryGetValue(ht["MSBitPadding"], s)) {
+									throw gcnew PSH5XException("BITFIELD: Unable to convert the 'MSBitPadding' value into a string.");
+								}
 
-                                    if (s != nullptr)
-                                    {
-                                        s = s->Trim()->ToUpper();
-                                        if (s != "ZERO" && s != "ONE" && s != "BACKGROUND") {
-                                            throw gcnew PSH5XException("BITFIELD: Invalid 'MSBitPadding' value. Must be 'Zero' or 'One' or 'Background'!");
-                                        }
+								if (s != nullptr)
+								{
+									s = s->Trim()->ToUpper();
+									if (s != "ZERO" && s != "ONE" && s != "BACKGROUND") {
+										throw gcnew PSH5XException("BITFIELD: Invalid 'MSBitPadding' value. Must be 'Zero' or 'One' or 'Background'!");
+									}
 
-                                        if (s == "ONE") {
-                                            msb = H5T_PAD_ONE;
-                                        }
-                                        else if (s == "BACKGROUND") {
-                                            msb = H5T_PAD_BACKGROUND;
-                                        }
-                                    }
-                                    else {
-                                        throw gcnew PSH5XException("BITFIELD: Invalid 'MSBitPadding' value. Must be 'Zero' or 'One' or 'Background'!");
-                                    }
-                                }
-                                if (ht->ContainsKey("LSBitPadding")) {
-                                    if (!TryGetValue(ht["LSBitPadding"], s)) {
-                                        throw gcnew PSH5XException("BITFIELD: Unable to convert the 'LSBitPadding' value into a string.");
-                                    }
+									if (s == "ONE") {
+										msb = H5T_PAD_ONE;
+									}
+									else if (s == "BACKGROUND") {
+										msb = H5T_PAD_BACKGROUND;
+									}
+								}
+								else {
+									throw gcnew PSH5XException("BITFIELD: Invalid 'MSBitPadding' value. Must be 'Zero' or 'One' or 'Background'!");
+								}
+							}
+							if (ht->ContainsKey("LSBitPadding")) {
+								if (!TryGetValue(ht["LSBitPadding"], s)) {
+									throw gcnew PSH5XException("BITFIELD: Unable to convert the 'LSBitPadding' value into a string.");
+								}
 
-                                    if (s != nullptr)
-                                    {
-                                        s = s->Trim()->ToUpper();
-                                        if (s != "ZERO" && s != "ONE" && s != "BACKGROUND") {
-                                            throw gcnew PSH5XException("BITFIELD: Invalid 'LSBitPadding' value. Must be 'Zero' or 'One' or 'Background'!");
-                                        }
+								if (s != nullptr)
+								{
+									s = s->Trim()->ToUpper();
+									if (s != "ZERO" && s != "ONE" && s != "BACKGROUND") {
+										throw gcnew PSH5XException("BITFIELD: Invalid 'LSBitPadding' value. Must be 'Zero' or 'One' or 'Background'!");
+									}
 
-                                        if (s == "ONE") {
-                                            msb = H5T_PAD_ONE;
-                                        }
-                                    else if (s == "BACKGROUND") {
-                                        msb = H5T_PAD_BACKGROUND;
-                                    }
-                                }
-                                else {
-                                    throw gcnew PSH5XException("BITFIELD: Invalid 'LSBitPadding' value. Must be 'Zero' or 'One' or 'Background'!");
-                                }
-                            }
+									if (s == "ONE") {
+										msb = H5T_PAD_ONE;
+									}
+									else if (s == "BACKGROUND") {
+										msb = H5T_PAD_BACKGROUND;
+									}
+								}
+								else {
+									throw gcnew PSH5XException("BITFIELD: Invalid 'LSBitPadding' value. Must be 'Zero' or 'One' or 'Background'!");
+								}
+							}
 
-                            result = H5Tcopy(H5T_NATIVE_B8);
-                            if (result < 0) {
-                                throw gcnew HDF5Exception("H5Tcopy failed!");
-                            }
+							result = H5Tcopy(H5T_NATIVE_B8);
+							if (result < 0) {
+								throw gcnew HDF5Exception("H5Tcopy failed!");
+							}
 
-                            if (H5Tset_precision(result, precision) < 0) {
-                                throw gcnew HDF5Exception("H5Tset_precision failed!");
-                            }
-                            if (H5Tset_offset(result, offset) < 0) {
-                                throw gcnew HDF5Exception("H5Tset_offset failed!");
-                            }
-                            if (H5Tset_order(result, order) < 0) {
-                                throw gcnew HDF5Exception("H5Tset_order failed!");
-                            }
-                            if (H5Tset_pad(result, lsb, msb) < 0) {
-                                throw gcnew HDF5Exception("H5Tset_pad failed!");
-                            }
-                            }
+							if (H5Tset_precision(result, precision) < 0) {
+								throw gcnew HDF5Exception("H5Tset_precision failed!");
+							}
+							if (H5Tset_offset(result, offset) < 0) {
+								throw gcnew HDF5Exception("H5Tset_offset failed!");
+							}
+							if (H5Tset_order(result, order) < 0) {
+								throw gcnew HDF5Exception("H5Tset_order failed!");
+							}
+							if (H5Tset_pad(result, lsb, msb) < 0) {
+								throw gcnew HDF5Exception("H5Tset_pad failed!");
+							}
+
 #pragma endregion
-                        }
+						}
                         else if (type_class == "OPAQUE")
                         {
 #pragma region OPAQUE
                             size_t size = 0;
-                            if (ht->ContainsKey("Bytes")) // TODO: check size < 64KB
+                            if (ht->ContainsKey("Size")) // TODO: check size < 64KB
                             {
-                                if (TryGetValue(ht["Bytes"], size))
+                                if (TryGetValue(ht["Size"], size))
                                 {
                                     if (ht->ContainsKey("Tag"))
                                     {
@@ -1277,110 +1270,103 @@ namespace PSH5X
 #pragma endregion
                         }
                         else if (type_class == "COMPOUND")
-                        {
+						{
 #pragma region COMPOUND
 
-                            size_t size = 0;
+							size_t size = 0;
 
-                            if (ht->ContainsKey("Size"))
-                            {
-                                if (ProviderUtils::TryGetValue(ht["Size"], size))
-                                {
-                                    result = H5Tcreate(H5T_COMPOUND, size);
-                                    if (result < 0) {
-                                        throw gcnew HDF5Exception("COMPOUND: H5Tcreate failed.");
-                                    }
+							if (ht->ContainsKey("Size"))
+							{
+								if (ProviderUtils::TryGetValue(ht["Size"], size))
+								{
+									result = H5Tcreate(H5T_COMPOUND, size);
+									if (result < 0) {
+										throw gcnew HDF5Exception("COMPOUND: H5Tcreate failed.");
+									}
+								}
+								else {
+									throw gcnew PSH5XException("COMPOUND: Unable to convert the 'Size' value into size_t.");
+								}
+							}
+							else {
+								throw gcnew PSH5XException("COMPOUND: No 'Size' key found.");
+							}
 
-                                    if (ht->ContainsKey("Members"))
-                                    {
-                                        Hashtable^ components = nullptr;
+							if (ht->ContainsKey("Members"))
+							{
+								Hashtable^ components = nullptr;
 
-                                        if (TryGetValue(ht["Members"], components))
-                                        {
-                                            for each (String^ key in components->Keys)
-                                            {
-                                                name = (char*)(Marshal::StringToHGlobalAnsi(key)).ToPointer();
+								if (TryGetValue(ht["Members"], components))
+								{
+									for each (String^ key in components->Keys)
+									{
+										name = (char*)(Marshal::StringToHGlobalAnsi(key)).ToPointer();
 
-                                                Hashtable^ comp = nullptr;
+										array<Object^>^ comp = nullptr;
 
-                                                if (TryGetValue(components[key], comp))
-                                                {
-                                                    size_t offset = 0;
-                                                    if (comp->ContainsKey("MemberOffset"))
-                                                    {
-                                                        if (ProviderUtils::TryGetValue(comp["MemberOffset"], offset))
-                                                        {
-                                                            dtype = ParseH5Type(comp);
-                                                            if (dtype >= 0)
-                                                            {
-                                                                if (H5Tinsert(result, name, offset, dtype) < 0)
-                                                                {
-                                                                    throw gcnew HDF5Exception(
-                                                                        String::Format("COMPOUND: H5Tinsert failed on component '{0}'!", key));
-                                                                }
-                                                            }
-                                                            else {
-                                                                throw gcnew PSH5XException(
-                                                                    String::Format("COMPOUND: Unsupported component type '{0}' for component '{1}'",
-                                                                    comp, key));
-                                                            }
-                                                            
-                                                            if (H5Tclose(dtype)) {
-                                                                throw gcnew HDF5Exception("H5Tclose failed!");
-                                                            }
-                                                            dtype = -1;
-                                                        }
-                                                        else {
-                                                            throw gcnew PSH5XException(
-                                                                String::Format("COMPOUND: Unable to convert the 'MemberOffset' value into size_t for component '{0}'", key));
-                                                        }
-                                                    }
-                                                    else {
-                                                        throw gcnew PSH5XException(
-                                                            String::Format("COMPOUND: No 'MemberOffset' key found for component '{0}'.", key));
-                                                    }
-                                                }
-                                                else {
-                                                    throw gcnew PSH5XException(
-                                                        String::Format("COMPOUND: Member '{0}' does not contain a hashtable.", key));
-                                                }
+										if (TryGetValue(components[key], comp))
+										{
+											if (comp->Length != 2) {
+												throw gcnew HDF5Exception(
+													String::Format("COMPOUND: Invalid member definition for key '{0}' found!", key));
+											}
 
-                                                Marshal::FreeHGlobal(IntPtr(name));
-                                                name = NULL;
-                                            }
-                                        }
-                                        else {
-                                            throw gcnew PSH5XException("COMPOUND: 'Members' does not contain a hashtable.");
-                                        }
-                                    }
-                                    else {
-                                        throw gcnew PSH5XException("COMPOUND: No 'Members' key found.");
-                                    }
-                                }
-                                else {
-                                    throw gcnew PSH5XException("COMPOUND: Unable to convert the 'Size' value into size_t.");
-                                }
-                            }
-                            else {
-                                throw gcnew PSH5XException("COMPOUND: No 'Size' key found.");
-                            }
+											size_t offset = 0;
+											if (ProviderUtils::TryGetValue(comp[0], offset))
+											{
+												dtype = ParseH5Type(comp[1]);
+												if (dtype >= 0)
+												{
+													if (H5Tinsert(result, name, offset, dtype) < 0)
+													{
+														throw gcnew HDF5Exception(
+															String::Format("COMPOUND: H5Tinsert failed on member '{0}'!", key));
+													}
+												}
+												else {
+													throw gcnew PSH5XException(
+														String::Format("COMPOUND: Unsupported member type '{0}' for component '{1}'",
+														comp[1]->ToString(), key));
+												}
+
+												if (H5Tclose(dtype)) {
+													throw gcnew HDF5Exception("H5Tclose failed!");
+												}
+												dtype = -1;
+											}
+											else {
+												throw gcnew PSH5XException(
+													String::Format("COMPOUND: Unable to determine the member offset for '{0}'", key));
+											}
+
+
+											Marshal::FreeHGlobal(IntPtr(name));
+											name = NULL;
+										}
+									}
+
+								}
+								else {
+									throw gcnew PSH5XException("COMPOUND: No 'Members' key found.");
+								}
+							}
 
 #pragma endregion
-                        }
+						}
                         else if (type_class == "REFERENCE")
                         {
 #pragma region REFERENCE
 
-                            if (ht->ContainsKey("Type"))
+                            if (ht->ContainsKey("Kind"))
                             {
-                                String^ ref_type = ht["Type"]->ToString()->ToUpper();
-                                if (ref_type == "REF_OBJ") {
+                                String^ ref_type = ht["Kind"]->ToString()->ToUpper();
+                                if (ref_type == "OBJECT") {
                                     result = H5Tcopy(H5T_STD_REF_OBJ);
                                     if (result < 0) {
                                         throw gcnew HDF5Exception("H5Tcopy failed!");
                                     }
                                 }
-                                else if (ref_type == "REF_DSETREG") {
+                                else if (ref_type == "REGION") {
                                     result = H5Tcopy(H5T_STD_REF_DSETREG);
                                     if (result < 0) {
                                         throw gcnew HDF5Exception("H5Tcopy failed!");
@@ -1400,7 +1386,7 @@ namespace PSH5X
                         else if (type_class == "ENUM")
                         {
 #pragma region ENUM
-                            // TODO: finish this
+                            // TODO: finish this and support arbitrary native integer types
 
                             if (ht->ContainsKey("Members"))
                             {
@@ -1441,10 +1427,10 @@ namespace PSH5X
                         {
 #pragma region VLEN
 
-                            if (ht->ContainsKey("Type"))
+                            if (ht->ContainsKey("Base"))
                             {
-                                String^ ref_type = ht["Type"]->ToString()->ToUpper();
-                                base_type = ParseH5Type(ht["Type"]);
+                                String^ ref_type = ht["Base"]->ToString()->ToUpper();
+                                base_type = ParseH5Type(ht["Base"]);
                                 if (base_type < 0) {
                                     throw gcnew PSH5XException(
                                         String::Format("VLEN: Invalid base type '{0}'!", ref_type));
@@ -1456,7 +1442,7 @@ namespace PSH5X
                                 }
                             }
                             else {
-                                throw gcnew PSH5XException("VLEN: No 'Type' key found.");
+                                throw gcnew PSH5XException("VLEN: No 'Base' key found.");
                             }
 
 #pragma endregion
@@ -1465,11 +1451,11 @@ namespace PSH5X
                         {
 #pragma region ARRAY
 
-                            if (ht->ContainsKey("Type"))
+                            if (ht->ContainsKey("Base"))
                             {
-                                base_type = ParseH5Type(ht["Type"]);
+                                base_type = ParseH5Type(ht["Base"]);
                                 if (base_type < 0) {
-                                    throw gcnew PSH5XException("ARRAY: No 'Type' key found.");
+                                    throw gcnew PSH5XException("ARRAY: No 'Base' key found.");
                                 }
 
                                 if (ht->ContainsKey("Dims"))
@@ -1478,10 +1464,10 @@ namespace PSH5X
 
                                     if (ProviderUtils::TryGetValue(ht["Dims"], dims))
                                     {
-                                        if (dims->Length > 0 && dims->Length <= 4)
+                                        if (dims->Length > 0 && dims->Length <= H5S_MAX_RANK)
                                         {
                                             unsigned rank = safe_cast<unsigned>(dims->Length);
-                                            hsize_t tmp[4];
+                                            hsize_t tmp[H5S_MAX_RANK];
                                             for (int i = 0; i < dims->Length; ++i) {
                                                 tmp[i] = dims[i];
 
@@ -1495,10 +1481,10 @@ namespace PSH5X
                                                 throw gcnew HDF5Exception("H5Tarray_create2 failed!");
                                             }
                                         }
-                                        else {
-                                            throw gcnew PSH5XException(
-                                                "ARRAY: The 'Dims' array's rank must not exceed 4.");
-                                        }
+										else {
+											throw gcnew PSH5XException(
+												String::Format("ARRAY: The 'Dims' array's rank must not exceed '{0}'.", H5S_MAX_RANK));
+										}
                                     }
                                     else {
                                         throw gcnew PSH5XException(
@@ -1522,15 +1508,8 @@ namespace PSH5X
                             String::Format("Unsupported type class '{0}' found.", type_class));
                     }
                 }
-                else if (ht->ContainsKey("Type"))
-                {
-                    result = ProviderUtils::ParseH5Type(ht["Type"]);
-                    if (result < 0) {
-                        throw gcnew PSH5XException("Invalid type!");
-                    }
-                }
                 else {
-                    throw gcnew PSH5XException("No 'Class' or 'Type' key found.");
+                    throw gcnew PSH5XException("No 'Class' key found.");
                 }
             }
             else
@@ -1811,7 +1790,7 @@ namespace PSH5X
         Assembly^ assembly = compilate->CompiledAssembly;
         Type^ t = assembly->GetType("Point");
         
-        result = Array::CreateInstance(t, length);
+        result = Array::CreateInstance(t, safe_cast<int>(length));
         for (long long i = 0; i < length; ++i)
         {
             result->SetValue(Activator::CreateInstance(t), i);

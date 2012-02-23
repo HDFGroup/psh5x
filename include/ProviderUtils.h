@@ -215,6 +215,8 @@ namespace PSH5X
         static bool TryGetValue(System::Object^ obj, array<hsize_t>^% arr);
 
         static bool TryGetValue(System::Object^ obj, array<System::String^>^% arr);
+		
+		static bool TryGetValue(System::Object^ obj, array<System::Object^>^% arr);
 
         template<typename T>
         static bool TryGetValue(System::Object^ obj, array<T>^% arr)
