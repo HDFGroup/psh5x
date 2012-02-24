@@ -357,15 +357,9 @@ namespace PSH5X
                 throw gcnew PSH5XException("The drive is read-only and cannot be modified!");
             }
 
-            if (!ProviderUtils::IsValidAbsoluteH5Path(drive->FileHandle, h5path))
+            if (!ProviderUtils::IsResolvableH5Path(drive->FileHandle, h5path))
             {
-                throw gcnew PSH5XException(String::Format("Item '{0}' does not exist", path));
-            }
-
-            if (!ProviderUtils::IsH5Object(drive->FileHandle, h5path))
-            {
-                throw gcnew PSH5XException(String::Format(
-                    "Item '{0}' is not an HDF5 dataset, group, or datatype object and cannot have attributes", path));
+                throw gcnew PSH5XException(String::Format("HDF5 object '{0}' does not exist", path));
             }
 
 #pragma endregion
@@ -692,8 +686,6 @@ namespace PSH5X
             {
                 throw gcnew PSH5XException(String::Format("HDF5 object '{0}' not found", path));
             }
-
-
 
             old_attr_name = (char*)(Marshal::StringToHGlobalAnsi(sourceProperty)).ToPointer();
             new_attr_name = (char*)(Marshal::StringToHGlobalAnsi(destinationProperty)).ToPointer();

@@ -159,70 +159,6 @@ namespace PSH5X
         return !invalidLinkNameFound;
     }
 
-    bool ProviderUtils::IsValidAbsoluteH5Path(hid_t file, String^ h5path)
-    {
-        char *name = NULL, *group_path = NULL;
-
-        if (ProviderUtils::IsH5RootPathName(h5path))
-            return true;
-
-        array<String^>^ linkNames = h5path->Split((gcnew array<wchar_t>{'/'}),
-            StringSplitOptions::RemoveEmptyEntries);
-        if (linkNames->Length == 0) {
-            return true;
-        }
-
-        bool result = false;
-        String^ currentPath = "/";
-        int count = 0;
-        
-        for each (String^ linkName in linkNames)
-        {
-            group_path = (char*)(Marshal::StringToHGlobalAnsi(currentPath)).ToPointer();
-            hid_t group = H5Gopen2(file, group_path, H5P_DEFAULT);
-            if (group >= 0)
-            {
-                name = (char*)(Marshal::StringToHGlobalAnsi(linkName)).ToPointer();
-
-                if (H5Lexists(group, name, H5P_DEFAULT) > 0)
-                {
-                    if (count < (linkNames->Length - 1))
-                    {
-                        ++count;
-                        currentPath = currentPath + "/" + linkName;
-                    }
-                    else {
-                        result = true;
-                    }
-
-                    if (H5Gclose(group) < 0) { // TODO
-                    }
-                }
-                else
-                {
-                    result = false;
-                 
-                    if (H5Gclose(group) < 0) { // TODO
-                    }
-                    
-                    break;
-                }
-            }
-            else { // TODO
-            }
-        }
-
-        if (group_path != NULL) {
-            Marshal::FreeHGlobal(IntPtr(group_path));
-        }
-
-        if (name != NULL) {
-            Marshal::FreeHGlobal(IntPtr(name));
-        }
-
-        return result;
-    }
-
 	// TODO: Check this!
 
     bool ProviderUtils::IsValidH5Path(hid_t loc, String^ h5path)
@@ -257,8 +193,7 @@ namespace PSH5X
             throw gcnew PSH5XException("Unsuitable or invalid location handle!.");
         }
 
-        array<String^>^ linkNames = h5path->Split((gcnew array<wchar_t>{'/'}),
-            StringSplitOptions::RemoveEmptyEntries);
+        array<String^>^ linkNames = GetLinkNames(h5path);
 
         if (linkNames->Length == 0) { return true; }
 
@@ -388,6 +323,7 @@ namespace PSH5X
 			if (IsValidH5Path(loc, h5path))
 			{
 				array<String^>^ linkNames = GetLinkNames(h5path);
+
 				if (linkNames->Length > 1)
 				{
 					String^ name = linkNames[linkNames->Length-1];
@@ -395,18 +331,18 @@ namespace PSH5X
 					for (int i = 0; i < linkNames->Length-1; ++i)
 					{
 						if (i > 0) {
-							sb->Append('/');
+							sb->Append("/");
 						}
 						sb->Append(linkNames[i]);
 					}
 					String^ objPath = sb->ToString();
 
-					obj_path_str = (char*) Marshal::StringToHGlobalAuto(objPath).ToPointer();
+					obj_path_str = (char*) Marshal::StringToHGlobalAnsi(objPath).ToPointer();
 					obj = H5Oopen(loc, obj_path_str, H5P_DEFAULT);
 					H5I_type_t type = H5Iget_type(obj);
 					if (type == H5I_FILE || type == H5I_GROUP)
 					{
-						name_str = (char*) Marshal::StringToHGlobalAuto(name).ToPointer();
+						name_str = (char*) Marshal::StringToHGlobalAnsi(name).ToPointer();
 						if (H5Oexists_by_name(obj, name_str, H5P_DEFAULT) > 0) {
 							result = true;
 						}
@@ -455,8 +391,7 @@ namespace PSH5X
 
         if (IsValidH5Path(loc, h5path)) { return false; }
 
-        array<String^>^ linkNames = h5path->Split((gcnew array<wchar_t>{'/'}),
-            StringSplitOptions::RemoveEmptyEntries);
+        array<String^>^ linkNames = GetLinkNames(h5path);
 
         bool result = true;
 
@@ -652,7 +587,6 @@ namespace PSH5X
         return result;
     }
 
-    
     String^ ProviderUtils::ParentPath(String^ h5path)
     {
         if (ProviderUtils::IsWellFormedH5Path(h5path))

@@ -1,9 +1,13 @@
 
+New-Alias Copy-H5Attribute Copy-ItemProperty
+
 New-Alias Get-H5Attribute Get-ItemProperty
 
 New-Alias Get-H5Member Get-ChildItem
 
 New-Alias Get-H5Object Get-Item
+
+New-Alias Move-H5Attribute Move-ItemProperty
 
 New-Alias Remove-H5Attribute Remove-ItemProperty
 

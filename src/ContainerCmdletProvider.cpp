@@ -53,7 +53,7 @@ namespace PSH5X
             }
 
 			// Does the source object exist?
-			if (!ProviderUtils::IsResolvableH5Path(drive->FileHandle, h5path)) {
+			if (!ProviderUtils::IsResolvableH5Path(drive->FileHandle, h5path)) { 
 				throw gcnew PSH5XException(String::Format("The source object '{0}' does not exist", path));
 			}
 			// Is the destination drive writable?
@@ -552,7 +552,7 @@ namespace PSH5X
 
                 gid = H5Gopen2(drive->FileHandle, gpath, H5P_DEFAULT);
                 if (gid < 0) {
-                    throw gcnew Exception("H5Gopen2 failed!");
+                    throw gcnew HDF5Exception("H5Gopen2 failed!");
                 }
 
                 H5G_info_t info;
@@ -561,7 +561,7 @@ namespace PSH5X
                     result = (info.nlinks > 0);
                 }
                 else {
-                    throw gcnew Exception("H5Gget_info failed!");
+                    throw gcnew HDF5Exception("H5Gget_info failed!");
                 }
             }
         }
@@ -581,7 +581,8 @@ namespace PSH5X
 
 
 	// TODO: RemoveItem, at the moment, is an unlink. Add an option that let's one remove ALL
-	//       links to a given object.
+	//       links to a given object. I'd have to iterate the entire file to pick up
+	//       ALL pathnames and then carefully unlink them one-by-one.
 
     void Provider::RemoveItem(String^ path, bool recurse)
     {
@@ -595,7 +596,7 @@ namespace PSH5X
         try
         {
             if (recurse) {
-                WriteWarning("The '-Recurse' option has no effect at the moment.");
+                WriteWarning("The '-Recurse' option has no effect.");
             }
 
             DriveInfo^ drive = nullptr;
@@ -616,7 +617,6 @@ namespace PSH5X
             }
             else
             {
-
                 String^ groupPath = ProviderUtils::ParentPath(h5path);
                 group_path = (char*)(Marshal::StringToHGlobalAnsi(groupPath)).ToPointer();
 
@@ -636,11 +636,11 @@ namespace PSH5X
                         if (H5Ldelete(gid, link_name, H5P_DEFAULT) >= 0)
                         {
                             if (H5Fflush(gid, H5F_SCOPE_LOCAL) < 0) {
-                                throw gcnew Exception("H5Fflush failed!");
+                                throw gcnew HDF5Exception("H5Fflush failed!");
                             }
                         }
                         else {
-                            throw gcnew Exception("H5Ldelete failed!!!");
+                            throw gcnew HDF5Exception("H5Ldelete failed!!!");
                         }
                     }
                 }
@@ -725,11 +725,11 @@ namespace PSH5X
                         if (H5Lmove(gid, link_name, gid, new_name, H5P_DEFAULT, H5P_DEFAULT) >= 0)
                         {
                             if (H5Fflush(gid, H5F_SCOPE_LOCAL) < 0) {
-                                throw gcnew Exception("H5Fflush failed!");
+                                throw gcnew HDF5Exception("H5Fflush failed!");
                             }
                         }
                         else {
-                            throw gcnew Exception("H5Lmove failed!!!");
+                            throw gcnew HDF5Exception("H5Lmove failed!!!");
                         }
                     }
                 }

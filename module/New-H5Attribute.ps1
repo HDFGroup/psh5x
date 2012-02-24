@@ -32,7 +32,7 @@ Function New-H5Attribute
      The must not be used as part of link names.
  #>
     [CmdletBinding(SupportsShouldProcess=$true,
-                   DefaultParametersetName='Simple')]
+                   DefaultParametersetName='Scalar')]
     param
     (
         [Parameter(Mandatory=$true,
@@ -62,18 +62,13 @@ Function New-H5Attribute
         $Simple,
         [Parameter(Mandatory=$true,
                    Position=3,
-                   ParameterSetName='Scalar',
-                   HelpMessage='Scalar dataspace?')]
-        [switch]
-        $Scalar,
-        [Parameter(Mandatory=$true,
-                   Position=3,
                    ParameterSetName='Null',
                    HelpMessage='Null dataspace?')]
         [switch]
         $Nulll,
         [Parameter(Mandatory=$false,
-                   Position=4,
+                   Position=3,
+                   ParameterSetName='Scalar',
                    HelpMessage='Attribute value')]
         [ValidateNotNull()]
         [object]
@@ -121,8 +116,9 @@ Function New-H5Attribute
         {
             if ($Value) {
                 Write-Output(
-                    New-ItemProperty $Path -Name $Name -ElementType $Type `
-                                     -Value $Value)
+                    New-ItemProperty $Path -Name $Name -ElementType $Type)
+                # HACK: Do this directly in New-ItemProperty!
+                Set-ItemProperty -Path $Path -Name $Name -Value $Value
             }
             else {
                 Write-Output(
@@ -131,16 +127,9 @@ Function New-H5Attribute
         }
         else # simple attribute
         {
-            if ($Value) {
-                Write-Output(
-                    New-ItemProperty $Path -Name $Name -ElementType $Type `
-                                     -Simple $Simple -Value $Value)
-            }
-            else {
-                Write-Output(
-                    New-ItemProperty $Path -Name $Name -ElementType $Type `
-                                     -Simple $Simple)
-            }
+            Write-Output(
+                New-ItemProperty $Path -Name $Name -ElementType $Type `
+                                 -Simple $Simple)
         }
     }
 }

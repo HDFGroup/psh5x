@@ -2046,7 +2046,6 @@ error:
         return result;
     }
 
-
     bool ProviderUtils::IsH5SimpleType(hid_t dtype)
     {
         H5T_class_t cls = H5Tget_class(dtype);

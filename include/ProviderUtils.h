@@ -92,14 +92,13 @@ namespace PSH5X
 
         static bool IsWellFormedH5Path(System::String^ h5path);
         
-        // a valid path must be well formed
-        // IsValidH5Path returns false for not well-formed paths
+        // path is in use, but may end in a dangling link
 
         static bool IsValidH5Path(hid_t loc, System::String^ h5path);
 
-		static bool IsResolvableH5Path(hid_t loc, System::String^ h5path);
+		// path can be resolved to an HDF5 object
 
-        static bool IsValidAbsoluteH5Path(hid_t file, System::String^ h5path);
+		static bool IsResolvableH5Path(hid_t loc, System::String^ h5path);
 
         static bool CanCreateItemAt(hid_t loc, System::String^ h5path);
 

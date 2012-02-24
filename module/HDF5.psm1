@@ -4,6 +4,7 @@ $ScriptDir = Split-Path $MyInvocation.MyCommand.Path
 Import-Module $ScriptDir\PSH5X.dll
 
 . $ScriptDir\Aliases.ps1
+. $ScriptDir\Copy-H5Object.ps1
 . $ScriptDir\Get-H5Drive.ps1
 . $ScriptDir\New-H5Attribute.ps1
 . $ScriptDir\New-H5Dataset.ps1

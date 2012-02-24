@@ -73,12 +73,11 @@ namespace PSH5X
         DriveInfo^ drive = nullptr;
         String^ h5path = nullptr;
 
-        if (!ProviderUtils::TryGetDriveEtH5Path(path, ProviderInfo, drive, h5path))
-        {
+        if (!ProviderUtils::TryGetDriveEtH5Path(path, ProviderInfo, drive, h5path)) {
             throw gcnew PSH5XException("Ill-formed HDF5 path name and/or unable to obtain drive name!");
         }
         
-        return ProviderUtils::IsValidH5Path(drive->FileHandle, h5path);
+		return ProviderUtils::IsResolvableH5Path(drive->FileHandle, h5path);
     }
 
     Object^ Provider::ItemExistsDynamicParameters(String^ path)
