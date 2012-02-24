@@ -249,6 +249,8 @@ namespace PSH5X
 
     private:
 
+		static array<System::String^>^ GetLinkNames(System::String^ h5path);
+
         static ProviderUtils();
         
         static System::String^ m_hdf5_path_sep;

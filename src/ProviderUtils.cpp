@@ -1,6 +1,7 @@
 
 #include "HDF5Exception.h"
 #include "ProviderUtils.h"
+#include "PSH5XException.h"
 
 extern "C" {
 #include "H5Apublic.h"
@@ -18,6 +19,7 @@ using namespace System;
 using namespace System::Collections;
 using namespace System::Management::Automation;
 using namespace System::Runtime::InteropServices;
+using namespace System::Text;
 
 namespace PSH5X
 {
@@ -115,13 +117,29 @@ namespace PSH5X
         String^ tpath = h5path->Trim();
 
         // the root path is well-formed
-        if (tpath == "/") { return true; }
+        if (tpath == "/") {
+			return true;
+		}
+
+		// the current location path is well-formed
+        if (tpath == ".") {
+			return true;
+		}
+
+		// the '..' is non-sense in HDF5 path names
+        if (tpath->StartsWith("..")) {
+			return false;
+		}
 
         // (unless the root path) a well-formed path must not end with a slash
-        if (tpath->EndsWith("/")) { return false; }
+        if (tpath->EndsWith("/")) {
+			return false;
+		}
 
         // a relative path may begin with a dot
-        if (tpath->StartsWith(".")) { tpath = tpath->Substring(1); }
+        if (tpath->StartsWith(".")) {
+			tpath = tpath->Substring(1);
+		}
 
         array<String^>^ linkNames = tpath->Split((gcnew array<wchar_t>{'/'}),
             StringSplitOptions::RemoveEmptyEntries);
@@ -205,6 +223,8 @@ namespace PSH5X
         return result;
     }
 
+	// TODO: Check this!
+
     bool ProviderUtils::IsValidH5Path(hid_t loc, String^ h5path)
     {
         bool result = true;
@@ -234,7 +254,7 @@ namespace PSH5X
         }
 
         if (!isValidLocation) {
-            throw gcnew ArgumentException("Unsuitable or invalid location handle!.");
+            throw gcnew PSH5XException("Unsuitable or invalid location handle!.");
         }
 
         array<String^>^ linkNames = h5path->Split((gcnew array<wchar_t>{'/'}),
@@ -355,14 +375,75 @@ namespace PSH5X
         return result;
     }
 
-	// TODO: Finish this!
-
 	bool ProviderUtils::IsResolvableH5Path(hid_t loc, String^ h5path)
 	{
 		bool result = false;
 
-		if (IsValidH5Path(loc, h5path))
+		hid_t obj = -1;
+
+		char *obj_path_str = NULL, *name_str = NULL;
+
+		try
 		{
+			if (IsValidH5Path(loc, h5path))
+			{
+				array<String^>^ linkNames = GetLinkNames(h5path);
+				if (linkNames->Length > 1)
+				{
+					String^ name = linkNames[linkNames->Length-1];
+					StringBuilder^ sb = gcnew StringBuilder();
+					for (int i = 0; i < linkNames->Length-1; ++i)
+					{
+						if (i > 0) {
+							sb->Append('/');
+						}
+						sb->Append(linkNames[i]);
+					}
+					String^ objPath = sb->ToString();
+
+					obj_path_str = (char*) Marshal::StringToHGlobalAuto(objPath).ToPointer();
+					obj = H5Oopen(loc, obj_path_str, H5P_DEFAULT);
+					H5I_type_t type = H5Iget_type(obj);
+					if (type == H5I_FILE || type == H5I_GROUP)
+					{
+						name_str = (char*) Marshal::StringToHGlobalAuto(name).ToPointer();
+						if (H5Oexists_by_name(obj, name_str, H5P_DEFAULT) > 0) {
+							result = true;
+						}
+					}
+				}
+				else
+				{
+					H5I_type_t type = H5Iget_type(loc);
+					if (type == H5I_FILE || type == H5I_GROUP)
+					{
+						if (linkNames->Length == 1)
+						{
+							name_str = (char*) Marshal::StringToHGlobalAnsi(linkNames[0]).ToPointer();
+							if (H5Lexists(loc, name_str, H5P_DEFAULT) > 0) {
+								if (H5Oexists_by_name(loc, name_str, H5P_DEFAULT) > 0) {
+									result = true;
+								}
+							}
+						}
+						else {
+							result = (type == H5I_FILE);
+						}
+					}
+				}
+			}
+		}
+		finally
+		{
+			if (obj != -1) {
+				H5Oclose(obj);
+			}
+			if (obj_path_str != NULL) {
+				Marshal::FreeHGlobal(IntPtr(obj_path_str));
+			}
+			if (name_str != NULL) {
+				Marshal::FreeHGlobal(IntPtr(name_str));
+			}
 		}
 
 		return result;
@@ -842,6 +923,12 @@ namespace PSH5X
             return false;
         }
     }
+
+
+	array<String^>^ ProviderUtils::GetLinkNames(String^ h5path)
+	{
+		return h5path->Split((gcnew array<wchar_t>{'/'}), StringSplitOptions::RemoveEmptyEntries);
+	}
 
     static ProviderUtils::ProviderUtils()
     {
