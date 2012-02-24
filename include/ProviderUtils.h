@@ -97,6 +97,8 @@ namespace PSH5X
 
         static bool IsValidH5Path(hid_t loc, System::String^ h5path);
 
+		static bool IsResolvableH5Path(hid_t loc, System::String^ h5path);
+
         static bool IsValidAbsoluteH5Path(hid_t file, System::String^ h5path);
 
         static bool CanCreateItemAt(hid_t loc, System::String^ h5path);

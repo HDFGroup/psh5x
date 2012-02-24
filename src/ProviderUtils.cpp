@@ -205,7 +205,7 @@ namespace PSH5X
         return result;
     }
 
-    bool ProviderUtils::IsValidH5Path(hid_t loc, System::String^ h5path)
+    bool ProviderUtils::IsValidH5Path(hid_t loc, String^ h5path)
     {
         bool result = true;
 
@@ -354,6 +354,19 @@ namespace PSH5X
 
         return result;
     }
+
+	// TODO: Finish this!
+
+	bool ProviderUtils::IsResolvableH5Path(hid_t loc, String^ h5path)
+	{
+		bool result = false;
+
+		if (IsValidH5Path(loc, h5path))
+		{
+		}
+
+		return result;
+	}
 
     bool ProviderUtils::CanCreateItemAt(hid_t loc, String^ h5path)
     {

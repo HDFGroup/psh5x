@@ -32,12 +32,14 @@ namespace PSH5X
             "HDF5Provider::CopyItem(Path = '{0}', CopyPath = '{1}', Recurse = {2})",
             path, copyPath, recurse));
         
-		hid_t plist = H5Pcreate(H5P_OBJECT_COPY), oid = -1;
+		hid_t ocpypl= H5Pcreate(H5P_OBJECT_COPY), lcpl = H5Pcreate(H5P_LINK_CREATE), oid = -1;
 
 		char *path_str = NULL, *copy_path_str = NULL;
 		
 		try
 		{
+#pragma region sanity check
+
 			DriveInfo^ drive = nullptr;
             String^ h5path = nullptr;
             if (!ProviderUtils::TryGetDriveEtH5Path(path, ProviderInfo, drive, h5path)) {
@@ -50,14 +52,31 @@ namespace PSH5X
                 throw gcnew PSH5XException("Ill-formed HDF5 path name and/or unable to obtain drive name!");
             }
 
-			path_str = (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
-			copy_path_str = (char*)(Marshal::StringToHGlobalAnsi(copyH5Path)).ToPointer();
+			// Does the source object exist?
+			if (!ProviderUtils::IsResolvableH5Path(drive->FileHandle, h5path)) {
+				throw gcnew PSH5XException(String::Format("The source object '{0}' does not exist", path));
+			}
+			// Is the destination drive writable?
+			if (copyDrive->ReadOnly) {
+                throw gcnew PSH5XException("The destination drive is read-only and cannot be modified!");
+            }
+			// Can we create the destination object(s)?
+			if (!(ProviderUtils::CanCreateItemAt(copyDrive->FileHandle, copyH5Path) ||
+				(Force && ProviderUtils::CanForceCreateItemAt(copyDrive->FileHandle, copyH5Path))))	{
+				throw gcnew PSH5XException(String::Format("The destination object '{0}' cannot be created!", copyPath));
+			}
 
-			// TODO: check source and destination
+#pragma endregion
+
+			if (Force) {
+				if (H5Pset_create_intermediate_group(lcpl, 1) < 0) {
+					throw gcnew HDF5Exception("H5Pset_create_intermediate_group failed!!!");
+				}
+			}
 
 			if (!recurse) {
-				if(H5Pset_copy_object(plist, H5O_COPY_SHALLOW_HIERARCHY_FLAG) < 0) {
-					throw gcnew HDF5Exception("H5Pset_copy_object failed.");
+				if(H5Pset_copy_object(ocpypl, H5O_COPY_SHALLOW_HIERARCHY_FLAG) < 0) {
+					throw gcnew HDF5Exception("H5Pset_copy_object failed!!!");
 				}
 			}
 
@@ -68,12 +87,15 @@ namespace PSH5X
                 ignoreAttributes = dynamicParameters["IgnoreAttributes"]->IsSet;
             }
 			if (ignoreAttributes) {
-				if(H5Pset_copy_object(plist, H5O_COPY_WITHOUT_ATTR_FLAG) < 0) {
-					throw gcnew HDF5Exception("H5Pset_copy_object failed.");
+				if(H5Pset_copy_object(ocpypl, H5O_COPY_WITHOUT_ATTR_FLAG) < 0) {
+					throw gcnew HDF5Exception("H5Pset_copy_object failed!!!");
 				}
 			}
 
-			if (H5Ocopy(drive->FileHandle, path_str, copyDrive->FileHandle, copy_path_str, plist, H5P_DEFAULT) >= 0)
+			path_str = (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
+			copy_path_str = (char*)(Marshal::StringToHGlobalAnsi(copyH5Path)).ToPointer();
+
+			if (H5Ocopy(drive->FileHandle, path_str, copyDrive->FileHandle, copy_path_str, ocpypl, lcpl) >= 0)
 			{
 				if (H5Fflush(copyDrive->FileHandle, H5F_SCOPE_LOCAL) >= 0)
 				{
@@ -96,8 +118,12 @@ namespace PSH5X
 		}
 		finally
 		{
-			if (plist >= 0) {
-                H5Pclose(plist);
+			if (ocpypl >= 0) {
+                H5Pclose(ocpypl);
+            }
+
+			if (lcpl >= 0) {
+                H5Pclose(lcpl);
             }
 
 			if (path_str != NULL) {
@@ -553,6 +579,10 @@ namespace PSH5X
         return result;
     }
 
+
+	// TODO: RemoveItem, at the moment, is an unlink. Add an option that let's one remove ALL
+	//       links to a given object.
+
     void Provider::RemoveItem(String^ path, bool recurse)
     {
         WriteVerbose(String::Format(
@@ -564,9 +594,7 @@ namespace PSH5X
 
         try
         {
-
-            if (recurse)
-            {
+            if (recurse) {
                 WriteWarning("The '-Recurse' option has no effect at the moment.");
             }
 
