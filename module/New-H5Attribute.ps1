@@ -7,24 +7,30 @@ Function New-H5Attribute
     .DESCRIPTION
       The New-H5Attribute function creates a new HDF5 attribute
       of an HDF5 object (group, dataset, linked datatype).
+      If only a path, name and value are specified, the function attempts
+      to create a variable-length string, scalar HDF5 attribute.
+
       Unless the current location is on the targeted H5Drive,
       the path(s) must be drive-qualified.
    .PARAMETER Path
      The path to the HDF5 object (group, dataset, linked datatype) to decorate.
    .PARAMETER Name
      The name of the HDF5 attribute
+   .PARAMETER Value 
+     The HDF5 attribute value
+   .PARAMETER Simple 
+     Create an HDF5 attribute with a simple dataspace.
+   .PARAMETER Nulll
+     Create an HDF5 attribute with a null dataspace (empty set).
    .PARAMETER Type
      The element type of the HDF5 attribute. The type can be specified as
      1) A pre-defined HDF5 datatype (string)
      2) An HDF5 datatype definition (hashtable)
      3) The HDF5 path name of a linked HDF5 datatype
-   .PARAMETER Simple 
-     Create an HDF5 attribute with a simple dataspace.
-   .PARAMETER Nulll
-     Create an HDF5 attribute with a null dataspace (empty set).
-   .PARAMETER Value 
-     The HDF5 attribute value
    .EXAMPLE
+     New-H5Attribute h5:\groupA foo bar
+
+     New-H5Attribute h5:\groupA intAttr 4711 -Type int
    .LINK
      New-ItemProperty
    .NOTES
@@ -49,35 +55,40 @@ Function New-H5Attribute
         $Name,
         [Parameter(Mandatory=$true,
                    Position=2,
-                   HelpMessage='The element type of the new HDF5 attribute')]
-        [ValidateNotNull()]
-        [object]
-        $Type,
-        [Parameter(Mandatory=$true,
-                   Position=3,
                    ParameterSetName='Simple',
                    HelpMessage='Dimensions of the simple dataspace')]
         [ValidateCount(1,32)]
         [long[]]
         $Simple,
         [Parameter(Mandatory=$true,
-                   Position=3,
+                   Position=2,
                    ParameterSetName='Null',
                    HelpMessage='Null dataspace?')]
         [switch]
         $Nulll,
         [Parameter(Mandatory=$false,
-                   Position=3,
+                   Position=2,
                    ParameterSetName='Scalar',
                    HelpMessage='Attribute value')]
         [ValidateNotNull()]
         [object]
-        $Value
+        $Value,
+        [Parameter(Mandatory=$false,
+                   Position=3,
+                   HelpMessage='The element type of the new HDF5 attribute')]
+        [ValidateNotNull()]
+        [object]
+        $Type=([string] 'string')
     )
 
     if (!(Test-Path $Path))
     {
         Write-Error "`nThe path name '$Path' is invalid."
+        return
+    }
+    if ((Get-Item $Path).AttributeNames -Contains $Name)
+    {
+        Write-Error "`nThe object '$Path' already has a '$Name' attribute."
         return
     }
 
@@ -112,24 +123,25 @@ Function New-H5Attribute
             Write-Output(
                 New-ItemProperty $Path -Name $Name -ElementType $Type -Null)
         }
-        elseif ($Scalar)
+        elseif ($Simple) # simple attribute
+        {
+            Write-Output(
+                New-ItemProperty $Path -Name $Name -ElementType $Type `
+                                 -Simple $Simple)
+        }
+        else
         {
             if ($Value) {
-                Write-Output(
-                    New-ItemProperty $Path -Name $Name -ElementType $Type)
+                $dummy = New-ItemProperty $Path -Name $Name -ElementType $Type
                 # HACK: Do this directly in New-ItemProperty!
                 Set-ItemProperty -Path $Path -Name $Name -Value $Value
+                Write-Output(
+                    Get-ItemProperty $Path -Name $Name)
             }
             else {
                 Write-Output(
                     New-ItemProperty $Path -Name $Name -ElementType $Type)
             }
-        }
-        else # simple attribute
-        {
-            Write-Output(
-                New-ItemProperty $Path -Name $Name -ElementType $Type `
-                                 -Simple $Simple)
         }
     }
 }

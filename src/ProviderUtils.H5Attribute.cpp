@@ -404,7 +404,6 @@ namespace PSH5X
                         {
                             ht->Add("IsVariableLength", true);
 
-                            Console::WriteLine(npoints);
                             vrdata = new char* [npoints];
 
                             mtype = H5Tcopy(H5T_C_S1);
@@ -550,6 +549,321 @@ namespace PSH5X
         return ht;
     }
 
+	void ProviderUtils::SetScalarH5AttributeValue(hid_t aid, Object^ value)
+    {
+        hid_t fspace = -1, ftype = -1, ntype = -1, mtype = -1;
+
+        htri_t is_vlen = -1;
+
+        char* wdata[1];
+		wdata[0] = NULL;
+        char* vwdata[1];
+		vwdata[0] = NULL;
+
+		try
+		{
+
+#pragma region sanity check
+
+			fspace = H5Aget_space(aid);
+			if (fspace < 0) {
+				throw gcnew HDF5Exception("H5Aget_space failed!");
+			}
+
+			H5S_class_t stype = H5Sget_simple_extent_type(fspace);
+			if (stype != H5S_SCALAR) {
+				throw gcnew PSH5XException("Scalar HDF5 attributes only!");
+			}
+			
+			ftype = H5Aget_type(aid);
+            if (ftype < 0) {
+                throw gcnew HDF5Exception("H5Aget_type failed!");
+            }
+
+            H5T_class_t cls = H5Tget_class(ftype);
+            if (cls != H5T_INTEGER &&
+                cls != H5T_FLOAT   &&
+                cls != H5T_STRING) {
+                    throw gcnew PSH5XException("Attribute type unsupported (currently)!");
+            }
+
+#pragma endregion
+    
+			size_t size = H5Tget_size(ftype);
+			ntype = H5Tget_native_type(ftype, H5T_DIR_ASCEND);
+			
+            char achar;
+            double adouble;
+            float afloat;
+			int aint;
+            long long allong;
+            short ashort;
+            String^ astring = nullptr;
+			unsigned char auchar;
+            unsigned short aushort;
+            unsigned int auint;
+            unsigned long long aullong;
+            
+            H5T_sign_t sign = H5T_SGN_NONE;
+
+            switch (H5Tget_class(ftype))
+            {
+            case H5T_INTEGER:
+
+#pragma region HDF5 INTEGER
+
+                sign = H5Tget_sign(ftype);
+                if (sign == H5T_SGN_2)
+                {
+#pragma region signed
+                    if (size == 1)
+                    {
+                        if (ProviderUtils::TryGetValue(value, achar))
+                        {
+                            if (H5Awrite(aid, ntype, &achar) < 0) {
+                                throw gcnew HDF5Exception("H5Awrite failed!");
+                            }
+                        }
+                        else {
+                            throw gcnew PSH5XException("Value size or type mismatch!");
+                        }
+                    }
+                    else if (size == 2)
+                    {
+                        if (ProviderUtils::TryGetValue(value, ashort))
+                        {
+                            if (H5Awrite(aid, ntype, &ashort) < 0) {
+                                throw gcnew HDF5Exception("H5Awrite failed!");
+                            }
+                        }
+                        else {
+                            throw gcnew PSH5XException("Value size or type mismatch!");
+                        }
+                    }
+                    else if (size == 4)
+                    {
+                        if (ProviderUtils::TryGetValue(value, aint))
+                        {
+                            if (H5Awrite(aid, ntype, &aint) < 0) {
+                                throw gcnew HDF5Exception("H5Awrite failed!");
+                            }
+                        }
+                        else {
+                            throw gcnew PSH5XException("Value size or type mismatch!");
+                        }
+                    }
+                    else if (size == 8)
+                    {
+                        if (ProviderUtils::TryGetValue(value, allong))
+                        {
+                            if (H5Awrite(aid, ntype, &allong) < 0) {
+                                throw gcnew HDF5Exception("H5Awrite failed!");
+                            }
+                        }
+                        else {
+                            throw gcnew PSH5XException("Value size or type mismatch!");
+                        }
+                    }
+                    else {
+                        throw gcnew PSH5XException("Unsupported INTEGER type!");
+                    }
+#pragma endregion
+                }
+                else if (sign == H5T_SGN_NONE)
+                {
+#pragma region unsigned
+                    if (size == 1)
+                    {
+                        if (ProviderUtils::TryGetValue(value, auchar))
+                        {
+                            if (H5Awrite(aid, ntype, &auchar) < 0) {
+                                throw gcnew HDF5Exception("H5Awrite failed!");
+                            }
+                        }
+                        else {
+                            throw gcnew PSH5XException("Value size or type mismatch!");
+                        }
+                    }
+                    else if (size == 2)
+                    {
+                        if (ProviderUtils::TryGetValue(value, aushort))
+                        {
+                            if (H5Awrite(aid, ntype, &aushort) < 0) {
+                                throw gcnew HDF5Exception("H5Awrite failed!");
+                            }
+                        }
+                        else {
+                            throw gcnew PSH5XException("Value size or type mismatch!");
+                        }
+                    }
+                    else if (size == 4)
+                    {
+                        if (ProviderUtils::TryGetValue(value, auint))
+                        {
+                            if (H5Awrite(aid, ntype, &auint) < 0) {
+                                throw gcnew HDF5Exception("H5Awrite failed!");
+                            }
+                        }
+                        else {
+                            throw gcnew PSH5XException("Value size or type mismatch!");
+                        }
+                    }
+                    else if (size == 8)
+                    {
+                        if (ProviderUtils::TryGetValue(value, aullong))
+                        {
+                            if (H5Awrite(aid, ntype, &aullong) < 0) {
+                                throw gcnew HDF5Exception("H5Awrite failed!");
+                            }
+                        }
+                        else {
+                            throw gcnew PSH5XException("Value size or type mismatch!");
+                        }
+                    }
+                    else {
+                        throw gcnew PSH5XException("Unsupprted INTEGER type!");
+                    }
+#pragma endregion
+                }
+                else {
+                    throw gcnew PSH5XException("Unknown sign convention!");
+                }
+
+#pragma endregion
+
+                break;
+
+            case H5T_FLOAT:
+
+#pragma region HDF5 FLOAT
+
+                if (size == 4)
+                {
+                    if (ProviderUtils::TryGetValue(value, afloat))
+                    {
+                        if (H5Awrite(aid, ntype, &afloat) < 0) {
+                            throw gcnew Exception("H5Awrite failed!");
+                        }
+                    }
+                    else {
+                        throw gcnew PSH5XException("Value size or type mismatch!");
+                    }
+                }
+                else if (size == 8)
+                {
+                    if (ProviderUtils::TryGetValue(value, adouble))
+                    {
+                        if (H5Awrite(aid, ntype, &adouble) < 0) {
+                            throw gcnew Exception("H5Awrite failed!");
+                        }
+                    }
+                    else {
+                        throw gcnew PSH5XException("Value size or type mismatch!");
+                    }
+                }
+                else {
+                    throw gcnew PSH5XException("Unsupprted FLOAT type!!!");
+                }
+
+#pragma endregion
+
+                break;
+
+            case H5T_STRING:
+
+#pragma region HDF5 string
+
+                is_vlen = H5Tis_variable_str(ftype);
+
+                if (is_vlen > 0)
+                {
+                    if (ProviderUtils::TryGetValue(value, astring))
+                    {
+                        vwdata[0] = (char*) Marshal::StringToHGlobalAnsi(astring).ToPointer();
+                        
+                        mtype = H5Tcopy(H5T_C_S1);
+                        if (H5Tset_size(mtype, H5T_VARIABLE) < 0) {
+                            throw gcnew HDF5Exception("H5Tset_size failed!");
+                        }
+
+                        if (H5Awrite(aid, mtype, vwdata) < 0) {
+                            throw gcnew HDF5Exception("H5Awrite failed!");
+                        }
+                    }
+                    else {
+                        throw gcnew PSH5XException("Value type mismatch!");
+                    }
+                }
+                else if (is_vlen == 0)
+                {
+                    wdata[0] = new char [size+1];
+
+                    if (ProviderUtils::TryGetValue(value, astring))
+					{
+						if (astring->Length > size) {
+							throw gcnew PSH5XException("String too long!");
+						}
+
+						char* buf = (char*) Marshal::StringToHGlobalAnsi(astring).ToPointer();
+						memcpy((void*) wdata[0], (void*) buf, size);
+						Marshal::FreeHGlobal(IntPtr(buf));
+
+						mtype = H5Tcopy(H5T_C_S1);
+						if (H5Tset_size(mtype, size+1) < 0) {
+							throw gcnew HDF5Exception("H5Tset_size failed!!!");
+						}
+
+						if (H5Awrite(aid, mtype, wdata) < 0) {
+							throw gcnew HDF5Exception("H5Awrite failed!");
+						}
+					}
+                    else {
+                        throw gcnew PSH5XException("Value size or type mismatch!");
+                    }
+                }
+                else {
+                    throw gcnew PSH5XException("Unknown STRING type found!!!");
+                }
+
+#pragma endregion
+
+                break;
+
+            default:
+
+                break;
+            }
+        }
+        finally
+        {
+			if (vwdata[0] != NULL) {
+				Marshal::FreeHGlobal(IntPtr(vwdata[0]));
+			}
+
+            if (wdata[0] != NULL) {
+                delete [] wdata;
+            }
+
+            if (mtype >= 0) {
+                H5Tclose(mtype);
+            }
+
+            if (ntype >= 0) {
+                H5Tclose(ntype);
+            }
+
+            if (ftype >= 0) {
+                H5Tclose(ftype);
+            }
+
+            if (fspace >= 0) {
+                H5Sclose(fspace);
+            }
+        }
+
+        return;
+    }
+
     void ProviderUtils::SetH5AttributeValue(hid_t aid, Object^ value)
     {
         hid_t fspace = -1, ftype = -1, ntype = -1, mtype = -1;
@@ -576,12 +890,10 @@ namespace PSH5X
                 return;
             }
 
-            if (stype == H5S_SIMPLE)
-            {
+            if (stype == H5S_SIMPLE) {
                 npoints = H5Sget_simple_extent_npoints(fspace);       
             }
-            else if (stype == H5S_SCALAR)
-            {
+            else if (stype == H5S_SCALAR) {
                 npoints = 1;
             }
             else {
@@ -600,13 +912,8 @@ namespace PSH5X
                     throw gcnew PSH5XException("Attribute type unsupported (currently)!");
             }
 
-            if (cls == H5T_BITFIELD) {
-                ntype = H5Tget_native_type(ftype, H5T_DIR_DESCEND);
-            }
-            else {
-                ntype = H5Tget_native_type(ftype, H5T_DIR_ASCEND);
-            }
-            size_t size = H5Tget_size(ntype);
+			ntype = H5Tget_native_type(ftype, H5T_DIR_ASCEND);
+			size_t size = H5Tget_size(ntype);
 
             array<char>^ achar = nullptr;
             pin_ptr<char> achar_ptr = nullptr;
@@ -833,14 +1140,14 @@ namespace PSH5X
 
                 if (is_vlen > 0)
                 {
-                    vwdata = new char* [npoints];
+					vwdata = new char* [npoints];
 
                     astring = gcnew array<String^>(npoints);
-
+					
                     if (ProviderUtils::TryGetValue(value, astring))
                     {
                         for (i = 0; i < npoints; ++i)
-                        {
+						{
                             vwdata[i] = (char*) Marshal::StringToHGlobalAnsi(astring[i]).ToPointer();
                         }
 

@@ -197,6 +197,8 @@ namespace PSH5X
 
         static System::Collections::Hashtable^ H5Attribute(hid_t attr_id, System::String^ attributeName);
 
+		static void SetScalarH5AttributeValue(hid_t attr_id, System::Object^ value);
+
         static void SetH5AttributeValue(hid_t attr_id, System::Object^ value);
 
 #pragma endregion
@@ -205,9 +207,25 @@ namespace PSH5X
 
         static bool ResolveItemType(System::String^ str, System::String^% itemType);
 
+		static bool TryGetValue(System::Object^ obj, char& i);
+
+		static bool TryGetValue(System::Object^ obj, unsigned char& i);
+
+		static bool TryGetValue(System::Object^ obj, short& i);
+
+		static bool TryGetValue(System::Object^ obj, unsigned short& i);
+
         static bool TryGetValue(System::Object^ obj, int& i);
 
+		static bool TryGetValue(System::Object^ obj, unsigned int& i);
+
+		static bool TryGetValue(System::Object^ obj, long long& i);
+
         static bool TryGetValue(System::Object^ obj, size_t& size);
+
+		static bool TryGetValue(System::Object^ obj, float& i);
+
+		static bool TryGetValue(System::Object^ obj, double& i);
 
         static bool TryGetValue(System::Object^ obj, System::String^% str);
 

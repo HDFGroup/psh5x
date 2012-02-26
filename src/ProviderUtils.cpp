@@ -724,13 +724,125 @@ namespace PSH5X
 
 #pragma region TryGetValue
 
-    bool ProviderUtils::TryGetValue(Object^ obj, int& i)
+	bool ProviderUtils::TryGetValue(Object^ obj, char& i)
     {
         bool result = false;
 
         try
         {
-            i = Convert::ToInt32(obj);
+            i = Convert::ToChar(obj);
+            result = true;
+        }
+        catch (...) {}
+
+        return result;
+    }
+
+	bool ProviderUtils::TryGetValue(Object^ obj, unsigned char& i)
+    {
+        bool result = false;
+
+        try
+        {
+            i = Convert::ToByte(obj);
+            result = true;
+        }
+        catch (...) {}
+
+        return result;
+    }
+
+	bool ProviderUtils::TryGetValue(Object^ obj, short& i)
+    {
+        bool result = false;
+
+        try
+        {
+            i = Convert::ToInt16(obj);
+            result = true;
+        }
+        catch (...) {}
+
+        return result;
+    }
+
+	bool ProviderUtils::TryGetValue(Object^ obj, unsigned short& i)
+    {
+        bool result = false;
+
+        try
+        {
+            i = Convert::ToUInt16(obj);
+            result = true;
+        }
+        catch (...) {}
+
+        return result;
+    }
+
+    bool ProviderUtils::TryGetValue(Object^ obj, int& i)
+    {
+        bool result = false;
+
+        try
+		{
+			i = Convert::ToInt32(obj);
+			result = true;
+		}
+        catch (...) {}
+
+        return result;
+    }
+
+	bool ProviderUtils::TryGetValue(Object^ obj, unsigned int& i)
+    {
+        bool result = false;
+
+        try
+        {
+            i = Convert::ToUInt32(obj);
+            result = true;
+        }
+        catch (...) {}
+
+        return result;
+    }
+
+	bool ProviderUtils::TryGetValue(Object^ obj, long long& i)
+    {
+        bool result = false;
+
+        try
+        {
+            i = Convert::ToInt64(obj);
+            result = true;
+        }
+        catch (...) {}
+
+        return result;
+    }
+
+	bool ProviderUtils::TryGetValue(Object^ obj, float& i)
+    {
+        bool result = false;
+
+        try
+        {
+            i = Convert::ToSingle(obj);
+            result = true;
+        }
+        catch (...) {}
+
+        return result;
+    }
+
+	bool ProviderUtils::TryGetValue(Object^ obj, double& i)
+    {
+        bool result = false;
+
+        try
+        {
+            i = Convert::ToDouble(obj);
             result = true;
         }
         catch (...) {}
