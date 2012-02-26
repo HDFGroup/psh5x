@@ -1579,29 +1579,73 @@ namespace PSH5X
         }
         else if (t->StartsWith("S"))
         {
+			bool isString = false;
             if (t == "STRING") // variable-length C-string
             {
                 result = H5Tcreate(H5T_STRING, H5T_VARIABLE);
                 if (result < 0) {
                     throw gcnew HDF5Exception("H5Tcreate failed!");
                 }
+				isString = true;
+            }
+			else if (t->StartsWith("STRING"))
+			{
+				try
+				{
+					size_t size = safe_cast<size_t>(Convert::ToUInt32(t->Substring(6)));
+					result = H5Tcreate(H5T_STRING, size);
+					if (result < 0) {
+						throw gcnew HDF5Exception("H5Tcreate failed!");
+					}
+					isString = true;
+					if (H5Tset_strpad(result, H5T_STR_NULLTERM) < 0) {
+						throw gcnew HDF5Exception("H5Tset_strpad failed!");
+					}
+				}
+				catch (...) {}
+			}
+
+			if (isString)
+			{
 				if (H5Tset_cset(result, H5T_CSET_ASCII) < 0) {
 					throw gcnew HDF5Exception("H5Tset_cset failed!");
 				}
-            }
+			}
         }
 		else if (t->StartsWith("U"))
         {
+			bool isString = false;
             if (t == "USTRING") // variable-length UTF-8 string
             {
                 result = H5Tcreate(H5T_STRING, H5T_VARIABLE);
                 if (result < 0) {
                     throw gcnew HDF5Exception("H5Tcreate failed!");
                 }
+				isString = true;
+            }
+			else if (t->StartsWith("USTRING"))
+			{
+				try
+				{
+					size_t size = safe_cast<size_t>(Convert::ToUInt32(t->Substring(7)));
+					result = H5Tcreate(H5T_STRING, size);
+					if (result < 0) {
+						throw gcnew HDF5Exception("H5Tcreate failed!");
+					}
+					isString = true;
+					if (H5Tset_strpad(result, H5T_STR_NULLTERM) < 0) {
+						throw gcnew HDF5Exception("H5Tset_strpad failed!");
+					}
+				}
+				catch (...) {}
+			}
+
+			if (isString)
+			{
 				if (H5Tset_cset(result, H5T_CSET_UTF8) < 0) {
 					throw gcnew HDF5Exception("H5Tset_cset failed!");
 				}
-            }
+			}
         }
 
         if (result < 0) {

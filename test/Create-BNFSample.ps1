@@ -7,9 +7,7 @@ $drive = New-H5Drive sample $ScriptDir\sample.h5 -RW
 
 cd sample:\
 
-$t = @{Class = 'String'; Encoding = 'Ascii'; Length = 17; StrPad = 'Nullterm'}
-
-$attr = New-H5Attribute . attr1 'string attribute' -Type $t
+$attr = New-H5Attribute . attr1 'string attribute' string17
 
 $dset = New-H5Dataset dset1 H5T_STD_I32BE 10,10
 
