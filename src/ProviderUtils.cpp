@@ -822,6 +822,20 @@ namespace PSH5X
         return result;
     }
 
+	bool ProviderUtils::TryGetValue(Object^ obj, unsigned long long& i)
+    {
+        bool result = false;
+
+        try
+        {
+            i = Convert::ToUInt64(obj);
+            result = true;
+        }
+        catch (...) {}
+
+        return result;
+    }
+
 	bool ProviderUtils::TryGetValue(Object^ obj, float& i)
     {
         bool result = false;
@@ -844,30 +858,6 @@ namespace PSH5X
         {
             i = Convert::ToDouble(obj);
             result = true;
-        }
-        catch (...) {}
-
-        return result;
-    }
-
-    bool ProviderUtils::TryGetValue(Object^ obj, size_t& size)
-    {
-        bool result = false;
-
-        try
-        {
-            if (IntPtr::Size == 4)
-            {
-                unsigned tmp = Convert::ToUInt32(obj);
-                size = safe_cast<size_t>(tmp);
-                result = true;
-            }
-            else
-            {
-                unsigned long long tmp = Convert::ToUInt64(obj);
-                size = safe_cast<size_t>(tmp);
-                result = true;
-            }
         }
         catch (...) {}
 

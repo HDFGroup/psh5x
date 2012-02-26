@@ -221,7 +221,7 @@ namespace PSH5X
 
 		static bool TryGetValue(System::Object^ obj, long long& i);
 
-        static bool TryGetValue(System::Object^ obj, size_t& size);
+		static bool TryGetValue(System::Object^ obj, unsigned long long& i);
 
 		static bool TryGetValue(System::Object^ obj, float& i);
 

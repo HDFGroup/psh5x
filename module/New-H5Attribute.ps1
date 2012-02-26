@@ -86,7 +86,7 @@ Function New-H5Attribute
         Write-Error "`nThe path name '$Path' is invalid."
         return
     }
-    if ((Get-Item $Path).AttributeNames -Contains $Name)
+    if (Test-H5Attribute $Path $Name)
     {
         Write-Error "`nThe object '$Path' already has a '$Name' attribute."
         return
