@@ -730,7 +730,7 @@ namespace PSH5X
 
         try
         {
-            i = Convert::ToChar(obj);
+            i = Convert::ToSByte(obj);
             result = true;
         }
         catch (...) {}
