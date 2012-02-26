@@ -555,8 +555,7 @@ namespace PSH5X
 
         htri_t is_vlen = -1;
 
-        char* wdata[1];
-		wdata[0] = NULL;
+        char* wdata = NULL;
         char* vwdata[1];
 		vwdata[0] = NULL;
 
@@ -796,23 +795,17 @@ namespace PSH5X
                 }
                 else if (is_vlen == 0)
                 {
-                    wdata[0] = new char [size+1];
-
                     if (ProviderUtils::TryGetValue(value, astring))
 					{
-						if (astring->Length > size) {
+						if (astring->Length > size-1) {
 							throw gcnew PSH5XException("String too long!");
 						}
 
-						char* buf = (char*) Marshal::StringToHGlobalAnsi(astring).ToPointer();
-						memcpy((void*) wdata[0], (void*) buf, size);
-						Marshal::FreeHGlobal(IntPtr(buf));
-
+						wdata = (char*) Marshal::StringToHGlobalAnsi(astring).ToPointer();
 						mtype = H5Tcopy(H5T_C_S1);
-						if (H5Tset_size(mtype, size+1) < 0) {
+						if (H5Tset_size(mtype, size) < 0) {
 							throw gcnew HDF5Exception("H5Tset_size failed!!!");
 						}
-
 						if (H5Awrite(aid, mtype, wdata) < 0) {
 							throw gcnew HDF5Exception("H5Awrite failed!");
 						}
@@ -840,8 +833,8 @@ namespace PSH5X
 				Marshal::FreeHGlobal(IntPtr(vwdata[0]));
 			}
 
-            if (wdata[0] != NULL) {
-                delete [] wdata;
+            if (wdata != NULL) {
+                Marshal::FreeHGlobal(IntPtr(wdata));
             }
 
             if (mtype >= 0) {

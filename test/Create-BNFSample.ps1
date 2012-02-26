@@ -1,48 +1,60 @@
 
-$t = @{
-  Class    = 'String';
-  CharSet  = 'Ascii';
-  Length   = 17;
-  StrPad   = 'Nullterm'
+$ScriptDir = Split-Path $MyInvocation.MyCommand.Path
+
+$file = New-H5File $ScriptDir\sample.h5
+
+$drive = New-H5Drive sample $ScriptDir\sample.h5 -RW
+
+cd sample:\
+
+$t = @{Class = 'String'; Encoding = 'Ascii'; Length = 17; StrPad = 'Nullterm'}
+
+$attr = New-H5Attribute . attr1 'string attribute' -Type $t
+
+$dset = New-H5Dataset dset1 H5T_STD_I32BE 10,10
+
+$t = @{ Class = 'Compound'; Size = 16;
+    Members = `
+        @{
+            a = @(0, 'H5T_STD_I32BE') ;
+            b = @(4, 'H5T_IEEE_F32BE') ;
+            c = @(8, 'H5T_IEEE_F64BE') ;
+        }
 }
 
-$ret = New-ItemProperty -Path h5tmp:\ -Name attr1 -ElementType $t
+$dset = New-H5Dataset dset2 $t 5 
 
-$ret = New-Item -Path h5tmp:\dset1 -ItemType Dataset -ElementType H5T_STD_I32BE -Dimensions 10,10
+$group = New-H5Group group1
 
-$t = @{
-  Class   = 'Compound';
-  Size    = 16;
-  Members = @{
-    a = @{Class = 'Integer'; Type = 'H5T_STD_I32BE' ; MemberOffset = 0 };
-    b = @{Class = 'Float'  ; Type = 'H5T_IEEE_F32BE'; MemberOffset = 4 };
-    # for known types we don't have to specify the type class
-    c = @{Type = 'H5T_IEEE_F64BE'; MemberOffset = 8 }
-  }
+$t = @{ Class = 'Compound'; Size = 136;
+    Members =
+        @{
+            a = @(0, @{Class = 'Array'; Base = 'H5T_STD_I32BE'; Dims = @(4)}) ;
+            b = @(16,@{Class = 'Array'; Base = 'H5T_IEEE_F32BE';Dims = @(5,6)})
+        }
 }
 
-$ret = New-Item -Path h5tmp:\dset2 -ItemType Dataset -ElementType $t -Dimensions 5 
+$dtype = New-H5LinkedDatatype type1 $t
 
-$ret = New-Item -Path h5tmp:\group1 -ItemType Group
+cd group1
 
-$t = @{
-  Class   = 'Compound';
-  Size    = 136;
-  Members = @{
-    a = @{Class = 'Array'; Type = 'H5T_STD_I32BE' ; Dims = @(4)  ; MemberOffset = 0 }
-    b = @{Class = 'Array'; Type = 'H5T_IEEE_F32BE'; Dims = @(5,6); MemberOffset = 16 }
-  }
-}
+$dset = New-H5Dataset dset3 /type1 5 
 
-$ret = New-Item -Path h5tmp:\type1 -ItemType Datatype -Definition $t
+$t = @{Class = 'Vlen'; Base = 'H5T_STD_I32LE'}
 
-$ret = New-Item -Path h5tmp:\group1\dset3 -ItemType Dataset -ElementType /type1 -Dimensions 5 
+cd ..
 
-$t = @{Class = 'Vlen'; Type = 'H5T_STD_I32LE'}
+$dset = New-H5Dataset dset3 $t 4 
 
-$ret = New-Item -Path h5tmp:\dset3 -ItemType Dataset -ElementType $t -Dimensions 4 
+$hlink = New-H5Hardlink group2 /group1
 
-$ret = New-Item -Path h5tmp:\group2 -ItemType HardLink -Value /group1
+$slink = New-H5Softlink slink1 somevalue
 
-$ret = New-Item -Path h5tmp:\slink1 -ItemType SoftLink -Value somevalue
+$logo = New-H5Image hdf_logo $ScriptDir\hdf_logo.jpg
 
+e:
+cd $ScriptDir
+
+Remove-H5Drive sample
+
+& 'C:\Program Files\TheHDFGroup\HDFView2.8\HDFView.exe' $ScriptDir\sample.h5
