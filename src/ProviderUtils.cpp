@@ -386,203 +386,188 @@ namespace PSH5X
 	}
 
     bool ProviderUtils::CanCreateItemAt(hid_t loc, String^ h5path)
-    {
-        char *name = NULL, *path = NULL;
+	{
+		char *name_str = NULL, *new_name_str = NULL, *path_str = NULL;
 
-        if (IsValidH5Path(loc, h5path)) { return false; }
+		if (IsValidH5Path(loc, h5path)) { return false; }
 
-        array<String^>^ linkNames = GetLinkNames(h5path);
+		array<String^>^ linkNames = GetLinkNames(h5path);
 
-        bool result = true;
+		bool result = false;
 
-        hid_t group = -1, obj = -1;
+		hid_t group = -1, obj = -1;
 
-        String^ currentPath = ".";
+		String^ currentPath = ".";
 
-        int count = 0;
+		try
+		{
+			for (int i = 0; i < linkNames->Length; ++i)
+			{
+				path_str = (char*)(Marshal::StringToHGlobalAnsi(currentPath)).ToPointer();
+				
+				group = H5Gopen2(loc, path_str, H5P_DEFAULT);
+				if (group >= 0)
+				{
+					name_str = (char*)(Marshal::StringToHGlobalAnsi(linkNames[i])).ToPointer();
+					
+					if (H5Lexists(group, name_str, H5P_DEFAULT) > 0)
+					{
+						if (H5Oexists_by_name(group, name_str, H5P_DEFAULT) > 0) {
+							if (i == linkNames->Length-2) // we have to deal with the corner case linkNames->Length = 1
+							{
+								obj = H5Oopen(group, name_str, H5P_DEFAULT);
+								if (obj < 0) {
+									throw gcnew HDF5Exception("H5Oopen failed!!!");
+								}
 
-        for (int i = 0; i < linkNames->Length-1; ++i)
-        {
-            path = (char*)(Marshal::StringToHGlobalAnsi(currentPath)).ToPointer();
-            name = (char*)(Marshal::StringToHGlobalAnsi(linkNames[i])).ToPointer();
+								new_name_str = (char*)(Marshal::StringToHGlobalAnsi(linkNames[i+1])).ToPointer(); 
+								if (H5Iget_type(obj) == H5I_GROUP && (H5Lexists(obj, name_str, H5P_DEFAULT) == 0)) {
+									result = true;
+								}
+								Marshal::FreeHGlobal(IntPtr(new_name_str));
 
-            bool doBreak = false;
+								H5Oclose(obj);
+								obj = -1;
+							}
+						}
+						else {
+							break;
+						}
+					}
+					else {
+						if (linkNames->Length == 1 && H5Lexists(group, name_str, H5P_DEFAULT) == 0) { // corner case
+							result = true;
+						}
+						else {
+							break;
+						}
+					}
 
-            group = H5Gopen2(loc, path, H5P_DEFAULT);
-            if (group >= 0)
-            {
-                if (H5Lexists(group, name, H5P_DEFAULT) > 0)
-                {
-                    H5L_info_t info;
-                    if (H5Lget_info(group, name, &info, H5P_DEFAULT) >= 0)
-                    {
-                        if (info.type == H5L_TYPE_HARD)
-                        {
-                            obj = H5Oopen(group, name, H5P_DEFAULT);
-                            if (obj >= 0)
-                            {
-                                H5I_type_t t = H5Iget_type(obj);
-                                if ((t == H5I_GROUP || t == H5I_FILE)) {
-                                    currentPath += "/" + linkNames[i];
-                                }
-                                else {
-                                    result = false;
-                                    doBreak = true;
-                                }
+					Marshal::FreeHGlobal(IntPtr(name_str));
+					name_str = NULL;
+				}
+				H5Gclose(group);
+				group = -1;
 
-                                if (H5Oclose(obj) < 0) { // TODO
-                                }
-                            }
-                            else {
-                                result = false;
-                                doBreak = true;
-                            }
-                        }
-                        else // TODO: we ignore symbolic links for now
-                        {
-                            result = false;
-                            doBreak = true;
-                        }
-                    }
-                    else {
-                        result = false;
-                        doBreak = true;
-                    }
-                }
-                else {
-                    result = false;
-                    doBreak = true;
-                }
+				currentPath += "/" + linkNames[i];
 
-                if (H5Gclose(group) < 0) { // TODO
-                }
-            }
-            else {
-                result = false;
-                doBreak = true;
-            }
+				Marshal::FreeHGlobal(IntPtr(path_str));
+				path_str = NULL;
+			}
+		}
+		finally
+		{
+			if (group != -1) {
+				H5Gclose(group);
+			}
 
-            if (doBreak) {
-                break;
-            }
+			if (obj != -1) {
+				H5Oclose(obj);
+			}
 
-            if (count < linkNames->Length-2) {
-                result = false;
-            }
+			if (path_str != NULL) {
+				Marshal::FreeHGlobal(IntPtr(path_str));
+			}
 
-            Marshal::FreeHGlobal(IntPtr(path));
-            path = NULL;
-            Marshal::FreeHGlobal(IntPtr(name));
-            name = NULL;
-        }
-
-        if (path != NULL) {
-            Marshal::FreeHGlobal(IntPtr(path));
-        }
-
-        if (name != NULL) {
-            Marshal::FreeHGlobal(IntPtr(name));
-        }
-
-        return result;
-    }
+			if (name_str != NULL) {
+				Marshal::FreeHGlobal(IntPtr(name_str));
+			}
+		}
+		return result;
+	}
 
     bool ProviderUtils::CanForceCreateItemAt(hid_t loc, String^ h5path)
     {
-        char *name = NULL, *path = NULL;
+		char *name_str = NULL, *new_name_str = NULL, *path_str = NULL;
 
-        if (IsValidH5Path(loc, h5path)) { return false; }
+		if (IsValidH5Path(loc, h5path)) { return false; }
 
-        array<String^>^ linkNames = h5path->Split((gcnew array<wchar_t>{'/'}),
-            StringSplitOptions::RemoveEmptyEntries);
+		array<String^>^ linkNames = GetLinkNames(h5path);
 
-        bool result = true;
+		bool result = false;
 
-        hid_t group = -1, obj = -1;
+		hid_t group = -1, obj = -1;
 
-        String^ currentPath = ".";
+		String^ currentPath = ".";
 
-        for (int i = 0; i < linkNames->Length-1; ++i)
-        {
-            path = (char*)(Marshal::StringToHGlobalAnsi(currentPath)).ToPointer();
-            name = (char*)(Marshal::StringToHGlobalAnsi(linkNames[i])).ToPointer();
+		try
+		{
+			for (int i = 0; i < linkNames->Length; ++i)
+			{
+				path_str = (char*)(Marshal::StringToHGlobalAnsi(currentPath)).ToPointer();
+				
+				group = H5Gopen2(loc, path_str, H5P_DEFAULT);
+				if (group >= 0)
+				{
+					name_str = (char*)(Marshal::StringToHGlobalAnsi(linkNames[i])).ToPointer();
+					
+					htri_t flag = H5Lexists(group, name_str, H5P_DEFAULT);
+					if (flag < 0) {
+						throw gcnew HDF5Exception("H5Lexists failed!!!");
+					}
 
-            bool doBreak = false;
+					if (flag > 0)
+					{
+						if (H5Oexists_by_name(group, name_str, H5P_DEFAULT) > 0) {
+							if (i == linkNames->Length-2) // we have to deal with the corner case linkNames->Length = 1
+							{
+								obj = H5Oopen(group, name_str, H5P_DEFAULT);
+								if (obj < 0) {
+									throw gcnew HDF5Exception("H5Oopen failed!!!");
+								}
 
-            group = H5Gopen2(loc, path, H5P_DEFAULT);
-            if (group >= 0)
-            {
-                if (H5Lexists(group, name, H5P_DEFAULT) > 0)
-                {
-                    H5L_info_t info;
-                    if (H5Lget_info(group, name, &info, H5P_DEFAULT) >= 0)
-                    {
-                        if (info.type == H5L_TYPE_HARD)
-                        {
-                            obj = H5Oopen(group, name, H5P_DEFAULT);
-                            if (obj >= 0)
-                            {
-                                H5I_type_t t = H5Iget_type(obj);
-                                if ((t == H5I_GROUP || t == H5I_FILE)) {
-                                    currentPath += "/" + linkNames[i];
-                                }
-                                else {
-                                    result = false;
-                                    doBreak = true;
-                                }
+								new_name_str = (char*)(Marshal::StringToHGlobalAnsi(linkNames[i+1])).ToPointer(); 
+								if (H5Iget_type(obj) == H5I_GROUP && (H5Lexists(obj, name_str, H5P_DEFAULT) == 0)) {
+									result = true;
+								}
+								Marshal::FreeHGlobal(IntPtr(new_name_str));
 
-                                if (H5Oclose(obj) < 0) { // TODO
-                                }
-                            }
-                            else {
-                                result = false;
-                                doBreak = true;
-                            }
-                        }
-                        else if (info.type == H5L_TYPE_SOFT || info.type == H5L_TYPE_EXTERNAL) {
-                            result = false; 
-                            doBreak = true;
-                        }
-                        else
-                        {
-                            result = false;
-                            doBreak = true;
-                        }
-                    }
-                    else {
-                        result = false;
-                        doBreak = true;
-                    }
-                }
-                else {
-                    doBreak = true;
-                }
+								H5Oclose(obj);
+								obj = -1;
+							}
+						}
+						else {
+							break;
+						}
+					}
+					else {
+						if (flag == 0)
+						{
+							result = true;
+							break;
+						}
+					}
 
-                if (H5Gclose(group) < 0) { // TODO
-                }
+					Marshal::FreeHGlobal(IntPtr(name_str));
+					name_str = NULL;
+				}
+				H5Gclose(group);
+				group = -1;
 
-                if (doBreak) {
-                    break;
-                }
-            }
-            else {
-                result = false;
-                break;
-            }
+				currentPath += "/" + linkNames[i];
 
-            Marshal::FreeHGlobal(IntPtr(path));
-            path = NULL;
-            Marshal::FreeHGlobal(IntPtr(name));
-            name = NULL;
-        }
+				Marshal::FreeHGlobal(IntPtr(path_str));
+				path_str = NULL;
+			}
+		}
+		finally
+		{
+			if (group != -1) {
+				H5Gclose(group);
+			}
 
-        if (path != NULL) {
-            Marshal::FreeHGlobal(IntPtr(path));
-        }
+			if (obj != -1) {
+				H5Oclose(obj);
+			}
 
-        if (name != NULL) {
-            Marshal::FreeHGlobal(IntPtr(name));
-        }
+			if (path_str != NULL) {
+				Marshal::FreeHGlobal(IntPtr(path_str));
+			}
+
+			if (name_str != NULL) {
+				Marshal::FreeHGlobal(IntPtr(name_str));
+			}
+		}
 
         return result;
     }
