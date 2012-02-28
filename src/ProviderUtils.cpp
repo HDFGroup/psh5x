@@ -159,155 +159,108 @@ namespace PSH5X
         return !invalidLinkNameFound;
     }
 
-	// TODO: Check this!
-
     bool ProviderUtils::IsValidH5Path(hid_t loc, String^ h5path)
     {
-        bool result = true;
+		bool result = false;
 
-        hid_t group = -1, peek = -1;
+		char *path_str = NULL, *name_str = NULL;
 
-        char *path = NULL, *name = NULL;
+		hid_t group = -1, obj = -1;
 
-        if (!IsWellFormedH5Path(h5path)) { return false; }
+		try
+		{
+			bool isValidLocation = false;
+			switch (H5Iget_type(loc))
+			{
+			case H5I_FILE:
+				isValidLocation = true;
+				break;
+			case H5I_GROUP:
+				isValidLocation = true;
+				break;
+			default:
+				break;
+			}
+			if (!isValidLocation) {
+				throw gcnew PSH5XException("Unsuitable or invalid location handle!.");
+			}
 
-        if (IsH5RootPathName(h5path)) { return true; }
+			array<String^>^ linkNames = GetLinkNames(h5path);
 
-        // currently only file or group handles represent valid locations
+			if (linkNames->Length == 0 || (linkNames->Length == 1 && linkNames[0] == ".")) {
+				return true;
+			}
 
-        bool isValidLocation = false;
+			String^ currentPath = ".";
 
-        switch (H5Iget_type(loc))
-        {
-        case H5I_FILE:
-            isValidLocation = true;
-            break;
-        case H5I_GROUP:
-            isValidLocation = true;
-            break;
-        default:
-            break;
-        }
+			for (int i = 0; i < linkNames->Length; ++i)
+			{
+				path_str = (char*)(Marshal::StringToHGlobalAnsi(currentPath)).ToPointer();
+			
+				group = H5Gopen2(loc, path_str, H5P_DEFAULT);
+				if (group < 0) {
+					throw gcnew HDF5Exception("H5Gopen2 failed!");
+				}
+					
+				name_str = (char*)(Marshal::StringToHGlobalAnsi(linkNames[i])).ToPointer();
 
-        if (!isValidLocation) {
-            throw gcnew PSH5XException("Unsuitable or invalid location handle!.");
-        }
+				if (H5Lexists(group, name_str, H5P_DEFAULT) > 0)
+				{
+					if (i < linkNames->Length-1)
+					{
+						if (H5Oexists_by_name(group, name_str, H5P_DEFAULT) > 0)
+						{
+							obj = H5Oopen(group, name_str, H5P_DEFAULT);
+							if (obj < 0) {
+								throw gcnew HDF5Exception("H5Oopen failed!!!");
+							}
+							if (H5Iget_type(obj) != H5I_GROUP) {
+								break;
+							}
+							H5Oclose(obj);
+							obj = -1;
+						}
+						else {
+							break;
+						}
+					}
+					else {
+						result = true;
+					}
+				}
+				else {
+					break;
+				}
 
-        array<String^>^ linkNames = GetLinkNames(h5path);
+				Marshal::FreeHGlobal(IntPtr(name_str));
+				name_str = NULL;
 
-        if (linkNames->Length == 0) { return true; }
+				H5Gclose(group);
+				group = -1;
 
-        try
-        {
-            String^ currentPath = ".";
+				Marshal::FreeHGlobal(IntPtr(path_str));
+				path_str = NULL;
 
-            bool doBreak = false;
+				currentPath += "/" + linkNames[i];
+			}
+		}
+		finally
+		{
+			if (name_str != NULL) {
+				Marshal::FreeHGlobal(IntPtr(name_str));
+			}
+			if (path_str != NULL) {
+				Marshal::FreeHGlobal(IntPtr(path_str));
+			}
+			if (obj >= 0) {
+				H5Oclose(obj);
+			}
+			if (group >= 0) {
+				H5Gclose(group);
+			}
+		}
 
-            for (int i = 0; i < linkNames->Length; ++i)
-            {
-                path = (char*)(Marshal::StringToHGlobalAnsi(currentPath)).ToPointer();
-                name = (char*)(Marshal::StringToHGlobalAnsi(linkNames[i])).ToPointer();
-
-                group = H5Gopen2(loc, path, H5P_DEFAULT);
-                if (group < 0) {
-                    throw gcnew HDF5Exception("H5Gopen2 failed!");
-                }
-
-                if (H5Lexists(group, name, H5P_DEFAULT) > 0)
-                {
-                    H5L_info_t info;
-                    if (H5Lget_info(group, name, &info, H5P_DEFAULT) >= 0)
-                    {
-                        if (info.type == H5L_TYPE_HARD)
-                        {
-                            peek = H5Oopen(group, name, H5P_DEFAULT);
-                            if (peek < 0) {
-                                throw gcnew HDF5Exception("H5Oopen failed!");
-                            }
-
-
-                            H5I_type_t t = H5Iget_type(peek);
-                            if ((t == H5I_GROUP || t == H5I_FILE)) {
-                                currentPath += "/" + linkNames[i];
-                            }
-                            else if ((t == H5I_DATASET || t == H5I_DATATYPE)) {
-                                if (i == linkNames->Length-1) {
-                                    result = true;
-                                }
-                                else {
-                                    result = false;
-                                }
-                                doBreak = true;
-                            }
-                            else {
-                                result = false;
-                                doBreak = true;
-                            }
-
-                            if (H5Oclose(peek) < 0) {
-                                throw gcnew HDF5Exception("H5Oclose failed!");
-                            }
-                            peek = -1;
-                        }
-                        else if (info.type == H5L_TYPE_SOFT || info.type == H5L_TYPE_EXTERNAL) {
-                            // the first time we encounter a symlink we tell it to stop
-                            // TODO: implement proper handling
-                            if (i == linkNames->Length-1) {
-                                result = true;
-                            }
-                            else {
-                                result = false;
-                            }
-                            doBreak = true; 
-                        }
-                        else {
-                            result = false;
-                            doBreak = true;
-                        }
-                    }
-                    else {
-                        result = false;
-                        doBreak = true;
-                    }
-                }
-                else {
-                    result = false;
-                    doBreak = true;
-                }
-
-                if (H5Gclose(group) < 0) {
-                    throw gcnew HDF5Exception("H5Gclose failed!");
-                }
-                group = -1;
-
-                Marshal::FreeHGlobal(IntPtr(path));
-                path = NULL;
-                Marshal::FreeHGlobal(IntPtr(name));
-                name = NULL;
-
-                if (doBreak) {
-                    break;
-                }
-            }
-        }
-        finally
-        {
-            if (path != NULL) {
-                Marshal::FreeHGlobal(IntPtr(path));
-            }
-
-            if (name != NULL) {
-                Marshal::FreeHGlobal(IntPtr(name));
-            }
-            if (group >= 0) {
-                H5Gclose(group);
-            }
-            if (peek >= 0) {
-                H5Oclose(peek);
-            }
-        }
-
-        return result;
+		return result;
     }
 
 	bool ProviderUtils::IsResolvableH5Path(hid_t loc, String^ h5path)
