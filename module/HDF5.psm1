@@ -2,6 +2,7 @@
 $ScriptDir = Split-Path $MyInvocation.MyCommand.Path
 
 Import-Module $ScriptDir\PSH5X.dll
+Export-ModuleMember -Cmdlet * 
 
 . $ScriptDir\Aliases.ps1
 . $ScriptDir\Copy-H5Object.ps1
