@@ -66,6 +66,9 @@ namespace PSH5X
         return nullptr;
     }
 
+	// ItemExists means HDF5 path is in use
+	// Use the -Resolvable to determine if it can be reolved to and HDF5 object
+
     bool Provider::ItemExists(System::String^ path)
     {
         WriteVerbose(String::Format("HDF5Provider::ItemExists(Path = '{0}')",path));
@@ -76,8 +79,21 @@ namespace PSH5X
         if (!ProviderUtils::TryGetDriveEtH5Path(path, ProviderInfo, drive, h5path)) {
             throw gcnew PSH5XException("Ill-formed HDF5 path name and/or unable to obtain drive name!");
         }
-        
-		return ProviderUtils::IsResolvableH5Path(drive->FileHandle, h5path);
+
+		bool resolvableCheck = false;
+		RuntimeDefinedParameterDictionary^ dynamicParameters =
+			(RuntimeDefinedParameterDictionary^) DynamicParameters;
+		if (dynamicParameters != nullptr && dynamicParameters->ContainsKey("Resolvable"))
+		{
+			resolvableCheck = dynamicParameters["Resolvable"]->IsSet;
+		}
+
+		if (!resolvableCheck) {
+			return ProviderUtils::IsValidH5Path(drive->FileHandle, h5path);
+		}
+		else {
+			return ProviderUtils::IsResolvableH5Path(drive->FileHandle, h5path);
+		}
     }
 
     Object^ Provider::ItemExistsDynamicParameters(String^ path)
@@ -93,9 +109,10 @@ namespace PSH5X
         Collection<Attribute^>^ atts = gcnew Collection<Attribute^>();
         ParameterAttribute^ paramAttr = gcnew ParameterAttribute();
         paramAttr->Mandatory = false;
+        paramAttr->ValueFromPipeline = false;
         atts->Add(paramAttr);
-        dynamicParameters->Add("itemType",
-            gcnew RuntimeDefinedParameter("itemType", String::typeid, atts));
+        dynamicParameters->Add("Resolvable",
+            gcnew RuntimeDefinedParameter("Resolvable", SwitchParameter::typeid, atts));
         
         return dynamicParameters;
     }
