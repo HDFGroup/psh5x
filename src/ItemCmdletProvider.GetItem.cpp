@@ -66,12 +66,10 @@ namespace PSH5X
                     throw gcnew HDF5Exception("H5Oopen failed!!!");
                 }
 
-                if (!detailed)
-                {
+                if (!detailed) {
                     WriteItemObject(gcnew GroupInfoLite(obj_id), path, true);
                 }
-                else
-                {
+                else {
                     WriteItemObject(gcnew GroupInfo(obj_id), path, true);
                 }
 

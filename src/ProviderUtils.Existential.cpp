@@ -21,30 +21,7 @@ namespace PSH5X
 {
     bool ProviderUtils::IsH5Object(hid_t file, String^ h5path)
     {
-        bool result = false;
-
-        if (ProviderUtils::IsValidH5Path(file, h5path) &&
-            !ProviderUtils::IsH5SymLink(file, h5path))
-        {
-            char* name = (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
-            hid_t obj_id = H5Oopen(file, name, H5P_DEFAULT);
-            if (obj_id >= 0)
-            {
-                H5O_info_t info;
-                if (H5Oget_info(obj_id, &info) >= 0)
-                {
-                    result = (info.type == H5O_TYPE_DATASET ||
-                        info.type == H5O_TYPE_GROUP ||
-                        info.type == H5O_TYPE_NAMED_DATATYPE);
-                }
-
-                H5Oclose(obj_id);
-            }
-
-            Marshal::FreeHGlobal(IntPtr(name));
-        }
-
-        return result;
+		return IsResolvableH5Path(file, h5path);
     }
 
     bool ProviderUtils::IsH5Group(hid_t file, String^ h5path)
