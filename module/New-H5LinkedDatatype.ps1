@@ -71,13 +71,17 @@ Function New-H5LinkedDatatype
                 Write-Output(
                     New-Item $Path -ItemType Datatype -Definition $Definition `
                              -Force)
-                Write-Host "`nSuccess: HDF5 linked datatype '$Path' created."
+                if (Test-Path $Path) {
+                    Write-Host "`nSuccess: HDF5 linked datatype '$Path' created."
+                }
             }
             else
             {
                 Write-Output(
                     New-Item $Path -ItemType Datatype -Definition $Definition)
-                Write-Host "`nSuccess: HDF5 linked datatype '$Path' created."
+                if (Test-Path $Path) {
+                    Write-Host "`nSuccess: HDF5 linked datatype '$Path' created."
+                }
             }
         }
         catch {

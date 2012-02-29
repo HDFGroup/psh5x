@@ -53,10 +53,13 @@ Function New-H5Drive
         $Scope=2
     )
 
-    if (!(Test-H5File $File))
+    if (!(Test-H5File (Resolve-Path $File)))
     {
         Write-Error "`nFile '$File' is not an HDF5 file."
         return
+    }
+    else {
+        $File = Resolve-Path $File
     }
 
     $count = 0
@@ -81,14 +84,22 @@ Function New-H5Drive
                 Write-Output(
                     New-PSDrive -Name $Name -PSProvider HDF5 -Path $File `
                                 -Root $Root -Mode RW -Scope $Scope)
-                Write-Host "`nSuccess: WRITEABLE H5Drive '$Name' created."
+                $count = 0
+                Get-PSDrive | ?{$_.Name -eq $Name} | %{$count++}
+                if ($count -eq 1) {
+                    Write-Host "`nSuccess: WRITEABLE H5Drive '$Name' created."
+                }
             }
             else
             {
                 Write-Output(
                     New-PSDrive -Name $Name -PSProvider HDF5 -Path $File `
                                 -Root $Root -Scope $Scope)
-                Write-Host "`nSuccess: READ-ONLY H5Drive '$Name' created."
+                $count = 0
+                Get-PSDrive | ?{$_.Name -eq $Name} | %{$count++}
+                if ($count -eq 1) {
+                    Write-Host "`nSuccess: READ-ONLY H5Drive '$Name' created."
+                }
             }
         }
         catch {

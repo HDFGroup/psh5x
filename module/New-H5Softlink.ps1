@@ -45,7 +45,9 @@ Function New-H5Softlink
         {
             Write-Output(
                 New-Item -Path $Source -ItemType SoftLink -Value $Destination)
-            Write-Host "`nSuccess: HDF5 softlink '$Source' -> '$Destination' created."
+            if (Test-Path $Source) {
+                Write-Host "`nSuccess: HDF5 softlink '$Source' -> '$Destination' created."
+            }
         }
         catch {
             Write-Debug($_|Out-String)

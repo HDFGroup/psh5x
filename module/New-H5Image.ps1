@@ -116,7 +116,9 @@ Function New-H5Image
                                           -InterlaceMode $Interlace)
                 }
             }
-            Write-Host "`nSuccess: HDF5 image '$Path' created."
+            if (Test-Path $Path) {
+                Write-Host "`nSuccess: HDF5 image '$Path' created."
+            }
         }
         catch
         {

@@ -242,48 +242,33 @@ Function New-H5Dataset
         }
         elseif ($Compact)
         {
-            if ($Null)
-            {
+            if ($Force) {
+                Write-Output( `
+                    New-Item $Path -ItemType Dataset -ElementType $type `
+                             -Dimensions $Dimensions -Compact -Force)
             }
-            elseif ($Scalar)
-            {
-            }
-            else
-            {
-                if ($Force) {
-                    Write-Output( `
-                        New-Item $Path -ItemType Dataset -ElementType $type `
-                                 -Dimensions $Dimensions -Compact -Force)
-                }
-                else {
-                    Write-Output( `
-                        New-Item $Path -ItemType Dataset -ElementType $type `
-                                 -Dimensions $Dimensions -Compact)
-                }
+            else {
+                Write-Output( `
+                    New-Item $Path -ItemType Dataset -ElementType $type `
+                             -Dimensions $Dimensions -Compact)
             }
         }
         else #contiguous layout
         {
-            if ($Null)
-            {
+            if ($Force) {
+                Write-Output( `
+                    New-Item $Path -ItemType Dataset -ElementType $type `
+                             -Dimensions $Dimensions -Force)
             }
-            elseif ($Scalar)
-            {
-            }
-            else
-            {
-                if ($Force) {
-                    Write-Output( `
-                        New-Item $Path -ItemType Dataset -ElementType $type `
-                                 -Dimensions $Dimensions -Force)
-                }
-                else {
-                    Write-Output( `
-                        New-Item $Path -ItemType Dataset -ElementType $type `
-                                 -Dimensions $Dimensions)
-                }
+            else {
+                Write-Output( `
+                    New-Item $Path -ItemType Dataset -ElementType $type `
+                             -Dimensions $Dimensions)
             }
         }
-        Write-Host "`nSuccess: HDF5 dataset '$Path' created."
+
+        if (Test-Path $Path -Resolvable) {
+            Write-Host "`nSuccess: HDF5 dataset '$Path' created."
+        }
     }
 }

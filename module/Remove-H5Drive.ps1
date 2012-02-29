@@ -43,8 +43,12 @@ Function Remove-H5Drive
             {
                 try
                 {
-                    Write-Output(Remove-PSDrive -Name $Name -Scope $Scope)
-                    Write-Host "`nSuccess: H5Drive '$n' removed."
+                    Write-Output(Remove-PSDrive -Name $n -Scope $Scope)
+                    $count = 0
+                    Get-PSDrive -PSProvider HDF5 | ?{$_.Name -eq $n} | %{$count++}
+                    if ($count -eq 0) {
+                        Write-Host "`nSuccess: H5Drive '$n' removed."
+                    }
                 }
                 catch
                 {

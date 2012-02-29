@@ -71,7 +71,7 @@ Function Copy-H5Object
         Write-Error "`nThe source path name '$Source' cannot be resolved."
         return
     }
-    if ((Test-Path $Destination))
+    if (Test-Path $Destination)
     {
         Write-Error "`nThe destination path name '$Destination' is in use."
         return
@@ -79,54 +79,22 @@ Function Copy-H5Object
 
     if ($PSCmdlet.ShouldProcess($Path, 'Copy HDF5 object'))
     { 
-        if ($Force)
-        {
-            if ($IgnoreAttributes)
-            {
-                if ($Recurse) {
-                    Write-Output(Copy-Item $Source $Destination -Recurse `
-                                           -IgnoreAttributes -Force)
-                }
-                else {
-                    Write-Output(Copy-Item $Source $Destination `
-                                           -IgnoreAttributes -Force)
-                }
-            }
-            else
-            {
-                if ($Recurse) {
-                    Write-Output(Copy-Item $Source $Destination `
-                                           -Recurse -Force)
-                }
-                else {
-                    Write-Output(Copy-Item $Source $Destination -Force)
-                }
-            }
+        $param = @($Source, $Destination)
+
+        if ($Force) {
+            $param += '-Force'
         }
-        else
-        {
-            if ($IgnoreAttributes)
-            {
-                if ($Recurse) {
-                    Write-Output(Copy-Item $Source $Destination -Recurse `
-                                           -IgnoreAttributes)
-                }
-                else {
-                    Write-Output(Copy-Item $Source $Destination `
-                                           -IgnoreAttributes)
-                }
-            }
-            else
-            {
-                if ($Recurse) {
-                    Write-Output(Copy-Item $Source $Destination -Recurse)
-                }
-                else {
-                    Write-Output(Copy-Item $Source $Destination)
-                }
-            }
+        if ($IgnoreAttributes) {
+            $param += '-IgnoreAttributes'
+        }
+        if ($Recurse) {
+            $param += '-Recurse'
         }
 
-        Write-Host "`nSuccess: HDF5 object '$Source' copied to '$Destination'."
+        Write-Output(Invoke-Expression "Copy-Item $param")
+
+        if (Test-Path $Destination) {
+            Write-Host "`nSuccess: HDF5 object '$Source' copied to '$Destination'."
+        }
     }
 }

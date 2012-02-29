@@ -33,7 +33,9 @@ Function New-H5File
                 try
                 {
                     Write-Output(Format-H5File -Path $p)
-                    Write-Host "`nSuccess: HDF5 file '$p' created."
+                    if (Test-H5File $p) {
+                        Write-Host "`nSuccess: HDF5 file '$p' created."
+                    }
                 }
                 catch
                 {
