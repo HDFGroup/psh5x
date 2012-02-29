@@ -37,7 +37,7 @@ namespace PSH5X
             String::Format("HDF5Provider::NewItem(Path = '{0}', ItemTypeName = '{1}')",
             path, itemTypeName));
 
-        hid_t lcplist = -1, gid = -1, dtype = -1, fspace = -1, dset = -1, dcplist = -1, oid = -1;
+        hid_t lcplist = -1, gcplist = -1, gid = -1, dtype = -1, fspace = -1, dset = -1, dcplist = -1, oid = -1;
 
         char *name = NULL, *topath = NULL, *hard = NULL, *soft = NULL, *file = NULL, *link = NULL, *mode = NULL, *pal_name = NULL;
 
@@ -113,14 +113,36 @@ namespace PSH5X
             name = (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
 
 			if (itemTypeName->ToUpper() == "GROUP")
-            {
+            {				
+				gcplist = H5Pcreate(H5P_GROUP_CREATE);
+				unsigned int flags = 0;
+				
+				RuntimeDefinedParameterDictionary^ dynamicParameters =
+                    (RuntimeDefinedParameterDictionary^) DynamicParameters;
+
+				bool trackAttrOrder = (dynamicParameters["TrackAttributeOrder"]->IsSet);
+				bool indexAttrOrder = (dynamicParameters["IndexAttributeOrder"]->IsSet);
+				if (trackAttrOrder) { flags |= H5P_CRT_ORDER_TRACKED; }
+				if (indexAttrOrder) { flags |= H5P_CRT_ORDER_TRACKED|H5P_CRT_ORDER_INDEXED; }
+				if(H5Pset_attr_creation_order(gcplist, flags) < 0) {
+					throw gcnew HDF5Exception("H5Pset_attr_creation_order failed!!!");
+				}
+
+				bool trackLinkOrder = (dynamicParameters["TrackLinkOrder"]->IsSet);
+				bool indexLinkOrder = (dynamicParameters["IndexLinkOrder"]->IsSet);
+				flags = 0;
+				if (trackLinkOrder) { flags |= H5P_CRT_ORDER_TRACKED; }
+				if (indexLinkOrder) { flags |= H5P_CRT_ORDER_TRACKED|H5P_CRT_ORDER_INDEXED; }
+				if(H5Pset_link_creation_order(gcplist, flags) < 0) {
+					throw gcnew HDF5Exception("H5Pset_link_creation_order failed!!!");
+				}
 
 #pragma region HDF5 group
 
                 if (this->ShouldProcess(h5path,
                     String::Format("HDF5 group '{0}' does not exist, create it", linkName)))
                 {
-                    gid = H5Gcreate2(drive->FileHandle, name, lcplist, H5P_DEFAULT, H5P_DEFAULT);
+                    gid = H5Gcreate2(drive->FileHandle, name, lcplist, gcplist, H5P_DEFAULT);
                     if (gid < 0) {
                         throw gcnew Exception("H5Gcreate2 failed!");
                     }
@@ -887,6 +909,10 @@ namespace PSH5X
 
             if (gid >= 0) {
                 H5Gclose(gid);
+            }
+
+			if (gcplist >= 0) {
+                H5Pclose(gcplist);
             }
 
             if (lcplist >= 0) {

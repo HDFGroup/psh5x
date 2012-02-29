@@ -136,8 +136,63 @@ namespace PSH5X
 
             dict->Add("Definition", paramTypeDef);
         }
-        else if (itemTypeName->ToUpper() == "DIMENSIONSCALE")
+        else if (itemTypeName->ToUpper() == "GROUP")
         {
+#pragma region Group
+
+			// Track link order
+
+			ParameterAttribute^ attr1 = gcnew ParameterAttribute();
+            attr1->Mandatory = false;
+            attr1->ValueFromPipeline = false;
+
+            RuntimeDefinedParameter^ paramTrackLinkOrder = gcnew RuntimeDefinedParameter();
+            paramTrackLinkOrder->Name = "TrackLinkOrder";
+            paramTrackLinkOrder->ParameterType = SwitchParameter::typeid;
+            paramTrackLinkOrder->Attributes->Add(attr1);
+
+            dict->Add("TrackLinkOrder", paramTrackLinkOrder);
+
+			// Index link order
+
+			ParameterAttribute^ attr2 = gcnew ParameterAttribute();
+            attr2->Mandatory = false;
+            attr2->ValueFromPipeline = false;
+
+            RuntimeDefinedParameter^ paramIndexLinkOrder = gcnew RuntimeDefinedParameter();
+            paramIndexLinkOrder->Name = "IndexLinkOrder";
+            paramIndexLinkOrder->ParameterType = SwitchParameter::typeid;
+            paramIndexLinkOrder->Attributes->Add(attr2);
+
+            dict->Add("IndexLinkOrder", paramIndexLinkOrder);
+
+			// Track attribute order
+
+			ParameterAttribute^ attr3 = gcnew ParameterAttribute();
+            attr3->Mandatory = false;
+            attr3->ValueFromPipeline = false;
+
+            RuntimeDefinedParameter^ paramTrackAttrOrder = gcnew RuntimeDefinedParameter();
+            paramTrackAttrOrder->Name = "TrackAttributeOrder";
+            paramTrackAttrOrder->ParameterType = SwitchParameter::typeid;
+            paramTrackAttrOrder->Attributes->Add(attr3);
+
+            dict->Add("TrackAttributeOrder", paramTrackAttrOrder);
+
+			// Index attribute order
+
+			ParameterAttribute^ attr4 = gcnew ParameterAttribute();
+            attr4->Mandatory = false;
+            attr4->ValueFromPipeline = false;
+
+            RuntimeDefinedParameter^ paramIndexAttrOrder = gcnew RuntimeDefinedParameter();
+            paramIndexAttrOrder->Name = "IndexAttributeOrder";
+            paramIndexAttrOrder->ParameterType = SwitchParameter::typeid;
+            paramIndexAttrOrder->Attributes->Add(attr4);
+
+			dict->Add("IndexAttributeOrder", paramIndexAttrOrder);
+
+#pragma endregion
         }
         else if (itemTypeName->ToUpper() == "IMAGE")
         {

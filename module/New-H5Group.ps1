@@ -11,6 +11,14 @@ Function New-H5Group
       the path(s) must be drive-qualified.
    .PARAMETER Path
      The path of the new HDF5 group(s).
+   .PARAMETER TrackAttributeOrder
+     Track the attribute creation order.
+   .PARAMETER IndexAttributeOrder
+     Maintain an index by attribute creation order.
+   .PARAMETER TrackLinkOrder
+     Track the link creation order.
+   .PARAMETER IndexLinkOrder
+     Maintain an index by link creation order.
    .PARAMETER Force
      Force the creation of intermediates.
    .EXAMPLE
@@ -35,6 +43,22 @@ Function New-H5Group
         [string[]]
         $Path,
         [Parameter(Mandatory=$false,
+                   HelpMessage='Track attribute creation order?')]
+        [switch]
+        $TrackAttributeOrder,
+        [Parameter(Mandatory=$false,
+                   HelpMessage='Maintain an index by attribute creation order?')]
+        [switch]
+        $IndexAttributeOrder,
+        [Parameter(Mandatory=$false,
+                   HelpMessage='Track link creation order?')]
+        [switch]
+        $TrackLinkOrder,
+        [Parameter(Mandatory=$false,
+                   HelpMessage='Maintain an index by link creation order?')]
+        [switch]
+        $IndexLinkOrder,
+        [Parameter(Mandatory=$false,
                    HelpMessage='Force the creation of intermediates?')]
         [switch]
         $Force
@@ -48,14 +72,27 @@ Function New-H5Group
             { 
                 try
                 {
-                    if ($Force)
-                    {
-                        Write-Output(New-Item -Path $p -ItemType Group -Force)
-                        Write-Host "`nSuccess: HDF5 group '$p' created."
+                    $param = @('-Path', $p, '-ItemType', 'Group')
+
+                    if ($TrackAttributeOrder) {
+                        $param += '-TrackAttributeOrder'
                     }
-                    else
-                    {
-                        Write-Output(New-Item -Path $p -ItemType Group)
+                    if ($IndexAttributeOrder) {
+                        $param += '-IndexAttributeOrder'
+                    }
+                    if ($TrackLinkOrder) {
+                        $param += '-TrackLinkOrder'
+                    }
+                    if ($IndexLinkOrder) {
+                        $param += '-IndexLinkOrder'
+                    }
+                    if ($Force) {
+                        $param += '-Force'
+                    }
+
+                    Write-Output(Invoke-Expression "New-Item $param")
+
+                    if (Test-Path $p) {
                         Write-Host "`nSuccess: HDF5 group '$p' created."
                     }
                 }
