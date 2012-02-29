@@ -73,13 +73,20 @@ Function Copy-H5Object
     }
     if (Test-Path $Destination)
     {
-        Write-Error "`nThe destination path name '$Destination' is in use."
-        return
+        $trial_path = Join-Path $Destination (Get-H5Object $Source).PSChildName
+        if (Test-Path $trial_path)
+        {
+            Write-Error "`nThe destination path name '$Destination' is in use."
+            return
+        }
+        else {
+            $Destination = $trial_path
+        }
     }
 
     if ($PSCmdlet.ShouldProcess($Path, 'Copy HDF5 object'))
     { 
-        $param = @($Source, $Destination)
+        $param = @("'$Source'", "'$Destination'")
 
         if ($Force) {
             $param += '-Force'
