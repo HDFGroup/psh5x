@@ -72,7 +72,7 @@ Function New-H5Group
             { 
                 try
                 {
-                    $param = @('-Path', $p, '-ItemType', 'Group')
+                    $param = @('-Path', "'$p'", '-ItemType', 'Group')
 
                     if ($TrackAttributeOrder) {
                         $param += '-TrackAttributeOrder'
