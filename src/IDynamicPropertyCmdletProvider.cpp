@@ -15,10 +15,12 @@ extern "C" {
 
 using namespace System;
 using namespace System::Collections;
+using namespace System::Collections::Generic;
 using namespace System::Collections::ObjectModel;
 using namespace System::Management::Automation;
 using namespace System::Management::Automation::Provider;
 using namespace System::Runtime::InteropServices;
+using namespace System::Web::Script::Serialization;
 
 namespace PSH5X
 {
@@ -369,8 +371,53 @@ namespace PSH5X
 
             // mandatory parameters -ElementType
 
-            Object^ elemType = dynamicParameters["ElementType"]->Value;
+            String^ elemType = (String^) dynamicParameters["ElementType"]->Value;
 
+			if (!elemType->Trim()->StartsWith("{")) // not JSON, alias or predefined type
+				{
+					if (elemType->StartsWith("/")) {
+                        if (ProviderUtils::IsH5DatatypeObject(drive->FileHandle, elemType))
+                        {
+                            path_str = (char*)(Marshal::StringToHGlobalAnsi(elemType)).ToPointer();
+                            ftype = H5Topen2(drive->FileHandle, path_str, H5P_DEFAULT);
+                            if (ftype < 0) {
+                                throw gcnew HDF5Exception("H5Topen2 failed!!!");
+                            }
+                        }
+                        else {
+                            throw gcnew PSH5XException("The HDF5 path name specified does not refer to an datatype object.");
+                        }
+                    }
+                    else
+                    {
+                        ftype = ProviderUtils::H5Type(elemType);
+                        if (ftype < 0) {
+                            throw gcnew PSH5XException("Invalid HDF5 datatype specified!");
+                        }
+                    }
+				}
+				else
+				{
+					JavaScriptSerializer^ serializer = gcnew JavaScriptSerializer();
+					Dictionary<String^,Object^>^ type = nullptr;
+					try
+					{
+						type = safe_cast<Dictionary<String^,Object^>^>(serializer->DeserializeObject(elemType));
+						
+					}
+					catch (...)
+					{
+						throw gcnew PSH5XException("JSON format error.");
+					}
+
+					ftype = ProviderUtils::ParseH5Type(type);
+                    if (ftype < 0) {
+                        throw gcnew PSH5XException("Invalid HDF5 datatype specified!");
+                    }
+				}
+
+
+			/*
             Hashtable^ ht = nullptr;
             String^ typeOrPath = nullptr;
 
@@ -407,6 +454,7 @@ namespace PSH5X
             else {
                 throw gcnew PSH5XException("Unrecognized type: must be string or hashtable.");
             }
+			*/
 
             // optional parameters, determine shape first
 
@@ -537,7 +585,7 @@ namespace PSH5X
         RuntimeDefinedParameter^ paramElementType = gcnew RuntimeDefinedParameter();
         paramElementType->Name = "ElementType";
         // can be String or Hashtable
-        paramElementType->ParameterType = Object::typeid;
+        paramElementType->ParameterType = String::typeid;
         paramElementType->Attributes->Add(attr1);
 
         dict->Add("ElementType", paramElementType);

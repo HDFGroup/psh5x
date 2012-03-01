@@ -146,6 +146,8 @@ namespace PSH5X
 
         static System::Collections::Hashtable^ ParseH5Type(hid_t type);
 
+		static hid_t ParseH5Type(System::Collections::Generic::Dictionary<System::String^, System::Object^>^ dict);
+
         static hid_t ParseH5Type(System::Object^ obj);
 
         static hid_t H5Type(System::String^ type);
@@ -236,6 +238,9 @@ namespace PSH5X
         static bool TryGetValue(System::Object^ obj, array<System::String^>^% arr);
 		
 		static bool TryGetValue(System::Object^ obj, array<System::Object^>^% arr);
+
+		static bool TryGetValue(System::Object^ obj,
+			System::Collections::Generic::Dictionary<System::String^, System::Object^>^% dict);
 
         template<typename T>
         static bool TryGetValue(System::Object^ obj, array<T>^% arr)

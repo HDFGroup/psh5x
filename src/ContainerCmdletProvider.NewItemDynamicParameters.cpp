@@ -47,7 +47,7 @@ namespace PSH5X
             RuntimeDefinedParameter^ paramElementType = gcnew RuntimeDefinedParameter();
             paramElementType->Name = "ElementType";
             // can be String or Hashtable
-            paramElementType->ParameterType = Object::typeid;
+            paramElementType->ParameterType = String::typeid;
             paramElementType->Attributes->Add(attr1);
 
             dict->Add("ElementType", paramElementType);
@@ -130,8 +130,7 @@ namespace PSH5X
 
             RuntimeDefinedParameter^ paramTypeDef = gcnew RuntimeDefinedParameter();
             paramTypeDef->Name = "Definition";
-            // can be String or Hashtable
-            paramTypeDef->ParameterType = Object::typeid;
+            paramTypeDef->ParameterType = String::typeid;
             paramTypeDef->Attributes->Add(attr1);
 
             dict->Add("Definition", paramTypeDef);

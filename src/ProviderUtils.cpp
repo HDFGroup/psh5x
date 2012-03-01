@@ -17,6 +17,7 @@ using namespace std;
 
 using namespace System;
 using namespace System::Collections;
+using namespace System::Collections::Generic;
 using namespace System::Management::Automation;
 using namespace System::Runtime::InteropServices;
 using namespace System::Text;
@@ -883,6 +884,21 @@ namespace PSH5X
 
         return result;
     }
+
+    bool ProviderUtils::TryGetValue(Object^ obj, Dictionary<String^, Object^>^% dict)
+    {
+        bool result = false;
+
+        try
+        {
+            dict = safe_cast<Dictionary<String^, Object^>^>(obj);
+            result = true;
+        }
+        catch (...) {}
+
+        return result;
+    }
+
 
 #pragma endregion
 

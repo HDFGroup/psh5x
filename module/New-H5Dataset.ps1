@@ -13,8 +13,8 @@ Function New-H5Dataset
      The path of the new HDF5 Dataset.
    .PARAMETER Type
      The element type of the HDF5 Dataset. The type can be specified as
-     1) A pre-defined HDF5 datatype (string)
-     2) An HDF5 datatype definition (hashtable)
+     1) A pre-defined HDF5 datatype
+     2) An HDF5 datatype definition (JSON)
      3) The HDF5 path name of a linked HDF5 datatype
    .PARAMETER Nulll
      Create an HDF5 dataset with a null dataspace (empty set).
@@ -52,7 +52,7 @@ Function New-H5Dataset
                    Position=1,
                    HelpMessage='The element type of the new HDF5 dataset.')]
         [ValidateNotNull()]
-        [object]
+        [string]
         $Type,
         [Parameter(Mandatory=$true,
                    Position=2,
@@ -117,12 +117,6 @@ Function New-H5Dataset
     if (!$Chunked -and $Gzip)
     {
         Write-Error "`nThe -Gzip option requires chunked layout. (-Chunked...)."
-        return
-    }
-
-    if (!(($Type -is [string]) -or ($Type -is [hashtable])))
-    {
-        Write-Error "`nInvalid type specification '$Type' found."
         return
     }
 

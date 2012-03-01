@@ -77,8 +77,8 @@ Function New-H5Attribute
                    Position=3,
                    HelpMessage='The element type of the new HDF5 attribute')]
         [ValidateNotNull()]
-        [object]
-        $Type=([string] 'string')
+        [string]
+        $Type='string'
     )
 
     if (!(Test-Path $Path))

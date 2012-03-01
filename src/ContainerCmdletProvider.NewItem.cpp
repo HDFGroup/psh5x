@@ -27,6 +27,7 @@ using namespace System::Drawing::Imaging;
 using namespace System::Management::Automation;
 using namespace System::Management::Automation::Provider;
 using namespace System::Runtime::InteropServices;
+using namespace System::Web::Script::Serialization;
 
 namespace PSH5X
 {
@@ -113,7 +114,10 @@ namespace PSH5X
             name = (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
 
 			if (itemTypeName->ToUpper() == "GROUP")
-            {				
+            {
+
+#pragma region HDF5 group
+
 				gcplist = H5Pcreate(H5P_GROUP_CREATE);
 				unsigned int flags = 0;
 				
@@ -137,7 +141,7 @@ namespace PSH5X
 					throw gcnew HDF5Exception("H5Pset_link_creation_order failed!!!");
 				}
 
-#pragma region HDF5 group
+
 
                 if (this->ShouldProcess(h5path,
                     String::Format("HDF5 group '{0}' does not exist, create it", linkName)))
@@ -167,23 +171,14 @@ namespace PSH5X
 
                 // mandatory parameters -ElementType and -Dimensions
 
-                Object^ elemType = dynamicParameters["ElementType"]->Value;
+                String^ elemType = (String^) dynamicParameters["ElementType"]->Value;
 
-                Hashtable^ ht = nullptr;
-                String^ typeOrPath = nullptr;
-
-                if (ProviderUtils::TryGetValue(elemType, ht)) {
-                    dtype = ProviderUtils::ParseH5Type(ht);
-                    if (dtype < 0) {
-                        throw gcnew PSH5XException("Invalid HDF5 datatype specified!");
-                    }
-                }
-                else if (ProviderUtils::TryGetValue(elemType, typeOrPath))
-                {
-                    if (typeOrPath->StartsWith("/")) {
-                        if (ProviderUtils::IsH5DatatypeObject(drive->FileHandle, typeOrPath))
+				if (!elemType->Trim()->StartsWith("{")) // not JSON, alias or predefined type
+				{
+					if (elemType->StartsWith("/")) {
+                        if (ProviderUtils::IsH5DatatypeObject(drive->FileHandle, elemType))
                         {
-                            topath = (char*)(Marshal::StringToHGlobalAnsi(typeOrPath)).ToPointer();
+                            topath = (char*)(Marshal::StringToHGlobalAnsi(elemType)).ToPointer();
                             dtype = H5Topen2(drive->FileHandle, topath, H5P_DEFAULT);
                             if (dtype < 0) {
                                 throw gcnew HDF5Exception("H5Topen2 failed!!!");
@@ -195,15 +190,31 @@ namespace PSH5X
                     }
                     else
                     {
-                        dtype = ProviderUtils::H5Type(typeOrPath);
+                        dtype = ProviderUtils::H5Type(elemType);
                         if (dtype < 0) {
                             throw gcnew PSH5XException("Invalid HDF5 datatype specified!");
                         }
                     }
-                }
-                else {
-                    throw gcnew PSH5XException("Unrecognized type: must be string or hashtable.");
-                }
+				}
+				else
+				{
+					JavaScriptSerializer^ serializer = gcnew JavaScriptSerializer();
+					Dictionary<String^,Object^>^ type = nullptr;
+					try
+					{
+						type = safe_cast<Dictionary<String^,Object^>^>(serializer->DeserializeObject(elemType));
+						
+					}
+					catch (...)
+					{
+						throw gcnew PSH5XException("JSON format error.");
+					}
+
+					dtype = ProviderUtils::ParseH5Type(type);
+                    if (dtype < 0) {
+                        throw gcnew PSH5XException("Invalid HDF5 datatype specified!");
+                    }
+				}
 
                 array<hsize_t>^ dims = (array<hsize_t>^) dynamicParameters["Dimensions"]->Value;
 
@@ -352,29 +363,36 @@ namespace PSH5X
 
                 // mandatory parameter -Defintion
 
-                Object^ typeDef = dynamicParameters["Definition"]->Value;
+                String^ def = (String^) dynamicParameters["Definition"]->Value;
 
-                Hashtable^ ht = nullptr;
-                String^ type = nullptr;
-
-                if (ProviderUtils::TryGetValue(typeDef, ht)) {
-                    dtype = ProviderUtils::ParseH5Type(ht);
+				if (!def->Trim()->StartsWith("{")) // not JSON, alias or predefined type
+				{
+					dtype = ProviderUtils::H5Type(def);
                     if (dtype < 0) {
                         throw gcnew PSH5XException("Invalid HDF5 datatype specified!");
                     }
-                }
-                else if (ProviderUtils::TryGetValue(typeDef, type))
-                {
-                    dtype = ProviderUtils::H5Type(type);
+				}
+				else
+				{
+					JavaScriptSerializer^ serializer = gcnew JavaScriptSerializer();
+					Dictionary<String^,Object^>^ type = nullptr;
+					try
+					{
+						type = safe_cast<Dictionary<String^,Object^>^>(serializer->DeserializeObject(def));
+						
+					}
+					catch (...)
+					{
+						throw gcnew PSH5XException("JSON format error.");
+					}
+
+					dtype = ProviderUtils::ParseH5Type(type);
                     if (dtype < 0) {
                         throw gcnew PSH5XException("Invalid HDF5 datatype specified!");
                     }
-                }
-                else {
-                    throw gcnew PSH5XException("Unrecognized type: must be string or hashtable.");
-                }
+				}
 
-                if (this->ShouldProcess(h5path,
+				if (this->ShouldProcess(h5path,
                     String::Format("HDF5 datatype '{0}' does not exist, create it", linkName)))
                 {
                     if (H5Tcommit2(drive->FileHandle, name, dtype, lcplist, H5P_DEFAULT, H5P_DEFAULT) < 0) {
