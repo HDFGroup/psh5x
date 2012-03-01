@@ -10,21 +10,20 @@ namespace PSH5X
     public:
 
         NewH5ArrayCommand()
-            : m_length(-1), m_obj(nullptr),
-            m_is_ht(false), m_ht(nullptr), m_is_str(false), m_str(nullptr) {}
+            : m_length(-1), m_type(nullptr) {}
 
-        [System::Management::Automation::Parameter(Mandatory=true, Position=1)]
+		[System::Management::Automation::Parameter(Mandatory=true, Position=1)]
+        property System::String^ Type
+        {
+            System::String^ get() { return m_type; }
+            void set(System::String^ value) { m_type = value; }
+        }
+
+        [System::Management::Automation::Parameter(Mandatory=true, Position=2)]
         property long long Length
         {
             long long get() { return m_length ; }
             void set(long long value) { m_length = value; }
-        }
-
-        [System::Management::Automation::Parameter(Mandatory=true, Position=2)]
-        property System::Object^ Type
-        {
-            System::Object^ get() { return m_obj; }
-            void set(Object^ value) { m_obj = value; }
         }
 
     protected:
@@ -37,15 +36,7 @@ namespace PSH5X
 
         long long m_length;
 
-        Object^ m_obj;
-
-        bool m_is_ht;
-
-        System::Collections::Hashtable^ m_ht;
-
-        bool m_is_str;
-
-        System::String^ m_str;
+        System::String^ m_type;
 
     };
 

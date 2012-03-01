@@ -16,6 +16,14 @@ $dummy = New-H5Attribute . attr1 'string attribute' string17
 
 $dummy = New-H5Dataset dset1 H5T_STD_I32BE 10,10
 
+$value = New-H5Array int 100
+
+foreach ($i in 0..99) {
+    $value[$i] = $i%10
+}
+
+Set-Content dset1 $value
+
 $t = @"
 {
     "Class": "Compound",
@@ -56,6 +64,10 @@ $t = '{"Class": "Vlen", "Base": "H5T_STD_I32LE"}'
 cd ..
 
 $dummy = New-H5Dataset dset3 $t 4
+
+$value = @(@(0), @(10,11), @(20,21,22), @(30,31,32,33))
+
+Set-Content dset3 $value
 
 $dummy = New-H5Hardlink group2 /group1
 

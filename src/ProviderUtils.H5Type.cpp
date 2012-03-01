@@ -1758,6 +1758,13 @@ namespace PSH5X
                 else if (H5Tequal(super, H5T_NATIVE_ULONG)  > 0) { result = UInt32::typeid; }
                 else if (H5Tequal(super, H5T_NATIVE_ULLONG) > 0) { result = UInt64::typeid; }
             }
+			else if (cls == H5T_REFERENCE)
+			{
+				throw gcnew PSH5XException("Reference types are unsupported!");
+			}
+			else {
+				throw gcnew PSH5XException("Unsupported type class!");
+			}
         }
         finally
         {

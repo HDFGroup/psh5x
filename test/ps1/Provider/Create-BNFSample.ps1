@@ -18,6 +18,14 @@ Set-ItemProperty . attr1 'string attribute'
 
 New-Item dset1 -ItemType Dataset -ElementType H5T_STD_I32BE -Dimensions 10,10
 
+$value = New-H5Array int 100
+
+foreach ($i in 0..99) {
+    $value[$i] = $i%10
+}
+
+Set-Content dset1 $value
+
 $t = @"
 {
     "Class": "Compound",
@@ -58,6 +66,10 @@ cd ..
 $t = '{"Class": "Vlen", "Base": "H5T_STD_I32LE"}'
 
 New-Item dset3 -ItemType Dataset -ElementType $t -Dimensions 4 
+
+$value = @(@(0), @(10,11), @(20,21,22), @(30,31,32,33))
+
+Set-Content dset3 $value
 
 New-Item group2 -ItemType Hardlink -Value /group1
 
