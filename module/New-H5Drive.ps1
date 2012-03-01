@@ -50,16 +50,17 @@ Function New-H5Drive
         [Parameter(Mandatory=$false,
                    HelpMessage='The scope of the H5Drive. See about_Scopes.')]
         [int]
-        $Scope=2
+        $Scope=2,
+        [Parameter(Mandatory=$false,
+                   HelpMessage='Force the creation of a new file?')]
+        [switch]
+        $Force
     )
 
-    if (!(Test-H5File (Resolve-Path $File)))
+    if (!($Force -or (Test-H5File (Resolve-Path $File))))
     {
         Write-Error "`nFile '$File' is not an HDF5 file."
         return
-    }
-    else {
-        $File = Resolve-Path $File
     }
 
     $count = 0
@@ -81,9 +82,16 @@ Function New-H5Drive
         {
             if ($RW)
             {
-                Write-Output(
-                    New-PSDrive -Name $Name -PSProvider HDF5 -Path $File `
-                                -Root $Root -Mode RW -Scope $Scope)
+                if ($Force) {
+                    Write-Output(
+                        New-PSDrive -Name $Name -PSProvider HDF5 -Path $File `
+                                    -Root $Root -Mode RW -Scope $Scope -Force)
+                }
+                else {
+                    Write-Output(
+                        New-PSDrive -Name $Name -PSProvider HDF5 -Path $File `
+                                    -Root $Root -Mode RW -Scope $Scope)
+                }
                 $count = 0
                 Get-PSDrive | ?{$_.Name -eq $Name} | %{$count++}
                 if ($count -eq 1) {
