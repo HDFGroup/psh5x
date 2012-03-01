@@ -660,6 +660,19 @@ namespace PSH5X
         return result;
     }
 
+	Object^ ProviderUtils::GetDotNetObject(Object^ obj)
+	{
+		Object^ result = nullptr;
+
+		if (obj->GetType() == System::Management::Automation::PSObject::typeid)	{
+			result = safe_cast<System::Management::Automation::PSObject^>(obj)->BaseObject;
+		}
+		else {
+			result = obj;
+		}
+
+		return result;
+	}
 
 #pragma region TryGetValue
 

@@ -132,11 +132,9 @@ Function New-H5Attribute
         else
         {
             if ($Value) {
-                $dummy = New-ItemProperty $Path -Name $Name -ElementType $Type
-                # HACK: Do this directly in New-ItemProperty!
-                Set-ItemProperty -Path $Path -Name $Name -Value $Value
                 Write-Output(
-                    Get-ItemProperty $Path -Name $Name)
+                    New-ItemProperty $Path -Name $Name -ElementType $Type `
+                                     -Value $Value)
             }
             else {
                 Write-Output(

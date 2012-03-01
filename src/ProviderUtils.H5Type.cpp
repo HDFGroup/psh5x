@@ -2108,72 +2108,52 @@ error:
 
     bool ProviderUtils::IsH5IntegerType(hid_t dtype)
     {
-        H5T_class_t cls = H5Tget_class(dtype);
-
-        return (cls == H5T_INTEGER);
+        return (H5Tget_class(dtype) == H5T_INTEGER);
     }
 
     bool ProviderUtils::IsH5FloatType(hid_t dtype)
     {
-        H5T_class_t cls = H5Tget_class(dtype);
-
-        return (cls == H5T_FLOAT);
+        return (H5Tget_class(dtype) == H5T_FLOAT);
     }
 
     bool ProviderUtils::IsH5StringType(hid_t dtype)
     {
-        H5T_class_t cls = H5Tget_class(dtype);
-
-        return (cls == H5T_STRING);
+        return (H5Tget_class(dtype) == H5T_STRING);
     }
 
     bool ProviderUtils::IsH5BitfieldType(hid_t dtype)
     {
-        H5T_class_t cls = H5Tget_class(dtype);
-
-        return (cls == H5T_BITFIELD);
+        return (H5Tget_class(dtype) == H5T_BITFIELD);
     }
 
     bool ProviderUtils::IsH5OpaqueType(hid_t dtype)
     {
-        H5T_class_t cls = H5Tget_class(dtype);
-
-        return (cls == H5T_OPAQUE);
+        return (H5Tget_class(dtype) == H5T_OPAQUE);
     }
 
     bool ProviderUtils::IsH5CompoundType(hid_t dtype)
     {
-        H5T_class_t cls = H5Tget_class(dtype);
-
-        return (cls == H5T_COMPOUND);
+        return (H5Tget_class(dtype) == H5T_COMPOUND);
     }
 
     bool ProviderUtils::IsH5ReferenceType(hid_t dtype)
-    {
-        H5T_class_t cls = H5Tget_class(dtype);
-
-        return (cls == H5T_REFERENCE);
+	{
+        return (H5Tget_class(dtype) == H5T_REFERENCE);
     }
 
     bool ProviderUtils::IsH5EnumType(hid_t dtype)
     {
-        H5T_class_t cls = H5Tget_class(dtype);
-
-        return (cls == H5T_ENUM);
+        return (H5Tget_class(dtype) == H5T_ENUM);
     }
 
     bool ProviderUtils::IsH5VlenType(hid_t dtype)
     {
-        H5T_class_t cls = H5Tget_class(dtype);
-
-        return (cls == H5T_VLEN);
+        return (H5Tget_class(dtype) == H5T_VLEN);
     }
 
     bool ProviderUtils::IsH5ArrayType(hid_t dtype)
     {
-        H5T_class_t cls = H5Tget_class(dtype);
-
-        return (cls == H5T_ARRAY);
+        return (H5Tget_class(dtype) == H5T_ARRAY);
     }
 
     

@@ -338,7 +338,7 @@ namespace PSH5X
 
         hid_t ftype = -1, fspace = -1, oid = -1, aid = -1;
 
-        char *path_str = NULL;
+        char *path_str = NULL, *attr_name = NULL, *obj_path = NULL;
 
         hsize_t* current_size = NULL;
 
@@ -366,10 +366,13 @@ namespace PSH5X
 
 #pragma endregion
 
+			attr_name = (char*)(Marshal::StringToHGlobalAnsi(propertyName)).ToPointer();
+            obj_path = (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
+
             RuntimeDefinedParameterDictionary^ dynamicParameters =
                 (RuntimeDefinedParameterDictionary^) DynamicParameters;
 
-            // mandatory parameters -ElementType
+#pragma region mandatory parameters
 
             String^ elemType = (String^) dynamicParameters["ElementType"]->Value;
 
@@ -416,47 +419,9 @@ namespace PSH5X
                     }
 				}
 
+#pragma endregion
 
-			/*
-            Hashtable^ ht = nullptr;
-            String^ typeOrPath = nullptr;
-
-            if (ProviderUtils::TryGetValue(elemType, ht)) {
-                ftype = ProviderUtils::ParseH5Type(ht);
-                if (ftype < 0) {
-                    throw gcnew PSH5XException("Invalid HDF5 datatype specified!");
-                }
-            }
-            else if (ProviderUtils::TryGetValue(elemType, typeOrPath))
-            {
-                if (typeOrPath->StartsWith("/")) {
-                    if (ProviderUtils::IsH5DatatypeObject(drive->FileHandle, typeOrPath))
-                    {
-                        path_str = (char*)(Marshal::StringToHGlobalAnsi(typeOrPath)).ToPointer();
-                        ftype = H5Topen2(drive->FileHandle, path_str, H5P_DEFAULT);
-                        if (ftype < 0) {
-                            throw gcnew HDF5Exception("H5Topen2 failed!");
-                        }
-                    }
-                    else {
-                        throw gcnew
-                            PSH5XException("The HDF5 path name specified does not refer to an datatype object.");
-                    }
-                }
-                else
-                {
-                    ftype = ProviderUtils::H5Type(typeOrPath);
-                    if (ftype < 0) {
-                        throw gcnew PSH5XException("Invalid HDF5 datatype specified!");
-                    }
-                }
-            }
-            else {
-                throw gcnew PSH5XException("Unrecognized type: must be string or hashtable.");
-            }
-			*/
-
-            // optional parameters, determine shape first
+#pragma region optional parameters
 
             String^ shape = "scalar";
 
@@ -468,9 +433,6 @@ namespace PSH5X
             }
             if (isNull)   { shape = "Null";   }
             if (isSimple) { shape = "Simple"; }
-
-            char* attr_name = (char*)(Marshal::StringToHGlobalAnsi(propertyName)).ToPointer();
-            char* obj_path = (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
 
             oid = H5Oopen(drive->FileHandle, obj_path, H5P_DEFAULT);
             if (oid < 0) {
@@ -498,7 +460,6 @@ namespace PSH5X
             }
             else if (shape->ToUpper() == "SIMPLE")
             {
-
                 fspace = H5Screate(H5S_SIMPLE);
                 if (fspace < 0) {
                     throw gcnew Exception("H5Screate failed!");
@@ -518,7 +479,15 @@ namespace PSH5X
                 throw gcnew PSH5XException("Invalid shape!");
             }
 
-            // TODO: set the value
+			bool setValue = false;
+			Object^ attrValue = nullptr;
+			if (value != nullptr)
+			{
+				attrValue = ProviderUtils::GetDotNetObject(value);
+				setValue = true;
+			}
+
+#pragma endregion
 
             if (this->ShouldProcess(h5path,
                 String::Format("HDF5 attribute '{0}' does not exist, create it",
@@ -529,7 +498,17 @@ namespace PSH5X
                     throw gcnew HDF5Exception("H5Acreate2 failed!");
                 }
 
-                if (H5Fflush(aid, H5F_SCOPE_LOCAL) < 0) {
+				if (setValue)
+				{
+					if (shape->ToUpper() == "SIMPLE") {
+						ProviderUtils::SetH5AttributeValue(aid, attrValue);
+					}
+					else if (shape->ToUpper() == "SCALAR") {
+						ProviderUtils::SetScalarH5AttributeValue(aid, attrValue);
+					}
+				}
+
+				if (H5Fflush(aid, H5F_SCOPE_LOCAL) < 0) {
                     throw gcnew HDF5Exception("H5Fflush failed!");
                 }
 
@@ -561,6 +540,14 @@ namespace PSH5X
 
             if (path_str != NULL) {
                 Marshal::FreeHGlobal(IntPtr(path_str));
+            }
+
+			if (attr_name != NULL) {
+                Marshal::FreeHGlobal(IntPtr(attr_name));
+            }
+
+			if (obj_path != NULL) {
+                Marshal::FreeHGlobal(IntPtr(obj_path));
             }
         }
 

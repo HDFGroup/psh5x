@@ -17,4 +17,6 @@ New-Alias Remove-H5Object Remove-Item
 
 New-Alias Rename-H5Object Rename-Item
 
+New-Alias Set-H5Attribute Set-ItemProperty
+
 New-Alias Unlink-H5Object Remove-Item

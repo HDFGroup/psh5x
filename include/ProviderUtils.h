@@ -209,6 +209,8 @@ namespace PSH5X
 
         static bool ResolveItemType(System::String^ str, System::String^% itemType);
 
+		static System::Object^ GetDotNetObject(System::Object^ obj);
+
 		static bool TryGetValue(System::Object^ obj, char& i);
 
 		static bool TryGetValue(System::Object^ obj, unsigned char& i);

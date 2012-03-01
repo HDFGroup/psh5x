@@ -228,13 +228,7 @@ namespace PSH5X
 				
 					H5S_class_t stype = H5Sget_simple_extent_type(fspace);
 					
-					Object^ obj = nullptr;
-					if (info->Value->GetType() == System::Management::Automation::PSObject::typeid)	{
-						obj = safe_cast<System::Management::Automation::PSObject^>(info->Value)->BaseObject;
-					}
-					else {
-						obj = info->Value;
-					}
+					Object^ obj = ProviderUtils::GetDotNetObject(info->Value);
 					
 					if (obj != nullptr)
 					{
