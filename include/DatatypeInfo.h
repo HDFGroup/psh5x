@@ -16,22 +16,19 @@ namespace PSH5X
 
         DatatypeInfo(hid_t type) : ObjectInfo(type)
         {
-            m_definition = ProviderUtils::ParseH5Type(type);
+			System::Web::Script::Serialization::JavaScriptSerializer^ ser =
+				gcnew System::Web::Script::Serialization::JavaScriptSerializer();
+            m_definition = ser->Serialize(ProviderUtils::ParseH5Type(type));
         }
 
-        property System::Collections::Hashtable^ Definition
+        property System::String^ Definition
         {
-            System::Collections::Hashtable^ get() { return m_definition; }
-        }
-
-        ~DatatypeInfo()
-        {
-            delete m_definition;
+            System::String^ get() { return m_definition; }
         }
 
     private:
 
-        System::Collections::Hashtable^ m_definition;
+        System::String^ m_definition;
 
     };
 

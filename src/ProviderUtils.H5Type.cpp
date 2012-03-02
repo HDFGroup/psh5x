@@ -24,10 +24,13 @@ using namespace System::Text;
 
 namespace PSH5X
 {
-    Hashtable^ ProviderUtils::ParseH5Type(hid_t type)
+    Dictionary<String^,Object^>^ ProviderUtils::ParseH5Type(hid_t type)
     {
-        Hashtable^ result = gcnew Hashtable();
-        Hashtable^ ht = nullptr;
+		Dictionary<String^,Object^>^ result = gcnew Dictionary<String^,Object^>();
+
+		Dictionary<String^,Object^>^ members = nullptr;
+
+		ArrayList^ member = nullptr;
 
         hid_t unwnd = -1;
         size_t size = 0, offset;
@@ -61,45 +64,45 @@ namespace PSH5X
 
 #pragma region Integer
 
-                result["Class"] = "INTEGER";
+				result->Add("Class", "Integer");
                 size = H5Tget_size(type);
-                result["Size"] = size;
+				result->Add("Size", size);
                 size = H5Tget_precision(type);
-                result["Precision"] = size;
+                result->Add("Precision", size);
                 i = H5Tget_offset(type);
-                result["BitOffset"] = i;
+                result->Add("BitOffset", i);
 
                 if (H5Tget_pad(type, &lsb, &msb) >= 0)
                 {
                     switch (lsb)
                     {
                     case H5T_PAD_ZERO:
-                        result["LSBitPadding"] = "Zero";
+						result->Add("LSBitPadding", "Zero");
                         break;
                     case H5T_PAD_ONE:
-                        result["LSBitPadding"] = "One";
+                        result->Add("LSBitPadding", "One");
                         break;
                     case H5T_PAD_BACKGROUND:
-                        result["LSBitPadding"] = "Background";
+                        result->Add("LSBitPadding", "Background");
                         break;
                     default:
-                        result["LSBitPadding"] = "UNKNOWN";
+                        result->Add("LSBitPadding", "UNKONWN");
                         break;
                     }
 
                     switch (msb)
                     {
                     case H5T_PAD_ZERO:
-                        result["MSBitPadding"] = "Zero";
+                        result->Add("MSBitPadding", "Zero");
                         break;
                     case H5T_PAD_ONE:
-                        result["MSBitPadding"] = "One";
+                        result->Add("MSBitPadding", "One");
                         break;
                     case H5T_PAD_BACKGROUND:
-                        result["MSBitPadding"] = "Background";
+                        result->Add("MSBitPadding", "Background");
                         break;
                     default:
-                        result["MSBitPadding"] = "UNKNOWN";
+                        result->Add("MSBitPadding", "UNKNOWN");
                         break;
                     }
                 }
@@ -110,35 +113,35 @@ namespace PSH5X
                 switch (H5Tget_sign(type))
                 {
                 case H5T_SGN_NONE:
-                    result["SignType"] = "None";
+                    result->Add("SignType", "None");
                     break;
                 case H5T_SGN_2:
-                    result["SignType"] = "2";
+                    result->Add("SignType", "2");
                     break;
                 default:
-                    result["SignType"] = "UNKNOWN";
+                    result->Add("SignType", "UNKNOWN");
                     break;
                 }
 
                 switch (H5Tget_order(type))
                 {
                 case H5T_ORDER_LE:
-                    result["ByteOrder"] = "LE";
+                    result->Add("ByteOrder", "LE");
                     break;
                 case H5T_ORDER_BE:
-                    result["ByteOrder"] = "BE";
+                    result->Add("ByteOrder", "BE");
                     break;
                 case H5T_ORDER_VAX:
-                    result["ByteOrder"] = "VAX";
-                    break;
+                    result->Add("ByteOrder", "VAX");
+					break;
                 case H5T_ORDER_MIXED:
-                    result["ByteOrder"] = "Mixed";
+                    result->Add("ByteOrder", "Mixed");
                     break;
                 case H5T_ORDER_NONE:
-                    result["ByteOrder"] = "None";
+                    result->Add("ByteOrder", "None");
                     break;
                 default:
-                    result["ByteOrder"] = "UNKNOWN";
+                    result->Add("ByteOrder", "UNKNOWN");
                     break;
                 }
 
@@ -150,45 +153,45 @@ namespace PSH5X
 
 #pragma region Float
 
-                result["Class"] = "FLOAT";
+                result->Add("Class", "Float");
                 size = H5Tget_size(type);
-                result["Size"] = size;
+                result->Add("Size", size);
                 size = H5Tget_precision(type);
-                result["Precision"] = size;
+                result->Add("Precision", size);
                 i = H5Tget_offset(type);
-                result["BitOffset"] = i;
+                result->Add("BitOffset", i);
 
                 if (H5Tget_pad(type, &lsb, &msb) >= 0)
                 {
                     switch (lsb)
                     {
                     case H5T_PAD_ZERO:
-                        result["LSBitPadding"] = "Zero";
+                		result->Add("LSBitPadding", "Zero");
                         break;
                     case H5T_PAD_ONE:
-                        result["LSBitPadding"] = "One";
+                		result->Add("LSBitPadding", "One");
                         break;
                     case H5T_PAD_BACKGROUND:
-                        result["LSBitPadding"] = "Background";
+                		result->Add("LSBitPadding", "Background");
                         break;
                     default:
-                        result["LSBitPadding"] = "UNKNOWN";
+                		result->Add("LSBitPadding", "UNKNOWN");
                         break;
                     }
 
                     switch (msb)
                     {
                     case H5T_PAD_ZERO:
-                        result["MSBitPadding"] = "Zero";
+                		result->Add("MSBitPadding", "Zero");
                         break;
                     case H5T_PAD_ONE:
-                        result["MSBitPadding"] = "One";
+                		result->Add("MSBitPadding", "One");
                         break;
                     case H5T_PAD_BACKGROUND:
-                        result["MSBitPadding"] = "Background";
+                		result->Add("MSBitPadding", "Background");
                         break;
                     default:
-                        result["MSBitPadding"] = "UNKNOWN";
+                		result->Add("MSBitPadding", "UNKNOWN");
                         break;
                     }
                 }
@@ -199,69 +202,69 @@ namespace PSH5X
                 switch (H5Tget_inpad(type))
                 {
                 case H5T_PAD_ZERO:
-                    result["IntlBitPadding"] = "Zero";
+                	result->Add("IntlBitPadding", "Zero");
                     break;
                 case H5T_PAD_ONE:
-                    result["IntlBitPadding"] = "One";
+                	result->Add("IntlBitPadding", "One");
                     break;
                 case H5T_PAD_BACKGROUND:
-                    result["IntlBitPadding"] = "Background";
+                	result->Add("IntlBitPadding", "Background");
                     break;
                 default:
-                    result["IntlBitPadding"] = "UNKNOWN";
+                	result->Add("IntlBitPadding", "UNKNOWN");
                     break;
                 }
 
                 switch (H5Tget_order(type))
                 {
                 case H5T_ORDER_LE:
-                    result["ByteOrder"] = "LE";
+                	result->Add("ByteOrder", "LE");
                     break;
                 case H5T_ORDER_BE:
-                    result["ByteOrder"] = "BE";
+                	result->Add("ByteOrder", "BE");
                     break;
                 case H5T_ORDER_VAX:
-                    result["ByteOrder"] = "VAX";
+                	result->Add("ByteOrder", "VAX");
                     break;
                 case H5T_ORDER_MIXED:
-                    result["ByteOrder"] = "Mixed";
+                	result->Add("ByteOrder", "Mixed");
                     break;
                 case H5T_ORDER_NONE:
-                    result["ByteOrder"] = "None";
+                	result->Add("ByteOrder", "None");
                     break;
                 default:
-                    result["ByteOrder"] = "UNKNOWN";
+                	result->Add("ByteOrder", "UNKNOWN");
                     break;
                 }
 
                 if (H5Tget_fields(type, &spos, &epos, &esize, &mpos, &msize) >= 0)
                 {
-                    result["SignBitPos"] = spos;
-                    result["ExpBitPos"] = epos;
-                    result["ExpBits"] = esize;
-                    result["MantBitPos"] = mpos;
-                    result["MantBits"] = msize;
+                	result->Add("SignBitPos", spos);
+                	result->Add("ExpBitPos", epos);
+                	result->Add("ExpBits", esize);
+                 	result->Add("MantBitPos", mpos);
+                 	result->Add("MantBits", msize);
                 }
                 else {
                     throw gcnew HDF5Exception("H5Tget_fields failed!");
                 }
 
                 size = H5Tget_ebias(type);
-                result["ExpBias"] = size;
+                result->Add("ExpBias", size);
 
                 switch (H5Tget_norm(type))
                 {
                 case H5T_NORM_IMPLIED:
-                    result["MantNorm"] = "Implied";
+                	result->Add("MantNorm", "Implied");
                     break;
                 case H5T_NORM_MSBSET:
-                    result["MantNorm"] = "MsbSet";
+                	result->Add("MantNorm", "MsbSet");
                     break;
                 case H5T_NORM_NONE:
-                    result["MantNorm"] = "None";
+                	result->Add("MantNorm", "None");
                     break;
                 default:
-                    result["MantNorm"] = "UNKNOWN";
+                	result->Add("MantNorm", "UNKNOWN");
                     break;
                 }
 
@@ -273,18 +276,18 @@ namespace PSH5X
 
 #pragma region String
 
-                result["Class"] = "STRING";
+               result->Add("Class", "String");
                 cset = H5Tget_cset(type);
                 switch (cset)
                 {
                 case H5T_CSET_ASCII:
-                    result["CharSet"] = "Ascii";
+               	result->Add("Encoding", "Ascii");
                     break;
                 case H5T_CSET_UTF8:
-                    result["CharSet"] = "Utf8";
+               	result->Add("Encoding", "Utf8");
                     break;
                 default:
-                    result["CharSet"] = "UNKNOWN";
+               	result->Add("Encoding", "UNKNOWN");
                     break;
                 }
 
@@ -292,30 +295,30 @@ namespace PSH5X
                 if (ierr == 0)
                 {
                     size = H5Tget_size(type);
-                    result["Length"] = size;
+                 	result->Add("Length", size);
                     strpad = H5Tget_strpad(type);
                     switch (strpad)
                     {
                     case H5T_STR_NULLTERM:
-                        result["StrPad"] = "Nullterm";
+                 		result->Add("StrPad", "Nullterm");
                         break;
                     case H5T_STR_NULLPAD:
-                        result["StrPad"] = "Nullpad";
+                 		result->Add("StrPad", "Nullpad");
                         break;
                     case H5T_STR_SPACEPAD:
-                        result["StrPad"] = "Spacepad";
+                 		result->Add("StrPad", "SpacePad");
                         break;
                     default:
-                        result["StrPad"] = "UNKNOWN";
+                 		result->Add("StrPad", "UNKNOWN");
                         break;
                     }
-                    result["IsVariableLength"] = false;
+                 	result->Add("IsVariableLength", false);
                 }
                 else if (ierr > 0) {
-                    result["IsVariableLength"] = true;
+                 	result->Add("IsVariableLength", true);
                 }
                 else {
-                    throw gcnew HDF5Exception("H5Tis_variable_str faile!");
+                    throw gcnew HDF5Exception("H5Tis_variable_str failed!!!");
                 }
 
 #pragma endregion
@@ -326,45 +329,45 @@ namespace PSH5X
 
 #pragma region Bitfield
 
-                result["Class"] = "BITFIELD";
+                result->Add("Class", "Bitfield");
                 size = H5Tget_size(type);
-                result["Size"] = size;
+                result->Add("Size", size);
                 size = H5Tget_precision(type);
-                result["Precision"] = size;
+                result->Add("Precision", size);
                 i = H5Tget_offset(type);
-                result["BitOffset"] = i;
+                result->Add("BitOffset", i);
 
                 if (H5Tget_pad(type, &lsb, &msb) >= 0)
                 {
                     switch (lsb)
                     {
                     case H5T_PAD_ZERO:
-                        result["LSBitPadding"] = "Zero";
+                		result->Add("LSBitPadding", "Zero");
                         break;
                     case H5T_PAD_ONE:
-                        result["LSBitPadding"] = "One";
+                		result->Add("LSBitPadding", "One");
                         break;
                     case H5T_PAD_BACKGROUND:
-                        result["LSBitPadding"] = "Background";
+                		result->Add("LSBitPadding", "Background");
                         break;
                     default:
-                        result["LSBitPadding"] = "UNKNOWN";
+                		result->Add("LSBitPadding", "UNKNOWN");
                         break;
                     }
 
                     switch (msb)
                     {
                     case H5T_PAD_ZERO:
-                        result["MSBitPadding"] = "Zero";
+                		result->Add("MSBitPadding", "Zero");
                         break;
                     case H5T_PAD_ONE:
-                        result["MSBitPadding"] = "One";
+                		result->Add("MSBitPadding", "One");
                         break;
                     case H5T_PAD_BACKGROUND:
-                        result["MSBitPadding"] = "Background";
+                		result->Add("MSBitPadding", "Background");
                         break;
                     default:
-                        result["MSBitPadding"] = "UNKNOWN";
+                		result->Add("MSBitPadding", "UNKNOWN");
                         break;
                     }
                 }
@@ -375,22 +378,22 @@ namespace PSH5X
                 switch (H5Tget_order(type))
                 {
                 case H5T_ORDER_LE:
-                    result["ByteOrder"] = "LE";
+                	result->Add("ByteOrder", "LE");
                     break;
                 case H5T_ORDER_BE:
-                    result["ByteOrder"] = "BE";
+                	result->Add("ByteOrder", "BE");
                     break;
                 case H5T_ORDER_VAX:
-                    result["ByteOrder"] = "VAX";
+                	result->Add("ByteOrder", "VAX");
                     break;
                 case H5T_ORDER_MIXED:
-                    result["ByteOrder"] = "Mixed";
+                	result->Add("ByteOrder", "Mixed");
                     break;
                 case H5T_ORDER_NONE:
-                    result["ByteOrder"] = "None";
+                	result->Add("ByteOrder", "None");
                     break;
                 default:
-                    result["ByteOrder"] = "UNKNOWN";
+                	result->Add("ByteOrder", "UNKNOWN");
                     break;
                 }
 
@@ -402,29 +405,30 @@ namespace PSH5X
 
 #pragma region Opaque
 
-                result["Class"] = "OPAQUE";
+                result->Add("Class", "Opaque");
                 name = H5Tget_tag(type);
-                result["Tag"] = gcnew String(name);
+                result->Add("Tag", gcnew String(name));
+				result->Add("Size", size);
 
                 switch (H5Tget_order(type))
                 {
                 case H5T_ORDER_LE:
-                    result["ByteOrder"] = "LE";
+                	result->Add("ByteOrder", "LE");
                     break;
                 case H5T_ORDER_BE:
-                    result["ByteOrder"] = "BE";
+                	result->Add("ByteOrder", "BE");
                     break;
                 case H5T_ORDER_VAX:
-                    result["ByteOrder"] = "VAX";
+                	result->Add("ByteOrder", "VAX");
                     break;
                 case H5T_ORDER_MIXED:
-                    result["ByteOrder"] = "Mixed";
+                	result->Add("ByteOrder", "Mixed");
                     break;
                 case H5T_ORDER_NONE:
-                    result["ByteOrder"] = "None";
+                	result->Add("ByteOrder", "None");
                     break;
                 default:
-                    result["ByteOrder"] = "UNKNOWN";
+                	result->Add("ByteOrder", "UNKNOWN");
                     break;
                 }
 
@@ -437,30 +441,40 @@ namespace PSH5X
 
 #pragma region Compound
 
-                result["Class"] = "COMPOUND";
+                result->Add("Class", "Compound");
                 size = H5Tget_size(type);
-                result["Size"] = size;
-                ht = gcnew Hashtable();
+                result->Add("Size", size);
+
+                members = gcnew Dictionary<String^,Object^>();
+
                 nmembers = H5Tget_nmembers(type);
                 for (ui = 0; ui < safe_cast<unsigned>(nmembers); ++ui)
                 {
                     name = H5Tget_member_name(type, ui);
                     s = gcnew String(name);
+
+					member = gcnew ArrayList();
+
                     unwnd = H5Tget_member_type(type, ui);
                     if (unwnd >= 0)
                     {
-                        ht[s] = ProviderUtils::ParseH5Type(unwnd);
                         offset = H5Tget_member_offset(type, ui);
-                        ((Hashtable^) ht[s])->Add("MemberOffset", offset);
-                        if (H5Tclose(unwnd) < 0) {
+                        
+						member->Add(offset);
+						member->Add(ProviderUtils::ParseH5Type(unwnd));
+						
+						if (H5Tclose(unwnd) < 0) {
                             throw gcnew HDF5Exception("H5Tclose failed!");
                         }
                         else {
                             unwnd = -1;
                         }
                     }
+
+					members->Add(s, member);
                 }
-                result["Members"] = ht;
+                
+				result->Add("Members", members);
 
 #pragma endregion
 
@@ -470,17 +484,18 @@ namespace PSH5X
 
 #pragma region Enum
 
-                result["Class"] = "ENUM";
+                result->Add("Class", "Enum");
                 size = H5Tget_size(type);
                 if (size != 1 && size != 2 && size != 4 && size != 8) {
                     throw gcnew PSH5XException("Unsupported enum size!");
                 }
-                result["Size"] = size;
+                result->Add("Size", size);
                 unwnd = H5Tget_super(type);
-                result["Type"] = ProviderUtils::ParseH5Type(unwnd);
+                result->Add("Type", ProviderUtils::ParseH5Type(unwnd));
                 sign = H5Tget_sign(unwnd);
                 
-                ht = gcnew Hashtable();
+                members = gcnew Dictionary<String^,Object^>();
+
                 nmembers = H5Tget_nmembers(type);
                 if (nmembers < 0) {
                     throw gcnew HDF5Exception("H5Tget_nmembers failed!");
@@ -499,8 +514,7 @@ namespace PSH5X
                             if (H5Tget_member_value(type, ui, &B) < 0) {
                                 throw gcnew HDF5Exception("H5Tget_member_value failed!");
                             }
-                            ht[s] = B;
-                            
+                			members->Add(s, B);                            
                             break;
 
                         case 2:
@@ -508,8 +522,7 @@ namespace PSH5X
                             if (H5Tget_member_value(type, ui, &H) < 0) {
                                 throw gcnew HDF5Exception("H5Tget_member_value failed!");
                             }
-                            ht[s] = H;
-                            
+                			members->Add(s, H);
                             break;
 
                         case 4:
@@ -517,8 +530,7 @@ namespace PSH5X
                             if (H5Tget_member_value(type, ui, &I) < 0) {
                                 throw gcnew HDF5Exception("H5Tget_member_value failed!");
                             }
-                            ht[s] = I;
-                            
+                			members->Add(s, I);
                             break;
 
                         case 8:
@@ -526,8 +538,7 @@ namespace PSH5X
                             if (H5Tget_member_value(type, ui, &L) < 0) {
                                 throw gcnew HDF5Exception("H5Tget_member_value failed!");
                             }
-                            ht[s] = L;
-                            
+                			members->Add(s, L);
                             break;
                         }
                     }
@@ -540,8 +551,7 @@ namespace PSH5X
                             if (H5Tget_member_value(type, ui, &b) < 0) {
                                 throw gcnew HDF5Exception("H5Tget_member_value failed!");
                             }
-                            ht[s] = b;
-                            
+                			members->Add(s, b);
                             break;
 
                         case 2:
@@ -549,8 +559,7 @@ namespace PSH5X
                             if (H5Tget_member_value(type, ui, &h) < 0) {
                                 throw gcnew HDF5Exception("H5Tget_member_value failed!");
                             }
-                            ht[s] = h;
-                            
+                			members->Add(s, h);            
                             break;
 
                         case 4:
@@ -558,7 +567,7 @@ namespace PSH5X
                             if (H5Tget_member_value(type, ui, &i) < 0) {
                                 throw gcnew HDF5Exception("H5Tget_member_value failed!");
                             }
-                            ht[s] = i;
+							members->Add(s, i);
                             
                             break;
 
@@ -567,7 +576,7 @@ namespace PSH5X
                             if (H5Tget_member_value(type, ui, &l) < 0) {
                                 throw gcnew HDF5Exception("H5Tget_member_value failed!");
                             }
-                            ht[s] = l;
+							members->Add(s, l);
                             
                             break;
                         }
@@ -576,7 +585,7 @@ namespace PSH5X
                         throw gcnew HDF5Exception("Unknown sign type!");
                     }
                 }
-                result["Members"] = ht;
+				result->Add("Members", members);
 
 #pragma endregion
 
@@ -586,13 +595,11 @@ namespace PSH5X
 
 #pragma region Vlen
 
-                result["Class"] = "VLEN";
-
+                result->Add("Class", "Vlen");
                 unwnd = H5Tget_super(type);
                 if (unwnd >= 0)
                 {
-                    result["Type"] = ProviderUtils::ParseH5Type(unwnd);
-                    
+                	result->Add("Base", ProviderUtils::ParseH5Type(unwnd));
                 }
 
 #pragma endregion
@@ -603,15 +610,16 @@ namespace PSH5X
 
 #pragma region Reference
 
-                result["Class"] = "REFERENCE";
+                result->Add("Class", "Reference");
+
                 if (H5Tequal(type, H5T_STD_REF_OBJ) > 0) {
-                    result["Type"] = "REF_OBJ";
+					result->Add("Kind", "Object");
                 }
                 else if (H5Tequal(type, H5T_STD_REF_DSETREG) > 0) {
-                    result["Type"] = "REF_DSETREG";
+					result->Add("Kind", "Region");
                 }
                 else {
-                    result["Type"] = "UNKNOWN";
+					result->Add("Kind", "UNKNOWN");
                 }
 
 #pragma endregion
@@ -623,7 +631,7 @@ namespace PSH5X
 
 #pragma region Array
 
-                result["Class"] = "ARRAY";
+				result->Add("Class", "Array");
                 rank = H5Tget_array_ndims(type);
                 dims = new hsize_t [rank];
                 rank = H5Tget_array_dims2(type, dims);
@@ -631,11 +639,12 @@ namespace PSH5X
                 for (i = 0; i < rank; ++i) {
                     d[i] = dims[i];
                 }
-                result["Dims"] = d;
+				result->Add("Dims", d);
+
                 unwnd = H5Tget_super(type);
                 if (unwnd >= 0)
                 {
-                    result["Type"] = ProviderUtils::ParseH5Type(unwnd);
+					result->Add("Base", ProviderUtils::ParseH5Type(unwnd));
                 }
                 else {
                     throw gcnew HDF5Exception("H5Tget_super failed!");

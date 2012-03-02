@@ -21,6 +21,7 @@ using namespace System::Collections::Generic;
 using namespace System::Management::Automation;
 using namespace System::Runtime::InteropServices;
 using namespace System::Text;
+using namespace System::Web::Script::Serialization;
 
 namespace PSH5X
 {
@@ -927,7 +928,6 @@ namespace PSH5X
         }
     }
 
-
 	array<String^>^ ProviderUtils::GetLinkNames(String^ h5path)
 	{
 		return h5path->Split((gcnew array<wchar_t>{'/'}), StringSplitOptions::RemoveEmptyEntries);
@@ -952,165 +952,168 @@ namespace PSH5X
 
         /* http://www.hdfgroup.org/HDF5/doc/RM/PredefDTypes.html */
 
+
+		JavaScriptSerializer^ serializer = gcnew JavaScriptSerializer();
+
         m_predefined_types = gcnew Hashtable();
 
         // IEEE floating point datatypes
 
         hid_t type = H5Tcopy(H5T_IEEE_F32BE);
-        m_predefined_types["H5T_IEEE_F32BE"] = ParseH5Type(type);
+        m_predefined_types["H5T_IEEE_F32BE"] = serializer->Serialize(ParseH5Type(type));
         H5Tclose(type);
         type = H5Tcopy(H5T_IEEE_F32LE);
-        m_predefined_types["H5T_IEEE_F32LE"] = ParseH5Type(type);
+        m_predefined_types["H5T_IEEE_F32LE"] = serializer->Serialize(ParseH5Type(type));
         H5Tclose(type);
         type = H5Tcopy(H5T_IEEE_F64BE);
-        m_predefined_types["H5T_IEEE_F64BE"] = ParseH5Type(type);
+        m_predefined_types["H5T_IEEE_F64BE"] = serializer->Serialize(ParseH5Type(type));
         H5Tclose(type);
         type = H5Tcopy(H5T_IEEE_F64LE);
-        m_predefined_types["H5T_IEEE_F64LE"] = ParseH5Type(type);
+        m_predefined_types["H5T_IEEE_F64LE"] = serializer->Serialize(ParseH5Type(type));
         H5Tclose(type);
 
         // Standard datatypes
 
         type = H5Tcopy(H5T_STD_I8BE);
-        m_predefined_types["H5T_STD_I8BE"] = ParseH5Type(type);
+        m_predefined_types["H5T_STD_I8BE"] = serializer->Serialize(ParseH5Type(type));
         H5Tclose(type);
         type = H5Tcopy(H5T_STD_I8LE);
-        m_predefined_types["H5T_STD_I8LE"] = ParseH5Type(type);
+        m_predefined_types["H5T_STD_I8LE"] = serializer->Serialize(ParseH5Type(type));
         H5Tclose(type);
         type = H5Tcopy(H5T_STD_I16BE);
-        m_predefined_types["H5T_STD_I16BE"] = ParseH5Type(type);
+        m_predefined_types["H5T_STD_I16BE"] = serializer->Serialize(ParseH5Type(type));
         H5Tclose(type);
         type = H5Tcopy(H5T_STD_I16LE);
-        m_predefined_types["H5T_STD_I16LE"] = ParseH5Type(type);
+        m_predefined_types["H5T_STD_I16LE"] = serializer->Serialize(ParseH5Type(type));
         H5Tclose(type);
         type = H5Tcopy(H5T_STD_I32BE);
-        m_predefined_types["H5T_STD_I32BE"] = ParseH5Type(type);
+        m_predefined_types["H5T_STD_I32BE"] = serializer->Serialize(ParseH5Type(type));
         H5Tclose(type);
         type = H5Tcopy(H5T_STD_I32LE);
-        m_predefined_types["H5T_STD_I32LE"] = ParseH5Type(type);
+        m_predefined_types["H5T_STD_I32LE"] = serializer->Serialize(ParseH5Type(type));
         H5Tclose(type);
         type = H5Tcopy(H5T_STD_I64BE);
-        m_predefined_types["H5T_STD_I64BE"] = ParseH5Type(type);
+        m_predefined_types["H5T_STD_I64BE"] = serializer->Serialize(ParseH5Type(type));
         H5Tclose(type);
         type = H5Tcopy(H5T_STD_I32LE);
-        m_predefined_types["H5T_STD_I64LE"] = ParseH5Type(type);
+        m_predefined_types["H5T_STD_I64LE"] = serializer->Serialize(ParseH5Type(type));
         H5Tclose(type);
 
         type = H5Tcopy(H5T_STD_U8BE);
-        m_predefined_types["H5T_STD_U8BE"] = ParseH5Type(type);
+        m_predefined_types["H5T_STD_U8BE"] = serializer->Serialize(ParseH5Type(type));
         H5Tclose(type);
         type = H5Tcopy(H5T_STD_U8LE);
-        m_predefined_types["H5T_STD_U8LE"] = ParseH5Type(type);
+        m_predefined_types["H5T_STD_U8LE"] = serializer->Serialize(ParseH5Type(type));
         H5Tclose(type);
         type = H5Tcopy(H5T_STD_U16BE);
-        m_predefined_types["H5T_STD_U16BE"] = ParseH5Type(type);
+        m_predefined_types["H5T_STD_U16BE"] = serializer->Serialize(ParseH5Type(type));
         H5Tclose(type);
         type = H5Tcopy(H5T_STD_U16LE);
-        m_predefined_types["H5T_STD_U16LE"] = ParseH5Type(type);
+        m_predefined_types["H5T_STD_U16LE"] = serializer->Serialize(ParseH5Type(type));
         H5Tclose(type);
         type = H5Tcopy(H5T_STD_U32BE);
-        m_predefined_types["H5T_STD_U32BE"] = ParseH5Type(type);
+        m_predefined_types["H5T_STD_U32BE"] = serializer->Serialize(ParseH5Type(type));
         H5Tclose(type);
         type = H5Tcopy(H5T_STD_U32LE);
-        m_predefined_types["H5T_STD_U32LE"] = ParseH5Type(type);
+        m_predefined_types["H5T_STD_U32LE"] = serializer->Serialize(ParseH5Type(type));
         H5Tclose(type);
         type = H5Tcopy(H5T_STD_U64BE);
-        m_predefined_types["H5T_STD_U64BE"] = ParseH5Type(type);
+        m_predefined_types["H5T_STD_U64BE"] = serializer->Serialize(ParseH5Type(type));
         H5Tclose(type);
         type = H5Tcopy(H5T_STD_U32LE);
-        m_predefined_types["H5T_STD_U64LE"] = ParseH5Type(type);
+        m_predefined_types["H5T_STD_U64LE"] = serializer->Serialize(ParseH5Type(type));
         H5Tclose(type);
 
         type = H5Tcopy(H5T_STD_B8BE);
-        m_predefined_types["H5T_STD_B8BE"] = ParseH5Type(type);
+        m_predefined_types["H5T_STD_B8BE"] = serializer->Serialize(ParseH5Type(type));
         H5Tclose(type);
         type = H5Tcopy(H5T_STD_B8LE);
-        m_predefined_types["H5T_STD_B8LE"] = ParseH5Type(type);
+        m_predefined_types["H5T_STD_B8LE"] = serializer->Serialize(ParseH5Type(type));
         H5Tclose(type);
         type = H5Tcopy(H5T_STD_B16BE);
-        m_predefined_types["H5T_STD_B16BE"] = ParseH5Type(type);
+        m_predefined_types["H5T_STD_B16BE"] = serializer->Serialize(ParseH5Type(type));
         H5Tclose(type);
         type = H5Tcopy(H5T_STD_B16LE);
-        m_predefined_types["H5T_STD_B16LE"] = ParseH5Type(type);
+        m_predefined_types["H5T_STD_B16LE"] = serializer->Serialize(ParseH5Type(type));
         H5Tclose(type);
         type = H5Tcopy(H5T_STD_B32BE);
-        m_predefined_types["H5T_STD_B32BE"] = ParseH5Type(type);
+        m_predefined_types["H5T_STD_B32BE"] = serializer->Serialize(ParseH5Type(type));
         H5Tclose(type);
         type = H5Tcopy(H5T_STD_B32LE);
-        m_predefined_types["H5T_STD_B32LE"] = ParseH5Type(type);
+        m_predefined_types["H5T_STD_B32LE"] = serializer->Serialize(ParseH5Type(type));
         H5Tclose(type);
         type = H5Tcopy(H5T_STD_B64BE);
-        m_predefined_types["H5T_STD_B64BE"] = ParseH5Type(type);
+        m_predefined_types["H5T_STD_B64BE"] = serializer->Serialize(ParseH5Type(type));
         H5Tclose(type);
         type = H5Tcopy(H5T_STD_B64LE);
-        m_predefined_types["H5T_STD_B64LE"] = ParseH5Type(type);
+        m_predefined_types["H5T_STD_B64LE"] = serializer->Serialize(ParseH5Type(type));
         H5Tclose(type);
 
         type = H5Tcopy(H5T_STD_REF_OBJ);
-        m_predefined_types["H5T_STD_REF_OBJ"] = ParseH5Type(type);
+        m_predefined_types["H5T_STD_REF_OBJ"] = serializer->Serialize(ParseH5Type(type));
         H5Tclose(type);
         type = H5Tcopy(H5T_STD_REF_DSETREG);
-        m_predefined_types["H5T_STD_REF_DSETREG"] = ParseH5Type(type);
+        m_predefined_types["H5T_STD_REF_DSETREG"] = serializer->Serialize(ParseH5Type(type));
         H5Tclose(type);
 
         // C-specific datatype
 
         type = H5Tcopy(H5T_C_S1);
-        m_predefined_types["H5T_C_S1"] = ParseH5Type(type);
+        m_predefined_types["H5T_C_S1"] = serializer->Serialize(ParseH5Type(type));
         H5Tclose(type);
 
         // Predefined native datatypes
 
         type = H5Tcopy(H5T_NATIVE_CHAR);
-        m_predefined_types["H5T_NATIVE_CHAR"] = ParseH5Type(type);
+        m_predefined_types["H5T_NATIVE_CHAR"] = serializer->Serialize(ParseH5Type(type));
         H5Tclose(type);
         type = H5Tcopy(H5T_NATIVE_SHORT);
-        m_predefined_types["H5T_NATIVE_SHORT"] = ParseH5Type(type);
+        m_predefined_types["H5T_NATIVE_SHORT"] = serializer->Serialize(ParseH5Type(type));
         H5Tclose(type);
         type = H5Tcopy(H5T_NATIVE_INT);
-        m_predefined_types["H5T_NATIVE_INT"] = ParseH5Type(type);
+        m_predefined_types["H5T_NATIVE_INT"] = serializer->Serialize(ParseH5Type(type));
         H5Tclose(type);
         type = H5Tcopy(H5T_NATIVE_LONG);
-        m_predefined_types["H5T_NATIVE_LONG"] = ParseH5Type(type);
+        m_predefined_types["H5T_NATIVE_LONG"] = serializer->Serialize(ParseH5Type(type));
         H5Tclose(type);
         type = H5Tcopy(H5T_NATIVE_LLONG);
-        m_predefined_types["H5T_NATIVE_LLONG"] = ParseH5Type(type);
+        m_predefined_types["H5T_NATIVE_LLONG"] = serializer->Serialize(ParseH5Type(type));
         H5Tclose(type);
         type = H5Tcopy(H5T_NATIVE_UCHAR);
-        m_predefined_types["H5T_NATIVE_UCHAR"] = ParseH5Type(type);
+        m_predefined_types["H5T_NATIVE_UCHAR"] = serializer->Serialize(ParseH5Type(type));
         H5Tclose(type);
         type = H5Tcopy(H5T_NATIVE_USHORT);
-        m_predefined_types["H5T_NATIVE_USHORT"] = ParseH5Type(type);
+        m_predefined_types["H5T_NATIVE_USHORT"] = serializer->Serialize(ParseH5Type(type));
         H5Tclose(type);
         type = H5Tcopy(H5T_NATIVE_UINT);
-        m_predefined_types["H5T_NATIVE_UINT"] = ParseH5Type(type);
+        m_predefined_types["H5T_NATIVE_UINT"] = serializer->Serialize(ParseH5Type(type));
         H5Tclose(type);
         type = H5Tcopy(H5T_NATIVE_ULONG);
-        m_predefined_types["H5T_NATIVE_ULONG"] = ParseH5Type(type);
+        m_predefined_types["H5T_NATIVE_ULONG"] = serializer->Serialize(ParseH5Type(type));
         H5Tclose(type);
         type = H5Tcopy(H5T_NATIVE_ULLONG);
-        m_predefined_types["H5T_NATIVE_ULLONG"] = ParseH5Type(type);
+        m_predefined_types["H5T_NATIVE_ULLONG"] = serializer->Serialize(ParseH5Type(type));
         H5Tclose(type);
         type = H5Tcopy(H5T_NATIVE_FLOAT);
-        m_predefined_types["H5T_NATIVE_FLOAT"] = ParseH5Type(type);
+        m_predefined_types["H5T_NATIVE_FLOAT"] = serializer->Serialize(ParseH5Type(type));
         H5Tclose(type);
         type = H5Tcopy(H5T_NATIVE_DOUBLE);
-        m_predefined_types["H5T_NATIVE_DOUBLE"] = ParseH5Type(type);
+        m_predefined_types["H5T_NATIVE_DOUBLE"] = serializer->Serialize(ParseH5Type(type));
         H5Tclose(type);
         type = H5Tcopy(H5T_NATIVE_LDOUBLE);
-        m_predefined_types["H5T_NATIVE_LDOUBLE"] = ParseH5Type(type);
+        m_predefined_types["H5T_NATIVE_LDOUBLE"] = serializer->Serialize(ParseH5Type(type));
         H5Tclose(type);
         type = H5Tcopy(H5T_NATIVE_B8);
-        m_predefined_types["H5T_NATIVE_B8"] = ParseH5Type(type);
+        m_predefined_types["H5T_NATIVE_B8"] = serializer->Serialize(ParseH5Type(type));
         H5Tclose(type);
         type = H5Tcopy(H5T_NATIVE_B16);
-        m_predefined_types["H5T_NATIVE_B16"] = ParseH5Type(type);
+        m_predefined_types["H5T_NATIVE_B16"] = serializer->Serialize(ParseH5Type(type));
         H5Tclose(type);
         type = H5Tcopy(H5T_NATIVE_B32);
-        m_predefined_types["H5T_NATIVE_B32"] = ParseH5Type(type);
+        m_predefined_types["H5T_NATIVE_B32"] = serializer->Serialize(ParseH5Type(type));
         H5Tclose(type);
         type = H5Tcopy(H5T_NATIVE_B64);
-        m_predefined_types["H5T_NATIVE_B64"] = ParseH5Type(type);
+        m_predefined_types["H5T_NATIVE_B64"] = serializer->Serialize(ParseH5Type(type));
         H5Tclose(type);
 
         m_bitfield_types = gcnew Hashtable();

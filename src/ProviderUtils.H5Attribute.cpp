@@ -17,6 +17,7 @@ using namespace System;
 using namespace System::Collections;
 using namespace System::Management::Automation;
 using namespace System::Runtime::InteropServices;
+using namespace System::Web::Script::Serialization;
 
 namespace PSH5X
 {
@@ -162,7 +163,9 @@ namespace PSH5X
                         throw gcnew HDF5Exception("H5Aget_type failed!");
                     }
 
-                    ht["ElementType"] = ProviderUtils::ParseH5Type(ftype);
+					JavaScriptSerializer^ serializer = gcnew JavaScriptSerializer();
+
+                    ht["ElementType"] = serializer->Serialize(ProviderUtils::ParseH5Type(ftype));
                     size_t size = H5Tget_size(ftype);
 
                     switch (H5Tget_class(ftype))

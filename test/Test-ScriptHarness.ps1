@@ -18,6 +18,8 @@ ForEach-Object -Begin `
 } -Process `
 {
     $error.Clear()
+    "`n" |
+        Out-File -Append -FilePath $report
     $startTime = Get-Date
     "  Begin testing $_ at $startTime" |
         Out-File -Append -FilePath $report
@@ -25,15 +27,21 @@ ForEach-Object -Begin `
     $endTime = Get-Date
     "  End testing $_ at $endTime" |
         Out-File -Append -FilePath $report
+    "`n" |
+        Out-File -Append -FilePath $report
     "  Script generated $($error.Count) errors" |
         Out-File -Append -FilePath $report
-    "Elapsed time $($endTime - $startTime)" |
+    "`n" |
+        Out-File -Append -FilePath $report
+    "  Elapsed time $($endTime - $startTime)" |
         Out-File -Append -FilePath $report
 
 } -End `
 {
     $etime = Get-Date
     $ErrorActionPreference = "Continue"
+    "`n" |
+        Out-File -Append -FilePath $report
     "Completed testing all scripts in $path $etime" |
         Out-File -Append -FilePath $report
     "Testing took $($etime - $stime)" |

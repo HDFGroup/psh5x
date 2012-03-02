@@ -14,6 +14,7 @@ using namespace System;
 using namespace System::IO;
 using namespace System::Management::Automation;
 using namespace System::Runtime::InteropServices;
+using namespace System::Web::Script::Serialization;
 
 namespace PSH5X
 {
@@ -69,7 +70,8 @@ namespace PSH5X
             break;
         }
 
-        m_elem_type = ProviderUtils::ParseH5Type(dtype);
+		JavaScriptSerializer^ serializer = gcnew JavaScriptSerializer();
+        m_elem_type = serializer->Serialize(ProviderUtils::ParseH5Type(dtype));
 
 #pragma endregion
 

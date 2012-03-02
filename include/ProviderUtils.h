@@ -144,7 +144,7 @@ namespace PSH5X
 
         static bool IsSupportedH5Type(System::String^ type);
 
-        static System::Collections::Hashtable^ ParseH5Type(hid_t type);
+        static System::Collections::Generic::Dictionary<System::String^,System::Object^>^ ParseH5Type(hid_t type);
 
 		static hid_t ParseH5Type(System::Collections::Generic::Dictionary<System::String^, System::Object^>^ dict);
 
@@ -300,8 +300,6 @@ namespace PSH5X
         static System::Collections::Hashtable^ m_reference_types;
 
         static System::Collections::Hashtable^ m_standard_types;
-
-        //static System::Collections::Hashtable^ m_sysdef_types;
 
         static System::Collections::Hashtable^ m_known_types;
 

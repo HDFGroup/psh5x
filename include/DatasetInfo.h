@@ -21,9 +21,9 @@ namespace PSH5X
             System::String^ get() { return m_elem_type_class; }
         }
 
-        property System::Object^ ElementType
+        property System::String^ ElementType
         {
-            System::Object^ get() { return m_elem_type; }
+            System::String^ get() { return m_elem_type; }
         }
 
         property long long StorageSizeBytes
@@ -98,7 +98,7 @@ namespace PSH5X
 
         System::String^   m_elem_type_class;
 
-        System::Object^   m_elem_type;
+        System::String^   m_elem_type;
 
         hsize_t           m_storage_size;
 
