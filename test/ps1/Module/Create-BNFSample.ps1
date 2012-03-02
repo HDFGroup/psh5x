@@ -14,9 +14,9 @@ cd "$($name):"
 
 $dummy = New-H5Attribute . attr1 'string attribute' string17
 
-$dummy = New-H5Dataset dset1 H5T_STD_I32BE 10,10
+$dset = New-H5Dataset dset1 H5T_STD_I32BE 10,10
 
-$value = New-H5Array int 100
+$value = New-H5Array $dset.ElementType $dset.ElementCount
 
 foreach ($i in 0..99) {
     $value[$i] = $i%10
@@ -37,9 +37,9 @@ $t = @"
 }
 "@
 
-$dummy = New-H5Dataset dset2 $t 5
+$dset = New-H5Dataset dset2 $t 5
 
-$value = New-H5Array $t 5
+$value = New-H5Array $dset.ElementType $dset.ElementCount
 
 foreach ($i in 1..5)
 {
@@ -66,13 +66,27 @@ $dummy = New-H5LinkedDatatype type1 $t
 
 cd group1
 
-$dummy = New-H5Dataset dset3 /type1 5
+$dset = New-H5Dataset dset3 /type1 5
 
-$t = '{"Class": "Vlen", "Base": "H5T_STD_I32LE"}'
+$value = New-H5Array $dset.ElementType $dset.ElementCount
+
+foreach ($i in 0..4)
+{
+    foreach ($j in 0..3) {
+        $value[$i].A0[$j] = $j
+    }
+    foreach ($r in 0..4) {
+        foreach ($c in 0..5) {
+            $value[$i].A1[$r,$c] = ($r+1)/10
+        }
+    }
+}
 
 cd ..
 
-$dummy = New-H5Dataset dset3 $t 4
+$t = '{"Class": "Vlen", "Base": "H5T_STD_I32LE"}'
+
+$dset = New-H5Dataset dset3 $t 4
 
 $value = @(@(0), @(10,11), @(20,21,22), @(30,31,32,33))
 

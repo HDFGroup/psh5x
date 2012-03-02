@@ -1705,7 +1705,9 @@ namespace PSH5X
 
         H5T_class_t cls = H5Tget_class(dtype);
 
-        hid_t ntype = -1, super = -1;
+        hid_t ntype = -1, super = -1, atype = -1;
+
+		hsize_t* adims = NULL;
 
         try
         {
@@ -1755,7 +1757,6 @@ namespace PSH5X
             else if (cls == H5T_ENUM)
             {
                 super = H5Tget_super(ntype);
-
                 if      (H5Tequal(super, H5T_NATIVE_CHAR)   > 0) { result = SByte::typeid;  }
                 else if (H5Tequal(super, H5T_NATIVE_SHORT)  > 0) { result = Int16::typeid;  }
                 else if (H5Tequal(super, H5T_NATIVE_INT)    > 0) { result = Int32::typeid;  }
@@ -1771,18 +1772,52 @@ namespace PSH5X
 			{
 				throw gcnew PSH5XException("Reference types are unsupported!");
 			}
+			else if (cls == H5T_ARRAY)
+			{
+				super = H5Tget_super(dtype);
+
+				Type^ t = H5Type2DotNet(super);
+				if (t != nullptr)
+				{
+
+					int rank = H5Tget_array_ndims(dtype);
+					if (rank < 0) {
+						throw gcnew HDF5Exception("H5Tget_array_ndims failed!!!");
+					}
+					adims = new hsize_t [rank];
+					rank = H5Tget_array_dims2(dtype, adims);
+					if (rank < 0) {
+						throw gcnew HDF5Exception("H5Tget_array_dims2 failed!!!");
+					}
+					array<int>^ dims = gcnew array<int>(rank);
+					for (int i = 0; i < rank; ++i) {
+						dims[i] = safe_cast<int>(adims[i]);
+					}
+					Array^ dummy = Array::CreateInstance(t, dims);
+					result = dummy->GetType();
+				}
+				else {
+					throw gcnew PSH5XException("Unsupported array base type!");
+				}
+			}
 			else {
 				throw gcnew PSH5XException("Unsupported type class!");
 			}
         }
         finally
         {
+			if (atype >= 0) {
+                H5Tclose(atype);
+            }
             if (ntype >= 0) {
                 H5Tclose(ntype);
             }
             if (super >= 0) {
                 H5Tclose(super);
             }
+			if (adims != NULL) {
+				delete [] adims;
+			}
         }
 
         return result;
@@ -1823,6 +1858,9 @@ namespace PSH5X
         else if (t == System::UInt64::typeid) {
             return 'L';
         }
+		else if (t->IsArray) {
+			return 'A';
+		}
         else {
             return '\0';
         }
@@ -1990,6 +2028,8 @@ error:
         array<int>^ member_size = gcnew array<int>(member_count);
         array<int>^ member_offset = gcnew array<int>(member_count);
         array<__wchar_t>^ member_tcode = gcnew array<__wchar_t>(member_count);
+		array<bool>^ member_is_array = gcnew array<bool>(member_count);
+		array<String^>^ array_member_dims = gcnew array<String^>(member_count);
 
         StringBuilder^ sbname = gcnew StringBuilder();
         StringBuilder^ sbconstr = gcnew StringBuilder("(");
@@ -1997,6 +2037,8 @@ error:
         char* name = NULL;
 
         hid_t mtype = -1, ntype = -1;
+
+		hsize_t* adims = NULL;
 
         try
         {
@@ -2015,6 +2057,28 @@ error:
                 if (mtype < 0) {
                     throw gcnew HDF5Exception("H5Tget_member_type failed!");
                 }
+
+				if (H5Tget_class(mtype) == H5T_ARRAY)
+				{
+					StringBuilder^ sb = gcnew StringBuilder();
+					member_is_array[i] = true;
+					int rank = H5Tget_array_ndims(mtype);
+					adims = new hsize_t [rank];
+					rank = H5Tget_array_dims2(mtype, adims);
+					sb->Append("[");
+					for (int r = 0; r < rank; ++r) {
+						if (r > 0) {
+							sb->Append("," + safe_cast<int>(adims[r]).ToString());
+						}
+						else {
+							sb->Append(safe_cast<int>(adims[r]).ToString());
+						}
+					}
+					sb->Append("]");
+					delete [] adims;
+					adims = NULL;
+					array_member_dims[i] = sb->ToString();
+				}
 
                 if (H5Tget_class(mtype) == H5T_BITFIELD) {
                     ntype = H5Tget_native_type(mtype, H5T_DIR_DESCEND);
@@ -2071,7 +2135,14 @@ error:
             for (int i = 0; i < member_count; ++i)
             {
                 sbcode->Append("[FieldOffset(" + member_offset[i] + ")]");
-                sbcode->Append(" public " + member_type[i] + " " + member_name[i] + ";"); // + " {get;set;} ");
+				if (!member_is_array[i]) {
+					sbcode->Append(" public " + member_type[i] + " " + member_name[i] + ";");
+				}
+				else {
+					String^ arrString = member_type[i]->Substring(0, member_type[i]->IndexOf('['))
+						+ array_member_dims[i];
+					sbcode->Append(" public " + member_type[i] + " " + member_name[i] + " = new " + arrString + ";");
+				}
 
                 if (member_tcode[i] == 's') {
                     sb_def_constr->Append(" " + member_name[i] + " = \"\"; ");
@@ -2104,6 +2175,9 @@ error:
         }
         finally
         {
+			if (adims != NULL) {
+				delete [] adims;
+			}
             if (mtype >= 0) {
                 H5Tclose(mtype);
             }

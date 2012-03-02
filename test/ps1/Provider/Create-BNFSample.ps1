@@ -16,9 +16,9 @@ New-ItemProperty . attr1 -ElementType string17
 
 Set-ItemProperty . attr1 'string attribute'
 
-New-Item dset1 -ItemType Dataset -ElementType H5T_STD_I32BE -Dimensions 10,10
+$dset = New-Item dset1 -ItemType Dataset -ElementType H5T_STD_I32BE -Dimensions 10,10
 
-$value = New-H5Array int 100
+$value = New-H5Array $dset.ElementType $dset.ElementCount
 
 foreach ($i in 0..99) {
     $value[$i] = $i%10
@@ -39,9 +39,9 @@ $t = @"
 }
 "@
 
-New-Item dset2 -ItemType Dataset -ElementType $t -Dimensions 5 
+$dset = New-Item dset2 -ItemType Dataset -ElementType $t -Dimensions 5 
 
-$value = New-H5Array $t 5
+$value = New-H5Array $dset.ElementType $dset.ElementCount
 
 foreach ($i in 1..5)
 {
@@ -68,7 +68,21 @@ New-Item type1 -ItemType Datatype -Definition $t
 
 cd group1
 
-New-Item dset3 -ItemType Dataset -ElementType /type1 -Dimensions 5 
+$dset = New-Item dset3 -ItemType Dataset -ElementType /type1 -Dimensions 5 
+
+$value = New-H5Array $dset.ElementType $dset.ElementCount
+
+foreach ($i in 0..4)
+{
+    foreach ($j in 0..3) {
+        $value[$i].A0[$j] = $j
+    }
+    foreach ($r in 0..4) {
+        foreach ($c in 0..5) {
+            $value[$i].A1[$r,$c] = ($r+1)/10
+        }
+    }
+}
 
 cd ..
 
