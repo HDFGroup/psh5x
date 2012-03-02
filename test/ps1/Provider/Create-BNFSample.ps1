@@ -41,6 +41,15 @@ $t = @"
 
 New-Item dset2 -ItemType Dataset -ElementType $t -Dimensions 5 
 
+$value = New-H5Array $t 5
+
+foreach ($i in 1..5)
+{
+    $value[$i-1].i0 = $i;
+    $value[$i-1].f1 = $i/10;
+    $value[$i-1].d2 = $i/100
+}
+
 New-Item group1 -ItemType Group
 
 $t = @"

@@ -14,6 +14,7 @@ using namespace System::Collections::Generic;
 using namespace System::Collections::ObjectModel;
 using namespace System::IO;
 using namespace System::Management::Automation;
+using namespace System::Reflection;
 using namespace System::Runtime::InteropServices;
 using namespace System::Web::Script::Serialization;
 
@@ -98,6 +99,7 @@ namespace PSH5X
 							}
 							Array^ dummy = Array::CreateInstance(t, dims);
 							result = Array::CreateInstance(dummy->GetType(), m_length);
+
 							for (long long i = 0; i < m_length; ++i) {
 								result->SetValue(Array::CreateInstance(t, dims), i);
 							}
@@ -112,23 +114,23 @@ namespace PSH5X
 					{
 #pragma region HDF5 compound type
 
-						int mcount = H5Tget_nmembers(ntype);
-						array<String^>^ mname = gcnew array<String^>(mcount);
-						array<System::Type^>^ mtype = gcnew array<System::Type^>(mcount);
-
-						for (int i = 0; i < mcount; ++i)
+						System::Type^ t = ProviderUtils::GetCompundDotNetType(ntype);
+						if (t != nullptr)
 						{
-							char* name = H5Tget_member_name(ntype, safe_cast<unsigned>(i));
-							mname[i] = gcnew String(name);
+							result = Array::CreateInstance(t, m_length);
 
-							dtype = H5Tget_member_type(ntype, safe_cast<unsigned>(i));
-							mtype[i] = ProviderUtils::H5Type2DotNet(dtype);
-							if (mtype[i] == nullptr) {
-								throw gcnew PSH5XException("Unsupported member datatype in COMPOUND!");
+							array<ConstructorInfo^>^ cinfo = t->GetConstructors();
+							if (cinfo->Length != 2) {
+								throw gcnew PSH5XException("Constructor code generation error!");
+							}
+
+							for (long long i = 0; i < m_length; ++i) {
+								result->SetValue(cinfo[0]->Invoke(nullptr), i);
 							}
 						}
-
-						result = ProviderUtils::GetPSObjectArray(m_length, mname, mtype);
+						else {
+							throw gcnew PSH5XException("Unsupported member datatype in COMPOUND!");
+						}
 
 #pragma endregion
 					}

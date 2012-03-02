@@ -71,8 +71,6 @@ namespace PSH5X
             System::Collections::Hashtable^ get() { return m_standard_types; }
         }
 
-        
-
 #pragma endregion
 
 #pragma region PS and HDF5 path names
