@@ -22,8 +22,7 @@ namespace PSH5X
 {
     void NewH5ArrayCommand::BeginProcessing()
     {
-        if (m_length <= 0)
-        {
+        if (m_length <= 0) {
             throw gcnew ArgumentException("Length must be positive!!!");
         }
 
@@ -33,8 +32,6 @@ namespace PSH5X
     void NewH5ArrayCommand::ProcessRecord()
     {
         hid_t dtype = -1, ntype = -1, base_type = -1;
-        hsize_t* adims = NULL;
-
         Array^ result = nullptr;
 
         array<long long>^ dims = gcnew array<long long>(1);
@@ -91,8 +88,9 @@ namespace PSH5X
 						if (t != nullptr)
 						{
 							int rank = H5Tget_array_ndims(ntype);
-							adims = new hsize_t [rank];
-							rank = H5Tget_array_dims2(ntype, adims);
+							array<hsize_t>^ adims = gcnew array<hsize_t>(rank);
+                            pin_ptr<hsize_t> adims_ptr = &adims[0];
+							rank = H5Tget_array_dims2(ntype, adims_ptr);
 							array<int>^ dims = gcnew array<int>(rank);
 							for (int i = 0; i < rank; ++i) {
 								dims[i] = safe_cast<int>(adims[i]);
@@ -166,10 +164,6 @@ namespace PSH5X
 		}
 		finally
 		{
-			if (adims != NULL) {
-				delete [] adims;
-			}
-
 			if (base_type >= 0) {
 				H5Tclose(base_type);
 			}

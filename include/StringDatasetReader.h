@@ -12,7 +12,7 @@ namespace PSH5X
     {
     public:
 
-        StringDatasetReader(hid_t h5file, System::String^ h5path);
+        StringDatasetReader(hid_t dset, hid_t ftype, hid_t fspace);
 
         /*
 

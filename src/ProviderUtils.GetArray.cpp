@@ -24,8 +24,6 @@ namespace PSH5X
 
         hid_t ntype = -1;
 
-        htri_t is_vlen = -1;
-
         try
         {
             size_t size = H5Tget_size(type_id);
@@ -289,12 +287,8 @@ namespace PSH5X
 
         hid_t ntype = -1;
 
-        htri_t is_vlen = -1;
-
         try
         {
-            size_t size = H5Tget_size(type_id);
-
             H5T_class_t cls = H5Tget_class(type_id);
 
             switch (cls)
@@ -376,15 +370,9 @@ namespace PSH5X
 
             case H5T_STRING:
 
-#pragma region HDF5 string
-
-                if (true)
-                {
-                    result = array<String^>::typeid;
-                }
-
-#pragma endregion
-
+				if (true) {
+					result = array<String^>::typeid;
+				}
                 break;
 
             case H5T_BITFIELD:

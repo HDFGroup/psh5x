@@ -12,32 +12,19 @@ extern "C" {
 
 namespace PSH5X
 {
-
     template <typename T>
     public ref class DatasetReaderT
         : System::Management::Automation::Provider::IContentReader
     {
     public:
 
-        DatasetReaderT(hid_t h5file, System::String^ h5path)
+        DatasetReaderT(hid_t dset, hid_t ftype, hid_t fspace)
             : m_array(nullptr), m_ienum(nullptr), m_position(0)
         {
-            char* name = (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
-
-            hid_t dset = -1, ftype = -1, ntype = -1, fspace = -1;
+            hid_t ntype = -1;
 
             try
             {
-                dset = H5Dopen2(h5file, name, H5P_DEFAULT);
-                if (dset < 0) {
-                    throw gcnew HDF5Exception("H5Dopen2 failed!");
-                }
-
-                ftype = H5Dget_type(dset);
-                if (ftype < 0) {
-                    throw gcnew HDF5Exception("H5Dget_type failed!");
-                }
-
                 if (H5Tget_class(ftype) == H5T_BITFIELD) {
                     ntype = H5Tget_native_type(ftype, H5T_DIR_DESCEND);
                 }
@@ -48,19 +35,16 @@ namespace PSH5X
                     throw gcnew HDF5Exception("H5Tget_native_type failed!");
                 }
 
-                fspace = H5Dget_space(dset);
-                if (fspace < 0) {
-                    throw gcnew HDF5Exception("H5Dget_space failed!");
-                }
-
                 Type^ t = ProviderUtils::H5Type2DotNet(ntype);
 
                 if (t != nullptr)
                 {
-                    size_t size = H5Tget_size(ntype);
-
-                    hssize_t npoints = H5Sget_simple_extent_npoints(fspace);
-                    if (npoints > 0)
+                    hssize_t npoints = 1;
+					if (H5Sget_simple_extent_type(fspace) == H5S_SIMPLE) { 
+						npoints = H5Sget_simple_extent_npoints(fspace);
+					}
+                    
+					if (npoints > 0)
                     {
                         int rank = H5Sget_simple_extent_ndims(fspace);
                         array<hsize_t>^ dims = gcnew array<hsize_t>(rank);
@@ -88,21 +72,9 @@ namespace PSH5X
             }
             finally
             {
-                if (fspace >= 0) {
-                    H5Sclose(fspace);
-                }
                 if (ntype >= 0) {
                     H5Tclose(ntype);
                 }
-                if (ftype >= 0) {
-                    H5Tclose(ftype);
-                }
-
-                if (dset >= 0) {
-                    H5Dclose(dset);
-                }
-
-                Marshal::FreeHGlobal(IntPtr(name));
             }
 
         }
@@ -147,7 +119,7 @@ namespace PSH5X
                     }
                 }
 
-                result = gcnew array<T>(length);
+                result = gcnew array<T>(safe_cast<int>(length));
 
                 // I have no idea how to efficiently copy a multidimensional array
                 // into a onedimensional array

@@ -14,8 +14,6 @@ extern "C" {
 #include <cstdlib>
 #include <cstring>
 
-using namespace Microsoft::CSharp;
-
 using namespace System;
 using namespace System::CodeDom::Compiler;
 using namespace System::Collections;
@@ -27,34 +25,22 @@ using namespace System::Text;
 
 namespace PSH5X
 {
-    CompoundDatasetReader::CompoundDatasetReader(hid_t h5file, String^ h5path)
+    CompoundDatasetReader::CompoundDatasetReader(hid_t dset, hid_t ftype, hid_t fspace)
         : m_array(nullptr), m_position(0)
     {
-        char* name = (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
         char* mname = NULL;
 
-        hid_t dset = -1, ftype = -1, ntype = -1, mtype = -1, memtype = -1, fspace = -1;
+        hid_t ntype = -1, mtype = -1, memtype = -1;
 
         try
         {
-            dset = H5Dopen2(h5file, name, H5P_DEFAULT);
-            if (dset < 0) {
-                throw gcnew HDF5Exception("H5Dopen2 failed!");
-            }
-
-            fspace = H5Dget_space(dset);
-            if (fspace < 0) {
-                throw gcnew HDF5Exception("H5Dget_space failed!");
-            }
-
-            ftype = H5Dget_type(dset);
-            if (ftype < 0) {
-                throw gcnew HDF5Exception("H5Dget_type failed!");
-            }
-
             size_t size = H5Tget_size(ftype);
                 
-            hssize_t npoints = H5Sget_simple_extent_npoints(fspace);
+            hssize_t npoints = 1;
+			if (H5Sget_simple_extent_type(fspace) == H5S_SIMPLE) { 
+				npoints = H5Sget_simple_extent_npoints(fspace);
+			}
+
             if (npoints > 0)
             {
                 int rank = H5Sget_simple_extent_ndims(fspace);
@@ -139,7 +125,7 @@ namespace PSH5X
                     throw gcnew PSH5XException("Constructor code generation error!");
                 }
 
-                array<unsigned char>^ mbuf = gcnew array<unsigned char>(npoints*size);
+                array<unsigned char>^ mbuf = gcnew array<unsigned char>(safe_cast<size_t>(npoints*size));
 
                 pin_ptr<unsigned char> p = &mbuf[0];
                 unsigned char* buf = p;
@@ -208,12 +194,6 @@ namespace PSH5X
         }
         finally
         {
-            if (fspace >= 0) {
-                H5Sclose(fspace);
-            }
-            if (ftype >= 0) {
-                H5Tclose(ftype);
-            }
             if (memtype >= 0) {
                 H5Tclose(memtype);
             }
@@ -222,12 +202,6 @@ namespace PSH5X
             }
             if (mtype >= 0) {
                 H5Tclose(mtype);
-            }
-            if (dset >= 0) {
-                H5Dclose(dset);
-            }
-            if (name != NULL) {
-                Marshal::FreeHGlobal(IntPtr(name));
             }
         }
     }

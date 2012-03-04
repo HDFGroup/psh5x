@@ -23,30 +23,22 @@ using namespace System::Runtime::InteropServices;
 
 namespace PSH5X
 {
-    ArrayDatasetReader::ArrayDatasetReader(hid_t h5file, String^ h5path)
+    ArrayDatasetReader::ArrayDatasetReader(hid_t dset, hid_t ftype, hid_t fspace)
         : m_array(nullptr), m_position(0)
     {
-        char* name = (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
-
         vector<unsigned char> rdata;
 
-        hid_t dset = -1, ftype = -1, ntype = -1, mtype = -1, base_type = -1, fspace = -1;
+        hid_t ntype = -1, mtype = -1, base_type = -1;
 
         vector<hsize_t> mdims;
 
         try
         {
-            dset = H5Dopen2(h5file, name, H5P_DEFAULT);
-            if (dset < 0) {
-                throw gcnew HDF5Exception("H5Dopen2 failed!");
-            }
+			hssize_t npoints = 1;
+			if (H5Sget_simple_extent_type(fspace) == H5S_SIMPLE) { 
+				npoints = H5Sget_simple_extent_npoints(fspace);
+			}
 
-            fspace = H5Dget_space(dset);
-            if (fspace < 0) {
-                throw gcnew HDF5Exception("H5Dget_space failed!");
-            }
-
-            hssize_t npoints = H5Sget_simple_extent_npoints(fspace);
             if (npoints > 0)
             {
                 int rank = H5Sget_simple_extent_ndims(fspace);
@@ -54,12 +46,7 @@ namespace PSH5X
                 pin_ptr<hsize_t> dims_ptr = &dims[0];
                 rank = H5Sget_simple_extent_dims(fspace, dims_ptr, NULL);
 
-                m_array = gcnew array<Array^>(npoints);
-
-                ftype = H5Dget_type(dset);
-                if (ftype < 0) {
-                    throw gcnew HDF5Exception("H5Dget_type failed!");
-                }
+                m_array = gcnew array<Array^>(safe_cast<int>(npoints));
 
                 rank = H5Tget_array_ndims(ftype);
                 if (rank < 0) {
@@ -108,7 +95,7 @@ namespace PSH5X
                     }
 
                     array<long long>^ index = gcnew array<long long>(rank);
-                    for (size_t i = 0; i < npoints; ++i)
+                    for (size_t i = 0; i < safe_cast<size_t>(npoints); ++i)
                     {
                         void* buffer = (void*) (&rdata[0]+i*count*size);
                         index = ArrayUtils::GetIndex((array<long long>^)dims, i);
@@ -130,12 +117,6 @@ namespace PSH5X
         }
         finally
         {
-            if (fspace >= 0) {
-                H5Sclose(fspace);
-            }
-            if (ftype >= 0) {
-                H5Tclose(ftype);
-            }
             if (base_type >= 0) {
                 H5Tclose(base_type);
             }
@@ -144,12 +125,6 @@ namespace PSH5X
             }
             if (mtype >= 0) {
                 H5Tclose(mtype);
-            }
-            if (dset >= 0) {
-                H5Dclose(dset);
-            }
-            if (name != NULL) {
-                Marshal::FreeHGlobal(IntPtr(name));
             }
         }
     }
@@ -179,7 +154,7 @@ namespace PSH5X
                 }
             }
 
-            result = Array::CreateInstance(m_type, length);
+            result = Array::CreateInstance(m_type, safe_cast<int>(length));
 
             for (long long i = 0; i < length; ++i) {
                 result->SetValue(m_ienum->Current, i);

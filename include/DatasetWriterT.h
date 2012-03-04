@@ -46,23 +46,19 @@ namespace PSH5X
                 if (dset < 0) {
                     throw gcnew HDF5Exception("H5Dopen2 failed!");
                 }
-
+				ftype = H5Dget_type(dset);
+                if (ftype < 0) {
+                    throw gcnew HDF5Exception("H5Dget_type failed!");
+                }
                 fspace = H5Dget_space(dset);
                 if (fspace < 0) {
                     throw gcnew HDF5Exception("H5Dget_space failed!");
                 }
 
-                ftype = H5Dget_type(dset);
-                if (ftype < 0) {
-                    throw gcnew HDF5Exception("H5Dget_type failed!");
-                }
-
-                ntype = H5Tget_native_type(ftype, H5T_DIR_ASCEND);
-                if (ntype < 0) {
-                    throw gcnew ArgumentException("H5Tget_native_type failed!");
-                }
-
-                hssize_t npoints = H5Sget_simple_extent_npoints(fspace);
+                hssize_t npoints = 1;
+				if (H5Sget_simple_extent_type(fspace) == H5S_SIMPLE) {
+				    npoints = H5Sget_simple_extent_npoints(fspace);
+				}
 
                 if (content->Count != safe_cast<int>(npoints))
                 {
@@ -73,7 +69,12 @@ namespace PSH5X
                 Array^ a = safe_cast<Array^>(content);
                 Array::Copy(a, m_array, a->Length);
                 pin_ptr<T> ptr = &m_array[0];
-                
+
+                ntype = H5Tget_native_type(ftype, H5T_DIR_ASCEND);
+                if (ntype < 0) {
+                    throw gcnew ArgumentException("H5Tget_native_type failed!");
+                }
+
                 if (H5Dwrite(dset, ntype, H5S_ALL, H5S_ALL, H5P_DEFAULT, ptr) < 0) {
                     throw gcnew HDF5Exception("H5Dwrite failed!");
                 }

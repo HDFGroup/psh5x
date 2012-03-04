@@ -261,7 +261,7 @@ namespace PSH5X
             }
 
             for (int i = 0; i < dims->Length; ++i) {
-                if (dims[i] == 0) {
+                if (dims[i] <= 0) {
                     throw gcnew PSH5XException("Dimensions must be positive!");
                 }
             }

@@ -72,7 +72,7 @@ namespace PSH5X
             {
                 vwdata = new char* [npoints];
 
-                astring = gcnew array<String^>(npoints);
+                astring = gcnew array<String^>(safe_cast<int>(npoints));
 
                 if (ProviderUtils::TryGetValue(content, astring))
                 {
@@ -108,7 +108,7 @@ namespace PSH5X
                     wdata[i] = wdata[0] + i*(size+1);
                 }
 
-                astring = gcnew array<String^>(npoints);
+                astring = gcnew array<String^>(safe_cast<int>(npoints));
 
                 if (ProviderUtils::TryGetValue(content, astring))
                 {

@@ -103,11 +103,11 @@ namespace PSH5X
                     IEnumerator^ ienum = content->GetEnumerator();
                     ienum->MoveNext();
 
-                    array<int>^ len = gcnew array<int>(npoints);
+                    array<int>^ len = gcnew array<int>(safe_cast<int>(npoints));
 
-                    array<int>^ offset = gcnew array<int>(npoints);
+                    array<int>^ offset = gcnew array<int>(safe_cast<int>(npoints));
 
-                    array<Object^>^ amaster = gcnew array<Object^>(npoints);
+                    array<Object^>^ amaster = gcnew array<Object^>(safe_cast<int>(npoints));
 
                     int total = 0;
 

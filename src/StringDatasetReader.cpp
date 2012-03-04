@@ -20,29 +20,21 @@ using namespace System::Runtime::InteropServices;
 
 namespace PSH5X
 {
-    StringDatasetReader::StringDatasetReader(hid_t h5file, String^ h5path)
+    StringDatasetReader::StringDatasetReader(hid_t dset, hid_t ftype, hid_t fspace)
         : m_array(nullptr), m_position(0)
     {
-        char* name = (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
-
         char** rdata = NULL;
         char** vrdata = NULL;
 
-        hid_t dset = -1, ftype = -1, mtype = -1, fspace = -1, mspace = -1;
+        hid_t mtype = -1, mspace = -1;
 
         try
         {
-            dset = H5Dopen2(h5file, name, H5P_DEFAULT);
-            if (dset < 0) {
-                throw gcnew HDF5Exception("H5Dopen2 failed!");
-            }
+            hssize_t npoints = 1;
+			if (H5Sget_simple_extent_type(fspace) == H5S_SIMPLE) { 
+				npoints = H5Sget_simple_extent_npoints(fspace);
+			}
 
-            fspace = H5Dget_space(dset);
-            if (fspace < 0) {
-                throw gcnew HDF5Exception("H5Dget_space failed!");
-            }
-
-            hssize_t npoints = H5Sget_simple_extent_npoints(fspace);
             if (npoints > 0)
             {
                 int rank = H5Sget_simple_extent_ndims(fspace);
@@ -54,22 +46,14 @@ namespace PSH5X
                 mdims[0] = static_cast<hsize_t>(npoints);
                 mspace = H5Screate_simple(1, mdims, NULL);
 
-                m_array = gcnew array<String^>(dims[0]);
-
-                ftype = H5Dget_type(dset);
-                if (ftype < 0) {
-                    throw gcnew HDF5Exception("H5Dget_type failed!");
-                }
-
                 m_array = Array::CreateInstance(String::typeid, (array<long long>^) dims);
-
-                mtype = H5Tcopy(H5T_C_S1);
 
                 htri_t is_vlen = H5Tis_variable_str(ftype);
                 if (is_vlen > 0)
                 {
-                    if (H5Tset_size(mtype, H5T_VARIABLE) < 0) {
-                        throw gcnew HDF5Exception("H5Tset_size failed!");
+					mtype = H5Tcreate(H5T_STRING, H5T_VARIABLE);
+                    if (mtype < 0) {
+                        throw gcnew HDF5Exception("H5Tcreate failed!");
                     }
 
                     vrdata = new char* [mdims[0]];
@@ -92,9 +76,9 @@ namespace PSH5X
                 else if (is_vlen == 0)
                 {
                     size_t size = H5Tget_size(ftype);
-
-                    if (H5Tset_size(mtype, size+1) < 0) {
-                        throw gcnew HDF5Exception("H5Tset_size failed!");
+					mtype = H5Tcreate(H5T_STRING, size+1);
+                    if (mtype < 0) {
+                        throw gcnew HDF5Exception("H5Tcreate failed!");
                     }
 
                     rdata = new char* [mdims[0]];
@@ -141,21 +125,8 @@ namespace PSH5X
             if (mspace >= 0) {
                 H5Sclose(mspace);
             }
-            if (fspace >= 0) {
-                H5Sclose(fspace);
-            }
-            if (ftype >= 0) {
-                H5Tclose(ftype);
-            }
             if (mtype >= 0) {
                 H5Tclose(mtype);
-            }
-            if (dset >= 0) {
-                H5Dclose(dset);
-            }
-
-            if (name != NULL) {
-                Marshal::FreeHGlobal(IntPtr(name));
             }
         }
     }
@@ -184,7 +155,7 @@ namespace PSH5X
                 }
             }
 
-            result = Array::CreateInstance(String::typeid, length);
+            result = Array::CreateInstance(String::typeid, safe_cast<int>(length));
 
             for (long long i = 0; i < length; ++i) {
                 result->SetValue(m_ienum->Current, i);
@@ -195,6 +166,5 @@ namespace PSH5X
         }
 
         return result;
-
     }
 }
