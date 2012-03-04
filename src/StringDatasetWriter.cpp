@@ -81,9 +81,9 @@ namespace PSH5X
                         vwdata[i] = (char*) Marshal::StringToHGlobalAnsi(astring[i]).ToPointer();
                     }
 
-                    mtype = H5Tcopy(H5T_C_S1);
-                    if (H5Tset_size(mtype, H5T_VARIABLE) < 0) {
-                        throw gcnew HDF5Exception("H5Tset_size failed!");
+                    mtype = H5Tcreate(H5T_STRING, H5T_VARIABLE);
+                    if (mtype < 0) {
+                        throw gcnew HDF5Exception("H5Tcreate failed!");
                     }
 
                     if (H5Dwrite(dset, mtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, vwdata) < 0) {
@@ -105,7 +105,7 @@ namespace PSH5X
                 wdata = new char* [npoints];
                 wdata[0] = new char [npoints*(size+1)];
                 for (i = 1; i < npoints; ++i) {
-                    wdata[i] = wdata[0] + i*(size+1);
+					wdata[i] = wdata[0] + i*size;
                 }
 
                 astring = gcnew array<String^>(safe_cast<int>(npoints));
@@ -113,7 +113,7 @@ namespace PSH5X
                 if (ProviderUtils::TryGetValue(content, astring))
                 {
                     for (i = 0; i < npoints; ++i) {
-                        if (astring[i]->Length > size) {
+                        if (astring[i]->Length > size-1) {
                             throw gcnew PSH5XException("String too long!");
                         }
                     }
@@ -125,10 +125,10 @@ namespace PSH5X
                         Marshal::FreeHGlobal(IntPtr(buf));
                     }
 
-                    mtype = H5Tcopy(H5T_C_S1);
-                    if (H5Tset_size(mtype, size+1) < 0) {
-                        throw gcnew HDF5Exception("H5Tset_size failed!!!");
-                    }
+					mtype = H5Tcreate(H5T_STRING, size);
+					if (mtype < 0) {
+						throw gcnew HDF5Exception("H5Tcreate failed!!!");
+					}
 
                     if (H5Dwrite(dset, mtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, wdata[0]) < 0) {
                         throw gcnew HDF5Exception("H5Dwrite failed!");
