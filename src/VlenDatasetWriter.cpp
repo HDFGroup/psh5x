@@ -6,7 +6,7 @@
 
 extern "C" {
 #include "H5Dpublic.h"
-    #include "H5Spublic.h"
+#include "H5Spublic.h"
 #include "H5Tpublic.h"
 }
 
@@ -82,7 +82,6 @@ namespace PSH5X
                 Type^ t = ProviderUtils::H5Type2DotNet(base_type);
                 if (t != nullptr)
                 {
-                    size_t size = H5Tget_size(base_type);
                     wdata = vector<hvl_t>(npoints);
 
                     if (H5Tget_class(base_type) == H5T_BITFIELD) {
@@ -103,30 +102,23 @@ namespace PSH5X
                     IEnumerator^ ienum = content->GetEnumerator();
                     ienum->MoveNext();
 
-                    array<int>^ len = gcnew array<int>(safe_cast<int>(npoints));
-
-                    array<int>^ offset = gcnew array<int>(safe_cast<int>(npoints));
-
-                    array<Object^>^ amaster = gcnew array<Object^>(safe_cast<int>(npoints));
+                    array<int>^ len = gcnew array<int>(npoints);
+                    array<int>^ offset = gcnew array<int>(npoints);
+                    array<Object^>^ amaster = gcnew array<Object^>(npoints);
 
                     int total = 0;
 
                     for (int i = 0; i < npoints; ++i)
                     {
-                        Object^ obj = nullptr;
-                        if (ienum->Current->GetType() == PSObject::typeid) {
-                            obj = ((PSObject^)ienum->Current)->BaseObject;
-                        }
-                        else {
-                            obj = ienum->Current;
-                        }
 
-                        offset[i] = total;
-                        Array^ a = safe_cast<Array^>(obj);
-                        len[i] = a->Length;
-                        total += len[i];
-
+						Object^ obj = ProviderUtils::GetDotNetObject(ienum->Current);
+						Array^ a = safe_cast<Array^>(obj);
+                        
+						offset[i] = total;
+						len[i] = a->Length;
                         amaster[i] = a;
+
+						total += len[i];
 
                         ienum->MoveNext();
                     }

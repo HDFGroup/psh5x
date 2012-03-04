@@ -6,7 +6,7 @@
 
 extern "C" {
 #include "H5Dpublic.h"
-    #include "H5Spublic.h"
+#include "H5Spublic.h"
 #include "H5Tpublic.h"
 }
 

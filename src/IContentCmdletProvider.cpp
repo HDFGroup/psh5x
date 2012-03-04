@@ -243,7 +243,6 @@ namespace PSH5X
             if (dset >= 0) {
                 H5Dclose(dset);
             }
-
             if (name != NULL) {
                 Marshal::FreeHGlobal(IntPtr(name));
             }
@@ -429,7 +428,6 @@ namespace PSH5X
             if (dset >= 0) {
                 H5Dclose(dset);
             }
-
             if (name != NULL) {
                 Marshal::FreeHGlobal(IntPtr(name));
             }
