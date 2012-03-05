@@ -263,6 +263,8 @@ namespace PSH5X
 
                 break;
 
+			// TODO: handle enums
+
             default:
 
                 throw gcnew PSH5XException("Unsupported datatype class!");

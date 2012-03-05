@@ -247,13 +247,7 @@ namespace PSH5X
         {
             bool result = false;
 
-            Object^ bobj = nullptr;
-            if (obj->GetType() == PSObject::typeid) {
-                bobj = safe_cast<PSObject^>(obj)->BaseObject;
-            }
-            else {
-                bobj = obj;
-            }
+            Object^ bobj = GetDotNetObject(obj);
 
             try
             {

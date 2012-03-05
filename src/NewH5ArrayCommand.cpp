@@ -144,7 +144,7 @@ namespace PSH5X
 							Array^ dummy = Array::CreateInstance(t, 0);
 							result = Array::CreateInstance(dummy->GetType(), m_length);
 							for (long long i = 0; i < m_length; ++i) {
-								result->SetValue(Array::CreateInstance(t, 0), i);
+								result->SetValue(dummy, i);
 							}
 						}
 						else {
