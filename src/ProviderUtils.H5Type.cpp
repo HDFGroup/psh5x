@@ -1608,19 +1608,24 @@ namespace PSH5X
             }
 			else if (t->StartsWith("STRING"))
 			{
-				try
+				size_t size = 0;
+				if (ProviderUtils::TryGetValue(t->Substring(6), size))
 				{
-					size_t size = safe_cast<size_t>(Convert::ToUInt32(t->Substring(6)));
-					result = H5Tcreate(H5T_STRING, size);
-					if (result < 0) {
-						throw gcnew HDF5Exception("H5Tcreate failed!");
+					if (size > 1)
+					{
+						result = H5Tcreate(H5T_STRING, size);
+						if (result < 0) {
+							throw gcnew HDF5Exception("H5Tcreate failed!");
+						}
+						isString = true;
+						if (H5Tset_strpad(result, H5T_STR_NULLTERM) < 0) {
+							throw gcnew HDF5Exception("H5Tset_strpad failed!");
+						}
 					}
-					isString = true;
-					if (H5Tset_strpad(result, H5T_STR_NULLTERM) < 0) {
-						throw gcnew HDF5Exception("H5Tset_strpad failed!");
+					else {
+						throw gcnew PSH5XException("Fixed-length strings must be at least 2 characters long!");
 					}
 				}
-				catch (...) {}
 			}
 
 			if (isString)
@@ -1643,19 +1648,24 @@ namespace PSH5X
             }
 			else if (t->StartsWith("USTRING"))
 			{
-				try
+				size_t size = 0;
+				if (ProviderUtils::TryGetValue(t->Substring(7), size))
 				{
-					size_t size = safe_cast<size_t>(Convert::ToUInt32(t->Substring(7)));
-					result = H5Tcreate(H5T_STRING, size);
-					if (result < 0) {
-						throw gcnew HDF5Exception("H5Tcreate failed!");
+					if (size > 1)
+					{
+						result = H5Tcreate(H5T_STRING, size);
+						if (result < 0) {
+							throw gcnew HDF5Exception("H5Tcreate failed!");
+						}
+						isString = true;
+						if (H5Tset_strpad(result, H5T_STR_NULLTERM) < 0) {
+							throw gcnew HDF5Exception("H5Tset_strpad failed!");
+						}
 					}
-					isString = true;
-					if (H5Tset_strpad(result, H5T_STR_NULLTERM) < 0) {
-						throw gcnew HDF5Exception("H5Tset_strpad failed!");
+					else {
+						throw gcnew PSH5XException("Fixed-length strings must be at least 2 characters long!");
 					}
 				}
-				catch (...) {}
 			}
 
 			if (isString)

@@ -823,8 +823,13 @@ namespace PSH5X
 
         try
         {
-            str = safe_cast<String^>(obj);
-            result = true;
+			if (obj != nullptr) {
+				str = safe_cast<String^>(obj);
+			}
+			else {
+				str = "";
+			}
+			result = true;
         }
         catch (...) {}
 
@@ -875,7 +880,12 @@ namespace PSH5X
             arr = gcnew array<String^>(tmp->Length);
             for (int i = 0; i < tmp->Length; ++i)
             {
-                arr[i] = tmp[i]->ToString();
+				if (tmp[i] != nullptr) {
+					arr[i] = tmp[i]->ToString();
+				}
+				else {
+					arr[i] = "";
+				}
             }
 
             result = true;
