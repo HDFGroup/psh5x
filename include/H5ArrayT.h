@@ -3,6 +3,10 @@
 
 #include "PSH5XException.h"
 
+extern "C" {
+#include "H5public.h"
+}
+
 namespace PSH5X
 {
     template <typename T>
