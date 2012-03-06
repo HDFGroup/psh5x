@@ -87,12 +87,6 @@
     <ClCompile Include="src\NavigationCmdletProvider.cpp">
       <Filter>Source Files\Provider\NavigationCmdletProvider</Filter>
     </ClCompile>
-    <ClCompile Include="src\ArrayDatasetReader.cpp">
-      <Filter>Source Files\Provider\IContentCmdletProvider</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ArrayDatasetWriter.cpp">
-      <Filter>Source Files\Provider\IContentCmdletProvider</Filter>
-    </ClCompile>
     <ClCompile Include="src\CompoundDatasetReader.cpp">
       <Filter>Source Files\Provider\IContentCmdletProvider</Filter>
     </ClCompile>
@@ -275,12 +269,6 @@
     <ClInclude Include="include\CompoundDatasetWriter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\ArrayDatasetReader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\ArrayDatasetWriter.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\VlenDatasetReader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -315,6 +303,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\TestH5FileCommand.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ArrayDatasetWriterT.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ArrayDatasetReaderT.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\VlenDatasetReaderT.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\VlenDatasetWriterT.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

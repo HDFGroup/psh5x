@@ -69,8 +69,6 @@ namespace PSH5X
 						arrayLength *= adims[i];
 					}
 
-					H5Array<T>^ dummy = gcnew H5Array<T>(adims);
-
 					array<T>^ rdata = gcnew array<T>(npoints*arrayLength);
 					pin_ptr<T> rdata_ptr = &rdata[0];
 
@@ -78,11 +76,17 @@ namespace PSH5X
 						throw gcnew HDF5Exception("H5Dread failed!");
 					}
 
-					m_array = Array::CreateInstance(dummy->GetType(), npoints);
-					for (hssize_t i = 0; i < npoints; ++i) {
-						// TODO: finish this
-
-						m_array->SetValue(dummy, i);
+					H5Array<T>^ dummy = gcnew H5Array<T>(adims);
+					m_array = Array::CreateInstance(dummy->GetArray()->GetType(), npoints);
+					
+					for (hssize_t i = 0; i < npoints; ++i)
+					{
+						H5Array<T>^ arr = gcnew H5Array<T>(adims);
+						interior_ptr<T> arr_ptr = arr->GetHandle();
+						for (hsize_t j = 0; j < arrayLength; ++j) {
+							arr_ptr[j] = rdata[i*arrayLength+j];
+						}
+						m_array->SetValue(arr->GetArray(), i);
 					}
 
 					m_ienum = m_array->GetEnumerator();

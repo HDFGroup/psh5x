@@ -51,7 +51,11 @@ namespace PSH5X
                 throw gcnew HDF5Exception("H5Dget_space failed!");
             }
 
-            npoints = H5Sget_simple_extent_npoints(fspace);
+			npoints = 1;
+			if (H5Sget_simple_extent_type(fspace) == H5S_SIMPLE) {
+				npoints = H5Sget_simple_extent_npoints(fspace);
+			}
+
             if (content->Count != safe_cast<int>(npoints)) {
                 throw gcnew PSH5XException("Size mismatch!");
             }
@@ -67,17 +71,6 @@ namespace PSH5X
                 if (base_type < 0) {
                     throw gcnew HDF5Exception("H5Tget_super failed!");
                 }
-
-                vector<char> vchar;
-                vector<short> vshort;
-                vector<int>   vint;
-                vector<long long> vllong;
-
-                vector<unsigned char> vuchar;
-                vector<unsigned short> vushort;
-                vector<unsigned int>   vuint;
-                vector<unsigned long long> vullong;
-
 
                 Type^ t = ProviderUtils::H5Type2DotNet(base_type);
                 if (t != nullptr)
@@ -427,6 +420,5 @@ namespace PSH5X
 
         return nullptr;
     }
-
 
 }

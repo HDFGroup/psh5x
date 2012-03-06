@@ -1,6 +1,5 @@
 #pragma once
 
-#include "H5ArrayT.h"
 #include "HDF5Exception.h"
 #include "PSH5XException.h"
 
@@ -10,80 +9,34 @@ extern "C" {
 #include "H5Tpublic.h"
 }
 
+#include <vector>
+
 namespace PSH5X
 {
     template <typename T>
-    public ref class DatasetReaderT
+    public ref class VlenDatasetReaderT
         : System::Management::Automation::Provider::IContentReader
     {
     public:
 
-        DatasetReaderT(hid_t dset, hid_t ftype, hid_t fspace)
+        VlenDatasetReaderT(hid_t dset, hid_t ftype, hid_t fspace)
             : m_array(nullptr), m_ienum(nullptr), m_position(0)
         {
-            hid_t ntype = -1;
-
-            try
-			{
-				if (H5Tget_class(ftype) == H5T_BITFIELD) {
-					ntype = H5Tget_native_type(ftype, H5T_DIR_DESCEND);
-				}
-				else {
-					ntype = H5Tget_native_type(ftype, H5T_DIR_ASCEND);
-				}
-				if (ntype < 0) {
-					throw gcnew HDF5Exception("H5Tget_native_type failed!");
-				}
-
-				hssize_t npoints = 1;
-				if (H5Sget_simple_extent_type(fspace) == H5S_SIMPLE) { 
-					npoints = H5Sget_simple_extent_npoints(fspace);
-				}
-
-				if (npoints > 0)
-				{
-					int rank = H5Sget_simple_extent_ndims(fspace);
-					array<hsize_t>^ dims = gcnew array<hsize_t>(rank);
-					pin_ptr<hsize_t> dims_ptr = &dims[0];
-					rank = H5Sget_simple_extent_dims(fspace, dims_ptr, NULL);
-
-					H5Array<T>^ h5a = gcnew H5Array<T>(dims);
-					m_array = h5a->GetArray();
-					pin_ptr<T> ptr = h5a->GetHandle();
-
-					if (H5Dread(dset, ntype, H5S_ALL, H5S_ALL, H5P_DEFAULT, ptr) < 0) {
-						throw gcnew HDF5Exception("H5Dread failed!");
-					}
-
-					m_ienum = m_array->GetEnumerator();
-					m_ienum->MoveNext();
-				}
-				else {
-					m_array = nullptr;
-				}
-			}
-            finally
-            {
-                if (ntype >= 0) {
-                    H5Tclose(ntype);
-                }
-            }
-
         }
 
         // TODO: implement hyperslabs and point sets
 
         /*
-        DatasetReaderT(hid_t h5file, System::String^ h5path,
+        VlenDatasetReaderT(hid_t h5file, System::String^ h5path,
             array<hsize_t>^ start, array<hsize_t>^ stride,
             array<hsize_t>^ count, array<hsize_t>^ block);
         
-        DatasetReaderT(hid_t h5file, System::String^ h5path, array<hsize_t>^ coord);
+        VlenDatasetReaderT(hid_t h5file, System::String^ h5path, array<hsize_t>^ coord);
         */
 
-        ~DatasetReaderT() { this->!DatasetReaderT(); }
+        ~VlenDatasetReaderT() { this->!ArrayDatasetReaderT(); }
 
-        !DatasetReaderT() {}
+        !VlenDatasetReaderT() {}
 
         virtual void Close() {}
 
@@ -129,7 +82,7 @@ namespace PSH5X
 
         virtual void Seek(long long offset, System::IO::SeekOrigin origin)
         {
-            System::Console::WriteLine("DatasetReaderT::Seek()");
+            System::Console::WriteLine("ArrayDatasetReaderT::Seek()");
         }
 
     private:

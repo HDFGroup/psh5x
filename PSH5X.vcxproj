@@ -98,6 +98,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <AdditionalIncludeDirectories>C:\Program Files\HDF Group\HDF5\1.8.8\include;.\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OpenMPSupport>false</OpenMPSupport>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -145,8 +146,8 @@
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\ArrayDatasetReader.h" />
-    <ClInclude Include="include\ArrayDatasetWriter.h" />
+    <ClInclude Include="include\ArrayDatasetReaderT.h" />
+    <ClInclude Include="include\ArrayDatasetWriterT.h" />
     <ClInclude Include="include\ArrayUtils.h" />
     <ClInclude Include="include\AttributeInfo.h" />
     <ClInclude Include="include\CompoundDatasetReader.h" />
@@ -185,11 +186,11 @@
     <ClInclude Include="include\StringDatasetWriter.h" />
     <ClInclude Include="include\TestH5FileCommand.h" />
     <ClInclude Include="include\VlenDatasetReader.h" />
+    <ClInclude Include="include\VlenDatasetReaderT.h" />
     <ClInclude Include="include\VlenDatasetWriter.h" />
+    <ClInclude Include="include\VlenDatasetWriterT.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\ArrayDatasetReader.cpp" />
-    <ClCompile Include="src\ArrayDatasetWriter.cpp" />
     <ClCompile Include="src\AssemblyInfo.cpp" />
     <ClCompile Include="src\CompoundDatasetReader.cpp" />
     <ClCompile Include="src\CompoundDatasetWriter.cpp" />
