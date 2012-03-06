@@ -186,8 +186,6 @@
     <ClInclude Include="include\StringDatasetWriter.h" />
     <ClInclude Include="include\TestH5FileCommand.h" />
     <ClInclude Include="include\VlenDatasetReader.h" />
-    <ClInclude Include="include\VlenDatasetReaderT.h" />
-    <ClInclude Include="include\VlenDatasetWriter.h" />
     <ClInclude Include="include\VlenDatasetWriterT.h" />
   </ItemGroup>
   <ItemGroup>

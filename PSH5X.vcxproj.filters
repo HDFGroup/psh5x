@@ -269,9 +269,6 @@
     <ClInclude Include="include\VlenDatasetReader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\VlenDatasetWriter.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\ArrayUtils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -306,9 +303,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\ArrayDatasetReaderT.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\VlenDatasetReaderT.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\VlenDatasetWriterT.h">
