@@ -588,7 +588,7 @@ namespace PSH5X
 					case H5T_FLOAT:
 #pragma region HDF5 float
 
-						t = ProviderUtils::H5Type2DotNet(ftype);
+						t = ProviderUtils::H5Type2DotNet(base_type);
 						if (t == Single::typeid) {
 							result = gcnew VlenDatasetWriterT<Single>(drive->FileHandle, h5path);
 						}
@@ -605,7 +605,7 @@ namespace PSH5X
 					case H5T_BITFIELD:
 #pragma region HDF5 bitfield
 
-						t = ProviderUtils::H5Type2DotNet(ftype);
+						t = ProviderUtils::H5Type2DotNet(base_type);
 						if (t == Byte::typeid) {
 							result = gcnew VlenDatasetWriterT<Byte>(drive->FileHandle, h5path);
 						}
@@ -660,8 +660,9 @@ namespace PSH5X
 #pragma endregion
 						break;
 
-
 					default:
+
+						throw gcnew PSH5XException("Unsupported base type in vlen!");
 						break;
 					}
 
@@ -712,7 +713,7 @@ namespace PSH5X
 					case H5T_FLOAT:
 #pragma region HDF5 float
 
-						t = ProviderUtils::H5Type2DotNet(ftype);
+						t = ProviderUtils::H5Type2DotNet(base_type);
 						if (t == Single::typeid) {
 							result = gcnew ArrayDatasetWriterT<Single>(drive->FileHandle, h5path);
 						}
@@ -729,7 +730,7 @@ namespace PSH5X
 					case H5T_BITFIELD:
 #pragma region HDF5 bitfield
 
-						t = ProviderUtils::H5Type2DotNet(ftype);
+						t = ProviderUtils::H5Type2DotNet(base_type);
 						if (t == Byte::typeid) {
 							result = gcnew ArrayDatasetWriterT<Byte>(drive->FileHandle, h5path);
 						}

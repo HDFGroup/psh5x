@@ -42,7 +42,7 @@ namespace PSH5X
         {
             char* name = (char*)(Marshal::StringToHGlobalAnsi(m_h5path)).ToPointer();
 
-            hid_t dset = -1, fspace = -1, ftype = -1, base_type = -1, ntype = -1, mtype = -1;
+            hid_t dset = -1, fspace = -1, ftype = -1, mtype = -1;
 
 			std::vector<hvl_t> wdata;
 
@@ -79,31 +79,17 @@ namespace PSH5X
 					if (ftype < 0) {
 						throw gcnew HDF5Exception("H5Dget_type failed!");
 					}
-
-					base_type = H5Tget_super(ftype);
-					if (base_type < 0) {
-						throw gcnew HDF5Exception("H5Tget_super failed!");
+					mtype = H5Tget_native_type(ftype, H5T_DIR_ASCEND);
+					if (mtype < 0) {
+						throw gcnew HDF5Exception("H5Tget_native_type failed!");
 					}
 
 					wdata = std::vector<hvl_t>(npoints);
 
-					if (H5Tget_class(base_type) == H5T_BITFIELD) {
-						ntype = H5Tget_native_type(base_type, H5T_DIR_DESCEND);
-					}
-					else {
-						ntype = H5Tget_native_type(base_type, H5T_DIR_ASCEND);
-					}
-					if (ntype < 0) {
-						throw gcnew HDF5Exception("H5Tget_native_type failed!");
-					}
-
-					mtype = H5Tvlen_create(ntype);
-					if (mtype < 0) {
-						throw gcnew HDF5Exception("H5Tvlen_create failed!");
-					}
-
 					IEnumerator^ ienum = content->GetEnumerator();
 					ienum->MoveNext();
+
+					// count the elements per array and initialize offsets into a global array
 
 					array<int>^ len = gcnew array<int>(npoints);
 					array<int>^ offset = gcnew array<int>(npoints);
@@ -135,6 +121,8 @@ namespace PSH5X
 
 					if (total > 1)  // there's nothing to write if total == 1
 					{
+						// copy stuff into a single global array and initialize the hvl_t structures
+
 						array<T>^ arr = gcnew array<T>(total);
 						pin_ptr<T> arr_ptr = &arr[0];
 						pin_ptr<T> p;
@@ -151,6 +139,10 @@ namespace PSH5X
 						if (H5Dwrite(dset, mtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, &wdata[0])) {
 							throw gcnew HDF5Exception("H5Dwrite failed!");
 						}
+
+						if (H5Fflush(dset, H5F_SCOPE_LOCAL) < 0) {
+							throw gcnew ArgumentException("H5Fflush failed!");
+						}
 					}
 				}
 
@@ -160,12 +152,6 @@ namespace PSH5X
             {
 				if (mtype >= 0) {
                     H5Tclose(mtype);
-                }
-                if (ntype >= 0) {
-                    H5Tclose(ntype);
-                }
-				if (base_type >= 0) {
-                    H5Tclose(base_type);
                 }
                 if (ftype >= 0) {
                     H5Tclose(ftype);

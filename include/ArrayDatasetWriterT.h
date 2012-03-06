@@ -42,7 +42,7 @@ namespace PSH5X
         {
             char* name = (char*)(Marshal::StringToHGlobalAnsi(m_h5path)).ToPointer();
 
-            hid_t dset = -1, fspace = -1, ftype = -1, ntype = -1;
+            hid_t dset = -1, fspace = -1, ftype = -1, mtype = -1;
 
 			std::vector<hsize_t> adims;
 
@@ -56,6 +56,10 @@ namespace PSH5X
                 if (ftype < 0) {
                     throw gcnew HDF5Exception("H5Dget_type failed!");
                 }
+				mtype = H5Tget_native_type(ftype, H5T_DIR_ASCEND);
+				if (mtype < 0) {
+					throw gcnew ArgumentException("H5Tget_native_type failed!");
+				}
                 fspace = H5Dget_space(dset);
                 if (fspace < 0) {
                     throw gcnew HDF5Exception("H5Dget_space failed!");
@@ -118,12 +122,7 @@ namespace PSH5X
 
 					pin_ptr<T> ptr = &m_array[0];
 
-					ntype = H5Tget_native_type(ftype, H5T_DIR_ASCEND);
-					if (ntype < 0) {
-						throw gcnew ArgumentException("H5Tget_native_type failed!");
-					}
-
-					if (H5Dwrite(dset, ntype, H5S_ALL, H5S_ALL, H5P_DEFAULT, ptr) < 0) {
+					if (H5Dwrite(dset, mtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, ptr) < 0) {
 						throw gcnew HDF5Exception("H5Dwrite failed!");
 					}
 
@@ -136,8 +135,8 @@ namespace PSH5X
             }
             finally
             {
-                if (ntype >= 0) {
-                    H5Tclose(ntype);
+                if (mtype >= 0) {
+                    H5Tclose(mtype);
                 }
                 if (ftype >= 0) {
                     H5Tclose(ftype);

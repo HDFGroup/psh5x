@@ -296,7 +296,6 @@ namespace PSH5X
             switch (cls)
             {
             case H5T_INTEGER:
-
 #pragma region HDF5 integer
 
                 ntype = H5Tget_native_type(type_id, H5T_DIR_ASCEND);
@@ -339,11 +338,9 @@ namespace PSH5X
                 }
 
 #pragma endregion
-
                 break;
 
             case H5T_FLOAT:
-
 #pragma region HDF5 float
 
                 ntype = H5Tget_native_type(type_id, H5T_DIR_ASCEND);
@@ -366,9 +363,7 @@ namespace PSH5X
                 }
 
 #pragma endregion
-
                 break;
-
 
             case H5T_STRING:
 
@@ -378,7 +373,6 @@ namespace PSH5X
                 break;
 
             case H5T_BITFIELD:
-
 #pragma region HDF5 bitfield
 
                 ntype = H5Tget_native_type(type_id, H5T_DIR_DESCEND);
@@ -404,7 +398,6 @@ namespace PSH5X
                 }
 
 #pragma endregion
-
                 break;
 
             default:

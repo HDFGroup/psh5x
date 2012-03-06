@@ -23,19 +23,14 @@ namespace PSH5X
         ArrayDatasetReaderT(hid_t dset, hid_t ftype, hid_t fspace)
             : m_array(nullptr), m_ienum(nullptr), m_position(0)
         {
-            hid_t ntype = -1;
+            hid_t mtype = -1;
 
 			array<hsize_t>^ adims = nullptr;
 
             try
 			{
-				if (H5Tget_class(ftype) == H5T_BITFIELD) {
-					ntype = H5Tget_native_type(ftype, H5T_DIR_DESCEND);
-				}
-				else {
-					ntype = H5Tget_native_type(ftype, H5T_DIR_ASCEND);
-				}
-				if (ntype < 0) {
+				mtype = H5Tget_native_type(ftype, H5T_DIR_ASCEND);
+				if (mtype < 0) {
 					throw gcnew HDF5Exception("H5Tget_native_type failed!");
 				}
 
@@ -72,7 +67,7 @@ namespace PSH5X
 					array<T>^ rdata = gcnew array<T>(npoints*arrayLength);
 					pin_ptr<T> rdata_ptr = &rdata[0];
 
-					if (H5Dread(dset, ntype, H5S_ALL, H5S_ALL, H5P_DEFAULT, rdata_ptr) < 0) {
+					if (H5Dread(dset, mtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, rdata_ptr) < 0) {
 						throw gcnew HDF5Exception("H5Dread failed!");
 					}
 
@@ -95,8 +90,8 @@ namespace PSH5X
 			}
             finally
             {
-                if (ntype >= 0) {
-                    H5Tclose(ntype);
+                if (mtype >= 0) {
+                    H5Tclose(mtype);
                 }
             }
 

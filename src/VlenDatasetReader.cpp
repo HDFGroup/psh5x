@@ -24,7 +24,7 @@ namespace PSH5X
     {
         hvl_t* rdata = NULL;
 
-        hid_t ntype = -1, mtype = -1, base_type = -1;
+        hid_t mtype = -1, base_type = -1;
 
         hssize_t npoints = -1;
 
@@ -56,19 +56,9 @@ namespace PSH5X
                     size_t size = H5Tget_size(base_type);
                     rdata = new hvl_t [npoints];
 
-                    if (H5Tget_class(base_type) == H5T_BITFIELD) {
-                        ntype = H5Tget_native_type(base_type, H5T_DIR_DESCEND);
-                    }
-                    else {
-                        ntype = H5Tget_native_type(base_type, H5T_DIR_ASCEND);
-                    }
-                    if (ntype < 0) {
-                        throw gcnew HDF5Exception("H5Tget_native_type failed!");
-                    }
-
-                    mtype = H5Tvlen_create(ntype);
+					mtype = H5Tget_native_type(ftype, H5T_DIR_ASCEND);
                     if (mtype < 0) {
-                        throw gcnew HDF5Exception("H5Tvlen_create failed!");
+                        throw gcnew HDF5Exception("H5Tget_native_type failed!");
                     }
 
                     if(H5Dread(dset, mtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, rdata) < 0) {
@@ -94,10 +84,6 @@ namespace PSH5X
                     throw gcnew PSH5XException("Unsupported base type in array type!");
                 }
             }
-            else
-            {
-                m_array = nullptr;
-            }
         }
         finally
         {
@@ -106,9 +92,6 @@ namespace PSH5X
             }
             if (base_type >= 0) {
                 H5Tclose(base_type);
-            }
-            if (ntype >= 0) {
-                H5Tclose(ntype);
             }
             if (mtype >= 0) {
                 H5Tclose(mtype);
