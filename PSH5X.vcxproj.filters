@@ -111,9 +111,6 @@
     <ClCompile Include="src\VlenDatasetReader.cpp">
       <Filter>Source Files\Provider\IContentCmdletProvider</Filter>
     </ClCompile>
-    <ClCompile Include="src\VlenDatasetWriter.cpp">
-      <Filter>Source Files\Provider\IContentCmdletProvider</Filter>
-    </ClCompile>
     <ClCompile Include="src\IPropertyCmdletProvider.cpp">
       <Filter>Source Files\Provider\IPropertyCmdletProvider</Filter>
     </ClCompile>

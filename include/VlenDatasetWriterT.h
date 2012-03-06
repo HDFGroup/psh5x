@@ -32,7 +32,7 @@ namespace PSH5X
         VlenDatasetWriterT(hid_t h5file, System::String^ h5path, array<hsize_t>^ coord);
         */
 
-        ~VlenDatasetWriterT() { this->!ArrayDatasetWriterT(); }
+        ~VlenDatasetWriterT() { this->!VlenDatasetWriterT(); }
 
         !VlenDatasetWriterT() {}
 
@@ -42,7 +42,11 @@ namespace PSH5X
         {
             char* name = (char*)(Marshal::StringToHGlobalAnsi(m_h5path)).ToPointer();
 
-            hid_t dset = -1, fspace = -1, ftype = -1, ntype = -1;
+            hid_t dset = -1, fspace = -1, ftype = -1, base_type = -1, ntype = -1, mtype = -1;
+
+			std::vector<hvl_t> wdata;
+
+            hssize_t npoints = -1;
 
             try
             {
@@ -71,14 +75,97 @@ namespace PSH5X
                 
 				if (npoints > 0)
 				{
+					ftype = H5Dget_type(dset);
+					if (ftype < 0) {
+						throw gcnew HDF5Exception("H5Dget_type failed!");
+					}
+
+					base_type = H5Tget_super(ftype);
+					if (base_type < 0) {
+						throw gcnew HDF5Exception("H5Tget_super failed!");
+					}
+
+					wdata = std::vector<hvl_t>(npoints);
+
+					if (H5Tget_class(base_type) == H5T_BITFIELD) {
+						ntype = H5Tget_native_type(base_type, H5T_DIR_DESCEND);
+					}
+					else {
+						ntype = H5Tget_native_type(base_type, H5T_DIR_ASCEND);
+					}
+					if (ntype < 0) {
+						throw gcnew HDF5Exception("H5Tget_native_type failed!");
+					}
+
+					mtype = H5Tvlen_create(ntype);
+					if (mtype < 0) {
+						throw gcnew HDF5Exception("H5Tvlen_create failed!");
+					}
+
+					IEnumerator^ ienum = content->GetEnumerator();
+					ienum->MoveNext();
+
+					array<int>^ len = gcnew array<int>(npoints);
+					array<int>^ offset = gcnew array<int>(npoints);
+					array<Object^>^ amaster = gcnew array<Object^>(npoints);
+
+					int total = 0;
+
+					for (int i = 0; i < npoints; ++i)
+					{
+						if (ienum->Current != nullptr)
+						{
+							Object^ obj = ProviderUtils::GetDotNetObject(ienum->Current);
+							Array^ a = safe_cast<Array^>(obj);
+
+							offset[i] = total;
+							len[i] = a->Length;
+							amaster[i] = a;
+
+							total += len[i];	
+						}
+						else {
+							throw gcnew PSH5XException(String::Format("Uninitialized array found at position {0}!", npoints));
+						}
+
+						ienum->MoveNext();
+					}
+
+					++total;
+
+					if (total > 1)  // there's nothing to write if total == 1
+					{
+						array<T>^ arr = gcnew array<T>(total);
+						pin_ptr<T> arr_ptr = &arr[0];
+						pin_ptr<T> p;
+
+						for (int i = 0; i < npoints; ++i) {
+							if (len[i] > 0) {
+								Array::Copy((Array^) amaster[i], 0, arr, offset[i], len[i]);
+							}
+							wdata[i].len = len[i];
+							p = &arr[offset[i]];
+							wdata[i].p = p;
+						}
+
+						if (H5Dwrite(dset, mtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, &wdata[0])) {
+							throw gcnew HDF5Exception("H5Dwrite failed!");
+						}
+					}
 				}
 
                 m_position += content->Count;
             }
             finally
             {
+				if (mtype >= 0) {
+                    H5Tclose(mtype);
+                }
                 if (ntype >= 0) {
                     H5Tclose(ntype);
+                }
+				if (base_type >= 0) {
+                    H5Tclose(base_type);
                 }
                 if (ftype >= 0) {
                     H5Tclose(ftype);

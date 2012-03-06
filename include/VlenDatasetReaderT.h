@@ -22,6 +22,10 @@ namespace PSH5X
         VlenDatasetReaderT(hid_t dset, hid_t ftype, hid_t fspace)
             : m_array(nullptr), m_ienum(nullptr), m_position(0)
         {
+
+
+
+
         }
 
         // TODO: implement hyperslabs and point sets

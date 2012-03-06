@@ -235,7 +235,6 @@
     <ClCompile Include="src\StringDatasetWriter.cpp" />
     <ClCompile Include="src\TestH5FileCommand.cpp" />
     <ClCompile Include="src\VlenDatasetReader.cpp" />
-    <ClCompile Include="src\VlenDatasetWriter.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

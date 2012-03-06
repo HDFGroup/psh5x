@@ -13,7 +13,7 @@
 #include "StringDatasetReader.h"
 #include "StringDatasetWriter.h"
 #include "VlenDatasetReader.h"
-#include "VlenDatasetWriter.h"
+#include "VlenDatasetWriterT.h"
 
 extern "C" {
 #include "H5public.h"
@@ -545,7 +545,126 @@ namespace PSH5X
 
 				case H5T_VLEN:
 
-					result = gcnew VlenDatasetWriter(drive->FileHandle, h5path);
+					base_type = H5Tget_super(ftype);
+					bcls = H5Tget_class(base_type);
+
+					switch (bcls)
+					{
+					case H5T_INTEGER:
+#pragma region HDF5 integer
+
+						t = ProviderUtils::H5Type2DotNet(base_type);
+						if (t == SByte::typeid) {
+							result = gcnew VlenDatasetWriterT<SByte>(drive->FileHandle, h5path);
+						}
+						else if (t == Int16::typeid) {
+							result = gcnew VlenDatasetWriterT<Int16>(drive->FileHandle, h5path);
+						}
+						else if (t == Int32::typeid) {
+							result = gcnew VlenDatasetWriterT<Int32>(drive->FileHandle, h5path);
+						}
+						else if (t == Int64::typeid) {
+							result = gcnew VlenDatasetWriterT<Int64>(drive->FileHandle, h5path);
+						}
+						else if (t == Byte::typeid) {
+							result = gcnew VlenDatasetWriterT<Byte>(drive->FileHandle, h5path);
+						}
+						else if (t == UInt16::typeid) {
+							result = gcnew VlenDatasetWriterT<UInt16>(drive->FileHandle, h5path);
+						}
+						else if (t ==  UInt32::typeid) {
+							result = gcnew VlenDatasetWriterT<UInt32>(drive->FileHandle, h5path);
+						}
+						else if (t ==  UInt64::typeid) {
+							result = gcnew VlenDatasetWriterT<UInt64>(drive->FileHandle, h5path);
+						}
+						else {
+							throw gcnew PSH5XException("Unsupported integer type!");
+						}
+
+#pragma endregion
+						break;
+
+					case H5T_FLOAT:
+#pragma region HDF5 float
+
+						t = ProviderUtils::H5Type2DotNet(ftype);
+						if (t == Single::typeid) {
+							result = gcnew VlenDatasetWriterT<Single>(drive->FileHandle, h5path);
+						}
+						else if (t == Double::typeid) {
+							result = gcnew VlenDatasetWriterT<Double>(drive->FileHandle, h5path);
+						}
+						else {
+							throw gcnew PSH5XException("Unsupported float type!");
+						}
+
+#pragma endregion
+						break;
+
+					case H5T_BITFIELD:
+#pragma region HDF5 bitfield
+
+						t = ProviderUtils::H5Type2DotNet(ftype);
+						if (t == Byte::typeid) {
+							result = gcnew VlenDatasetWriterT<Byte>(drive->FileHandle, h5path);
+						}
+						else if (t == UInt16::typeid) {
+							result = gcnew VlenDatasetWriterT<UInt16>(drive->FileHandle, h5path);
+						}
+						else if (t ==  UInt32::typeid) {
+							result = gcnew VlenDatasetWriterT<UInt32>(drive->FileHandle, h5path);
+						}
+						else if (t ==  UInt64::typeid) {
+							result = gcnew VlenDatasetWriterT<UInt64>(drive->FileHandle, h5path);
+						}
+						else {
+							throw gcnew PSH5XException("Unsupported bitfield type!");
+						}
+
+#pragma endregion
+						break;
+
+					case H5T_ENUM:
+#pragma region HDF5 enumeration
+
+						t = ProviderUtils::H5Type2DotNet(base_type);
+						if (t == SByte::typeid) {
+							result = gcnew VlenDatasetWriterT<SByte>(drive->FileHandle, h5path);
+						}
+						else if (t == Int16::typeid) {
+							result = gcnew VlenDatasetWriterT<Int16>(drive->FileHandle, h5path);
+						}
+						else if (t == Int32::typeid) {
+							result = gcnew VlenDatasetWriterT<Int32>(drive->FileHandle, h5path);
+						}
+						else if (t == Int64::typeid) {
+							result = gcnew VlenDatasetWriterT<Int64>(drive->FileHandle, h5path);
+						}
+						else if (t == Byte::typeid) {
+							result = gcnew VlenDatasetWriterT<Byte>(drive->FileHandle, h5path);
+						}
+						else if (t == UInt16::typeid) {
+							result = gcnew VlenDatasetWriterT<UInt16>(drive->FileHandle, h5path);
+						}
+						else if (t ==  UInt32::typeid) {
+							result = gcnew VlenDatasetWriterT<UInt32>(drive->FileHandle, h5path);
+						}
+						else if (t ==  UInt64::typeid) {
+							result = gcnew VlenDatasetWriterT<UInt64>(drive->FileHandle, h5path);
+						}
+						else {
+							throw gcnew PSH5XException("Unsupported enum type!");
+						}
+
+#pragma endregion
+						break;
+
+
+					default:
+						break;
+					}
+
 					break;
 
      			case H5T_ARRAY:
