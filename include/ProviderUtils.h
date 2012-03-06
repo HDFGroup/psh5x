@@ -160,10 +160,9 @@ namespace PSH5X
 
         static System::Type^ GetArrayType(hid_t type_id);
 
-        static System::Array^ ProviderUtils::GetArray(void* buffer, size_t nelems, hid_t type_id);
+		static System::Array^ ProviderUtils::GetArray(void* buffer, array<hsize_t>^ dims, hid_t type_id);
 
-        static System::Array^ ProviderUtils::GetPSObjectArray(long long length,
-            array<System::String^>^ mname, array<System::Type^>^ mtype);
+        static System::Array^ ProviderUtils::GetArray(void* buffer, size_t nelems, hid_t type_id);
 
         static System::Reflection::MethodInfo^ BitConverterMethod(hid_t type_id);
 

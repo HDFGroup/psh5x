@@ -1,4 +1,6 @@
 
+#include "ArrayUtils.h"
+#include "H5ArrayT.h"
 #include "HDF5Exception.h"
 #include "ProviderUtils.h"
 #include "PSH5XException.h"
@@ -16,6 +18,215 @@ using namespace System::Runtime::InteropServices;
 
 namespace PSH5X
 {
+	Array^ ProviderUtils::GetArray(void* buffer, array<hsize_t>^ dims, hid_t base_type)
+    {
+		array<long long>^ ldims = nullptr;
+
+		size_t length = 1;
+		if (dims != nullptr)
+		{
+			ldims = gcnew array<long long>(dims->Length);
+
+			for (int d = 0; d < dims->Length; ++d) {
+				length *= safe_cast<size_t>(dims[d]);
+				ldims[d] = safe_cast<long long>(dims[d]);
+			}
+
+			if (length == 0) {
+				throw gcnew PSH5XException("Zero dimension in array!");
+			}
+		}
+		else {
+			throw gcnew PSH5XException("Empty array!");
+		}
+
+		Array^ result = nullptr;
+        
+		unsigned char* ptr = (unsigned char*) buffer;
+
+        hid_t ntype = -1;
+
+        try
+        {
+            size_t size = H5Tget_size(base_type);
+
+            array<unsigned char>^ tmp = gcnew array<unsigned char>(size);
+
+			ntype = H5Tget_native_type(base_type, H5T_DIR_ASCEND);
+			if (ntype < 0) {
+				throw gcnew HDF5Exception("H5Tget_native_type failed!");
+			}
+
+            H5T_class_t cls = H5Tget_class(base_type);
+
+            switch (cls)
+			{
+			case H5T_INTEGER:
+#pragma region HDF5 integer
+
+				if (H5Tequal(ntype, H5T_NATIVE_CHAR) > 0)
+				{
+					H5Array<char>^ a = gcnew H5Array<char>(dims);
+					result = a->GetArray();
+                    for (size_t i = 0; i < length; ++i)
+                    {
+                        Marshal::Copy(IntPtr(ptr+i*size), tmp, 0, size);
+                        result->SetValue(BitConverter::ToSingle(tmp, 0), ArrayUtils::GetIndex(ldims, i));
+                    }
+				}
+				else if (H5Tequal(ntype, H5T_NATIVE_SHORT) > 0)
+				{
+					H5Array<short>^ a = gcnew H5Array<short>(dims);
+					result = a->GetArray();
+                    for (size_t i = 0; i < length; ++i)
+                    {
+                        Marshal::Copy(IntPtr(ptr+i*size), tmp, 0, size);
+                        result->SetValue(BitConverter::ToSingle(tmp, 0), ArrayUtils::GetIndex(ldims, i));
+                    }
+				}
+				else if (H5Tequal(ntype, H5T_NATIVE_INT) > 0)
+				{
+					H5Array<int>^ a = gcnew H5Array<int>(dims);
+					result = a->GetArray();
+                    for (size_t i = 0; i < length; ++i)
+                    {
+                        Marshal::Copy(IntPtr(ptr+i*size), tmp, 0, size);
+                        result->SetValue(BitConverter::ToSingle(tmp, 0), ArrayUtils::GetIndex(ldims, i));
+                    }
+				}
+				else if (H5Tequal(ntype, H5T_NATIVE_LONG) > 0)
+				{
+					H5Array<int>^ a = gcnew H5Array<int>(dims);
+					result = a->GetArray();
+                    for (size_t i = 0; i < length; ++i)
+                    {
+                        Marshal::Copy(IntPtr(ptr+i*size), tmp, 0, size);
+                        result->SetValue(BitConverter::ToSingle(tmp, 0), ArrayUtils::GetIndex(ldims, i));
+                    }
+				}
+				else if (H5Tequal(ntype, H5T_NATIVE_LLONG) > 0)
+				{
+					H5Array<long long>^ a = gcnew H5Array<long long>(dims);
+					result = a->GetArray();
+                    for (size_t i = 0; i < length; ++i)
+                    {
+                        Marshal::Copy(IntPtr(ptr+i*size), tmp, 0, size);
+                        result->SetValue(BitConverter::ToSingle(tmp, 0), ArrayUtils::GetIndex(ldims, i));
+                    }
+				}
+				else if (H5Tequal(ntype, H5T_NATIVE_UCHAR) > 0)
+				{
+					H5Array<unsigned char>^ a = gcnew H5Array<unsigned char>(dims);
+					result = a->GetArray();
+                    for (size_t i = 0; i < length; ++i)
+                    {
+                        Marshal::Copy(IntPtr(ptr+i*size), tmp, 0, size);
+                        result->SetValue(BitConverter::ToSingle(tmp, 0), ArrayUtils::GetIndex(ldims, i));
+                    }
+				}
+				else if (H5Tequal(ntype, H5T_NATIVE_USHORT) > 0)
+				{
+					H5Array<unsigned short>^ a = gcnew H5Array<unsigned short>(dims);
+					result = a->GetArray();
+                    for (size_t i = 0; i < length; ++i)
+                    {
+                        Marshal::Copy(IntPtr(ptr+i*size), tmp, 0, size);
+                        result->SetValue(BitConverter::ToSingle(tmp, 0), ArrayUtils::GetIndex(ldims, i));
+                    }
+				}
+				else if (H5Tequal(ntype, H5T_NATIVE_UINT) > 0)
+				{
+					H5Array<unsigned int>^ a = gcnew H5Array<unsigned int>(dims);
+					result = a->GetArray();
+                    for (size_t i = 0; i < length; ++i)
+                    {
+                        Marshal::Copy(IntPtr(ptr+i*size), tmp, 0, size);
+                        result->SetValue(BitConverter::ToSingle(tmp, 0), ArrayUtils::GetIndex(ldims, i));
+                    }
+				}
+				else if (H5Tequal(ntype, H5T_NATIVE_ULONG) > 0)
+				{
+					H5Array<unsigned int>^ a = gcnew H5Array<unsigned int>(dims);
+					result = a->GetArray();
+                    for (size_t i = 0; i < length; ++i)
+                    {
+                        Marshal::Copy(IntPtr(ptr+i*size), tmp, 0, size);
+                        result->SetValue(BitConverter::ToSingle(tmp, 0), ArrayUtils::GetIndex(ldims, i));
+                    }
+				}
+				else if (H5Tequal(ntype, H5T_NATIVE_ULLONG) > 0)
+				{
+					H5Array<unsigned long long>^ a = gcnew H5Array<unsigned long long>(dims);
+					result = a->GetArray();
+                    for (size_t i = 0; i < length; ++i)
+                    {
+                        Marshal::Copy(IntPtr(ptr+i*size), tmp, 0, size);
+                        result->SetValue(BitConverter::ToSingle(tmp, 0), ArrayUtils::GetIndex(ldims, i));
+                    }
+				}
+				else {
+					throw gcnew PSH5XException("Unknown integer type!");
+				}
+
+#pragma endregion
+				break;
+
+			case H5T_FLOAT:
+#pragma region HDF5 float
+
+                if (H5Tequal(ntype, H5T_NATIVE_FLOAT) > 0)
+                {
+					H5Array<float>^ a = gcnew H5Array<float>(dims);
+					result = a->GetArray();
+                    for (size_t i = 0; i < length; ++i)
+                    {
+                        Marshal::Copy(IntPtr(ptr+i*size), tmp, 0, size);
+                        result->SetValue(BitConverter::ToSingle(tmp, 0), ArrayUtils::GetIndex(ldims, i));
+                    }
+                }
+                else if (H5Tequal(ntype, H5T_NATIVE_DOUBLE) > 0)
+                {
+                    H5Array<double>^ a = gcnew H5Array<double>(dims);
+					result = a->GetArray();
+                    for (size_t i = 0; i < length; ++i)
+                    {
+                        Marshal::Copy(IntPtr(ptr+i*size), tmp, 0, size);
+                        result->SetValue(BitConverter::ToSingle(tmp, 0), ArrayUtils::GetIndex(ldims, i));
+                    }
+                }
+                else if (H5Tequal(ntype, H5T_NATIVE_LDOUBLE) > 0)
+                {
+                    H5Array<double>^ a = gcnew H5Array<double>(dims);
+					result = a->GetArray();
+                    for (size_t i = 0; i < length; ++i)
+                    {
+                        Marshal::Copy(IntPtr(ptr+i*size), tmp, 0, size);
+                        result->SetValue(BitConverter::ToSingle(tmp, 0), ArrayUtils::GetIndex(ldims, i));
+                    }
+                }
+                else {
+                    throw gcnew PSH5XException("Unknown float type!");
+                }
+
+#pragma endregion
+                break;
+
+			default:
+
+				throw gcnew PSH5XException("Unsupported datatype class!");
+				break;
+			}
+		}
+		finally
+		{
+			if (ntype >= 0) {
+                H5Tclose(ntype);
+            }
+		}
+
+		return result;
+	}
+
     Array^ ProviderUtils::GetArray(void* buffer, size_t nelems, hid_t type_id)
     {
         Array^ result = nullptr;

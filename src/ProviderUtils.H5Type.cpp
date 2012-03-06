@@ -1894,47 +1894,6 @@ namespace PSH5X
         return result;
     }
 
-    Array^ ProviderUtils::GetPSObjectArray(long long length,
-            array<String^>^ mname, array<Type^>^ mtype)
-    {
-        Exception^ ex = nullptr;
-
-        Array^ result = nullptr;
-
-        if (mname->Length != mtype->Length) {
-            ex = gcnew ArgumentException("Argument length mismatch!!!");
-            goto error;
-        }
-        
-        CompilerParameters^ params = gcnew CompilerParameters();
-        params->GenerateInMemory = true;
-        params->TreatWarningsAsErrors = false;
-        params->GenerateExecutable = false;
-        params->CompilerOptions = "/optimize";
-
-        String^ code = "public class Point { public double x {get; set;} public double y {get; set;} public Point() {x=0;y=0;} }";
-
-        CSharpCodeProvider^ provider = gcnew CSharpCodeProvider();
-        CompilerResults^ compilate = provider->CompileAssemblyFromSource(params, code);
-
-        Assembly^ assembly = compilate->CompiledAssembly;
-        Type^ t = assembly->GetType("Point");
-        
-        result = Array::CreateInstance(t, safe_cast<int>(length));
-        for (long long i = 0; i < length; ++i)
-        {
-            result->SetValue(Activator::CreateInstance(t), i);
-        }
-
-error:
-
-        if (ex != nullptr) {
-            throw ex;
-        }
-
-        return result;
-    }
-
     MethodInfo^ ProviderUtils::BitConverterMethod(hid_t type_id)
     {
         MethodInfo^ minfo = nullptr;
@@ -2115,6 +2074,7 @@ error:
                 }
 
                 sbconstr->Append(member_type[i] + " " + "param" + Convert::ToString(i));
+				
                 if (i < member_count-1) {
                     sbconstr->Append(", ");
                 }
@@ -2129,6 +2089,27 @@ error:
                 }
                 mtype = -1;
             }
+
+			// patch member offsets for objects (arrays and strings)
+
+			int mod = (IntPtr::Size == 4) ? 4 : 8;
+
+			for (int i = 0; i < member_count; ++i)
+            {
+				int shift = 0;
+
+				if (member_is_array[i] || member_tcode[i] == 's')
+				{
+					member_offset[i] += shift;
+					int res = member_offset[i]%mod;
+
+					if (res != 0)
+					{
+						shift += res;
+						member_offset[i] += res;
+					}
+				}
+			}
 
             sbconstr->Append(") {");
 
