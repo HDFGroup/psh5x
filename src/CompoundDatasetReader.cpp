@@ -13,6 +13,7 @@ extern "C" {
 
 using namespace System;
 using namespace System::Collections;
+using namespace System::IO;
 using namespace System::Management::Automation;
 using namespace System::Management::Automation::Provider;
 using namespace System::Reflection;
@@ -39,210 +40,235 @@ namespace PSH5X
 				npoints = H5Sget_simple_extent_npoints(fspace);
 			}
 
-            if (npoints > 0)
-            {
-                int rank = H5Sget_simple_extent_ndims(fspace);
-                array<hsize_t>^ dims = gcnew array<hsize_t>(rank);
-                pin_ptr<hsize_t> dims_ptr = &dims[0];
-                rank = H5Sget_simple_extent_dims(fspace, dims_ptr, NULL);
+			int rank = H5Sget_simple_extent_ndims(fspace);
+			array<hsize_t>^ dims = gcnew array<hsize_t>(rank);
+			pin_ptr<hsize_t> dims_ptr = &dims[0];
+			rank = H5Sget_simple_extent_dims(fspace, dims_ptr, NULL);
 
 #pragma region parse the compound type
 
-                int mcount = H5Tget_nmembers(ftype);
+			int mcount = H5Tget_nmembers(ftype);
 
-                array<H5T_class_t>^ member_class = gcnew array<H5T_class_t>(mcount);
+			array<H5T_class_t>^ member_class = gcnew array<H5T_class_t>(mcount);
 
-                array<Type^>^ member_type = gcnew array<Type^>(mcount);
+			array<Type^>^ member_type = gcnew array<Type^>(mcount);
 
-                array<int>^ member_size = gcnew array<int>(mcount);
-                
-				array<int>^ member_offset = gcnew array<int>(mcount);
+			array<int>^ member_size = gcnew array<int>(mcount);
 
-                array<MethodInfo^>^ member_info = gcnew array<MethodInfo^>(mcount);
-                
-				array<bool>^ member_is_vlen_str = gcnew array<bool>(mcount);
+			array<int>^ member_offset = gcnew array<int>(mcount);
 
-				array<bool>^ member_is_array = gcnew array<bool>(mcount);
+			array<MethodInfo^>^ member_info = gcnew array<MethodInfo^>(mcount);
 
-				array<array<hsize_t>^>^ member_array_dims = gcnew array<array<hsize_t>^>(mcount);
+			array<bool>^ member_is_vlen_str = gcnew array<bool>(mcount);
 
-				array<size_t>^ member_array_length = gcnew array<size_t>(mcount);
+			array<bool>^ member_is_array = gcnew array<bool>(mcount);
 
-                for (int i = 0; i < mcount; ++i)
-                {
-                    size_t offset = H5Tget_member_offset(ftype, i);
-                    member_offset[i] = safe_cast<int>(offset);
+			array<array<hsize_t>^>^ member_array_dims = gcnew array<array<hsize_t>^>(mcount);
 
-                    cmtype = H5Tget_member_type(ftype, safe_cast<unsigned>(i));
-                    if (cmtype < 0) {
-                        throw gcnew HDF5Exception("H5Tget_member_type failed!");
-                    }
-                    member_class[i] = H5Tget_class(cmtype);
+			array<size_t>^ member_array_length = gcnew array<size_t>(mcount);
 
-					if (member_class[i] == H5T_STRING) {
-						member_is_vlen_str[i] = (H5Tis_variable_str(cmtype) > 0);
+			for (int i = 0; i < mcount; ++i)
+			{
+				size_t offset = H5Tget_member_offset(ftype, i);
+				member_offset[i] = safe_cast<int>(offset);
+
+				cmtype = H5Tget_member_type(ftype, safe_cast<unsigned>(i));
+				if (cmtype < 0) {
+					throw gcnew HDF5Exception("H5Tget_member_type failed!");
+				}
+				member_class[i] = H5Tget_class(cmtype);
+
+				if (member_class[i] == H5T_STRING) {
+					member_is_vlen_str[i] = (H5Tis_variable_str(cmtype) > 0);
+				}
+
+				if (member_class[i] == H5T_ARRAY)
+				{
+					member_is_array[i] = true;
+
+					int arank = H5Tget_array_ndims(cmtype);
+					if (arank < 0) {
+						throw gcnew HDF5Exception("H5Tget_array_ndims failed!");
 					}
-					
-					if (member_class[i] == H5T_ARRAY)
+
+					member_array_dims[i] = gcnew array<hsize_t>(arank);
+					pin_ptr<hsize_t> adims_ptr = &member_array_dims[i][0];
+					if (H5Tget_array_dims2(cmtype, adims_ptr) < 0) {
+						throw gcnew HDF5Exception("H5Tget_array_dims2 failed!");
+					}
+
+					member_array_length[i] = 1;
+					for (int d = 0; d < arank; ++d) {
+						member_array_length[i] *= member_array_dims[i][d];
+					}
+				}
+
+				member_size[i] = safe_cast<int>(H5Tget_size(cmtype));
+
+				switch(member_class[i])
+				{
+				case H5T_BITFIELD:
+				case H5T_ENUM:
+				case H5T_FLOAT:
+				case H5T_INTEGER:
 					{
-						member_is_array[i] = true;
-
-						int arank = H5Tget_array_ndims(cmtype);
-						if (arank < 0) {
-							throw gcnew HDF5Exception("H5Tget_array_ndims failed!");
-						}
-
-						member_array_dims[i] = gcnew array<hsize_t>(arank);
-						pin_ptr<hsize_t> adims_ptr = &member_array_dims[i][0];
-						if (H5Tget_array_dims2(cmtype, adims_ptr) < 0) {
-							throw gcnew HDF5Exception("H5Tget_array_dims2 failed!");
-						}
-
-						member_array_length[i] = 1;
-						for (int d = 0; d < arank; ++d) {
-							member_array_length[i] *= member_array_dims[i][d];
-						}
+						member_info[i] = ProviderUtils::BinaryReaderMethod(cmtype);
 					}
+					break;
 
-                    member_size[i] = safe_cast<int>(H5Tget_size(cmtype));
-                    member_info[i] = ProviderUtils::BitConverterMethod(cmtype);
+				case H5T_ARRAY:
+					{
+						base_type = H5Tget_super(cmtype);
+						if (base_type < 0) {
+							throw gcnew HDF5Exception("H5Tget_member_type failed!");
+						}
 
-                    Type^ t = ProviderUtils::H5Type2DotNet(cmtype);
-                    if (t != nullptr) {
-                        member_type[i] = t;
-                    }
-                    else {
-                        throw gcnew PSH5XException("Unsupported member type in compound!");
-                    }
+						member_info[i] = ProviderUtils::BinaryReaderMethod(base_type);
+						if (member_info[i] == nullptr) {
+							throw gcnew PSH5XException("Unable to serialize type!");
+						}
 
-                    if (H5Tclose(cmtype) < 0) {
-                        throw gcnew HDF5Exception("H5Tclose failed!");
-                    }
-                    cmtype = -1;
-                }
+						H5Tclose(base_type);
+						base_type = -1;
+					}
+					break;
+
+				default:
+
+					throw gcnew PSH5XException("Unsupported member type!");
+					break;
+				}
+
+				Type^ t = ProviderUtils::H5Type2DotNet(cmtype);
+				if (t != nullptr) {
+					member_type[i] = t;
+				}
+				else {
+					throw gcnew PSH5XException("Unsupported member type in compound!");
+				}
+
+				if (H5Tclose(cmtype) < 0) {
+					throw gcnew HDF5Exception("H5Tclose failed!");
+				}
+				cmtype = -1;
+			}
 
 #pragma endregion
 
 #pragma region get a .NET representation
 
-                m_type = ProviderUtils::GetCompundDotNetType(ftype);
+			m_type = ProviderUtils::GetCompundDotNetType(ftype);
 
-                array<ConstructorInfo^>^ cinfo = m_type->GetConstructors();
-                if (cinfo->Length != 2) {
-                    throw gcnew PSH5XException("Constructor code generation error!");
-                }
+			array<ConstructorInfo^>^ cinfo = m_type->GetConstructors();
+			if (cinfo->Length != 2) {
+				throw gcnew PSH5XException("Constructor code generation error!");
+			}
 
 #pragma endregion
 
 #pragma region create a buffer and read the dataset as a byte array
 
-                array<unsigned char>^ mbuf = gcnew array<unsigned char>(safe_cast<size_t>(npoints*size));
-                pin_ptr<unsigned char> p = &mbuf[0];
-                unsigned char* buf = p;
+			array<unsigned char>^ mbuf = gcnew array<unsigned char>(safe_cast<size_t>(npoints*size));
+			pin_ptr<unsigned char> p = &mbuf[0];
+			unsigned char* buf = p;
 
-                if (H5Dread(dset, mtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, buf) < 0) {
-                    throw gcnew HDF5Exception("H5Dread failed!");
-                }
+			if (H5Dread(dset, mtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, buf) < 0) {
+				throw gcnew HDF5Exception("H5Dread failed!");
+			}
 
 #pragma endregion
 
 #pragma region create array of .NET objects and initialize its elements from he read buffer
 
-                m_array = Array::CreateInstance(m_type, (array<long long>^) dims);
+			m_array = Array::CreateInstance(m_type, (array<long long>^) dims);
 
-				// argument array for object constructor
-                array<Object^>^ args = gcnew array<Object^>(mcount);
-                
-				// a "row" representing a compound value
-                array<unsigned char>^ row = gcnew array<unsigned char>(size);
-				pin_ptr<unsigned char> row_ptr = &row[0];
+			// argument array for object constructor
+			array<Object^>^ args = gcnew array<Object^>(mcount);
 
-				// multidimensional index in the dataset
-                array<long long>^ index = gcnew array<long long>(rank);
+			// multidimensional index in the dataset
+			array<long long>^ index = gcnew array<long long>(rank);
 
-                for (long long i = 0; i < npoints; ++i)
-                {
-					// Is this copy really necessary?
-                    Array::Copy(mbuf, size*i, row, 0, size);
+			MemoryStream^ ms = gcnew MemoryStream(mbuf);
+			BinaryReader^ reader = gcnew BinaryReader(ms);
 
-                    for (int m = 0; m < mcount; ++m)
-                    {
-						switch (member_class[m])
-						{
-						case H5T_BITFIELD:
-						case H5T_ENUM:
-						case H5T_FLOAT:
-						case H5T_INTEGER:
+			for (long long i = 0; i < npoints; ++i)
+			{
+				for (int m = 0; m < mcount; ++m)
+				{
+					switch (member_class[m])
+					{
+					case H5T_BITFIELD:
+					case H5T_ENUM:
+					case H5T_FLOAT:
+					case H5T_INTEGER:
 
-							if (member_info[m] != nullptr) {
-								args[m] = member_info[m]->Invoke(
-									nullptr, gcnew array<Object^>{row, member_offset[m]});
-							}
-							else {
-								throw gcnew PSH5XException("How did we get here???");
-							}
+						if (member_info[m] != nullptr) {
+							args[m] = member_info[m]->Invoke(reader, nullptr);
+						}
+						else {
+							throw gcnew PSH5XException("How did we get here???");
+						}
 
-							break;
+						break;
 
-						case H5T_STRING:
+					case H5T_STRING:
 #pragma region string
 
-							if (member_is_vlen_str[m])
-							{
-								if (IntPtr::Size == 8) {
-									args[m] = Marshal::PtrToStringAnsi(
-										IntPtr(BitConverter::ToInt64(row, member_offset[m])));
-								}
-								else {
-									args[m] = Marshal::PtrToStringAnsi(
-										IntPtr(BitConverter::ToInt32(row, member_offset[m])));
-								}
+						if (member_is_vlen_str[m])
+						{
+							if (IntPtr::Size == 8) {
+								args[m] = Marshal::PtrToStringAnsi(IntPtr(reader->ReadInt64()));
 							}
 							else {
-								args[m] = Marshal::PtrToStringAnsi(IntPtr(buf+size*i+member_offset[m]));
+								args[m] = Marshal::PtrToStringAnsi(IntPtr(reader->ReadInt32()));
 							}
+						}
+						else {
+							args[m] = Marshal::PtrToStringAnsi(IntPtr(buf+size*i+member_offset[m]));
+						}
 
 #pragma endregion
-							break;
+						break;
 
-						case H5T_ARRAY:
-
-							cmtype = H5Tget_member_type(ftype, safe_cast<unsigned>(m));
-							if (cmtype < 0) {
-								throw gcnew HDF5Exception("H5Tget_member_type failed!");
-							}
-							base_type = H5Tget_super(cmtype);
-							if (base_type < 0) {
-								throw gcnew HDF5Exception("H5Tget_member_type failed!");
-							}
-
-							args[m] = ProviderUtils::GetArray(row_ptr, member_array_dims[m], base_type);
-
-							H5Tclose(base_type);
-							base_type = -1;
-							H5Tclose(cmtype);
-							cmtype = -1;
-
-							break;
-
-						default:
-
-							args[m] = "\"" + BitConverter::ToString(row, member_offset[m], member_size[m]) + "\""; 
-							break;
+					case H5T_ARRAY:
+#pragma region array
+						cmtype = H5Tget_member_type(ftype, safe_cast<unsigned>(m));
+						if (cmtype < 0) {
+							throw gcnew HDF5Exception("H5Tget_member_type failed!");
 						}
-                    }
+						base_type = H5Tget_super(cmtype);
+						if (base_type < 0) {
+							throw gcnew HDF5Exception("H5Tget_member_type failed!");
+						}
 
-					if (rank >= 1) {
-						index = ArrayUtils::GetIndex((array<long long>^)dims, i);
-						m_array->SetValue(cinfo[1]->Invoke(args), index);
-					}
-					else {
-					}
-                }
+						args[m] = ProviderUtils::GetArray(reader, member_array_dims[m], base_type);
 
-                m_ienum = m_array->GetEnumerator();
-                m_ienum->MoveNext();
-            }
+						H5Tclose(base_type);
+						base_type = -1;
+						H5Tclose(cmtype);
+						cmtype = -1;
+
+#pragma endregion
+						break;
+
+					default:
+
+						throw gcnew PSH5XException("Unsupported member in compound type!");
+						break;
+					}
+				}
+
+				if (rank > 1) {
+					index = ArrayUtils::GetIndex((array<long long>^)dims, i);
+					m_array->SetValue(cinfo[1]->Invoke(args), index);
+				}
+				else {
+					m_array->SetValue(cinfo[1]->Invoke(args), i);
+				}
+			}
+
+			m_ienum = m_array->GetEnumerator();
+			m_ienum->MoveNext();
 
 #pragma endregion
 

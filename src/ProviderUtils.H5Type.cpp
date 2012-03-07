@@ -1565,23 +1565,6 @@ namespace PSH5X
 		return result;
 	}
 
-    bool ProviderUtils::IsSupportedH5Type(String^ type)
-    {
-        String^ t = type->ToUpper();
-
-        if (t == "SYSTEM.COLLECTIONS.HASHTABLE")
-        {
-            return true;
-        }
-
-        if (m_known_types->ContainsKey(t))
-        {
-            return true;
-        }
-
-        return false;
-    }
-
     hid_t ProviderUtils::H5Type(String^ type)
     {
         hid_t result = -1;
@@ -1789,7 +1772,6 @@ namespace PSH5X
 				Type^ t = H5Type2DotNet(super);
 				if (t != nullptr)
 				{
-
 					int rank = H5Tget_array_ndims(dtype);
 					if (rank < 0) {
 						throw gcnew HDF5Exception("H5Tget_array_ndims failed!!!");
@@ -1894,74 +1876,106 @@ namespace PSH5X
         return result;
     }
 
-	// TODO: add H5T_BITMAP
-
-    MethodInfo^ ProviderUtils::BitConverterMethod(hid_t type_id)
+	MethodInfo^ ProviderUtils::BinaryReaderMethod(hid_t type_id)
     {
         MethodInfo^ minfo = nullptr;
 
-        Type^ magicType = System::BitConverter::typeid;
+        Type^ magicType = System::IO::BinaryReader::typeid;
 
         hid_t super = -1;
 
         try
         {
+			Type^ t = ProviderUtils::H5Type2DotNet(type_id);
+
             H5T_class_t cls = H5Tget_class(type_id);
             switch (cls)
             {
             case H5T_INTEGER:
 
-                if (ProviderUtils::H5Type2DotNet(type_id) == Int32::typeid) {
-                    minfo = magicType->GetMethod("ToInt32");
+				if (t == SByte::typeid) {
+                    minfo = magicType->GetMethod("ReadSByte");
                 }
-                else if (ProviderUtils::H5Type2DotNet(type_id) == Int64::typeid) {
-                    minfo = magicType->GetMethod("ToInt64");
+                else if (t == Int16::typeid) {
+                    minfo = magicType->GetMethod("ReadInt16");
                 }
-                else if (ProviderUtils::H5Type2DotNet(type_id) == Int16::typeid) {
-                    minfo = magicType->GetMethod("ToInt16");
+                else if (t == Int32::typeid) {
+                    minfo = magicType->GetMethod("ReadInt32");
                 }
-                if (ProviderUtils::H5Type2DotNet(type_id) == UInt32::typeid) {
-                    minfo = magicType->GetMethod("ToUInt32");
+                else if (t == Int64::typeid) {
+                    minfo = magicType->GetMethod("ReadInt64");
                 }
-                else if (ProviderUtils::H5Type2DotNet(type_id) == UInt64::typeid) {
-                    minfo = magicType->GetMethod("ToUInt64");
+				else if (t == Byte::typeid) {
+                    minfo = magicType->GetMethod("ReadByte");
                 }
-                else if (ProviderUtils::H5Type2DotNet(type_id) == UInt16::typeid) {
-                    minfo = magicType->GetMethod("ToUInt16");
+                else if (t == UInt16::typeid) {
+                    minfo = magicType->GetMethod("ReadUInt16");
                 }
+				else if (t == UInt32::typeid) {
+                    minfo = magicType->GetMethod("ReadUInt32");
+                }
+                else if (t == UInt64::typeid) {
+                    minfo = magicType->GetMethod("ReadUInt64");
+                }
+                
                 break;
 
             case H5T_FLOAT:
 
-                if (ProviderUtils::H5Type2DotNet(type_id) == Double::typeid) {
-                    minfo = magicType->GetMethod("ToDouble");
+                if (t == Double::typeid) {
+                    minfo = magicType->GetMethod("ReadDouble");
                 }
-                else if (ProviderUtils::H5Type2DotNet(type_id) == Single::typeid) {
-                    minfo = magicType->GetMethod("ToSingle");
+                else if (t == Single::typeid) {
+                    minfo = magicType->GetMethod("ReadSingle");
                 }
                 break;
+
+			case H5T_BITFIELD:
+
+				if (t == Byte::typeid) {
+                    minfo = magicType->GetMethod("ReadByte");
+                }
+                else if (t == UInt16::typeid) {
+                    minfo = magicType->GetMethod("ReadUInt16");
+                }
+				else if (t == UInt32::typeid) {
+                    minfo = magicType->GetMethod("ReadUInt32");
+                }
+                else if (t == UInt64::typeid) {
+                    minfo = magicType->GetMethod("ReadUInt64");
+                }
+
+				break;
 
             case H5T_ENUM:
 
                 super = H5Tget_super(type_id);
 
-                if (ProviderUtils::H5Type2DotNet(super) == Int32::typeid) {
-                    minfo = magicType->GetMethod("ToInt32");
+				t = ProviderUtils::H5Type2DotNet(super);
+
+                if (t == SByte::typeid) {
+                    minfo = magicType->GetMethod("ReadSByte");
                 }
-                else if (ProviderUtils::H5Type2DotNet(super) == Int64::typeid) {
-                    minfo = magicType->GetMethod("ToInt64");
+                else if (t == Int16::typeid) {
+                    minfo = magicType->GetMethod("ReadInt16");
                 }
-                else if (ProviderUtils::H5Type2DotNet(super) == Int16::typeid) {
-                    minfo = magicType->GetMethod("ToInt16");
+                else if (t == Int32::typeid) {
+                    minfo = magicType->GetMethod("ReadInt32");
                 }
-                if (ProviderUtils::H5Type2DotNet(super) == UInt32::typeid) {
-                    minfo = magicType->GetMethod("ToUInt32");
+                else if (t == Int64::typeid) {
+                    minfo = magicType->GetMethod("ReadInt64");
                 }
-                else if (ProviderUtils::H5Type2DotNet(super) == UInt64::typeid) {
-                    minfo = magicType->GetMethod("ToUInt64");
+				else if (t == Byte::typeid) {
+                    minfo = magicType->GetMethod("ReadByte");
                 }
-                else if (ProviderUtils::H5Type2DotNet(super) == UInt16::typeid) {
-                    minfo = magicType->GetMethod("ToUInt16");
+                else if (t == UInt16::typeid) {
+                    minfo = magicType->GetMethod("ReadUInt16");
+                }
+				else if (t == UInt32::typeid) {
+                    minfo = magicType->GetMethod("ReadUInt32");
+                }
+                else if (t == UInt64::typeid) {
+                    minfo = magicType->GetMethod("ReadUInt64");
                 }
                 break;
 
@@ -2092,6 +2106,7 @@ namespace PSH5X
                 mtype = -1;
             }
 
+			/*
 			// patch member offsets for objects (arrays and strings)
 
 			int mod = (IntPtr::Size == 4) ? 4 : 8;
@@ -2112,14 +2127,15 @@ namespace PSH5X
 					}
 				}
 			}
+			*/
 
             sbconstr->Append(") {");
 
             String^ class_name = sbname->ToString();
 
             StringBuilder^ sbcode = gcnew StringBuilder();
-            sbcode->Append("using System.Runtime.InteropServices; ");
-            sbcode->Append("[StructLayout(LayoutKind.Explicit,Size= " + size + ",CharSet=CharSet.Ansi)] ");
+            //sbcode->Append("using System.Runtime.InteropServices; ");
+            //sbcode->Append("[StructLayout(LayoutKind.Explicit,Size= " + size + ",CharSet=CharSet.Ansi)] ");
             sbcode->Append("public class " + class_name + " { ");
 
             StringBuilder^ sb_def_constr = gcnew StringBuilder();
@@ -2127,7 +2143,7 @@ namespace PSH5X
 
             for (int i = 0; i < member_count; ++i)
             {
-                sbcode->Append("[FieldOffset(" + member_offset[i] + ")]");
+                //sbcode->Append("[FieldOffset(" + member_offset[i] + ")]");
 				if (!member_is_array[i]) {
 					sbcode->Append(" public " + member_type[i] + " " + member_name[i] + ";");
 				}

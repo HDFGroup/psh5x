@@ -97,7 +97,7 @@ namespace PSH5X
 
                         hid_t mtype = H5Tget_member_type(ntype, safe_cast<unsigned>(i));
                         msize[i] = safe_cast<int>(H5Tget_size(mtype));
-                        minfo[i] = ProviderUtils::BitConverterMethod(mtype);
+                        //minfo[i] = ProviderUtils::BitConverterMethod(mtype);
                         H5Tclose(mtype);
                     }
 

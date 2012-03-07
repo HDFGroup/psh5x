@@ -37,7 +37,7 @@ namespace PSH5X
         char** wdata = NULL;
         char** vwdata = NULL;
 
-		hssize_t npoints;
+		hssize_t npoints = 0;
 
 		int i = 0;
 
@@ -66,89 +66,87 @@ namespace PSH5X
                 throw gcnew PSH5XException("Size mismatch!");
             }
 
-			if (npoints > 0)
+			is_vlen = H5Tis_variable_str(ftype);
+
+			array<String^>^ astring = nullptr;
+
+			if (is_vlen > 0)
 			{
-				is_vlen = H5Tis_variable_str(ftype);
+				vwdata = new char* [npoints];
 
-				array<String^>^ astring = nullptr;
+				astring = gcnew array<String^>(safe_cast<int>(npoints));
 
-				if (is_vlen > 0)
+				if (ProviderUtils::TryGetValue(content, astring))
 				{
-					vwdata = new char* [npoints];
-
-					astring = gcnew array<String^>(safe_cast<int>(npoints));
-
-					if (ProviderUtils::TryGetValue(content, astring))
-					{
-						for (i = 0; i < npoints; ++i)
-						{
-							vwdata[i] = (char*) Marshal::StringToHGlobalAnsi(astring[i]).ToPointer();
-						}
-
-						mtype = H5Tcreate(H5T_STRING, H5T_VARIABLE);
-						if (mtype < 0) {
-							throw gcnew HDF5Exception("H5Tcreate failed!");
-						}
-
-						if (H5Dwrite(dset, mtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, vwdata) < 0) {
-							throw gcnew HDF5Exception("H5Dwrite failed!");
-						}
-
-						if (H5Fflush(dset, H5F_SCOPE_LOCAL) < 0) {
-							throw gcnew HDF5Exception("H5Fflush failed!");
-						}
-					}
-					else {
-						throw gcnew PSH5XException("Value type mismatch!");
-					}
-				}
-				else if (is_vlen == 0)
-				{
-					size_t size = H5Tget_size(ftype);
-
-					wdata = new char* [npoints];
-					wdata[0] = new char [npoints*(size+1)];
-					for (i = 1; i < npoints; ++i) {
-						wdata[i] = wdata[0] + i*size;
+					for (i = 0; i < npoints; ++i) {
+						vwdata[i] = (char*) Marshal::StringToHGlobalAnsi(astring[i]).ToPointer();
 					}
 
-					astring = gcnew array<String^>(safe_cast<int>(npoints));
-
-					if (ProviderUtils::TryGetValue(content, astring))
-					{
-						for (i = 0; i < npoints; ++i) {
-							if (astring[i]->Length > size-1) {
-								throw gcnew PSH5XException("String too long!");
-							}
-						}
-
-						for (i = 0; i < npoints; ++i)
-						{
-							char* buf = (char*) Marshal::StringToHGlobalAnsi(astring[i]).ToPointer();
-							memcpy((void*) wdata[i], (void*) buf, size);
-							Marshal::FreeHGlobal(IntPtr(buf));
-						}
-
-						mtype = H5Tcreate(H5T_STRING, size);
-						if (mtype < 0) {
-							throw gcnew HDF5Exception("H5Tcreate failed!!!");
-						}
-
-						if (H5Dwrite(dset, mtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, wdata[0]) < 0) {
-							throw gcnew HDF5Exception("H5Dwrite failed!");
-						}
-
-						if (H5Fflush(dset, H5F_SCOPE_LOCAL) < 0) {
-							throw gcnew HDF5Exception("H5Fflush failed!");
-						}
+					mtype = H5Tcreate(H5T_STRING, H5T_VARIABLE);
+					if (mtype < 0) {
+						throw gcnew HDF5Exception("H5Tcreate failed!");
 					}
-					else {
-						throw gcnew PSH5XException("Value size or type mismatch!");
+
+					if (H5Dwrite(dset, mtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, vwdata) < 0) {
+						throw gcnew HDF5Exception("H5Dwrite failed!");
+					}
+
+					if (H5Fflush(dset, H5F_SCOPE_LOCAL) < 0) {
+						throw gcnew HDF5Exception("H5Fflush failed!");
 					}
 				}
 				else {
-					throw gcnew PSH5XException("Unknown STRING type found!!!");
+					throw gcnew PSH5XException("Value type mismatch!");
 				}
+			}
+			else if (is_vlen == 0)
+			{
+				size_t size = H5Tget_size(ftype);
+				H5T_str_t strpad = H5Tget_strpad(ftype);
+
+				wdata = new char* [npoints];
+				wdata[0] = new char [npoints*size];
+				for (i = 1; i < npoints; ++i) {
+					wdata[i] = wdata[0] + i*size;
+				}
+
+				astring = gcnew array<String^>(safe_cast<int>(npoints));
+
+				if (ProviderUtils::TryGetValue(content, astring))
+				{
+					for (i = 0; i < npoints; ++i) {
+						if (astring[i]->Length > size || 
+							(astring[i]->Length == size && !(strpad == H5T_STR_SPACEPAD))) {
+								throw gcnew PSH5XException("String too long!");
+						}
+					}
+
+					for (i = 0; i < npoints; ++i)
+					{
+						char* buf = (char*) Marshal::StringToHGlobalAnsi(astring[i]).ToPointer();
+						memcpy((void*) wdata[i], (void*) buf, size);
+						Marshal::FreeHGlobal(IntPtr(buf));
+					}
+
+					mtype = H5Tcreate(H5T_STRING, size);
+					if (mtype < 0) {
+						throw gcnew HDF5Exception("H5Tcreate failed!!!");
+					}
+
+					if (H5Dwrite(dset, mtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, wdata[0]) < 0) {
+						throw gcnew HDF5Exception("H5Dwrite failed!");
+					}
+
+					if (H5Fflush(dset, H5F_SCOPE_LOCAL) < 0) {
+						throw gcnew HDF5Exception("H5Fflush failed!");
+					}
+				}
+				else {
+					throw gcnew PSH5XException("Value size or type mismatch!");
+				}
+			}
+			else {
+				throw gcnew PSH5XException("Unknown STRING type found!!!");
 			}
 
 			m_position += content->Count;

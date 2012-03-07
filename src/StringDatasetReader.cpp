@@ -75,7 +75,12 @@ namespace PSH5X
                 }
                 else if (is_vlen == 0)
                 {
-                    size_t size = H5Tget_size(ftype);
+					size_t size = H5Tget_size(ftype);
+
+					if (H5Tget_strpad(ftype) == H5T_STR_SPACEPAD) { // FORTRAN
+						++size;
+					}
+					
 					mtype = H5Tcreate(H5T_STRING, size);
                     if (mtype < 0) {
                         throw gcnew HDF5Exception("H5Tcreate failed!");
@@ -83,8 +88,7 @@ namespace PSH5X
 
                     rdata = new char* [mdims[0]];
 					rdata[0] = new char [mdims[0]*size];
-                    for (size_t i = 1; i < mdims[0]; ++i)
-                    {
+                    for (size_t i = 1; i < mdims[0]; ++i) {
 						rdata[i] = rdata[0] + i*size;
                     }
 

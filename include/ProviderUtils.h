@@ -140,8 +140,6 @@ namespace PSH5X
 
 #pragma region HDF5 Datatype
 
-        static bool IsSupportedH5Type(System::String^ type);
-
         static System::Collections::Generic::Dictionary<System::String^,System::Object^>^ ParseH5Type(hid_t type);
 
 		static hid_t ParseH5Type(System::Collections::Generic::Dictionary<System::String^, System::Object^>^ dict);
@@ -160,11 +158,13 @@ namespace PSH5X
 
         static System::Type^ GetArrayType(hid_t type_id);
 
+		static System::Array^ ProviderUtils::GetArray(System::IO::BinaryReader^% reader, array<hsize_t>^ dims, hid_t type_id);
+
 		static System::Array^ ProviderUtils::GetArray(void* buffer, array<hsize_t>^ dims, hid_t type_id);
 
         static System::Array^ ProviderUtils::GetArray(void* buffer, size_t nelems, hid_t type_id);
 
-        static System::Reflection::MethodInfo^ BitConverterMethod(hid_t type_id);
+		static System::Reflection::MethodInfo^ BinaryReaderMethod(hid_t type_id);
 
         static System::Type^ GetCompundDotNetType(hid_t type_id);
 
