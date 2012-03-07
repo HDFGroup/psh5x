@@ -15,8 +15,10 @@ extern "C" {
 using namespace System;
 using namespace System::Collections;
 using namespace System::Collections::ObjectModel;
+using namespace System::IO;
 using namespace System::Management::Automation;
 using namespace System::Management::Automation::Provider;
+using namespace System::Reflection;
 using namespace System::Runtime::InteropServices;
 
 namespace PSH5X
@@ -30,7 +32,7 @@ namespace PSH5X
     {
 		char* name = (char*)(Marshal::StringToHGlobalAnsi(m_h5path)).ToPointer();
 
-        hid_t dset = -1, fspace = -1, ftype = -1, mtype = -1;
+        hid_t dset = -1, fspace = -1, ftype = -1, mtype = -1, cmtype = -1, base_type = -1;
 
 		try
 		{
@@ -65,30 +67,147 @@ namespace PSH5X
 			{
 				size_t size = H5Tget_size(ftype);
 
+#pragma region parse the compound type
+
 				int mcount = H5Tget_nmembers(ftype);
 
-				// parse the compound type
+				Hashtable^ members = gcnew Hashtable();
 
-				m_array = gcnew array<unsigned char>(content->Count*size);
+			    array<String^>^ member_name = gcnew array<String^>(mcount);
+				
+				array<H5T_class_t>^ member_class = gcnew array<H5T_class_t>(mcount);
+				
+				array<size_t>^ member_size = gcnew array<size_t>(mcount);
+
+				array<MethodInfo^>^ member_info = gcnew array<MethodInfo^>(mcount);
+
+				Type^ magicType = System::IO::BinaryWriter::typeid;
+
+				for (int m = 0; m < mcount; ++m)
+                {
+					member_name[m] = Marshal::PtrToStringAnsi(IntPtr(
+						H5Tget_member_name(ftype, safe_cast<unsigned>(m))));
+
+                    cmtype = H5Tget_member_type(ftype, safe_cast<unsigned>(m));
+                    if (cmtype < 0) {
+                        throw gcnew HDF5Exception("H5Tget_member_type failed!");
+                    }
+					
+					H5T_class_t cls = H5Tget_class(cmtype);
+					member_class[m] = cls;
+					member_size[m] = H5Tget_size(cmtype);
+
+					switch (cls)
+					{
+					case H5T_BITFIELD:
+				    case H5T_ENUM:
+					case H5T_FLOAT:
+					case H5T_INTEGER:
+						{
+							member_info[m] = magicType->GetMethod("Write",
+								gcnew array<Type^>{ ProviderUtils::H5Type2DotNet(cmtype) });
+
+							if (member_info[m] == nullptr) {
+								throw gcnew PSH5XException("Unable to serialize type!");
+							}
+
+						}
+						break;
+
+					case H5T_ARRAY:
+						{
+							base_type = H5Tget_super(cmtype);
+							if (base_type < 0) {
+								throw gcnew HDF5Exception("H5Tget_member_type failed!");
+							}
+
+							member_info[m] = magicType->GetMethod("Write",
+								gcnew array<Type^>{ ProviderUtils::H5Type2DotNet(base_type) });
+
+							if (member_info[m] == nullptr) {
+								throw gcnew PSH5XException("Unable to serialize type!");
+							}
+
+							H5Tclose(base_type);
+							base_type = -1;
+						}
+						break;
+
+					default:
+
+						throw gcnew PSH5XException("Unsupported member type!");
+						break;
+					}
+
+                    if (H5Tclose(cmtype) < 0) {
+                        throw gcnew HDF5Exception("H5Tclose failed!");
+                    }
+                    cmtype = -1;
+                }
+
+#pragma endregion
 
 				size_t count = 0;
 
 				IEnumerator^ ienum = content->GetEnumerator();
 				ienum->MoveNext();
 				
+#pragma region reflect on the object type
+
+				Object^ obj = ProviderUtils::GetDotNetObject(ienum->Current);
+				array<FieldInfo^>^ fields = ProviderUtils::GetDotNetObject(obj)->GetType()->GetFields();
+
+				for (int i = 0; i < fields->Length; i++)
+				{
+					if (!(member_name[i] == fields[i]->Name)) {
+						throw gcnew PSH5XException(
+							String::Format("Cannot match field '{0}' to member '{1}' in the HDF5 compound type",
+							fields[i]->Name, member_name[i]));
+					}
+				}
+
+#pragma endregion
+
+				ienum->Reset();
+				ienum->MoveNext();
+
+				MemoryStream^ ms = gcnew MemoryStream();
+				BinaryWriter^ writer = gcnew BinaryWriter(ms);
+
 				for (int i = 0; i < npoints; ++i)
 				{
 					if (ienum->Current != nullptr)
 					{
 						Object^ obj = ProviderUtils::GetDotNetObject(ienum->Current);
+						for (int m = 0; m < fields->Length; m++)
+						{
+							Object^ value = fields[m]->GetValue(obj);
+							switch (member_class[m])
+							{
+							case H5T_BITFIELD:
+							case H5T_ENUM:
+							case H5T_FLOAT:
+							case H5T_INTEGER:
+								{
+									member_info[m]->Invoke(writer, gcnew array<Object^>{value});
+								}
+								break;
 
-						
+							case H5T_ARRAY:
+								{
+									IEnumerator^ aenum = ((Array^) value)->GetEnumerator();
+									while (aenum->MoveNext()) {
+										member_info[m]->Invoke(
+											writer, gcnew array<Object^>{aenum->Current});
+									}
+								}
+								break;
 
-						// do something
+							default:
 
-						
-
-
+								break;
+							}
+						}
 					}
 					else {
 						throw gcnew PSH5XException(String::Format("Uninitialized array found at position {0}!", npoints));
@@ -97,6 +216,7 @@ namespace PSH5X
 					ienum->MoveNext();
 				}
 
+				m_array = ms->ToArray();
 				pin_ptr<unsigned char> ptr = &((array<unsigned char>^)m_array)[0];
 
 				if (H5Dwrite(dset, mtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, ptr) < 0) {
@@ -112,7 +232,12 @@ namespace PSH5X
 		}
 		finally
 		{
-			
+			if (base_type >= 0) {
+                H5Tclose(base_type);
+            }
+			if (cmtype >= 0) {
+                H5Tclose(cmtype);
+            }
             if (mtype >= 0) {
                 H5Tclose(mtype);
             }

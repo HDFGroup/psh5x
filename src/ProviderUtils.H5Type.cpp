@@ -1894,6 +1894,8 @@ namespace PSH5X
         return result;
     }
 
+	// TODO: add H5T_BITMAP
+
     MethodInfo^ ProviderUtils::BitConverterMethod(hid_t type_id)
     {
         MethodInfo^ minfo = nullptr;
