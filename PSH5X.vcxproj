@@ -154,9 +154,7 @@
     <ClInclude Include="include\CompoundDatasetWriter.h" />
     <ClInclude Include="include\DatasetInfo.h" />
     <ClInclude Include="include\DatasetInfoLite.h" />
-    <ClInclude Include="include\DatasetReader.h" />
     <ClInclude Include="include\DatasetReaderT.h" />
-    <ClInclude Include="include\DatasetWriter.h" />
     <ClInclude Include="include\DatasetWriterT.h" />
     <ClInclude Include="include\DataspaceInfo.h" />
     <ClInclude Include="include\DatatypeInfo.h" />
@@ -196,8 +194,6 @@
     <ClCompile Include="src\ContainerCmdletProvider.NewItemDynamicParameters.cpp" />
     <ClCompile Include="src\DatasetInfo.cpp" />
     <ClCompile Include="src\DatasetInfoLite.cpp" />
-    <ClCompile Include="src\DatasetReader.cpp" />
-    <ClCompile Include="src\DatasetWriter.cpp" />
     <ClCompile Include="src\DriveInfo.cpp" />
     <ClCompile Include="src\CmdletProvider.cpp" />
     <ClCompile Include="src\ContainerCmdletProvider.cpp" />

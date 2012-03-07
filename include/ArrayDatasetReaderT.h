@@ -39,54 +39,51 @@ namespace PSH5X
 					npoints = H5Sget_simple_extent_npoints(fspace);
 				}
 
-				if (npoints > 0)
-				{
-					int rank = H5Sget_simple_extent_ndims(fspace);
-					array<hsize_t>^ dims = gcnew array<hsize_t>(rank);
-					pin_ptr<hsize_t> dims_ptr = &dims[0];
-					rank = H5Sget_simple_extent_dims(fspace, dims_ptr, NULL);
+				int rank = H5Sget_simple_extent_ndims(fspace);
+				array<hsize_t>^ dims = gcnew array<hsize_t>(rank);
+				pin_ptr<hsize_t> dims_ptr = &dims[0];
+				rank = H5Sget_simple_extent_dims(fspace, dims_ptr, NULL);
 
-					// get the array dimensions of the data elements
+				// get the array dimensions of the data elements
 
-					int arank = H5Tget_array_ndims(ftype);
-					if (arank < 0) {
-						throw gcnew HDF5Exception("H5Tget_array_ndims failed!");
-					}
-
-					adims = gcnew array<hsize_t>(arank);
-					pin_ptr<hsize_t> adims_ptr = &adims[0];
-
-					if (H5Tget_array_dims2(ftype, adims_ptr) < 0) {
-						throw gcnew HDF5Exception("H5Tget_array_dims2 failed!");
-					}
-					hsize_t arrayLength = 1;
-					for (int i = 0; i < arank; ++i) {
-						arrayLength *= adims[i];
-					}
-
-					array<T>^ rdata = gcnew array<T>(npoints*arrayLength);
-					pin_ptr<T> rdata_ptr = &rdata[0];
-
-					if (H5Dread(dset, mtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, rdata_ptr) < 0) {
-						throw gcnew HDF5Exception("H5Dread failed!");
-					}
-
-					H5Array<T>^ dummy = gcnew H5Array<T>(adims);
-					m_array = Array::CreateInstance(dummy->GetArray()->GetType(), npoints);
-					
-					for (hssize_t i = 0; i < npoints; ++i)
-					{
-						H5Array<T>^ arr = gcnew H5Array<T>(adims);
-						interior_ptr<T> arr_ptr = arr->GetHandle();
-						for (hsize_t j = 0; j < arrayLength; ++j) {
-							arr_ptr[j] = rdata[i*arrayLength+j];
-						}
-						m_array->SetValue(arr->GetArray(), i);
-					}
-
-					m_ienum = m_array->GetEnumerator();
-					m_ienum->MoveNext();
+				int arank = H5Tget_array_ndims(ftype);
+				if (arank < 0) {
+					throw gcnew HDF5Exception("H5Tget_array_ndims failed!");
 				}
+
+				adims = gcnew array<hsize_t>(arank);
+				pin_ptr<hsize_t> adims_ptr = &adims[0];
+
+				if (H5Tget_array_dims2(ftype, adims_ptr) < 0) {
+					throw gcnew HDF5Exception("H5Tget_array_dims2 failed!");
+				}
+				hsize_t arrayLength = 1;
+				for (int i = 0; i < arank; ++i) {
+					arrayLength *= adims[i];
+				}
+
+				array<T>^ rdata = gcnew array<T>(npoints*arrayLength);
+				pin_ptr<T> rdata_ptr = &rdata[0];
+
+				if (H5Dread(dset, mtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, rdata_ptr) < 0) {
+					throw gcnew HDF5Exception("H5Dread failed!");
+				}
+
+				H5Array<T>^ dummy = gcnew H5Array<T>(adims);
+				m_array = Array::CreateInstance(dummy->GetArray()->GetType(), npoints);
+
+				for (hssize_t i = 0; i < npoints; ++i)
+				{
+					H5Array<T>^ arr = gcnew H5Array<T>(adims);
+					interior_ptr<T> arr_ptr = arr->GetHandle();
+					for (hsize_t j = 0; j < arrayLength; ++j) {
+						arr_ptr[j] = rdata[i*arrayLength+j];
+					}
+					m_array->SetValue(arr->GetArray(), i);
+				}
+
+				m_ienum = m_array->GetEnumerator();
+				m_ienum->MoveNext();
 			}
             finally
             {
@@ -115,7 +112,7 @@ namespace PSH5X
 
         virtual System::Collections::IList^ Read(long long readCount)
         {
-            array<T>^ result = nullptr;
+            array<Array^>^ result = nullptr;
 
             long long remaining = m_array->LongLength - m_position;
             if (remaining > 0)
@@ -137,13 +134,13 @@ namespace PSH5X
                     }
                 }
 
-                result = gcnew array<T>(safe_cast<int>(length));
+                result = gcnew array<Array^>(safe_cast<int>(length));
 
                 // I have no idea how to efficiently copy a multidimensional array
                 // into a onedimensional array
 
                 for (long long i = 0; i < length; ++i) {
-                    result[i] = safe_cast<T>(m_ienum->Current);
+                    result[i] = safe_cast<Array^>(m_ienum->Current);
                     m_ienum->MoveNext();
                 }
 

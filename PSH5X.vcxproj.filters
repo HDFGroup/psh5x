@@ -93,12 +93,6 @@
     <ClCompile Include="src\CompoundDatasetWriter.cpp">
       <Filter>Source Files\Provider\IContentCmdletProvider</Filter>
     </ClCompile>
-    <ClCompile Include="src\DatasetReader.cpp">
-      <Filter>Source Files\Provider\IContentCmdletProvider</Filter>
-    </ClCompile>
-    <ClCompile Include="src\DatasetWriter.cpp">
-      <Filter>Source Files\Provider\IContentCmdletProvider</Filter>
-    </ClCompile>
     <ClCompile Include="src\IContentCmdletProvider.cpp">
       <Filter>Source Files\Provider\IContentCmdletProvider</Filter>
     </ClCompile>
@@ -230,13 +224,7 @@
     <ClInclude Include="include\DatasetInfoLite.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\DatasetReader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\ShowH5TypesCommand.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\DatasetWriter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\DatasetReaderT.h">
