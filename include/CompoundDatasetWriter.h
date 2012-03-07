@@ -3,7 +3,7 @@
 #include "PSH5XException.h"
 
 extern "C" {
-#include "H5Dpublic.h"
+#include "H5Ipublic.h"
 }
 
 namespace PSH5X
@@ -44,6 +44,8 @@ namespace PSH5X
         System::String^ m_h5path;
 
         System::Array^ m_array;
+
+		long long m_position;
 
     };
 

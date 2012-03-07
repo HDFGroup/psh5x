@@ -45,6 +45,8 @@ namespace PSH5X
 
         System::Array^ m_array;
 
+		long long m_position;
+
     };
 
 }

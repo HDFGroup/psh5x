@@ -2,7 +2,7 @@
 #include "ArrayDatasetReaderT.h"
 #include "ArrayDatasetWriterT.h"
 #include "CompoundDatasetReader.h"
-//#include "CompoundDatasetWriter.h"
+#include "CompoundDatasetWriter.h"
 #include "DatasetReaderT.h"
 #include "DatasetWriterT.h"
 #include "DriveInfo.h"
@@ -501,12 +501,11 @@ namespace PSH5X
 #pragma endregion
 					break;
 
-					/*
-					case H5T_COMPOUND:
+
+				case H5T_COMPOUND:
 
 					result = gcnew CompoundDatasetWriter(drive->FileHandle, h5path);
 					break;
-					*/
 
 				case H5T_ENUM:
 #pragma region HDF5 enumeration

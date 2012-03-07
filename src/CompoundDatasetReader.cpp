@@ -91,7 +91,7 @@ namespace PSH5X
 						if (arank < 0) {
 							throw gcnew HDF5Exception("H5Tget_array_ndims failed!");
 						}
-						//array<hsize_t>^ adims = gcnew array<hsize_t>(arank);
+
 						member_array_dims[i] = gcnew array<hsize_t>(arank);
 						pin_ptr<hsize_t> adims_ptr = &member_array_dims[i][0];
 						if (H5Tget_array_dims2(cmtype, adims_ptr) < 0) {
@@ -99,9 +99,7 @@ namespace PSH5X
 						}
 
 						member_array_length[i] = 1;
-						//member_array_dims[i] = gcnew array<hsize_t>(arank);
 						for (int d = 0; d < arank; ++d) {
-							//member_array_dims[i][d] = safe_cast<int>(adims[d]);
 							member_array_length[i] *= member_array_dims[i][d];
 						}
 					}
