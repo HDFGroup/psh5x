@@ -16,13 +16,15 @@ $dummy = New-H5Attribute . attr1 'string attribute' string17
 
 $dset = New-H5Dataset dset1 H5T_STD_I32BE 10,10
 
-$value = New-H5Array $dset.ElementType $dset.ElementCount
+$value = New-Object 'int[,]' 10,10
 
-foreach ($i in 0..99) {
-    $value[$i] = $i%10
+foreach ($i in 0..9) {
+    foreach ($j in 0..9) {
+        $value[$i,$j] = $j
+    }
 }
 
-Set-Content dset1 $value
+Set-H5DatasetValue dset1 $value
 
 $t = @"
 {
@@ -37,16 +39,29 @@ $t = @"
 }
 "@
 
+Add-Type @"
+public class cmpd_a_b_c
+{
+    public int a;
+    public float b;
+    public double c;
+}
+"@
+
 $dset = New-H5Dataset dset2 $t 5
 
-$value = New-H5Array $dset.ElementType $dset.ElementCount
+$value = New-Object 'cmpd_a_b_c[]' 5
 
 foreach ($i in 1..5)
 {
-    $value[$i-1].i0 = $i;
-    $value[$i-1].f1 = $i/10;
-    $value[$i-1].d2 = $i/100
+    $value[$i-1] = New-Object cmpd_a_b_c
+
+    $value[$i-1].a = $i
+    $value[$i-1].b = $i/10
+    $value[$i-1].c = $i/100
 }
+
+Set-H5DatasetValue dset2 $value
 
 $dummy = New-H5Group group1
 
@@ -62,25 +77,37 @@ $t = @"
 }
 "@
 
+Add-Type @"
+public class cmpd_a_b 
+{
+    public int[] a = new int[4];
+    public float[,] b = new float [5,6];
+}
+"@
+
 $dummy = New-H5LinkedDatatype type1 $t
 
 cd group1
 
 $dset = New-H5Dataset dset3 /type1 5
 
-$value = New-H5Array $dset.ElementType $dset.ElementCount
+$value = New-Object 'cmpd_a_b[]' 5
 
 foreach ($i in 0..4)
 {
+    $value[$i] = New-Object cmpd_a_b
+
     foreach ($j in 0..3) {
-        $value[$i].A0[$j] = $j
+        $value[$i].a[$j] = $j
     }
     foreach ($r in 0..4) {
         foreach ($c in 0..5) {
-            $value[$i].A1[$r,$c] = ($r+1)/10
+            $value[$i].b[$r,$c] = ($r+1)/10
         }
     }
 }
+
+Set-H5DatasetValue dset3 $value
 
 cd ..
 
