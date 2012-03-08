@@ -1072,6 +1072,12 @@ namespace PSH5X
         m_predefined_types["H5T_C_S1"] = serializer->Serialize(ParseH5Type(type));
         H5Tclose(type);
 
+		// FORTRAN-specific datatype
+
+        type = H5Tcopy(H5T_FORTRAN_S1);
+        m_predefined_types["H5T_FORTRAN_S1"] = serializer->Serialize(ParseH5Type(type));
+        H5Tclose(type);
+
         // Predefined native datatypes
 
         type = H5Tcopy(H5T_NATIVE_CHAR);

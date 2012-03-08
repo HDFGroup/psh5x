@@ -1571,6 +1571,8 @@ namespace PSH5X
 
         String^ t = type->Trim()->ToUpper();
 
+		bool isString = false;
+
         if (m_known_types->ContainsKey(t))
         {
             result = H5Tcopy((hid_t) m_known_types[t]);
@@ -1578,10 +1580,75 @@ namespace PSH5X
                 throw gcnew HDF5Exception("H5Tcopy failed!");
             }
         }
-        else if (t->StartsWith("S"))
+		else if (t->StartsWith("CSTRING"))
         {
-			bool isString = false;
-            if (t == "STRING") // variable-length C-string
+#pragma region fixed-length C-style ASCII string
+
+			if (t == "CSTRING") {
+				throw gcnew HDF5Exception("You must specify a string length including the null terminator!");
+			}
+			else
+			{
+				size_t size = 0;
+				if (ProviderUtils::TryGetValue(t->Substring(7), size))
+				{
+					if (size >= 1)
+					{
+						result = H5Tcreate(H5T_STRING, size);
+						if (result < 0) {
+							throw gcnew HDF5Exception("H5Tcreate failed!");
+						}
+						isString = true;
+						// C
+						if (H5Tset_strpad(result, H5T_STR_NULLTERM) < 0) {
+							throw gcnew HDF5Exception("H5Tset_strpad failed!"); 
+						}
+					}
+					else {
+						throw gcnew PSH5XException("Fixed-length strings must be at least 1 character long!");
+					}
+				}
+			}
+
+#pragma endregion
+		}
+		else if (t->StartsWith("FSTRING"))
+		{
+#pragma region fixed-length FORTRAN-style ASCII string
+
+			if (t == "FSTRING") {
+				throw gcnew HDF5Exception("You must specify a (non-zero) string length!");
+			}
+			else
+			{
+				size_t size = 0;
+				if (ProviderUtils::TryGetValue(t->Substring(7), size))
+				{
+					if (size >= 1)
+					{
+						result = H5Tcreate(H5T_STRING, size);
+						if (result < 0) {
+							throw gcnew HDF5Exception("H5Tcreate failed!");
+						}
+						isString = true;
+						// C
+						if (H5Tset_strpad(result, H5T_STR_SPACEPAD) < 0) {
+							throw gcnew HDF5Exception("H5Tset_strpad failed!"); 
+						}
+					}
+					else {
+						throw gcnew PSH5XException("Fixed-length strings must be at least 1 character long!");
+					}
+				}
+			}
+
+#pragma endregion
+		}
+		else if (t->StartsWith("STRING"))
+        {
+#pragma region fixed-length FORTRAN or variable-length ASCII string
+
+			if (t == "STRING")
             {
                 result = H5Tcreate(H5T_STRING, H5T_VARIABLE);
                 if (result < 0) {
@@ -1589,38 +1656,105 @@ namespace PSH5X
                 }
 				isString = true;
             }
-			else if (t->StartsWith("STRING"))
+			else
 			{
 				size_t size = 0;
 				if (ProviderUtils::TryGetValue(t->Substring(6), size))
 				{
-					if (size > 1)
+					if (size >= 1)
 					{
 						result = H5Tcreate(H5T_STRING, size);
 						if (result < 0) {
 							throw gcnew HDF5Exception("H5Tcreate failed!");
 						}
 						isString = true;
-						if (H5Tset_strpad(result, H5T_STR_NULLTERM) < 0) {
-							throw gcnew HDF5Exception("H5Tset_strpad failed!");
+						// FORTRAN!!!
+						if (H5Tset_strpad(result, H5T_STR_SPACEPAD) < 0) {
+							throw gcnew HDF5Exception("H5Tset_strpad failed!"); 
 						}
 					}
 					else {
-						throw gcnew PSH5XException("Fixed-length strings must be at least 2 characters long!");
+						throw gcnew PSH5XException("Fixed-length strings must be at least 1 character long!");
 					}
 				}
 			}
 
-			if (isString)
+#pragma endregion
+		}
+		else if (t->StartsWith("UCSTRING"))
+        {
+#pragma region fixed-length C-style UTF-8 string
+
+			if (t == "UCSTRING") {
+				throw gcnew HDF5Exception("You must specify a string length including the null terminator!");
+			}
+			else
 			{
-				if (H5Tset_cset(result, H5T_CSET_ASCII) < 0) {
-					throw gcnew HDF5Exception("H5Tset_cset failed!");
+				size_t size = 0;
+				if (ProviderUtils::TryGetValue(t->Substring(8), size))
+				{
+					if (size >= 1)
+					{
+						result = H5Tcreate(H5T_STRING, size);
+						if (result < 0) {
+							throw gcnew HDF5Exception("H5Tcreate failed!");
+						}
+						isString = true;
+						// C
+						if (H5Tset_strpad(result, H5T_STR_NULLTERM) < 0) {
+							throw gcnew HDF5Exception("H5Tset_strpad failed!"); 
+						}
+						if (H5Tset_cset(result, H5T_CSET_UTF8) < 0) {
+							throw gcnew HDF5Exception("H5Tset_cset failed!");
+						}
+					}
+					else {
+						throw gcnew PSH5XException("Fixed-length strings must be at least 1 character long!");
+					}
 				}
 			}
-        }
-		else if (t->StartsWith("U"))
+
+#pragma endregion
+		}
+		else if (t->StartsWith("UFSTRING"))
         {
-			bool isString = false;
+#pragma region fixed-length FORTRAN-style UTF-8 string
+
+			if (t == "UFSTRING") {
+                throw gcnew HDF5Exception("You must specify a (non-zero) string length!");
+            }
+			else
+			{
+				size_t size = 0;
+				if (ProviderUtils::TryGetValue(t->Substring(8), size))
+				{
+					if (size >= 1)
+					{
+						result = H5Tcreate(H5T_STRING, size);
+						if (result < 0) {
+							throw gcnew HDF5Exception("H5Tcreate failed!");
+						}
+						isString = true;
+						// FORTRAN !!!
+						if (H5Tset_strpad(result, H5T_STR_SPACEPAD) < 0) {
+							throw gcnew HDF5Exception("H5Tset_strpad failed!");
+						}
+						if (H5Tset_cset(result, H5T_CSET_UTF8) < 0) {
+							throw gcnew HDF5Exception("H5Tset_cset failed!");
+						}
+					}
+					else {
+						throw gcnew PSH5XException("Fixed-length strings must be at least 1 character long!");
+					}
+				}
+			}
+
+#pragma endregion
+		}
+		else if (t->StartsWith("USTRING"))
+        {
+#pragma region fixed-length FORTRAN or variable-length UTF-8 string
+
             if (t == "USTRING") // variable-length UTF-8 string
             {
                 result = H5Tcreate(H5T_STRING, H5T_VARIABLE);
@@ -1629,39 +1763,38 @@ namespace PSH5X
                 }
 				isString = true;
             }
-			else if (t->StartsWith("USTRING"))
+			else
 			{
 				size_t size = 0;
 				if (ProviderUtils::TryGetValue(t->Substring(7), size))
 				{
-					if (size > 1)
+					if (size >= 1)
 					{
 						result = H5Tcreate(H5T_STRING, size);
 						if (result < 0) {
 							throw gcnew HDF5Exception("H5Tcreate failed!");
 						}
 						isString = true;
-						if (H5Tset_strpad(result, H5T_STR_NULLTERM) < 0) {
+						// FORTRAN !!!
+						if (H5Tset_strpad(result, H5T_STR_SPACEPAD) < 0) {
 							throw gcnew HDF5Exception("H5Tset_strpad failed!");
 						}
 					}
 					else {
-						throw gcnew PSH5XException("Fixed-length strings must be at least 2 characters long!");
+						throw gcnew PSH5XException("Fixed-length strings must be at least 1 characters long!");
 					}
 				}
 			}
 
-			if (isString)
-			{
-				if (H5Tset_cset(result, H5T_CSET_UTF8) < 0) {
-					throw gcnew HDF5Exception("H5Tset_cset failed!");
-				}
+			if (H5Tset_cset(result, H5T_CSET_UTF8) < 0) {
+				throw gcnew HDF5Exception("H5Tset_cset failed!");
 			}
-        }
+
+#pragma endregion
+		}
 
         if (result < 0) {
-            throw gcnew PSH5XException(
-                String::Format("Unknown type: '{0}'", t));
+            throw gcnew PSH5XException(String::Format("Unknown type: '{0}'", t));
         }
 
         return result;
