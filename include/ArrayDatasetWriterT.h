@@ -63,72 +63,68 @@ namespace PSH5X
                 fspace = H5Dget_space(dset);
                 if (fspace < 0) {
                     throw gcnew HDF5Exception("H5Dget_space failed!");
-                }
-
-                hssize_t npoints = 1;
-				if (H5Sget_simple_extent_type(fspace) == H5S_SIMPLE) {
-				    npoints = H5Sget_simple_extent_npoints(fspace);
 				}
 
-                if (content->Count != safe_cast<int>(npoints))
-                {
-                    throw gcnew PSH5XException("Size mismatch!");
-                }
-                
-				if (npoints > 0)
+				hssize_t npoints = 1;
+				if (H5Sget_simple_extent_type(fspace) == H5S_SIMPLE) {
+					npoints = H5Sget_simple_extent_npoints(fspace);
+				}
+
+				if (content->Count != safe_cast<int>(npoints)) {
+					throw gcnew PSH5XException("Size mismatch!");
+				}
+
+				// get the array dimensions
+
+				int rank = H5Tget_array_ndims(ftype);
+				if (rank < 0) {
+					throw gcnew HDF5Exception("H5Tget_array_ndims failed!");
+				}
+
+				adims = std::vector<hsize_t>(rank);
+				if (H5Tget_array_dims2(ftype, &adims[0]) < 0) {
+					throw gcnew HDF5Exception("H5Tget_array_dims2 failed!");
+				}
+				hsize_t arrayLength = 1;
+				for (int i = 0; i < rank; ++i) {
+					arrayLength *= adims[i];
+				}
+
+				m_array = gcnew array<T>(content->Count*arrayLength);
+				size_t count = 0;
+
+				IEnumerator^ ienum = content->GetEnumerator();
+				ienum->MoveNext();
+
+				Array^ a = nullptr;
+
+				for (int i = 0; i < npoints; ++i)
 				{
-					// get the array dimensions
-
-					int rank = H5Tget_array_ndims(ftype);
-					if (rank < 0) {
-						throw gcnew HDF5Exception("H5Tget_array_ndims failed!");
-					}
-
-					adims = std::vector<hsize_t>(rank);
-					if (H5Tget_array_dims2(ftype, &adims[0]) < 0) {
-						throw gcnew HDF5Exception("H5Tget_array_dims2 failed!");
-					}
-					hsize_t arrayLength = 1;
-					for (int i = 0; i < rank; ++i) {
-						arrayLength *= adims[i];
-					}
-
-					m_array = gcnew array<T>(content->Count*arrayLength);
-					size_t count = 0;
-
-					IEnumerator^ ienum = content->GetEnumerator();
-					ienum->MoveNext();
-					
-					Array^ a = nullptr;
-
-					for (int i = 0; i < npoints; ++i)
+					if (ienum->Current != nullptr)
 					{
-						if (ienum->Current != nullptr)
-						{
-							Object^ obj = ProviderUtils::GetDotNetObject(ienum->Current);
-							a = safe_cast<Array^>(obj);
-						}
-						else {
-							throw gcnew PSH5XException(String::Format("Uninitialized array found at position {0}!", npoints));
-						}
-
-						IEnumerator^ aenum = a->GetEnumerator();
-						while ((aenum->MoveNext()) && (aenum->Current != nullptr)) {
-							m_array[count++] = safe_cast<T>(aenum->Current);
-						}
-
-						ienum->MoveNext();
+						Object^ obj = ProviderUtils::GetDotNetObject(ienum->Current);
+						a = safe_cast<Array^>(obj);
+					}
+					else {
+						throw gcnew PSH5XException(String::Format("Uninitialized array found at position {0}!", npoints));
 					}
 
-					pin_ptr<T> ptr = &m_array[0];
-
-					if (H5Dwrite(dset, mtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, ptr) < 0) {
-						throw gcnew HDF5Exception("H5Dwrite failed!");
+					IEnumerator^ aenum = a->GetEnumerator();
+					while ((aenum->MoveNext()) && (aenum->Current != nullptr)) {
+						m_array[count++] = safe_cast<T>(aenum->Current);
 					}
 
-					if (H5Fflush(dset, H5F_SCOPE_LOCAL) < 0) {
-						throw gcnew ArgumentException("H5Fflush failed!");
-					}
+					ienum->MoveNext();
+				}
+
+				pin_ptr<T> ptr = &m_array[0];
+
+				if (H5Dwrite(dset, mtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, ptr) < 0) {
+					throw gcnew HDF5Exception("H5Dwrite failed!");
+				}
+
+				if (H5Fflush(dset, H5F_SCOPE_LOCAL) < 0) {
+					throw gcnew ArgumentException("H5Fflush failed!");
 				}
 
                 m_position += content->Count;

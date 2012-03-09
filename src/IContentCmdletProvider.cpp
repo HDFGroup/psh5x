@@ -10,6 +10,7 @@
 #include "Provider.h"
 #include "ProviderUtils.h"
 #include "PSH5XException.h"
+#include "PrimitiveTypeDatasetWriter.h"
 #include "StringDatasetReader.h"
 #include "StringDatasetWriter.h"
 #include "VlenDatasetReader.h"
@@ -422,55 +423,11 @@ namespace PSH5X
 				switch (cls)
 				{
 				case H5T_INTEGER:
-#pragma region HDF5 integer
-
-					t = ProviderUtils::H5Type2DotNet(ftype);
-					if (t == SByte::typeid) {
-						result = gcnew DatasetWriterT<SByte>(drive->FileHandle, h5path);
-					}
-					else if (t == Int16::typeid) {
-						result = gcnew DatasetWriterT<Int16>(drive->FileHandle, h5path);
-					}
-					else if (t ==  Int32::typeid) {
-						result = gcnew DatasetWriterT<Int32>(drive->FileHandle, h5path);
-					}
-					else if (t ==  Int64::typeid) {
-						result = gcnew DatasetWriterT<Int64>(drive->FileHandle, h5path);
-					}
-					else if (t == Byte::typeid) {
-						result = gcnew DatasetWriterT<Byte>(drive->FileHandle, h5path);
-					}
-					else if (t == UInt16::typeid) {
-						result = gcnew DatasetWriterT<UInt16>(drive->FileHandle, h5path);
-					}
-					else if (t ==  UInt32::typeid) {
-						result = gcnew DatasetWriterT<UInt32>(drive->FileHandle, h5path);
-					}
-					else if (t ==  UInt64::typeid) {
-						result = gcnew DatasetWriterT<UInt64>(drive->FileHandle, h5path);
-					}
-					else {
-						throw gcnew PSH5XException("Unsupported integer type!");
-					}
-
-#pragma endregion
-					break;
-
 				case H5T_FLOAT:
-#pragma region HDF5 float
+				case H5T_BITFIELD:
+				case H5T_ENUM:
 
-					t = ProviderUtils::H5Type2DotNet(ftype);
-					if (t == Single::typeid) {
-						result = gcnew DatasetWriterT<Single>(drive->FileHandle, h5path);
-					}
-					else if (t == Double::typeid) {
-						result = gcnew DatasetWriterT<Double>(drive->FileHandle, h5path);
-					}
-					else {
-						throw gcnew PSH5XException("Unsupported float type!");
-					}
-
-#pragma endregion
+					result = gcnew PrimitiveTypeDatasetWriter(drive->FileHandle, h5path);
 					break;
 
 				case H5T_STRING:
@@ -478,68 +435,9 @@ namespace PSH5X
 					result = gcnew StringDatasetWriter(drive->FileHandle, h5path);
 					break;
 
-				case H5T_BITFIELD:
-#pragma region HDF5 bitfield
-
-					t = ProviderUtils::H5Type2DotNet(ftype);
-					if (t == Byte::typeid) {
-						result = gcnew DatasetWriterT<Byte>(drive->FileHandle, h5path);
-					}
-					else if (t == UInt16::typeid) {
-						result = gcnew DatasetWriterT<UInt16>(drive->FileHandle, h5path);
-					}
-					else if (t ==  UInt32::typeid) {
-						result = gcnew DatasetWriterT<UInt32>(drive->FileHandle, h5path);
-					}
-					else if (t ==  UInt64::typeid) {
-						result = gcnew DatasetWriterT<UInt64>(drive->FileHandle, h5path);
-					}
-					else {
-						throw gcnew PSH5XException("Unsupported bitfield type!");
-					}
-
-#pragma endregion
-					break;
-
-
 				case H5T_COMPOUND:
 
 					result = gcnew CompoundDatasetWriter(drive->FileHandle, h5path);
-					break;
-
-				case H5T_ENUM:
-#pragma region HDF5 enumeration
-
-					t = ProviderUtils::H5Type2DotNet(ftype);
-					if (t == SByte::typeid) {
-						result = gcnew DatasetWriterT<SByte>(drive->FileHandle, h5path);
-					}
-					else if (t == Int16::typeid) {
-						result = gcnew DatasetWriterT<Int16>(drive->FileHandle, h5path);
-					}
-					else if (t == Int32::typeid) {
-						result = gcnew DatasetWriterT<Int32>(drive->FileHandle, h5path);
-					}
-					else if (t == Int64::typeid) {
-						result = gcnew DatasetWriterT<Int64>(drive->FileHandle, h5path);
-					}
-					else if (t == Byte::typeid) {
-						result = gcnew DatasetWriterT<Byte>(drive->FileHandle, h5path);
-					}
-					else if (t == UInt16::typeid) {
-						result = gcnew DatasetWriterT<UInt16>(drive->FileHandle, h5path);
-					}
-					else if (t ==  UInt32::typeid) {
-						result = gcnew DatasetWriterT<UInt32>(drive->FileHandle, h5path);
-					}
-					else if (t ==  UInt64::typeid) {
-						result = gcnew DatasetWriterT<UInt64>(drive->FileHandle, h5path);
-					}
-					else {
-						throw gcnew PSH5XException("Unsupported enum type!");
-					}
-
-#pragma endregion
 					break;
 
 				case H5T_VLEN:

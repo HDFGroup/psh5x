@@ -116,6 +116,10 @@ namespace PSH5X
 					}
 					break;
 
+				case H5T_STRING:
+
+					break;
+
 				case H5T_ARRAY:
 					{
 						base_type = H5Tget_super(cmtype);

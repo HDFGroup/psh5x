@@ -190,6 +190,8 @@ namespace PSH5X
 
         static bool IsH5ArrayType(hid_t dtype);
 
+		static hid_t GetH5MemoryType(System::Type^ t, hid_t ftype);
+
 #pragma endregion
 
 #pragma region HDF5 Attribute

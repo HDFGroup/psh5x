@@ -2388,5 +2388,389 @@ namespace PSH5X
         return (H5Tget_class(dtype) == H5T_ARRAY);
     }
 
+	hid_t ProviderUtils::GetH5MemoryType(Type^ t, hid_t ftype)
+	{
+		hid_t result = -1, ntype = -1, stype = -1, fcmtype = -1, mcmtype = -1;
+
+		try
+		{
+			switch (H5Tget_class(ftype))
+			{
+			case H5T_INTEGER:
+#pragma region integer
+				{
+					if (!t->IsPrimitive) {
+						throw gcnew PSH5XException("INTEGER: Unable to map non-primitive type to HDF5 integer type!");
+					}
+
+					size_t size = H5Tget_size(ftype);
+					ntype = H5Tget_native_type(ftype, H5T_DIR_ASCEND);
+					
+					switch (H5Tget_sign(ftype))
+					{
+					case H5T_SGN_NONE:
+						{
+							if (t != Byte::typeid && t != UInt16::typeid && t != UInt32::typeid && t != UInt64::typeid) {
+								throw gcnew PSH5XException("INTEGER: Primitive type is not a supported unsigned integer type!");
+							}
+
+							if (H5Tequal(ntype, H5T_NATIVE_UCHAR))
+							{
+								if (t == Byte::typeid) {
+									result = H5Tcopy(H5T_NATIVE_UCHAR);
+								}
+								else {
+									throw gcnew PSH5XException("INTEGER: Unable to map primitive type!");
+								}
+							}
+							else if (H5Tequal(ntype, H5T_NATIVE_USHORT))
+							{
+								if (t == Byte::typeid) {
+									result = H5Tcopy(H5T_NATIVE_UCHAR);
+								}
+								else if (t == UInt16::typeid) {
+									result = H5Tcopy(H5T_NATIVE_USHORT);
+								}
+								else {
+									throw gcnew PSH5XException("INTEGER: Unable to map primitive type!");
+								}
+							}
+							else if (H5Tequal(ntype, H5T_NATIVE_UINT))
+							{
+								if (t == Byte::typeid) {
+									result = H5Tcopy(H5T_NATIVE_UCHAR);
+								}
+								else if (t == UInt16::typeid) {
+									result = H5Tcopy(H5T_NATIVE_USHORT);
+								}
+								else if (t == UInt32::typeid) {
+									result = H5Tcopy(H5T_NATIVE_UINT);
+								}
+								else {
+									throw gcnew PSH5XException("INTEGER: Unable to map primitive type!");
+								}
+							}
+							else if (H5Tequal(ntype, H5T_NATIVE_ULONG))
+							{
+								if (t == Byte::typeid) {
+									result = H5Tcopy(H5T_NATIVE_UCHAR);
+								}
+								else if (t == UInt16::typeid) {
+									result = H5Tcopy(H5T_NATIVE_USHORT);
+								}
+								else if (t == UInt32::typeid) {
+									result = H5Tcopy(H5T_NATIVE_UINT);
+								}
+								else {
+									throw gcnew PSH5XException("INTEGER: Unable to map primitive type!");
+								}
+							}
+							else if (H5Tequal(ntype, H5T_NATIVE_ULLONG))
+							{
+								if (t == Byte::typeid) {
+									result = H5Tcopy(H5T_NATIVE_UCHAR);
+								}
+								else if (t == UInt16::typeid) {
+									result = H5Tcopy(H5T_NATIVE_USHORT);
+								}
+								else if (t == UInt32::typeid) {
+									result = H5Tcopy(H5T_NATIVE_UINT);
+								}
+								else if (t == UInt64::typeid) {
+									result = H5Tcopy(H5T_NATIVE_ULLONG);
+								}
+								else {
+									throw gcnew PSH5XException("INTEGER: Unable to map primitive type!");
+								}
+							}
+							else {
+								throw gcnew PSH5XException("INTEGER: Unsupported HDF5 integer datatype!");
+							}
+						}
+						break;
+					case H5T_SGN_2:
+						{
+							if (t != SByte::typeid && t != Int16::typeid && t != Int32::typeid && t != Int64::typeid) {
+								throw gcnew PSH5XException("INTEGER: Primitive type is not a supported signed integer type!");
+							}
+
+							if (H5Tequal(ntype, H5T_NATIVE_SCHAR))
+							{
+								if (t == SByte::typeid) {
+									result = H5Tcopy(H5T_NATIVE_SCHAR);
+								}
+								else {
+									throw gcnew PSH5XException("INTEGER: Unable to map primitive type!");
+								}
+							}
+							else if (H5Tequal(ntype, H5T_NATIVE_SHORT))
+							{
+								if (t == SByte::typeid) {
+									result = H5Tcopy(H5T_NATIVE_SCHAR);
+								}
+								else if (t == Int16::typeid) {
+									result = H5Tcopy(H5T_NATIVE_SHORT);
+								}
+								else {
+									throw gcnew PSH5XException("INTEGER: Unable to map primitive type!");
+								}
+							}
+							else if (H5Tequal(ntype, H5T_NATIVE_INT))
+							{
+								if (t == SByte::typeid) {
+									result = H5Tcopy(H5T_NATIVE_SCHAR);
+								}
+								else if (t == Int16::typeid) {
+									result = H5Tcopy(H5T_NATIVE_SHORT);
+								}
+								else if (t == Int32::typeid) {
+									result = H5Tcopy(H5T_NATIVE_INT);
+								}
+								else {
+									throw gcnew PSH5XException("INTEGER: Unable to map primitive type!");
+								}
+							}
+							else if (H5Tequal(ntype, H5T_NATIVE_LONG))
+							{
+								if (t == SByte::typeid) {
+									result = H5Tcopy(H5T_NATIVE_SCHAR);
+								}
+								else if (t == Int16::typeid) {
+									result = H5Tcopy(H5T_NATIVE_SHORT);
+								}
+								else if (t == Int32::typeid) {
+									result = H5Tcopy(H5T_NATIVE_INT);
+								}
+								else {
+									throw gcnew PSH5XException("INTEGER: Unable to map primitive type!");
+								}
+							}
+							else if (H5Tequal(ntype, H5T_NATIVE_LLONG))
+							{
+								if (t == SByte::typeid) {
+									result = H5Tcopy(H5T_NATIVE_SCHAR);
+								}
+								else if (t == Int16::typeid) {
+									result = H5Tcopy(H5T_NATIVE_SHORT);
+								}
+								else if (t == Int32::typeid) {
+									result = H5Tcopy(H5T_NATIVE_INT);
+								}
+								else if (t == Int64::typeid) {
+									result = H5Tcopy(H5T_NATIVE_LLONG);
+								}
+								else {
+									throw gcnew PSH5XException("INTEGER: Unable to map primitive type!");
+								}
+							}
+							else {
+								throw gcnew PSH5XException("INTEGER: Unsupported HDF5 integer datatype!");
+							}
+						}
+						break;
+
+					default:
+						throw gcnew PSH5XException("INTEGER: Unknown sign type!");
+						break;
+					}
+				}
+#pragma endregion
+				break;
+
+			case H5T_FLOAT:
+#pragma region float
+				{
+					if (!t->IsPrimitive) {
+						throw gcnew PSH5XException("FLOAT: Unable to map non-primitive type to HDF5 floating point type!");
+					}
+					if (t != Single::typeid && t != Double::typeid) {
+						throw gcnew PSH5XException("FLOAT: Primitive type is not a floating point type!");
+					}
+
+					size_t size = H5Tget_size(ftype);
+					ntype = H5Tget_native_type(ftype, H5T_DIR_ASCEND);
+					
+					if (H5Tequal(ntype, H5T_NATIVE_FLOAT))
+					{
+						if (t == Single::typeid) {
+							result = H5Tcopy(H5T_NATIVE_FLOAT);
+						}
+						else {
+							throw gcnew PSH5XException("FLOAT: Unable to map primitive type!");
+						}
+					}
+					else if (H5Tequal(ntype, H5T_NATIVE_DOUBLE))
+					{
+						if (t == Single::typeid) {
+							result = H5Tcopy(H5T_NATIVE_FLOAT);
+						}
+						else if (t == Double::typeid) {
+							result = H5Tcopy(H5T_NATIVE_DOUBLE);
+						}
+						else {
+							throw gcnew PSH5XException("FLOAT: Unable to map primitive type!");
+						}
+					}
+					else if (H5Tequal(ntype, H5T_NATIVE_LDOUBLE))
+					{
+						if (t == Single::typeid) {
+							result = H5Tcopy(H5T_NATIVE_FLOAT);
+						}
+						else if (t == Double::typeid) {
+							result = H5Tcopy(H5T_NATIVE_DOUBLE);
+						}
+						else {
+							throw gcnew PSH5XException("FLOAT: Unable to map primitive type!");
+						}
+					}
+					else {
+						throw gcnew PSH5XException("FLOAT: Unsupported HDF5 floating point datatype!");
+					}
+				}
+#pragma endregion
+				break;
+
+			case H5T_STRING:
+#pragma region string
+				{
+					if (t != String::typeid) {
+						throw gcnew PSH5XException("STRING: Unable to map type to HDF5 string type!");
+					}
+					htri_t is_vlen_str = H5Tis_variable_str(ftype);
+					if (is_vlen_str < 0) {
+						throw gcnew HDF5Exception("H5Tis_variable_str failed!");
+					}
+					
+					if (is_vlen_str > 0) {
+						result = H5Tcreate(H5T_STRING, H5T_VARIABLE);
+					}
+					else {
+						size_t size = H5Tget_size(ftype);
+						if (H5Tget_strpad(ftype) == H5T_STR_NULLTERM) {
+							result = H5Tcreate(H5T_STRING, size);
+						}
+						else {
+							result = H5Tcreate(H5T_STRING, size+1);
+						}
+						if (H5Tset_cset(result, H5Tget_cset(ftype)) < 0) {
+							throw gcnew HDF5Exception("H5Tset_cset failed!");
+						}
+					}
+				}
+#pragma endregion
+				break;
+
+			case H5T_VLEN:
+#pragma region vlen
+				{
+					if (!(t->IsArray || t->HasElementType)) {
+						throw gcnew PSH5XException("VLEN: Unable to map non-array type to HDF5 variable-length type!");
+					}
+					Type^ et = t->GetElementType();
+					stype = H5Tget_super(ftype);
+					result = H5Tvlen_create(GetH5MemoryType(et, stype));
+				}
+#pragma endregion
+				break;
+
+			case H5T_ARRAY:
+#pragma region array
+				{
+					if (!(t->IsArray || t->HasElementType)) {
+						throw gcnew PSH5XException("ARRAY: Unable to map non-array type to HDF5 array type!");
+					}
+					Type^ et = t->GetElementType();
+					stype = H5Tget_super(ftype);
+					int rank = H5Tget_array_ndims(ftype);
+					if (rank < 0) {
+						throw gcnew HDF5Exception("H5Tget_array_ndims failed!");
+					}
+					array<hsize_t>^ dims = gcnew array<hsize_t>(rank);
+					pin_ptr<hsize_t> dims_ptr = &dims[0];
+					rank =  H5Tget_array_dims2(ftype, dims_ptr);
+					result = H5Tarray_create2(GetH5MemoryType(et, stype), rank, dims_ptr);
+				}
+#pragma endregion
+				break;
+
+			case H5T_COMPOUND:
+#pragma region compound
+				{
+					array<FieldInfo^>^ info = t->GetFields(BindingFlags::Public|BindingFlags::Instance);
+					if (info == nullptr) {
+						throw gcnew PSH5XException("The .NET type has no public instance fields!");
+					}
+					if (info->Length != H5Tget_nmembers(ftype)) {
+						throw gcnew PSH5XException("Field count / member count mismatch!");
+					}
+
+					size_t size = 0;
+					array<size_t>^ offset = gcnew array<size_t>(info->Length);
+
+					// we have to run through this loop twice to get the total size
+
+					for (int m = 0; m < info->Length; ++m)
+					{
+						Type^ field_type = info[m]->FieldType;
+						fcmtype = H5Tget_member_type(ftype, safe_cast<unsigned int>(m));
+						mcmtype = ProviderUtils::GetH5MemoryType(field_type, fcmtype);
+
+						offset[m] = size;
+						size += H5Tget_size(mcmtype);
+
+						H5Tclose(mcmtype);
+						mcmtype = -1;
+						H5Tclose(fcmtype);
+						fcmtype = -1;
+					}
+
+					result = H5Tcreate(H5T_COMPOUND, size);
+					if (result < 0) {
+						throw gcnew HDF5Exception("H5Tcreate failed!");
+					}
+
+					for (int m = 0; m < info->Length; ++m)
+					{
+						char* name = H5Tget_member_name(ftype, safe_cast<unsigned int>(m));
+						
+						Type^ field_type = info[m]->FieldType;
+						fcmtype = H5Tget_member_type(ftype, safe_cast<unsigned int>(m));
+						mcmtype = ProviderUtils::GetH5MemoryType(field_type, fcmtype);
+						
+						if (H5Tinsert(result, name, offset[m], mcmtype) < 0) {
+							throw gcnew HDF5Exception("H5Tinsert failed!");
+						}
+						
+						H5Tclose(mcmtype);
+						mcmtype = -1;
+						H5Tclose(fcmtype);
+						fcmtype = -1;
+					}
+				}
+#pragma endregion
+				break;
+
+			default:
+				break;
+			}
+		}
+		finally
+		{
+			if (mcmtype >= 0) {
+				H5Tclose(mcmtype);
+			}
+			if (fcmtype >= 0) {
+				H5Tclose(fcmtype);
+			}
+			if (stype >= 0) {
+				H5Tclose(stype);
+			}
+			if (ntype >= 0) {
+				H5Tclose(ntype);
+			}
+		}
+
+		return result;
+	}
     
 }

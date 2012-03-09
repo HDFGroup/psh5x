@@ -177,6 +177,9 @@
     <ClCompile Include="src\TestH5FileCommand.cpp">
       <Filter>Source Files\Cmdlets</Filter>
     </ClCompile>
+    <ClCompile Include="src\PrimitiveTypeDatasetWriter.cpp">
+      <Filter>Source Files\Provider\IContentCmdletProvider</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Snapin.h">
@@ -294,6 +297,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\VlenDatasetWriterT.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PrimitiveTypeDatasetWriter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
