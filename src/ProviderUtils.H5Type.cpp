@@ -1833,100 +1833,113 @@ namespace PSH5X
 
         hid_t ntype = -1, super = -1, atype = -1;
 
-		hsize_t* adims = NULL;
-
         try
         {
-            if (cls == H5T_BITFIELD) {
-                ntype = H5Tget_native_type(dtype, H5T_DIR_DESCEND);
-            }
-            else {
-                ntype = H5Tget_native_type(dtype, H5T_DIR_ASCEND);
-            }
-            if (ntype < 0) {
-                throw gcnew HDF5Exception("H5Tget_native_type failed!");
-            }
-
-            if (cls == H5T_INTEGER)
-            {
-                if      (H5Tequal(ntype, H5T_NATIVE_CHAR)   > 0) { result = SByte::typeid;  }
-                else if (H5Tequal(ntype, H5T_NATIVE_SHORT)  > 0) { result = Int16::typeid;  }
-                else if (H5Tequal(ntype, H5T_NATIVE_INT)    > 0) { result = Int32::typeid;  }
-                else if (H5Tequal(ntype, H5T_NATIVE_LONG)   > 0) { result = Int32::typeid;  }
-                else if (H5Tequal(ntype, H5T_NATIVE_LLONG)  > 0) { result = Int64::typeid;  }
-                else if (H5Tequal(ntype, H5T_NATIVE_UCHAR)  > 0) { result = Byte::typeid;   }
-                else if (H5Tequal(ntype, H5T_NATIVE_USHORT) > 0) { result = UInt16::typeid; }
-                else if (H5Tequal(ntype, H5T_NATIVE_UINT)   > 0) { result = UInt32::typeid; }
-                else if (H5Tequal(ntype, H5T_NATIVE_ULONG)  > 0) { result = UInt32::typeid; }
-                else if (H5Tequal(ntype, H5T_NATIVE_ULLONG) > 0) { result = UInt64::typeid; }
-            }
-            else if (cls == H5T_FLOAT)
-            {
-                if      (H5Tequal(ntype, H5T_NATIVE_FLOAT) > 0)   { result = Single::typeid; }
-                else if (H5Tequal(ntype, H5T_NATIVE_DOUBLE) > 0)  { result = Double::typeid; }
-                else if (H5Tequal(ntype, H5T_NATIVE_LDOUBLE) > 0) { result = Double::typeid; }
-
-            }
-            else if (cls == H5T_STRING) {
-                result = String::typeid;
-            }
-            else if (cls == H5T_BITFIELD)
-            {
-                if      (H5Tequal(ntype, H5T_NATIVE_B8) > 0)  { result = Byte::typeid;   }
-                else if (H5Tequal(ntype, H5T_NATIVE_B16) > 0) { result = UInt16::typeid; }
-                else if (H5Tequal(ntype, H5T_NATIVE_B32) > 0) { result = UInt32::typeid; }
-                else if (H5Tequal(ntype, H5T_NATIVE_B64) > 0) { result = UInt64::typeid; }
-            }
-            else if (cls == H5T_OPAQUE) {
-                result = Byte::typeid;
-            }
-            else if (cls == H5T_ENUM)
-            {
-                super = H5Tget_super(ntype);
-                if      (H5Tequal(super, H5T_NATIVE_CHAR)   > 0) { result = SByte::typeid;  }
-                else if (H5Tequal(super, H5T_NATIVE_SHORT)  > 0) { result = Int16::typeid;  }
-                else if (H5Tequal(super, H5T_NATIVE_INT)    > 0) { result = Int32::typeid;  }
-                else if (H5Tequal(super, H5T_NATIVE_LONG)   > 0) { result = Int32::typeid;  }
-                else if (H5Tequal(super, H5T_NATIVE_LLONG)  > 0) { result = Int64::typeid;  }
-                else if (H5Tequal(super, H5T_NATIVE_UCHAR)  > 0) { result = Byte::typeid;   }
-                else if (H5Tequal(super, H5T_NATIVE_USHORT) > 0) { result = UInt16::typeid; }
-                else if (H5Tequal(super, H5T_NATIVE_UINT)   > 0) { result = UInt32::typeid; }
-                else if (H5Tequal(super, H5T_NATIVE_ULONG)  > 0) { result = UInt32::typeid; }
-                else if (H5Tequal(super, H5T_NATIVE_ULLONG) > 0) { result = UInt64::typeid; }
-            }
-			else if (cls == H5T_REFERENCE)
+			switch (cls)
 			{
-				throw gcnew PSH5XException("Reference types are unsupported!");
-			}
-			else if (cls == H5T_ARRAY)
-			{
-				super = H5Tget_super(dtype);
-
-				Type^ t = H5Type2DotNet(super);
-				if (t != nullptr)
+			case H5T_INTEGER:
+			case H5T_BITFIELD:
+			case H5T_ENUM:
 				{
-					int rank = H5Tget_array_ndims(dtype);
-					if (rank < 0) {
-						throw gcnew HDF5Exception("H5Tget_array_ndims failed!!!");
+					if (cls == H5T_INTEGER) {
+						ntype = H5Tget_native_type(dtype, H5T_DIR_ASCEND);
 					}
-					adims = new hsize_t [rank];
-					rank = H5Tget_array_dims2(dtype, adims);
-					if (rank < 0) {
-						throw gcnew HDF5Exception("H5Tget_array_dims2 failed!!!");
+					else if (cls == H5T_BITFIELD) {
+						ntype = H5Tget_native_type(dtype, H5T_DIR_DESCEND);
 					}
-					array<int>^ dims = gcnew array<int>(rank);
-					for (int i = 0; i < rank; ++i) {
-						dims[i] = safe_cast<int>(adims[i]);
+					else if (cls == H5T_ENUM)  {
+						super = H5Tget_super(dtype);
+						if (super < 0) {
+							throw gcnew HDF5Exception("H5Tget_super failed!");
+						}
+						ntype = H5Tget_native_type(super, H5T_DIR_ASCEND);
 					}
-					Array^ dummy = Array::CreateInstance(t, dims);
-					result = dummy->GetType();
+
+					if (ntype < 0) {
+						throw gcnew HDF5Exception("H5Tget_native_type failed!");
+					}
+
+					if      (H5Tequal(ntype, H5T_NATIVE_CHAR)   > 0) { result = SByte::typeid;  }
+					else if (H5Tequal(ntype, H5T_NATIVE_SHORT)  > 0) { result = Int16::typeid;  }
+					else if (H5Tequal(ntype, H5T_NATIVE_INT)    > 0) { result = Int32::typeid;  }
+					else if (H5Tequal(ntype, H5T_NATIVE_LONG)   > 0) { result = Int32::typeid;  }
+					else if (H5Tequal(ntype, H5T_NATIVE_LLONG)  > 0) { result = Int64::typeid;  }
+					else if (H5Tequal(ntype, H5T_NATIVE_UCHAR)  > 0) { result = Byte::typeid;   }
+					else if (H5Tequal(ntype, H5T_NATIVE_USHORT) > 0) { result = UInt16::typeid; }
+					else if (H5Tequal(ntype, H5T_NATIVE_UINT)   > 0) { result = UInt32::typeid; }
+					else if (H5Tequal(ntype, H5T_NATIVE_ULONG)  > 0) { result = UInt32::typeid; }
+					else if (H5Tequal(ntype, H5T_NATIVE_ULLONG) > 0) { result = UInt64::typeid; }
 				}
-				else {
-					throw gcnew PSH5XException("Unsupported array base type!");
+				break;
+
+			case H5T_FLOAT:
+				{
+					ntype = H5Tget_native_type(dtype, H5T_DIR_ASCEND);
+					if (ntype < 0) {
+						throw gcnew HDF5Exception("H5Tget_native_type failed!");
+					}
+
+					if      (H5Tequal(ntype, H5T_NATIVE_FLOAT) > 0)   { result = Single::typeid; }
+					else if (H5Tequal(ntype, H5T_NATIVE_DOUBLE) > 0)  { result = Double::typeid; }
+					else if (H5Tequal(ntype, H5T_NATIVE_LDOUBLE) > 0) { result = Double::typeid; }
 				}
-			}
-			else {
+				break;
+
+			case H5T_STRING:
+				{
+					result = String::typeid;
+				}
+				break;
+
+			case H5T_OPAQUE:
+				{
+					result = Byte::typeid;
+				}
+				break;
+
+			case H5T_REFERENCE:
+				{
+					throw gcnew PSH5XException("Reference types are currently not supported!");
+				}
+				break;
+
+			case H5T_ARRAY:
+				{
+					super = H5Tget_super(dtype);
+
+					Type^ t = H5Type2DotNet(super);
+					if (t != nullptr)
+					{
+						int rank = H5Tget_array_ndims(dtype);
+						if (rank < 0) {
+							throw gcnew HDF5Exception("H5Tget_array_ndims failed!!!");
+						}
+
+						array<hsize_t>^ adims = gcnew array<hsize_t>(rank);
+						pin_ptr<hsize_t> adims_ptr = &adims[0];
+						rank = H5Tget_array_dims2(dtype, adims_ptr);
+						if (rank < 0) {
+							throw gcnew HDF5Exception("H5Tget_array_dims2 failed!!!");
+						}
+						
+						array<int>^ dims = gcnew array<int>(rank);
+						for (int i = 0; i < rank; ++i) {
+							dims[i] = safe_cast<int>(adims[i]);
+						}
+
+						Array^ dummy = Array::CreateInstance(t, dims);
+						result = dummy->GetType();
+					}
+					else {
+						throw gcnew PSH5XException("Unsupported array base type!");
+					}
+				}
+				break;
+
+			default:
+
 				throw gcnew PSH5XException("Unsupported type class!");
+				break;
 			}
         }
         finally
@@ -1940,9 +1953,6 @@ namespace PSH5X
             if (super >= 0) {
                 H5Tclose(super);
             }
-			if (adims != NULL) {
-				delete [] adims;
-			}
         }
 
         return result;

@@ -35,55 +35,52 @@ namespace PSH5X
 				npoints = H5Sget_simple_extent_npoints(fspace);
 			}
 
-            if (npoints > 0)
-            {
-                int rank = H5Sget_simple_extent_ndims(fspace);
-                array<hsize_t>^ dims = gcnew array<hsize_t>(rank);
-                pin_ptr<hsize_t> dims_ptr = &dims[0];
-                rank = H5Sget_simple_extent_dims(fspace, dims_ptr, NULL);
-                
-                base_type = H5Tget_super(ftype);
-                if (base_type < 0) {
-                    throw gcnew HDF5Exception("H5Tget_super failed!");
-                }
+			int rank = H5Sget_simple_extent_ndims(fspace);
+			array<hsize_t>^ dims = gcnew array<hsize_t>(rank);
+			pin_ptr<hsize_t> dims_ptr = &dims[0];
+			rank = H5Sget_simple_extent_dims(fspace, dims_ptr, NULL);
 
-                Type^ t = ProviderUtils::H5Type2DotNet(base_type);
-                if (t != nullptr)
-                {
-                    m_type = ProviderUtils::GetArrayType(base_type);
-                    m_array = Array::CreateInstance(m_type, (array<long long>^) dims);
+			base_type = H5Tget_super(ftype);
+			if (base_type < 0) {
+				throw gcnew HDF5Exception("H5Tget_super failed!");
+			}
 
-                    size_t size = H5Tget_size(base_type);
-                    rdata = new hvl_t [npoints];
+			Type^ t = ProviderUtils::H5Type2DotNet(base_type);
+			if (t != nullptr)
+			{
+				m_type = ProviderUtils::GetArrayType(base_type);
+				m_array = Array::CreateInstance(m_type, (array<long long>^) dims);
 
-					mtype = H5Tget_native_type(ftype, H5T_DIR_ASCEND);
-                    if (mtype < 0) {
-                        throw gcnew HDF5Exception("H5Tget_native_type failed!");
-                    }
+				size_t size = H5Tget_size(base_type);
+				rdata = new hvl_t [npoints];
 
-                    if(H5Dread(dset, mtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, rdata) < 0) {
-                        throw gcnew HDF5Exception("H5Dread failed!");
-                    }
+				mtype = H5Tget_native_type(ftype, H5T_DIR_ASCEND);
+				if (mtype < 0) {
+					throw gcnew HDF5Exception("H5Tget_native_type failed!");
+				}
 
-                    array<long long>^ index = gcnew array<long long>(rank);
-                    for (long long i = 0; i < npoints; ++i)
-                    {
-                        index = ArrayUtils::GetIndex((array<long long>^)dims, i);
-                        m_array->SetValue(ProviderUtils::GetArray(rdata[i].p, rdata[i].len, base_type), index);
-                    }
+				if(H5Dread(dset, mtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, rdata) < 0) {
+					throw gcnew HDF5Exception("H5Dread failed!");
+				}
 
-                    if (H5Dvlen_reclaim(mtype, fspace, H5P_DEFAULT, rdata) < 0) {
-                        throw gcnew HDF5Exception("H5Dvlen_reclaim failed!");
-                    }
+				array<long long>^ index = gcnew array<long long>(rank);
+				for (long long i = 0; i < npoints; ++i)
+				{
+					index = ArrayUtils::GetIndex((array<long long>^)dims, i);
+					m_array->SetValue(ProviderUtils::GetArray(rdata[i].p, rdata[i].len, base_type), index);
+				}
 
-                    m_ienum = m_array->GetEnumerator();
-                    m_ienum->MoveNext();
-                }
-                else
-                {
-                    throw gcnew PSH5XException("Unsupported base type in array type!");
-                }
-            }
+				if (H5Dvlen_reclaim(mtype, fspace, H5P_DEFAULT, rdata) < 0) {
+					throw gcnew HDF5Exception("H5Dvlen_reclaim failed!");
+				}
+
+				m_ienum = m_array->GetEnumerator();
+				m_ienum->MoveNext();
+			}
+			else
+			{
+				throw gcnew PSH5XException("Unsupported base type in array type!");
+			}
         }
         finally
         {
