@@ -84,7 +84,7 @@ namespace PSH5X
 
 			array<bool>^ member_is_vlen_str = gcnew array<bool>(mcount);
 
-			array<int>^ member_str_len = gcnew array<int>(mcount);
+			array<int>^ member_strlen = gcnew array<int>(mcount);
 
 			Type^ magicType = System::IO::BinaryWriter::typeid;
 
@@ -118,8 +118,7 @@ namespace PSH5X
 					{
 						member_is_vlen_str[m] = (H5Tis_variable_str(cmtype) > 0);
 						if (!member_is_vlen_str[m]) {
-							member_str_len[m] = safe_cast<int>(H5Tget_size(cmtype));
-							Console::WriteLine(member_str_len[m]);
+							member_strlen[m] = safe_cast<int>(H5Tget_size(cmtype));
 						}
 					}
 					break;
@@ -186,7 +185,8 @@ namespace PSH5X
 									writer->Write(Marshal::StringToHGlobalAnsi((String^) value).ToInt64());
 								}
 								else{
-									array<unsigned char>^ bytes = Encoding::ASCII->GetBytes((String^) value);
+									array<unsigned char>^ bytes = Encoding::ASCII->GetBytes(
+										((String^) value)->PadRight(member_strlen[m])->Substring(0, member_strlen[m]));
 									writer->Write(bytes);
 								}
 							}
