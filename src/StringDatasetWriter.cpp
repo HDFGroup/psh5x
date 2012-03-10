@@ -82,10 +82,7 @@ namespace PSH5X
 						vwdata[i] = (char*) Marshal::StringToHGlobalAnsi(astring[i]).ToPointer();
 					}
 
-					mtype = H5Tcreate(H5T_STRING, H5T_VARIABLE);
-					if (mtype < 0) {
-						throw gcnew HDF5Exception("H5Tcreate failed!");
-					}
+					mtype = ProviderUtils::GetH5MemoryType(String::typeid, ftype);
 
 					if (H5Dwrite(dset, mtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, vwdata) < 0) {
 						throw gcnew HDF5Exception("H5Dwrite failed!");
@@ -101,8 +98,8 @@ namespace PSH5X
 			}
 			else if (is_vlen == 0)
 			{
-				size_t size = H5Tget_size(ftype);
-				H5T_str_t strpad = H5Tget_strpad(ftype);
+				mtype = ProviderUtils::GetH5MemoryType(String::typeid, ftype);
+				size_t size = H5Tget_size(mtype);
 
 				wdata = new char* [npoints];
 				wdata[0] = new char [npoints*size];
@@ -115,9 +112,8 @@ namespace PSH5X
 				if (ProviderUtils::TryGetValue(content, astring))
 				{
 					for (i = 0; i < npoints; ++i) {
-						if (astring[i]->Length > size || 
-							(astring[i]->Length == size && !(strpad == H5T_STR_SPACEPAD))) {
-								throw gcnew PSH5XException("String too long!");
+						if (astring[i]->Length >= size) {
+								throw gcnew PSH5XException(String::Format("String >{0}< too long!", astring[i]));
 						}
 					}
 
@@ -126,11 +122,6 @@ namespace PSH5X
 						char* buf = (char*) Marshal::StringToHGlobalAnsi(astring[i]).ToPointer();
 						memcpy((void*) wdata[i], (void*) buf, size);
 						Marshal::FreeHGlobal(IntPtr(buf));
-					}
-
-					mtype = H5Tcreate(H5T_STRING, size);
-					if (mtype < 0) {
-						throw gcnew HDF5Exception("H5Tcreate failed!!!");
 					}
 
 					if (H5Dwrite(dset, mtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, wdata[0]) < 0) {
