@@ -70,12 +70,6 @@ namespace PSH5X
                 Array::Copy(a, m_array, a->Length);
                 pin_ptr<T> ptr = &m_array[0];
 
-				/*
-                ntype = H5Tget_native_type(ftype, H5T_DIR_ASCEND);
-                if (ntype < 0) {
-                    throw gcnew ArgumentException("H5Tget_native_type failed!");
-                }
-				*/
 				ntype = ProviderUtils::GetH5MemoryType(T::typeid, ftype);
 
                 if (H5Dwrite(dset, ntype, H5S_ALL, H5S_ALL, H5P_DEFAULT, ptr) < 0) {

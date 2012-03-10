@@ -21,17 +21,17 @@ namespace PSH5X
         DatasetReaderT(hid_t dset, hid_t ftype, hid_t fspace)
             : m_array(nullptr), m_ienum(nullptr), m_position(0)
         {
-            hid_t ntype = -1;
+            hid_t mtype = -1;
 
             try
 			{
 				if (H5Tget_class(ftype) == H5T_BITFIELD) {
-					ntype = H5Tget_native_type(ftype, H5T_DIR_DESCEND);
+					mtype = H5Tget_native_type(ftype, H5T_DIR_DESCEND);
 				}
 				else {
-					ntype = H5Tget_native_type(ftype, H5T_DIR_ASCEND);
+					mtype = H5Tget_native_type(ftype, H5T_DIR_ASCEND);
 				}
-				if (ntype < 0) {
+				if (mtype < 0) {
 					throw gcnew HDF5Exception("H5Tget_native_type failed!");
 				}
 
@@ -40,32 +40,26 @@ namespace PSH5X
 					npoints = H5Sget_simple_extent_npoints(fspace);
 				}
 
-				if (npoints > 0)
-				{
-					int rank = H5Sget_simple_extent_ndims(fspace);
-					array<hsize_t>^ dims = gcnew array<hsize_t>(rank);
-					pin_ptr<hsize_t> dims_ptr = &dims[0];
-					rank = H5Sget_simple_extent_dims(fspace, dims_ptr, NULL);
+				int rank = H5Sget_simple_extent_ndims(fspace);
+				array<hsize_t>^ dims = gcnew array<hsize_t>(rank);
+				pin_ptr<hsize_t> dims_ptr = &dims[0];
+				rank = H5Sget_simple_extent_dims(fspace, dims_ptr, NULL);
 
-					H5Array<T>^ h5a = gcnew H5Array<T>(dims);
-					m_array = h5a->GetArray();
-					pin_ptr<T> ptr = h5a->GetHandle();
+				H5Array<T>^ h5a = gcnew H5Array<T>(dims);
+				m_array = h5a->GetArray();
+				pin_ptr<T> ptr = h5a->GetHandle();
 
-					if (H5Dread(dset, ntype, H5S_ALL, H5S_ALL, H5P_DEFAULT, ptr) < 0) {
-						throw gcnew HDF5Exception("H5Dread failed!");
-					}
-
-					m_ienum = m_array->GetEnumerator();
-					m_ienum->MoveNext();
+				if (H5Dread(dset, mtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, ptr) < 0) {
+					throw gcnew HDF5Exception("H5Dread failed!");
 				}
-				else {
-					m_array = nullptr;
-				}
+
+				m_ienum = m_array->GetEnumerator();
+				m_ienum->MoveNext();
 			}
             finally
             {
-                if (ntype >= 0) {
-                    H5Tclose(ntype);
+                if (mtype >= 0) {
+                    H5Tclose(mtype);
                 }
             }
 

@@ -90,7 +90,9 @@ namespace PSH5X
 				switch (cls)
 				{
 				case H5T_INTEGER:
-#pragma region HDF5 integer
+				case H5T_ENUM:
+				case H5T_BITFIELD:
+#pragma region HDF5 integer, enum, bitfield
 
 					t = ProviderUtils::H5Type2DotNet(ftype);
 					if (t == SByte::typeid) {
@@ -118,7 +120,7 @@ namespace PSH5X
 						result = gcnew DatasetReaderT<UInt64>(dset, ftype, fspace);
 					}
 					else {
-						throw gcnew PSH5XException("Unsupported integer type!");
+						throw gcnew PSH5XException("Unsupported integer, enum, or bitfield type!");
 					}
 
 #pragma endregion
@@ -146,67 +148,9 @@ namespace PSH5X
 					result = gcnew StringDatasetReader(dset, ftype, fspace);
 					break;
 
-				case H5T_BITFIELD:
-#pragma region HDF5 bitfield
-
-					t = ProviderUtils::H5Type2DotNet(ftype);
-					if (t == Byte::typeid) {
-						result = gcnew DatasetReaderT<Byte>(dset, ftype, fspace);
-					}
-					else if (t == UInt16::typeid) {
-						result = gcnew DatasetReaderT<UInt16>(dset, ftype, fspace);
-					}
-					else if (t ==  UInt32::typeid) {
-						result = gcnew DatasetReaderT<UInt32>(dset, ftype, fspace);
-					}
-					else if (t ==  UInt64::typeid) {
-						result = gcnew DatasetReaderT<UInt64>(dset, ftype, fspace);
-					}
-					else {
-						throw gcnew PSH5XException("Unsupported bitfield type!");
-					}
-
-#pragma endregion
-					break;
-
 				case H5T_COMPOUND:
 
 					result = gcnew CompoundDatasetReader(dset, ftype, fspace);
-					break;
-
-				case H5T_ENUM:
-#pragma region HDF5 enumeration
-
-					t = ProviderUtils::H5Type2DotNet(ftype);
-					if (t == SByte::typeid) {
-						result = gcnew DatasetReaderT<SByte>(dset, ftype, fspace);
-					}
-					else if (t == Int16::typeid) {
-						result = gcnew DatasetReaderT<Int16>(dset, ftype, fspace);
-					}
-					else if (t == Int32::typeid) {
-						result = gcnew DatasetReaderT<Int32>(dset, ftype, fspace);
-					}
-					else if (t == Int64::typeid) {
-						result = gcnew DatasetReaderT<Int64>(dset, ftype, fspace);
-					}
-					else if (t == Byte::typeid) {
-						result = gcnew DatasetReaderT<Byte>(dset, ftype, fspace);
-					}
-					else if (t == UInt16::typeid) {
-						result = gcnew DatasetReaderT<UInt16>(dset, ftype, fspace);
-					}
-					else if (t ==  UInt32::typeid) {
-						result = gcnew DatasetReaderT<UInt32>(dset, ftype, fspace);
-					}
-					else if (t ==  UInt64::typeid) {
-						result = gcnew DatasetReaderT<UInt64>(dset, ftype, fspace);
-					}
-					else {
-						throw gcnew PSH5XException("Unsupported enum type!");
-					}
-
-#pragma endregion
 					break;
 
 				case H5T_VLEN:
@@ -222,7 +166,9 @@ namespace PSH5X
 					switch (bcls)
 					{
 					case H5T_INTEGER:
-#pragma region HDF5 integer
+					case H5T_ENUM:
+					case H5T_BITFIELD:
+#pragma region HDF5 integer, enum, bitfield
 
 						t = ProviderUtils::H5Type2DotNet(base_type);
 						if (t == SByte::typeid) {
@@ -250,7 +196,7 @@ namespace PSH5X
 							result = gcnew ArrayDatasetReaderT<UInt64>(dset, ftype, fspace);
 						}
 						else {
-							throw gcnew PSH5XException("Unsupported integer type!");
+							throw gcnew PSH5XException("Unsupported integer, enum, or bitfield type!");
 						}
 #pragma endregion
 						break;
@@ -267,64 +213,6 @@ namespace PSH5X
 						}
 						else {
 							throw gcnew PSH5XException("Unsupported float type!");
-						}
-
-#pragma endregion
-						break;
-
-					case H5T_BITFIELD:
-#pragma region HDF5 bitfield
-
-						t = ProviderUtils::H5Type2DotNet(base_type);
-						if (t == Byte::typeid) {
-							result = gcnew ArrayDatasetReaderT<Byte>(dset, ftype, fspace);
-						}
-						else if (t == UInt16::typeid) {
-							result = gcnew ArrayDatasetReaderT<UInt16>(dset, ftype, fspace);
-						}
-						else if (t ==  UInt32::typeid) {
-							result = gcnew ArrayDatasetReaderT<UInt32>(dset, ftype, fspace);
-						}
-						else if (t ==  UInt64::typeid) {
-							result = gcnew ArrayDatasetReaderT<UInt64>(dset, ftype, fspace);
-						}
-						else {
-							throw gcnew PSH5XException("Unsupported bitfield type!");
-						}
-
-#pragma endregion
-						break;
-
-					case H5T_ENUM:
-#pragma region HDF5 enumeration
-
-						t = ProviderUtils::H5Type2DotNet(base_type);
-						if (t == SByte::typeid) {
-							result = gcnew DatasetReaderT<SByte>(dset, ftype, fspace);
-						}
-						else if (t == Int16::typeid) {
-							result = gcnew DatasetReaderT<Int16>(dset, ftype, fspace);
-						}
-						else if (t == Int32::typeid) {
-							result = gcnew DatasetReaderT<Int32>(dset, ftype, fspace);
-						}
-						else if (t == Int64::typeid) {
-							result = gcnew DatasetReaderT<Int64>(dset, ftype, fspace);
-						}
-						else if (t == Byte::typeid) {
-							result = gcnew DatasetReaderT<Byte>(dset, ftype, fspace);
-						}
-						else if (t == UInt16::typeid) {
-							result = gcnew DatasetReaderT<UInt16>(dset, ftype, fspace);
-						}
-						else if (t ==  UInt32::typeid) {
-							result = gcnew DatasetReaderT<UInt32>(dset, ftype, fspace);
-						}
-						else if (t ==  UInt64::typeid) {
-							result = gcnew DatasetReaderT<UInt64>(dset, ftype, fspace);
-						}
-						else {
-							throw gcnew PSH5XException("Unsupported enum type!");
 						}
 
 #pragma endregion
@@ -448,37 +336,39 @@ namespace PSH5X
 					switch (bcls)
 					{
 					case H5T_INTEGER:
-#pragma region HDF5 integer
-
-						t = ProviderUtils::H5Type2DotNet(base_type);
-						if (t == SByte::typeid) {
-							result = gcnew VlenDatasetWriterT<SByte>(drive->FileHandle, h5path);
+					case H5T_ENUM:
+					case H5T_BITFIELD:
+#pragma region HDF5 integer, enum, bitfield
+						{
+							t = ProviderUtils::H5Type2DotNet(base_type);
+							if (t == SByte::typeid) {
+								result = gcnew VlenDatasetWriterT<SByte>(drive->FileHandle, h5path);
+							}
+							else if (t == Int16::typeid) {
+								result = gcnew VlenDatasetWriterT<Int16>(drive->FileHandle, h5path);
+							}
+							else if (t == Int32::typeid) {
+								result = gcnew VlenDatasetWriterT<Int32>(drive->FileHandle, h5path);
+							}
+							else if (t == Int64::typeid) {
+								result = gcnew VlenDatasetWriterT<Int64>(drive->FileHandle, h5path);
+							}
+							else if (t == Byte::typeid) {
+								result = gcnew VlenDatasetWriterT<Byte>(drive->FileHandle, h5path);
+							}
+							else if (t == UInt16::typeid) {
+								result = gcnew VlenDatasetWriterT<UInt16>(drive->FileHandle, h5path);
+							}
+							else if (t ==  UInt32::typeid) {
+								result = gcnew VlenDatasetWriterT<UInt32>(drive->FileHandle, h5path);
+							}
+							else if (t ==  UInt64::typeid) {
+								result = gcnew VlenDatasetWriterT<UInt64>(drive->FileHandle, h5path);
+							}
+							else {
+								throw gcnew PSH5XException("Unsupported integer, enum, or bitfield type!");
+							}
 						}
-						else if (t == Int16::typeid) {
-							result = gcnew VlenDatasetWriterT<Int16>(drive->FileHandle, h5path);
-						}
-						else if (t == Int32::typeid) {
-							result = gcnew VlenDatasetWriterT<Int32>(drive->FileHandle, h5path);
-						}
-						else if (t == Int64::typeid) {
-							result = gcnew VlenDatasetWriterT<Int64>(drive->FileHandle, h5path);
-						}
-						else if (t == Byte::typeid) {
-							result = gcnew VlenDatasetWriterT<Byte>(drive->FileHandle, h5path);
-						}
-						else if (t == UInt16::typeid) {
-							result = gcnew VlenDatasetWriterT<UInt16>(drive->FileHandle, h5path);
-						}
-						else if (t ==  UInt32::typeid) {
-							result = gcnew VlenDatasetWriterT<UInt32>(drive->FileHandle, h5path);
-						}
-						else if (t ==  UInt64::typeid) {
-							result = gcnew VlenDatasetWriterT<UInt64>(drive->FileHandle, h5path);
-						}
-						else {
-							throw gcnew PSH5XException("Unsupported integer type!");
-						}
-
 #pragma endregion
 						break;
 
@@ -494,64 +384,6 @@ namespace PSH5X
 						}
 						else {
 							throw gcnew PSH5XException("Unsupported float type!");
-						}
-
-#pragma endregion
-						break;
-
-					case H5T_BITFIELD:
-#pragma region HDF5 bitfield
-
-						t = ProviderUtils::H5Type2DotNet(base_type);
-						if (t == Byte::typeid) {
-							result = gcnew VlenDatasetWriterT<Byte>(drive->FileHandle, h5path);
-						}
-						else if (t == UInt16::typeid) {
-							result = gcnew VlenDatasetWriterT<UInt16>(drive->FileHandle, h5path);
-						}
-						else if (t ==  UInt32::typeid) {
-							result = gcnew VlenDatasetWriterT<UInt32>(drive->FileHandle, h5path);
-						}
-						else if (t ==  UInt64::typeid) {
-							result = gcnew VlenDatasetWriterT<UInt64>(drive->FileHandle, h5path);
-						}
-						else {
-							throw gcnew PSH5XException("Unsupported bitfield type!");
-						}
-
-#pragma endregion
-						break;
-
-					case H5T_ENUM:
-#pragma region HDF5 enumeration
-
-						t = ProviderUtils::H5Type2DotNet(base_type);
-						if (t == SByte::typeid) {
-							result = gcnew VlenDatasetWriterT<SByte>(drive->FileHandle, h5path);
-						}
-						else if (t == Int16::typeid) {
-							result = gcnew VlenDatasetWriterT<Int16>(drive->FileHandle, h5path);
-						}
-						else if (t == Int32::typeid) {
-							result = gcnew VlenDatasetWriterT<Int32>(drive->FileHandle, h5path);
-						}
-						else if (t == Int64::typeid) {
-							result = gcnew VlenDatasetWriterT<Int64>(drive->FileHandle, h5path);
-						}
-						else if (t == Byte::typeid) {
-							result = gcnew VlenDatasetWriterT<Byte>(drive->FileHandle, h5path);
-						}
-						else if (t == UInt16::typeid) {
-							result = gcnew VlenDatasetWriterT<UInt16>(drive->FileHandle, h5path);
-						}
-						else if (t ==  UInt32::typeid) {
-							result = gcnew VlenDatasetWriterT<UInt32>(drive->FileHandle, h5path);
-						}
-						else if (t ==  UInt64::typeid) {
-							result = gcnew VlenDatasetWriterT<UInt64>(drive->FileHandle, h5path);
-						}
-						else {
-							throw gcnew PSH5XException("Unsupported enum type!");
 						}
 
 #pragma endregion
@@ -573,112 +405,56 @@ namespace PSH5X
 					switch (bcls)
 					{
 					case H5T_INTEGER:
-#pragma region HDF5 integer
-
-						t = ProviderUtils::H5Type2DotNet(base_type);
-						if (t == SByte::typeid) {
-							result = gcnew ArrayDatasetWriterT<SByte>(drive->FileHandle, h5path);
+					case H5T_ENUM:
+					case H5T_BITFIELD:
+#pragma region HDF5 integer, enum, bitfield
+						{
+							t = ProviderUtils::H5Type2DotNet(base_type);
+							if (t == SByte::typeid) {
+								result = gcnew ArrayDatasetWriterT<SByte>(drive->FileHandle, h5path);
+							}
+							else if (t == Int16::typeid) {
+								result = gcnew ArrayDatasetWriterT<Int16>(drive->FileHandle, h5path);
+							}
+							else if (t == Int32::typeid) {
+								result = gcnew ArrayDatasetWriterT<Int32>(drive->FileHandle, h5path);
+							}
+							else if (t == Int64::typeid) {
+								result = gcnew ArrayDatasetWriterT<Int64>(drive->FileHandle, h5path);
+							}
+							else if (t == Byte::typeid) {
+								result = gcnew ArrayDatasetWriterT<Byte>(drive->FileHandle, h5path);
+							}
+							else if (t == UInt16::typeid) {
+								result = gcnew ArrayDatasetWriterT<UInt16>(drive->FileHandle, h5path);
+							}
+							else if (t ==  UInt32::typeid) {
+								result = gcnew ArrayDatasetWriterT<UInt32>(drive->FileHandle, h5path);
+							}
+							else if (t ==  UInt64::typeid) {
+								result = gcnew ArrayDatasetWriterT<UInt64>(drive->FileHandle, h5path);
+							}
+							else {
+								throw gcnew PSH5XException("Unsupported integer, enum, or bitfield type!");
+							}
 						}
-						else if (t == Int16::typeid) {
-							result = gcnew ArrayDatasetWriterT<Int16>(drive->FileHandle, h5path);
-						}
-						else if (t == Int32::typeid) {
-							result = gcnew ArrayDatasetWriterT<Int32>(drive->FileHandle, h5path);
-						}
-						else if (t == Int64::typeid) {
-							result = gcnew ArrayDatasetWriterT<Int64>(drive->FileHandle, h5path);
-						}
-						else if (t == Byte::typeid) {
-							result = gcnew ArrayDatasetWriterT<Byte>(drive->FileHandle, h5path);
-						}
-						else if (t == UInt16::typeid) {
-							result = gcnew ArrayDatasetWriterT<UInt16>(drive->FileHandle, h5path);
-						}
-						else if (t ==  UInt32::typeid) {
-							result = gcnew ArrayDatasetWriterT<UInt32>(drive->FileHandle, h5path);
-						}
-						else if (t ==  UInt64::typeid) {
-							result = gcnew ArrayDatasetWriterT<UInt64>(drive->FileHandle, h5path);
-						}
-						else {
-							throw gcnew PSH5XException("Unsupported integer type!");
-						}
-
 #pragma endregion
 						break;
 
 					case H5T_FLOAT:
 #pragma region HDF5 float
-
-						t = ProviderUtils::H5Type2DotNet(base_type);
-						if (t == Single::typeid) {
-							result = gcnew ArrayDatasetWriterT<Single>(drive->FileHandle, h5path);
+						{
+							t = ProviderUtils::H5Type2DotNet(base_type);
+							if (t == Single::typeid) {
+								result = gcnew ArrayDatasetWriterT<Single>(drive->FileHandle, h5path);
+							}
+							else if (t == Double::typeid) {
+								result = gcnew ArrayDatasetWriterT<Double>(drive->FileHandle, h5path);
+							}
+							else {
+								throw gcnew PSH5XException("Unsupported float type!");
+							}
 						}
-						else if (t == Double::typeid) {
-							result = gcnew ArrayDatasetWriterT<Double>(drive->FileHandle, h5path);
-						}
-						else {
-							throw gcnew PSH5XException("Unsupported float type!");
-						}
-
-#pragma endregion
-						break;
-
-					case H5T_BITFIELD:
-#pragma region HDF5 bitfield
-
-						t = ProviderUtils::H5Type2DotNet(base_type);
-						if (t == Byte::typeid) {
-							result = gcnew ArrayDatasetWriterT<Byte>(drive->FileHandle, h5path);
-						}
-						else if (t == UInt16::typeid) {
-							result = gcnew ArrayDatasetWriterT<UInt16>(drive->FileHandle, h5path);
-						}
-						else if (t ==  UInt32::typeid) {
-							result = gcnew ArrayDatasetWriterT<UInt32>(drive->FileHandle, h5path);
-						}
-						else if (t ==  UInt64::typeid) {
-							result = gcnew ArrayDatasetWriterT<UInt64>(drive->FileHandle, h5path);
-						}
-						else {
-							throw gcnew PSH5XException("Unsupported bitfield type!");
-						}
-
-#pragma endregion
-						break;
-
-					case H5T_ENUM:
-#pragma region HDF5 enumeration
-
-						t = ProviderUtils::H5Type2DotNet(base_type);
-						if (t == SByte::typeid) {
-							result = gcnew ArrayDatasetWriterT<SByte>(drive->FileHandle, h5path);
-						}
-						else if (t == Int16::typeid) {
-							result = gcnew ArrayDatasetWriterT<Int16>(drive->FileHandle, h5path);
-						}
-						else if (t == Int32::typeid) {
-							result = gcnew ArrayDatasetWriterT<Int32>(drive->FileHandle, h5path);
-						}
-						else if (t == Int64::typeid) {
-							result = gcnew ArrayDatasetWriterT<Int64>(drive->FileHandle, h5path);
-						}
-						else if (t == Byte::typeid) {
-							result = gcnew ArrayDatasetWriterT<Byte>(drive->FileHandle, h5path);
-						}
-						else if (t == UInt16::typeid) {
-							result = gcnew ArrayDatasetWriterT<UInt16>(drive->FileHandle, h5path);
-						}
-						else if (t ==  UInt32::typeid) {
-							result = gcnew ArrayDatasetWriterT<UInt32>(drive->FileHandle, h5path);
-						}
-						else if (t ==  UInt64::typeid) {
-							result = gcnew ArrayDatasetWriterT<UInt64>(drive->FileHandle, h5path);
-						}
-						else {
-							throw gcnew PSH5XException("Unsupported enum type!");
-						}
-
 #pragma endregion
 						break;
 
