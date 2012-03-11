@@ -1936,6 +1936,22 @@ namespace PSH5X
 				}
 				break;
 
+                case H5T_VLEN:
+				{
+					super = H5Tget_super(dtype);
+
+					Type^ t = H5Type2DotNet(super);
+					if (t != nullptr)
+					{
+						Array^ dummy = Array::CreateInstance(t, 0);
+						result = dummy->GetType();
+					}
+					else {
+						throw gcnew PSH5XException("Unsupported vlen base type!");
+					}
+				}
+				break;
+
 			default:
 
 				throw gcnew PSH5XException("Unsupported type class!");
@@ -2678,6 +2694,9 @@ namespace PSH5X
 					}
 					Type^ et = t->GetElementType();
 					stype = H5Tget_super(ftype);
+					if (stype < 0) {
+						throw gcnew HDF5Exception("H5Tget_super failed!");
+					}
 					result = H5Tvlen_create(GetH5MemoryType(et, stype));
 				}
 #pragma endregion

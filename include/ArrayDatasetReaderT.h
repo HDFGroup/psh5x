@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ArrayUtils.h"
 #include "H5ArrayT.h"
 #include "HDF5Exception.h"
 #include "PSH5XException.h"
@@ -70,16 +71,18 @@ namespace PSH5X
 				}
 
 				H5Array<T>^ dummy = gcnew H5Array<T>(adims);
-				m_array = Array::CreateInstance(dummy->GetArray()->GetType(), npoints);
+				m_array = Array::CreateInstance(dummy->GetArray()->GetType(), (array<long long>^) dims);
 
-				for (hssize_t i = 0; i < npoints; ++i)
+				array<long long>^ index = gcnew array<long long>(rank);
+				for (long long i = 0; i < npoints; ++i)
 				{
 					H5Array<T>^ arr = gcnew H5Array<T>(adims);
 					interior_ptr<T> arr_ptr = arr->GetHandle();
 					for (hsize_t j = 0; j < arrayLength; ++j) {
 						arr_ptr[j] = rdata[i*arrayLength+j];
 					}
-					m_array->SetValue(arr->GetArray(), i);
+					index = ArrayUtils::GetIndex((array<long long>^)dims, i);
+					m_array->SetValue(arr->GetArray(), index);
 				}
 
 				m_ienum = m_array->GetEnumerator();
@@ -152,7 +155,7 @@ namespace PSH5X
 
         virtual void Seek(long long offset, System::IO::SeekOrigin origin)
         {
-            System::Console::WriteLine("ArrayDatasetReaderT::Seek()");
+            throw gcnew PSH5XException("ArrayDatasetReaderT::Seek() not implemented!");
         }
 
     private:

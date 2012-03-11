@@ -27,6 +27,17 @@ foreach ($i in 0..9) {
 }
 
 Set-Content dset1 $value
+$a = Get-Content dset1 -ReadCount 0
+
+foreach ($i in 0..9) {
+    foreach ($j in 0..9) {
+        if ($value[$i,$j] -ne $a[$i, $j]) {
+            Write-Error "$($value[$i,$j]) != $($a[$i, $j])"
+        }
+    }
+}
+
+$a = Get-Content dset1 -ReadCount 5
 
 $t = @"
 {
@@ -54,16 +65,32 @@ $dset = New-Item dset2 -ItemType Dataset -ElementType $t -Dimensions 5
 
 $value = New-Object 'cmpd_a_b_c[]' 5
 
-foreach ($i in 1..5)
+foreach ($i in 0..4)
 {
-    $value[$i-1] = New-Object cmpd_a_b_c
+    $value[$i] = New-Object cmpd_a_b_c
 
-    $value[$i-1].a = $i
-    $value[$i-1].b = $i/10
-    $value[$i-1].c = $i/100
+    $value[$i].a = $i+1
+    $value[$i].b = ($i+1)/10
+    $value[$i].c = ($i+1)/100
 }
 
 Set-Content dset2 $value
+$a = Get-Content dset2 -ReadCount 0
+
+foreach ($i in 0..4)
+{
+    if ($value[$i].a -ne $a[$i].i0) {
+        Write-Error "$($value[$i].a) != $($a[$i].i0)"
+    }
+    if ($value[$i].b -ne $a[$i].f1) {
+        Write-Error "$($value[$i].b) != $($a[$i].f1)"
+    }
+    if ($value[$i].c -ne $a[$i].d2) {
+        Write-Error "$($value[$i].c) != $($a[$i].d2)"
+    }
+}
+
+$a = Get-Content dset2 -ReadCount 2
 
 New-Item group1 -ItemType Group
 
@@ -110,6 +137,25 @@ foreach ($i in 0..4)
 }
 
 Set-Content dset3 $value
+$a = Get-Content dset3 -ReadCount 0
+
+foreach ($i in 0..4)
+{
+    foreach ($j in 0..3) {
+        if ($value[$i].a[$j] -ne $a[$i].A0[$j]) {
+            Write-Error "$($value[$i].a[$j]) != $($a[$i].A0[$j])"
+        }
+    }
+    foreach ($r in 0..4) {
+        foreach ($c in 0..5) {
+            if ($value[$i].b[$r,$c] -ne $a[$i].A1[$r,$c]) {
+                Write-Error "$($value[$i].b[$r,$c]) != $($a[$i].A1[$r,$c])"
+            }
+        }
+    }
+}
+
+$a = Get-Content dset3 -ReadCount 2
 
 cd ..
 
@@ -120,6 +166,22 @@ New-Item dset3 -ItemType Dataset -ElementType $t -Dimensions 4
 $value = @(@(0), @(10,11), @(20,21,22), @(30,31,32,33))
 
 Set-Content dset3 $value
+$a = Get-Content dset3 -ReadCount 0
+
+foreach ($i in 0..3)
+{
+    if ($value[$i].Count -ne $a[$i].Count) {
+        Write-Error "$($value[$i].Count) != $($a[$i].Count)"
+    }
+
+    foreach ($j in 0..$($value[$i].Count)) {
+        if ($value[$i][$j] -ne $a[$i][$j]) {
+            Write-Error "$($value[$i][$j]) != $($a[$i][$j])"
+        }
+    }
+}
+
+$a = Get-Content dset3 -ReadCount 2
 
 New-Item group2 -ItemType Hardlink -Value /group1
 

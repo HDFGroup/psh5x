@@ -38,7 +38,7 @@ namespace PSH5X
 
         virtual void Seek(long long offset, System::IO::SeekOrigin origin)
         {
-            System::Console::WriteLine("VlenDatasetReader->Seek()");
+            throw gcnew PSH5XException("VlenDatasetReader->Seek() not implemented!");
         }
 
     private:

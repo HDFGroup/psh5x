@@ -4,7 +4,6 @@
 #include "CompoundDatasetReader.h"
 #include "CompoundDatasetWriter.h"
 #include "DatasetReaderT.h"
-#include "DatasetWriterT.h"
 #include "DriveInfo.h"
 #include "HDF5Exception.h"
 #include "Provider.h"
