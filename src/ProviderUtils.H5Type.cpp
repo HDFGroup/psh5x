@@ -402,256 +402,225 @@ namespace PSH5X
                 break;
 
             case H5T_OPAQUE:
-
+				{
 #pragma region Opaque
-
-                result->Add("Class", "Opaque");
-                name = H5Tget_tag(type);
-                result->Add("Tag", gcnew String(name));
-				result->Add("Size", size);
-
-                switch (H5Tget_order(type))
-                {
-                case H5T_ORDER_LE:
-                	result->Add("ByteOrder", "LE");
-                    break;
-                case H5T_ORDER_BE:
-                	result->Add("ByteOrder", "BE");
-                    break;
-                case H5T_ORDER_VAX:
-                	result->Add("ByteOrder", "VAX");
-                    break;
-                case H5T_ORDER_MIXED:
-                	result->Add("ByteOrder", "Mixed");
-                    break;
-                case H5T_ORDER_NONE:
-                	result->Add("ByteOrder", "None");
-                    break;
-                default:
-                	result->Add("ByteOrder", "UNKNOWN");
-                    break;
-                }
-
+				
+					result->Add("Class", "Opaque");
+					name = H5Tget_tag(type);
+					result->Add("Tag", gcnew String(name));
+					result->Add("Size", H5Tget_size(type));
+				
 #pragma endregion
-
+				}
                 break;
 
 
             case H5T_COMPOUND:
-
+				{
 #pragma region Compound
 
-                result->Add("Class", "Compound");
-                size = H5Tget_size(type);
-                result->Add("Size", size);
+					result->Add("Class", "Compound");
+					size = H5Tget_size(type);
+					result->Add("Size", size);
 
-                members = gcnew Dictionary<String^,Object^>();
+					members = gcnew Dictionary<String^,Object^>();
 
-                nmembers = H5Tget_nmembers(type);
-                for (ui = 0; ui < safe_cast<unsigned>(nmembers); ++ui)
-                {
-                    name = H5Tget_member_name(type, ui);
-                    s = gcnew String(name);
+					nmembers = H5Tget_nmembers(type);
+					for (ui = 0; ui < safe_cast<unsigned>(nmembers); ++ui)
+					{
+						name = H5Tget_member_name(type, ui);
+						s = gcnew String(name);
 
-					member = gcnew ArrayList();
+						member = gcnew ArrayList();
 
-                    unwnd = H5Tget_member_type(type, ui);
-                    if (unwnd >= 0)
-                    {
-                        offset = H5Tget_member_offset(type, ui);
-                        
-						member->Add(offset);
-						member->Add(ProviderUtils::ParseH5Type(unwnd));
-						
-						if (H5Tclose(unwnd) < 0) {
-                            throw gcnew HDF5Exception("H5Tclose failed!");
-                        }
-                        else {
-                            unwnd = -1;
-                        }
-                    }
+						unwnd = H5Tget_member_type(type, ui);
+						if (unwnd >= 0)
+						{
+							offset = H5Tget_member_offset(type, ui);
 
-					members->Add(s, member);
-                }
-                
-				result->Add("Members", members);
+							member->Add(offset);
+							member->Add(ProviderUtils::ParseH5Type(unwnd));
 
+							if (H5Tclose(unwnd) < 0) {
+								throw gcnew HDF5Exception("H5Tclose failed!");
+							}
+							else {
+								unwnd = -1;
+							}
+						}
+
+						members->Add(s, member);
+					}
+
+					result->Add("Members", members);
 #pragma endregion
-
+				}
                 break;
 
             case H5T_ENUM:
-
+				{
 #pragma region Enum
+					result->Add("Class", "Enum");
+					size = H5Tget_size(type);
+					if (size != 1 && size != 2 && size != 4 && size != 8) {
+						throw gcnew PSH5XException("Unsupported enum size!");
+					}
+					result->Add("Size", size);
+					unwnd = H5Tget_super(type);
+					result->Add("Type", ProviderUtils::ParseH5Type(unwnd));
+					sign = H5Tget_sign(unwnd);
 
-                result->Add("Class", "Enum");
-                size = H5Tget_size(type);
-                if (size != 1 && size != 2 && size != 4 && size != 8) {
-                    throw gcnew PSH5XException("Unsupported enum size!");
-                }
-                result->Add("Size", size);
-                unwnd = H5Tget_super(type);
-                result->Add("Type", ProviderUtils::ParseH5Type(unwnd));
-                sign = H5Tget_sign(unwnd);
-                
-                members = gcnew Dictionary<String^,Object^>();
+					members = gcnew Dictionary<String^,Object^>();
 
-                nmembers = H5Tget_nmembers(type);
-                if (nmembers < 0) {
-                    throw gcnew HDF5Exception("H5Tget_nmembers failed!");
-                }
-                for (ui = 0; ui < safe_cast<unsigned>(nmembers); ++ui)
-                {
-                    name = H5Tget_member_name(type, ui);
-                    s = gcnew String(name);
+					nmembers = H5Tget_nmembers(type);
+					if (nmembers < 0) {
+						throw gcnew HDF5Exception("H5Tget_nmembers failed!");
+					}
+					for (ui = 0; ui < safe_cast<unsigned>(nmembers); ++ui)
+					{
+						name = H5Tget_member_name(type, ui);
+						s = gcnew String(name);
 
-                    if (sign == H5T_SGN_NONE)
-                    {
-                        switch (size)
-                        {
-                        case 1:
+						if (sign == H5T_SGN_NONE)
+						{
+							switch (size)
+							{
+							case 1:
 
-                            if (H5Tget_member_value(type, ui, &B) < 0) {
-                                throw gcnew HDF5Exception("H5Tget_member_value failed!");
-                            }
-                			members->Add(s, B);                            
-                            break;
+								if (H5Tget_member_value(type, ui, &B) < 0) {
+									throw gcnew HDF5Exception("H5Tget_member_value failed!");
+								}
+								members->Add(s, B);                            
+								break;
 
-                        case 2:
+							case 2:
 
-                            if (H5Tget_member_value(type, ui, &H) < 0) {
-                                throw gcnew HDF5Exception("H5Tget_member_value failed!");
-                            }
-                			members->Add(s, H);
-                            break;
+								if (H5Tget_member_value(type, ui, &H) < 0) {
+									throw gcnew HDF5Exception("H5Tget_member_value failed!");
+								}
+								members->Add(s, H);
+								break;
 
-                        case 4:
+							case 4:
 
-                            if (H5Tget_member_value(type, ui, &I) < 0) {
-                                throw gcnew HDF5Exception("H5Tget_member_value failed!");
-                            }
-                			members->Add(s, I);
-                            break;
+								if (H5Tget_member_value(type, ui, &I) < 0) {
+									throw gcnew HDF5Exception("H5Tget_member_value failed!");
+								}
+								members->Add(s, I);
+								break;
 
-                        case 8:
-                            
-                            if (H5Tget_member_value(type, ui, &L) < 0) {
-                                throw gcnew HDF5Exception("H5Tget_member_value failed!");
-                            }
-                			members->Add(s, L);
-                            break;
-                        }
-                    }
-                    else if (sign == H5T_SGN_2)
-                    {
-                        switch (size)
-                        {
-                        case 1:
+							case 8:
 
-                            if (H5Tget_member_value(type, ui, &b) < 0) {
-                                throw gcnew HDF5Exception("H5Tget_member_value failed!");
-                            }
-                			members->Add(s, b);
-                            break;
+								if (H5Tget_member_value(type, ui, &L) < 0) {
+									throw gcnew HDF5Exception("H5Tget_member_value failed!");
+								}
+								members->Add(s, L);
+								break;
+							}
+						}
+						else if (sign == H5T_SGN_2)
+						{
+							switch (size)
+							{
+							case 1:
 
-                        case 2:
+								if (H5Tget_member_value(type, ui, &b) < 0) {
+									throw gcnew HDF5Exception("H5Tget_member_value failed!");
+								}
+								members->Add(s, b);
+								break;
 
-                            if (H5Tget_member_value(type, ui, &h) < 0) {
-                                throw gcnew HDF5Exception("H5Tget_member_value failed!");
-                            }
-                			members->Add(s, h);            
-                            break;
+							case 2:
 
-                        case 4:
+								if (H5Tget_member_value(type, ui, &h) < 0) {
+									throw gcnew HDF5Exception("H5Tget_member_value failed!");
+								}
+								members->Add(s, h);            
+								break;
 
-                            if (H5Tget_member_value(type, ui, &i) < 0) {
-                                throw gcnew HDF5Exception("H5Tget_member_value failed!");
-                            }
-							members->Add(s, i);
-                            
-                            break;
+							case 4:
 
-                        case 8:
-                            
-                            if (H5Tget_member_value(type, ui, &l) < 0) {
-                                throw gcnew HDF5Exception("H5Tget_member_value failed!");
-                            }
-							members->Add(s, l);
-                            
-                            break;
-                        }
-                    }
-                    else {
-                        throw gcnew HDF5Exception("Unknown sign type!");
-                    }
-                }
-				result->Add("Members", members);
+								if (H5Tget_member_value(type, ui, &i) < 0) {
+									throw gcnew HDF5Exception("H5Tget_member_value failed!");
+								}
+								members->Add(s, i);
 
+								break;
+
+							case 8:
+
+								if (H5Tget_member_value(type, ui, &l) < 0) {
+									throw gcnew HDF5Exception("H5Tget_member_value failed!");
+								}
+								members->Add(s, l);
+
+								break;
+							}
+						}
+						else {
+							throw gcnew HDF5Exception("Unknown sign type!");
+						}
+					}
+					result->Add("Members", members);
 #pragma endregion
-
+				}
                 break;
 
             case H5T_VLEN:
-
+				{
 #pragma region Vlen
-
-                result->Add("Class", "Vlen");
-                unwnd = H5Tget_super(type);
-                if (unwnd >= 0)
-                {
-                	result->Add("Base", ProviderUtils::ParseH5Type(unwnd));
-                }
-
+					result->Add("Class", "Vlen");
+					unwnd = H5Tget_super(type);
+					if (unwnd >= 0)
+					{
+						result->Add("Base", ProviderUtils::ParseH5Type(unwnd));
+					}
 #pragma endregion
-
+				}
                 break;
 
             case H5T_REFERENCE:
-
+				{
 #pragma region Reference
+					result->Add("Class", "Reference");
 
-                result->Add("Class", "Reference");
-
-                if (H5Tequal(type, H5T_STD_REF_OBJ) > 0) {
-					result->Add("Kind", "Object");
-                }
-                else if (H5Tequal(type, H5T_STD_REF_DSETREG) > 0) {
-					result->Add("Kind", "Region");
-                }
-                else {
-					result->Add("Kind", "UNKNOWN");
-                }
-
+					if (H5Tequal(type, H5T_STD_REF_OBJ) > 0) {
+						result->Add("Kind", "Object");
+					}
+					else if (H5Tequal(type, H5T_STD_REF_DSETREG) > 0) {
+						result->Add("Kind", "Region");
+					}
+					else {
+						result->Add("Kind", "UNKNOWN");
+					}
 #pragma endregion
-
+				}
                 break;
 
 
             case H5T_ARRAY:
-
+				{
 #pragma region Array
+					result->Add("Class", "Array");
+					rank = H5Tget_array_ndims(type);
+					dims = new hsize_t [rank];
+					rank = H5Tget_array_dims2(type, dims);
+					d = gcnew array<hsize_t>(rank);
+					for (i = 0; i < rank; ++i) {
+						d[i] = dims[i];
+					}
+					result->Add("Dims", d);
 
-				result->Add("Class", "Array");
-                rank = H5Tget_array_ndims(type);
-                dims = new hsize_t [rank];
-                rank = H5Tget_array_dims2(type, dims);
-                d = gcnew array<hsize_t>(rank);
-                for (i = 0; i < rank; ++i) {
-                    d[i] = dims[i];
-                }
-				result->Add("Dims", d);
-
-                unwnd = H5Tget_super(type);
-                if (unwnd >= 0)
-                {
-					result->Add("Base", ProviderUtils::ParseH5Type(unwnd));
-                }
-                else {
-                    throw gcnew HDF5Exception("H5Tget_super failed!");
-                }
-
+					unwnd = H5Tget_super(type);
+					if (unwnd >= 0)
+					{
+						result->Add("Base", ProviderUtils::ParseH5Type(unwnd));
+					}
+					else {
+						throw gcnew HDF5Exception("H5Tget_super failed!");
+					}
 #pragma endregion
-
+				}
                 break;        
 
             default:
@@ -1791,6 +1760,48 @@ namespace PSH5X
 			}
 
 #pragma endregion
+		}
+		else if (t->StartsWith("OPAQUE"))
+		{
+			size_t size = 0;
+			String^ tag = nullptr;
+
+			if (t->IndexOf('[') != -1 && t->EndsWith("]"))
+			{
+				if (ProviderUtils::TryGetValue(t->Substring(6, t->IndexOf('[')-6), size))
+				{
+					tag = type->Trim()->Substring(t->IndexOf('[')+1, t->LastIndexOf(']')-t->IndexOf('[')-1);
+					Console::WriteLine(tag);
+					if (tag->Length > H5T_OPAQUE_TAG_MAX) {
+						throw gcnew PSH5XException(
+							String::Format("The tag length must not exceed {0}!", H5T_OPAQUE_TAG_MAX));
+					}
+					result = H5Tcreate(H5T_OPAQUE, size);
+					if (result < 0) {
+						throw gcnew HDF5Exception("H5Tcreate failed!");
+					}
+					if (H5Tset_tag(result, (char*) Marshal::StringToHGlobalAnsi(tag).ToPointer()) < 0) {
+						throw gcnew HDF5Exception("H5Tset_tag failed!");
+					}
+				}
+				else {
+					throw gcnew PSH5XException("Unable to determine size of opaque type! Syntax error?");
+				}
+			}
+			else {
+				if (ProviderUtils::TryGetValue(t->Substring(6), size))
+				{
+					result = H5Tcreate(H5T_OPAQUE, size);
+					if (result < 0) {
+						throw gcnew HDF5Exception("H5Tcreate failed!");
+					}
+				}
+				else {
+					throw gcnew PSH5XException("Unable to determine size of opaque type! Syntax error?");
+				}
+			}
+
+			Console::WriteLine(size);
 		}
 
         if (result < 0) {
