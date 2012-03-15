@@ -30,14 +30,24 @@ namespace PSH5X
         try
         {
             hssize_t npoints = 1;
-			if (H5Sget_simple_extent_type(fspace) == H5S_SIMPLE) { 
+
+			H5S_class_t cls = H5Sget_simple_extent_type(fspace);
+			if (cls == H5S_SIMPLE) { 
 				npoints = H5Sget_simple_extent_npoints(fspace);
 			}
 
-			int rank = H5Sget_simple_extent_ndims(fspace);
+			int rank = 1;
+			if (cls == H5S_SIMPLE) {
+				rank = H5Sget_simple_extent_ndims(fspace);
+			}
+
 			array<hsize_t>^ dims = gcnew array<hsize_t>(rank);
-			pin_ptr<hsize_t> dims_ptr = &dims[0];
-			rank = H5Sget_simple_extent_dims(fspace, dims_ptr, NULL);
+			dims[0] = 1;
+			if (cls == H5S_SIMPLE)
+			{
+				pin_ptr<hsize_t> dims_ptr = &dims[0];
+				rank = H5Sget_simple_extent_dims(fspace, dims_ptr, NULL);
+			}
 
 #pragma region get a .NET representation and the in-memory type
 

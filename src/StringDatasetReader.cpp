@@ -31,89 +31,110 @@ namespace PSH5X
         try
         {
             hssize_t npoints = 1;
-			if (H5Sget_simple_extent_type(fspace) == H5S_SIMPLE) { 
+
+			H5S_class_t cls = H5Sget_simple_extent_type(fspace);
+			if (cls == H5S_SIMPLE) { 
 				npoints = H5Sget_simple_extent_npoints(fspace);
 			}
 
-            if (npoints > 0)
-            {
-                int rank = H5Sget_simple_extent_ndims(fspace);
-                array<hsize_t>^ dims = gcnew array<hsize_t>(rank);
-                pin_ptr<hsize_t> dims_ptr = &dims[0];
-                rank = H5Sget_simple_extent_dims(fspace, dims_ptr, NULL);
+			int rank = 1;
+			if (cls == H5S_SIMPLE) {
+				rank = H5Sget_simple_extent_ndims(fspace);
+			}
 
-                hsize_t mdims[1];
-                mdims[0] = static_cast<hsize_t>(npoints);
-                mspace = H5Screate_simple(1, mdims, NULL);
+			array<hsize_t>^ dims = gcnew array<hsize_t>(rank);
+			dims[0] = 1;
+			if (cls == H5S_SIMPLE)
+			{
+				pin_ptr<hsize_t> dims_ptr = &dims[0];
+				rank = H5Sget_simple_extent_dims(fspace, dims_ptr, NULL);
+			}
 
-                m_array = Array::CreateInstance(String::typeid, (array<long long>^) dims);
+			hsize_t mdims[1];
+			mdims[0] = static_cast<hsize_t>(npoints);
+			mspace = H5Screate_simple(1, mdims, NULL);
 
-                htri_t is_vlen = H5Tis_variable_str(ftype);
-                if (is_vlen > 0)
-                {
-					mtype = H5Tcreate(H5T_STRING, H5T_VARIABLE);
-                    if (mtype < 0) {
-                        throw gcnew HDF5Exception("H5Tcreate failed!");
-                    }
+			m_array = Array::CreateInstance(String::typeid, (array<long long>^) dims);
 
-                    vrdata = new char* [mdims[0]];
+			htri_t is_vlen = H5Tis_variable_str(ftype);
+			if (is_vlen > 0)
+			{
+				mtype = H5Tcreate(H5T_STRING, H5T_VARIABLE);
+				if (mtype < 0) {
+					throw gcnew HDF5Exception("H5Tcreate failed!");
+				}
 
-                    if (H5Dread (dset, mtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, vrdata) < 0) {
-                        throw gcnew HDF5Exception("H5Dread failed!");
-                    }
+				vrdata = new char* [mdims[0]];
 
-                    array<long long>^ index = gcnew array<long long>(rank);
-                    for (long long i = 0; i < npoints; ++i)
-                    {
-                        index = ArrayUtils::GetIndex((array<long long>^)dims, i);
-                        m_array->SetValue(Marshal::PtrToStringAnsi(IntPtr(vrdata[i])), index);
-                    }
+				if (H5Dread (dset, mtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, vrdata) < 0) {
+					throw gcnew HDF5Exception("H5Dread failed!");
+				}
 
-                    if (H5Dvlen_reclaim(mtype, mspace, H5P_DEFAULT, vrdata) < 0) {
-                        throw gcnew HDF5Exception("H5Dvlen_reclaim failed!");
-                    }
-                }
-                else if (is_vlen == 0)
-                {
-					size_t size = H5Tget_size(ftype);
-
-					if (H5Tget_strpad(ftype) == H5T_STR_SPACEPAD) { // FORTRAN
-						++size;
+				if (rank > 1)
+				{
+					array<long long>^ index = gcnew array<long long>(rank);
+					for (long long i = 0; i < npoints; ++i)
+					{
+						index = ArrayUtils::GetIndex((array<long long>^)dims, i);
+						m_array->SetValue(Marshal::PtrToStringAnsi(IntPtr(vrdata[i])), index);
 					}
-					
-					mtype = H5Tcreate(H5T_STRING, size);
-                    if (mtype < 0) {
-                        throw gcnew HDF5Exception("H5Tcreate failed!");
-                    }
+				}
+				else
+				{
+					for (long long i = 0; i < npoints; ++i)
+					{
+						m_array->SetValue(Marshal::PtrToStringAnsi(IntPtr(vrdata[i])), i);
+					}
+				}
 
-                    rdata = new char* [mdims[0]];
-					rdata[0] = new char [mdims[0]*size];
-                    for (size_t i = 1; i < mdims[0]; ++i) {
-						rdata[i] = rdata[0] + i*size;
-                    }
+				if (H5Dvlen_reclaim(mtype, mspace, H5P_DEFAULT, vrdata) < 0) {
+					throw gcnew HDF5Exception("H5Dvlen_reclaim failed!");
+				}
+			}
+			else if (is_vlen == 0)
+			{
+				size_t size = H5Tget_size(ftype);
 
-                    if (H5Dread (dset, mtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, rdata[0]) < 0) {
-                        throw gcnew HDF5Exception("H5Dread failed!");
-                    }
+				if (H5Tget_strpad(ftype) == H5T_STR_SPACEPAD) { // FORTRAN
+					++size;
+				}
 
-                    array<long long>^ index = gcnew array<long long>(rank);
-                    for (long long i = 0; i < npoints; ++i)
-                    {
-                        index = ArrayUtils::GetIndex((array<long long>^)dims, i);
-                        m_array->SetValue(Marshal::PtrToStringAnsi(IntPtr(rdata[i])), index);
-                    }
-                }
-                else {
-                    throw gcnew HDF5Exception("H5Tis_variable_str failed!");
-                }
+				mtype = H5Tcreate(H5T_STRING, size);
+				if (mtype < 0) {
+					throw gcnew HDF5Exception("H5Tcreate failed!");
+				}
 
-                m_ienum = m_array->GetEnumerator();
-                m_ienum->MoveNext();
-            }
-            else
-            {
-                m_array = gcnew array<String^>(0);
-            }
+				rdata = new char* [mdims[0]];
+				rdata[0] = new char [mdims[0]*size];
+				for (size_t i = 1; i < mdims[0]; ++i) {
+					rdata[i] = rdata[0] + i*size;
+				}
+
+				if (H5Dread (dset, mtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, rdata[0]) < 0) {
+					throw gcnew HDF5Exception("H5Dread failed!");
+				}
+
+				if (rank > 1)
+				{
+					array<long long>^ index = gcnew array<long long>(rank);
+					for (long long i = 0; i < npoints; ++i)
+					{
+						index = ArrayUtils::GetIndex((array<long long>^)dims, i);
+						m_array->SetValue(Marshal::PtrToStringAnsi(IntPtr(rdata[i])), index);
+					}
+				}
+				else {
+					for (long long i = 0; i < npoints; ++i) {
+						m_array->SetValue(Marshal::PtrToStringAnsi(IntPtr(rdata[i])), i);
+					}
+				}
+			}
+			else {
+				throw gcnew HDF5Exception("H5Tis_variable_str failed!");
+			}
+
+			m_ienum = m_array->GetEnumerator();
+			m_ienum->MoveNext();
         }
         finally
         {

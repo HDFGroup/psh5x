@@ -129,9 +129,6 @@
     <ClCompile Include="src\IDynamicPropertyCmdletProvider.cpp">
       <Filter>Source Files\Provider\IDynamicPropertyCmdletProvider</Filter>
     </ClCompile>
-    <ClCompile Include="src\NewH5ArrayCommand.cpp">
-      <Filter>Source Files\Cmdlets</Filter>
-    </ClCompile>
     <ClCompile Include="src\ShowH5TypesCommand.cpp">
       <Filter>Source Files\Cmdlets</Filter>
     </ClCompile>
@@ -230,15 +227,6 @@
     <ClInclude Include="include\ShowH5TypesCommand.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\DatasetReaderT.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\DatasetWriterT.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\NewH5ArrayCommand.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\HDF5Exception.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -300,6 +288,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\PrimitiveTypeDatasetWriter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\DatasetReaderT.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

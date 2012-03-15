@@ -155,7 +155,6 @@
     <ClInclude Include="include\DatasetInfo.h" />
     <ClInclude Include="include\DatasetInfoLite.h" />
     <ClInclude Include="include\DatasetReaderT.h" />
-    <ClInclude Include="include\DatasetWriterT.h" />
     <ClInclude Include="include\DataspaceInfo.h" />
     <ClInclude Include="include\DatatypeInfo.h" />
     <ClInclude Include="include\DriveInfo.h" />
@@ -166,7 +165,6 @@
     <ClInclude Include="include\HDF5Exception.h" />
     <ClInclude Include="include\ItemInfo.h" />
     <ClInclude Include="include\LinkInfo.h" />
-    <ClInclude Include="include\NewH5ArrayCommand.h" />
     <ClInclude Include="include\ObjectInfo.h" />
     <ClInclude Include="include\ObjectInfoLite.h" />
     <ClInclude Include="include\PrimitiveTypeDatasetWriter.h" />
@@ -206,7 +204,6 @@
     <ClCompile Include="src\ItemCmdletProvider.SetItem.cpp" />
     <ClCompile Include="src\LinkInfo.cpp" />
     <ClCompile Include="src\NavigationCmdletProvider.cpp" />
-    <ClCompile Include="src\NewH5ArrayCommand.cpp" />
     <ClCompile Include="src\ObjectInfo.cpp" />
     <ClCompile Include="src\ObjectInfoLite.cpp" />
     <ClCompile Include="src\PrimitiveTypeDatasetWriter.cpp" />

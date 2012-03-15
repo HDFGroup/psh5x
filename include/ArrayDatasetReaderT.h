@@ -36,14 +36,24 @@ namespace PSH5X
 				}
 
 				hssize_t npoints = 1;
-				if (H5Sget_simple_extent_type(fspace) == H5S_SIMPLE) { 
+
+				H5S_class_t cls = H5Sget_simple_extent_type(fspace);
+				if (cls == H5S_SIMPLE) { 
 					npoints = H5Sget_simple_extent_npoints(fspace);
 				}
 
-				int rank = H5Sget_simple_extent_ndims(fspace);
+				int rank = 1;
+				if (cls == H5S_SIMPLE) {
+					rank = H5Sget_simple_extent_ndims(fspace);
+				}
+
 				array<hsize_t>^ dims = gcnew array<hsize_t>(rank);
-				pin_ptr<hsize_t> dims_ptr = &dims[0];
-				rank = H5Sget_simple_extent_dims(fspace, dims_ptr, NULL);
+				dims[0] = 1;
+				if (cls == H5S_SIMPLE)
+				{
+					pin_ptr<hsize_t> dims_ptr = &dims[0];
+					rank = H5Sget_simple_extent_dims(fspace, dims_ptr, NULL);
+				}
 
 				// get the array dimensions of the data elements
 
@@ -73,16 +83,31 @@ namespace PSH5X
 				H5Array<T>^ dummy = gcnew H5Array<T>(adims);
 				m_array = Array::CreateInstance(dummy->GetArray()->GetType(), (array<long long>^) dims);
 
-				array<long long>^ index = gcnew array<long long>(rank);
-				for (long long i = 0; i < npoints; ++i)
+				if (rank > 1)
 				{
-					H5Array<T>^ arr = gcnew H5Array<T>(adims);
-					interior_ptr<T> arr_ptr = arr->GetHandle();
-					for (hsize_t j = 0; j < arrayLength; ++j) {
-						arr_ptr[j] = rdata[i*arrayLength+j];
+					array<long long>^ index = gcnew array<long long>(rank);
+					for (long long i = 0; i < npoints; ++i)
+					{
+						H5Array<T>^ arr = gcnew H5Array<T>(adims);
+						interior_ptr<T> arr_ptr = arr->GetHandle();
+						for (hsize_t j = 0; j < arrayLength; ++j) {
+							arr_ptr[j] = rdata[i*arrayLength+j];
+						}
+						index = ArrayUtils::GetIndex((array<long long>^)dims, i);
+						m_array->SetValue(arr->GetArray(), index);
 					}
-					index = ArrayUtils::GetIndex((array<long long>^)dims, i);
-					m_array->SetValue(arr->GetArray(), index);
+				}
+				else
+				{
+					for (long long i = 0; i < npoints; ++i)
+					{
+						H5Array<T>^ arr = gcnew H5Array<T>(adims);
+						interior_ptr<T> arr_ptr = arr->GetHandle();
+						for (hsize_t j = 0; j < arrayLength; ++j) {
+							arr_ptr[j] = rdata[i*arrayLength+j];
+						}
+						m_array->SetValue(arr->GetArray(), i);
+					}
 				}
 
 				m_ienum = m_array->GetEnumerator();

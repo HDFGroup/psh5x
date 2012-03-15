@@ -29,15 +29,25 @@ namespace PSH5X
         try
         {
             hssize_t npoints = 1;
-			if (H5Sget_simple_extent_type(fspace) == H5S_SIMPLE) { 
+
+			H5S_class_t cls = H5Sget_simple_extent_type(fspace);
+			if (cls == H5S_SIMPLE) { 
 				npoints = H5Sget_simple_extent_npoints(fspace);
 			}
 
-			int rank = H5Sget_simple_extent_ndims(fspace);
+			int rank = 1;
+			if (cls == H5S_SIMPLE) {
+				rank = H5Sget_simple_extent_ndims(fspace);
+			}
+
 			array<hsize_t>^ dims = gcnew array<hsize_t>(rank);
-			pin_ptr<hsize_t> dims_ptr = &dims[0];
-			rank = H5Sget_simple_extent_dims(fspace, dims_ptr, NULL);
-			
+			dims[0] = 1;
+			if (cls == H5S_SIMPLE)
+			{
+				pin_ptr<hsize_t> dims_ptr = &dims[0];
+				rank = H5Sget_simple_extent_dims(fspace, dims_ptr, NULL);
+			}
+
 			base_type = H5Tget_super(ftype);
 			if (base_type < 0) {
 				throw gcnew HDF5Exception("H5Tget_super failed!");
@@ -56,11 +66,20 @@ namespace PSH5X
 
 				m_array = Array::CreateInstance(m_type, (array<long long>^) dims);
 
-				array<long long>^ index = gcnew array<long long>(rank);
-				for (long long i = 0; i < npoints; ++i)
+				if (rank > 1)
 				{
-					index = ArrayUtils::GetIndex((array<long long>^)dims, i);
-					m_array->SetValue(ProviderUtils::GetArray(rdata[i].p, rdata[i].len, base_type), index);
+					array<long long>^ index = gcnew array<long long>(rank);
+					for (long long i = 0; i < npoints; ++i)
+					{
+						index = ArrayUtils::GetIndex((array<long long>^)dims, i);
+						m_array->SetValue(ProviderUtils::GetArray(rdata[i].p, rdata[i].len, base_type), index);
+					}
+				}
+				else
+				{
+					for (long long i = 0; i < npoints; ++i) {
+						m_array->SetValue(ProviderUtils::GetArray(rdata[i].p, rdata[i].len, base_type), i);
+					}
 				}
 
 				if (H5Dvlen_reclaim(mtype, fspace, H5P_DEFAULT, rdata) < 0) {
