@@ -141,8 +141,6 @@ namespace PSH5X
 					throw gcnew HDF5Exception("H5Pset_link_creation_order failed!!!");
 				}
 
-
-
                 if (this->ShouldProcess(h5path,
                     String::Format("HDF5 group '{0}' does not exist, create it", linkName)))
                 {

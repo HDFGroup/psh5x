@@ -18,10 +18,10 @@ namespace PSH5X
     {
     public:
 
-        DatasetReaderT(hid_t dset, hid_t ftype, hid_t fspace)
+        DatasetReaderT(hid_t dset, hid_t ftype, hid_t fspace, hid_t mspace)
             : m_array(nullptr), m_ienum(nullptr), m_position(0)
         {
-            hid_t mtype = -1;
+            hid_t mtype = -1; //, mspace = H5S_ALL;
 
             try
 			{
@@ -38,28 +38,33 @@ namespace PSH5X
 				hssize_t npoints = 1;
 
 				H5S_class_t cls = H5Sget_simple_extent_type(fspace);
-				if (cls == H5S_SIMPLE) { 
-					npoints = H5Sget_simple_extent_npoints(fspace);
-				}
-
-				int rank = 1;
-				if (cls == H5S_SIMPLE) {
-					rank = H5Sget_simple_extent_ndims(fspace);
-				}
-
-				array<hsize_t>^ dims = gcnew array<hsize_t>(rank);
+				array<hsize_t>^ dims = gcnew array<hsize_t>(1);
 				dims[0] = 1;
+				
 				if (cls == H5S_SIMPLE)
-				{
+				{ 
+					int rank = H5Sget_simple_extent_ndims(fspace);
+					if (rank < 0) {
+						throw gcnew HDF5Exception("H5Sget_simple_extent_ndims failed!");
+					}
+					dims = gcnew array<hsize_t>(rank);
 					pin_ptr<hsize_t> dims_ptr = &dims[0];
-					rank = H5Sget_simple_extent_dims(fspace, dims_ptr, NULL);
+					if (mspace == H5S_ALL) {
+						rank = H5Sget_simple_extent_dims(fspace, dims_ptr, NULL);
+					}
+					else {
+						rank = H5Sget_simple_extent_dims(mspace, dims_ptr, NULL);
+					}
+					if (rank < 0) {
+						throw gcnew HDF5Exception("H5Sget_simple_extent_dims failed!");
+					}
 				}
 
 				H5Array<T>^ h5a = gcnew H5Array<T>(dims);
 				m_array = h5a->GetArray();
 				pin_ptr<T> ptr = h5a->GetHandle();
 
-				if (H5Dread(dset, mtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, ptr) < 0) {
+				if (H5Dread(dset, mtype, mspace, fspace, H5P_DEFAULT, ptr) < 0) {
 					throw gcnew HDF5Exception("H5Dread failed!");
 				}
 
@@ -72,18 +77,7 @@ namespace PSH5X
                     H5Tclose(mtype);
                 }
             }
-
         }
-
-        // TODO: implement hyperslabs and point sets
-
-        /*
-        DatasetReaderT(hid_t h5file, System::String^ h5path,
-            array<hsize_t>^ start, array<hsize_t>^ stride,
-            array<hsize_t>^ count, array<hsize_t>^ block);
-        
-        DatasetReaderT(hid_t h5file, System::String^ h5path, array<hsize_t>^ coord);
-        */
 
         ~DatasetReaderT() { this->!DatasetReaderT(); }
 
