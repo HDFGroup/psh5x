@@ -21,7 +21,7 @@ namespace PSH5X
         DatasetReaderT(hid_t dset, hid_t ftype, hid_t fspace, hid_t mspace)
             : m_array(nullptr), m_ienum(nullptr), m_position(0)
         {
-            hid_t mtype = -1; //, mspace = H5S_ALL;
+            hid_t mtype = -1;
 
             try
 			{
@@ -34,8 +34,6 @@ namespace PSH5X
 				if (mtype < 0) {
 					throw gcnew HDF5Exception("H5Tget_native_type failed!");
 				}
-
-				hssize_t npoints = 1;
 
 				H5S_class_t cls = H5Sget_simple_extent_type(fspace);
 				array<hsize_t>^ dims = gcnew array<hsize_t>(1);

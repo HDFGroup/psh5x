@@ -20,39 +20,45 @@ using namespace System::Runtime::InteropServices;
 
 namespace PSH5X
 {
-    StringDatasetReader::StringDatasetReader(hid_t dset, hid_t ftype, hid_t fspace)
+    StringDatasetReader::StringDatasetReader(hid_t dset, hid_t ftype, hid_t fspace, hid_t mspace)
         : m_array(nullptr), m_position(0)
     {
         char** rdata = NULL;
         char** vrdata = NULL;
 
-        hid_t mtype = -1, mspace = -1;
+        hid_t mtype = -1;
 
         try
         {
-            hssize_t npoints = 1;
+			hssize_t npoints = 1;
+			int rank = 1;
 
 			H5S_class_t cls = H5Sget_simple_extent_type(fspace);
-			if (cls == H5S_SIMPLE) { 
-				npoints = H5Sget_simple_extent_npoints(fspace);
-			}
-
-			int rank = 1;
-			if (cls == H5S_SIMPLE) {
-				rank = H5Sget_simple_extent_ndims(fspace);
-			}
-
-			array<hsize_t>^ dims = gcnew array<hsize_t>(rank);
+			array<hsize_t>^ dims = gcnew array<hsize_t>(1);
 			dims[0] = 1;
-			if (cls == H5S_SIMPLE)
-			{
-				pin_ptr<hsize_t> dims_ptr = &dims[0];
-				rank = H5Sget_simple_extent_dims(fspace, dims_ptr, NULL);
-			}
 
-			hsize_t mdims[1];
-			mdims[0] = static_cast<hsize_t>(npoints);
-			mspace = H5Screate_simple(1, mdims, NULL);
+			if (cls == H5S_SIMPLE)
+			{ 
+				rank = H5Sget_simple_extent_ndims(fspace);
+				if (rank < 0) {
+					throw gcnew HDF5Exception("H5Sget_simple_extent_ndims failed!");
+				}
+				dims = gcnew array<hsize_t>(rank);
+				pin_ptr<hsize_t> dims_ptr = &dims[0];
+				if (mspace == H5S_ALL)
+				{
+					rank = H5Sget_simple_extent_dims(fspace, dims_ptr, NULL);
+					npoints = H5Sget_simple_extent_npoints(fspace);
+				}
+				else
+				{
+					rank = H5Sget_simple_extent_dims(mspace, dims_ptr, NULL);
+					npoints = H5Sget_simple_extent_npoints(mspace);
+				}
+				if (rank < 0) {
+					throw gcnew HDF5Exception("H5Sget_simple_extent_dims failed!");
+				}
+			}
 
 			m_array = Array::CreateInstance(String::typeid, (array<long long>^) dims);
 
@@ -64,9 +70,9 @@ namespace PSH5X
 					throw gcnew HDF5Exception("H5Tcreate failed!");
 				}
 
-				vrdata = new char* [mdims[0]];
+				vrdata = new char* [npoints];
 
-				if (H5Dread (dset, mtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, vrdata) < 0) {
+				if (H5Dread (dset, mtype, mspace, fspace, H5P_DEFAULT, vrdata) < 0) {
 					throw gcnew HDF5Exception("H5Dread failed!");
 				}
 
@@ -87,8 +93,15 @@ namespace PSH5X
 					}
 				}
 
-				if (H5Dvlen_reclaim(mtype, mspace, H5P_DEFAULT, vrdata) < 0) {
-					throw gcnew HDF5Exception("H5Dvlen_reclaim failed!");
+				if (mspace == H5S_ALL) {
+					if (H5Dvlen_reclaim(mtype, fspace, H5P_DEFAULT, vrdata) < 0) {
+						throw gcnew HDF5Exception("H5Dvlen_reclaim failed!");
+					}
+				}
+				else {
+					if (H5Dvlen_reclaim(mtype, mspace, H5P_DEFAULT, vrdata) < 0) {
+						throw gcnew HDF5Exception("H5Dvlen_reclaim failed!");
+					}
 				}
 			}
 			else if (is_vlen == 0)
@@ -104,13 +117,13 @@ namespace PSH5X
 					throw gcnew HDF5Exception("H5Tcreate failed!");
 				}
 
-				rdata = new char* [mdims[0]];
-				rdata[0] = new char [mdims[0]*size];
-				for (size_t i = 1; i < mdims[0]; ++i) {
+				rdata = new char* [npoints];
+				rdata[0] = new char [npoints*size];
+				for (hssize_t i = 1; i < npoints; ++i) {
 					rdata[i] = rdata[0] + i*size;
 				}
 
-				if (H5Dread (dset, mtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, rdata[0]) < 0) {
+				if (H5Dread (dset, mtype, mspace, fspace, H5P_DEFAULT, rdata[0]) < 0) {
 					throw gcnew HDF5Exception("H5Dread failed!");
 				}
 
@@ -146,11 +159,8 @@ namespace PSH5X
             if (vrdata != NULL) {
                 delete [] vrdata;
             }
-
-            if (mspace >= 0) {
-                H5Sclose(mspace);
-            }
-            if (mtype >= 0) {
+			
+			if (mtype >= 0) {
                 H5Tclose(mtype);
             }
         }

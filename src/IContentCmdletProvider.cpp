@@ -273,17 +273,17 @@ namespace PSH5X
 
 				case H5T_STRING:
 
-					result = gcnew StringDatasetReader(dset, ftype, fspace);
+					result = gcnew StringDatasetReader(dset, ftype, fspace, mspace);
 					break;
 
 				case H5T_COMPOUND:
 
-					result = gcnew CompoundDatasetReader(dset, ftype, fspace);
+					result = gcnew CompoundDatasetReader(dset, ftype, fspace, mspace);
 					break;
 
 				case H5T_VLEN:
 
-					result = gcnew VlenDatasetReader(dset, ftype, fspace);
+					result = gcnew VlenDatasetReader(dset, ftype, fspace, mspace);
 					break;
 
 				case H5T_ARRAY:
@@ -300,28 +300,28 @@ namespace PSH5X
 
 						t = ProviderUtils::H5Type2DotNet(base_type);
 						if (t == SByte::typeid) {
-							result = gcnew ArrayDatasetReaderT<SByte>(dset, ftype, fspace);
+							result = gcnew ArrayDatasetReaderT<SByte>(dset, ftype, fspace, mspace);
 						}
 						else if (t == Int16::typeid) {
-							result = gcnew ArrayDatasetReaderT<Int16>(dset, ftype, fspace);
+							result = gcnew ArrayDatasetReaderT<Int16>(dset, ftype, fspace, mspace);
 						}
 						else if (t ==  Int32::typeid) {
-							result = gcnew ArrayDatasetReaderT<Int32>(dset, ftype, fspace);
+							result = gcnew ArrayDatasetReaderT<Int32>(dset, ftype, fspace, mspace);
 						}
 						else if (t ==  Int64::typeid) {
-							result = gcnew ArrayDatasetReaderT<Int64>(dset, ftype, fspace);
+							result = gcnew ArrayDatasetReaderT<Int64>(dset, ftype, fspace, mspace);
 						}
 						else if (t == Byte::typeid) {
-							result = gcnew ArrayDatasetReaderT<Byte>(dset, ftype, fspace);
+							result = gcnew ArrayDatasetReaderT<Byte>(dset, ftype, fspace, mspace);
 						}
 						else if (t == UInt16::typeid) {
-							result = gcnew ArrayDatasetReaderT<UInt16>(dset, ftype, fspace);
+							result = gcnew ArrayDatasetReaderT<UInt16>(dset, ftype, fspace, mspace);
 						}
 						else if (t ==  UInt32::typeid) {
-							result = gcnew ArrayDatasetReaderT<UInt32>(dset, ftype, fspace);
+							result = gcnew ArrayDatasetReaderT<UInt32>(dset, ftype, fspace, mspace);
 						}
 						else if (t ==  UInt64::typeid) {
-							result = gcnew ArrayDatasetReaderT<UInt64>(dset, ftype, fspace);
+							result = gcnew ArrayDatasetReaderT<UInt64>(dset, ftype, fspace, mspace);
 						}
 						else {
 							throw gcnew PSH5XException("Unsupported integer, enum, or bitfield type!");
@@ -334,10 +334,10 @@ namespace PSH5X
 
 						t = ProviderUtils::H5Type2DotNet(base_type);
 						if (t == Single::typeid) {
-							result = gcnew ArrayDatasetReaderT<Single>(dset, ftype, fspace);
+							result = gcnew ArrayDatasetReaderT<Single>(dset, ftype, fspace, mspace);
 						}
 						else if (t == Double::typeid) {
-							result = gcnew ArrayDatasetReaderT<Double>(dset, ftype, fspace);
+							result = gcnew ArrayDatasetReaderT<Double>(dset, ftype, fspace, mspace);
 						}
 						else {
 							throw gcnew PSH5XException("Unsupported float type!");

@@ -22,31 +22,41 @@ using namespace System::Text;
 
 namespace PSH5X
 {
-    CompoundDatasetReader::CompoundDatasetReader(hid_t dset, hid_t ftype, hid_t fspace)
+    CompoundDatasetReader::CompoundDatasetReader(hid_t dset, hid_t ftype, hid_t fspace, hid_t mspace)
         : m_array(nullptr), m_position(0)
     {
         hid_t mtype = -1, cmtype = -1, base_type = -1;
 
         try
         {
-            hssize_t npoints = 1;
+			hssize_t npoints = 1;
+			int rank = 1;
 
 			H5S_class_t cls = H5Sget_simple_extent_type(fspace);
-			if (cls == H5S_SIMPLE) { 
-				npoints = H5Sget_simple_extent_npoints(fspace);
-			}
-
-			int rank = 1;
-			if (cls == H5S_SIMPLE) {
-				rank = H5Sget_simple_extent_ndims(fspace);
-			}
-
-			array<hsize_t>^ dims = gcnew array<hsize_t>(rank);
+			array<hsize_t>^ dims = gcnew array<hsize_t>(1);
 			dims[0] = 1;
+
 			if (cls == H5S_SIMPLE)
-			{
+			{ 
+				rank = H5Sget_simple_extent_ndims(fspace);
+				if (rank < 0) {
+					throw gcnew HDF5Exception("H5Sget_simple_extent_ndims failed!");
+				}
+				dims = gcnew array<hsize_t>(rank);
 				pin_ptr<hsize_t> dims_ptr = &dims[0];
-				rank = H5Sget_simple_extent_dims(fspace, dims_ptr, NULL);
+				if (mspace == H5S_ALL)
+				{
+					rank = H5Sget_simple_extent_dims(fspace, dims_ptr, NULL);
+					npoints = H5Sget_simple_extent_npoints(fspace);
+				}
+				else
+				{
+					rank = H5Sget_simple_extent_dims(mspace, dims_ptr, NULL);
+					npoints = H5Sget_simple_extent_npoints(mspace);
+				}
+				if (rank < 0) {
+					throw gcnew HDF5Exception("H5Sget_simple_extent_dims failed!");
+				}
 			}
 
 #pragma region get a .NET representation and the in-memory type
@@ -172,7 +182,7 @@ namespace PSH5X
 			array<unsigned char>^ buf = gcnew array<unsigned char>(safe_cast<size_t>(npoints*size));
 			pin_ptr<unsigned char> buf_ptr = &buf[0];
 
-			if (H5Dread(dset, mtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, buf_ptr) < 0) {
+			if (H5Dread(dset, mtype, mspace, fspace, H5P_DEFAULT, buf_ptr) < 0) {
 				throw gcnew HDF5Exception("H5Dread failed!");
 			}
 

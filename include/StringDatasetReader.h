@@ -1,7 +1,7 @@
 #pragma once
 
 extern "C" {
-#include "H5Dpublic.h"
+#include "H5Ipublic.h"
 }
 
 namespace PSH5X
@@ -12,18 +12,7 @@ namespace PSH5X
     {
     public:
 
-        StringDatasetReader(hid_t dset, hid_t ftype, hid_t fspace);
-
-        /*
-
-        TODO: implement this
-
-        DatasetReader(hid_t h5file, System::String^ h5path,
-            array<hsize_t>^ start, array<hsize_t>^ stride,
-            array<hsize_t>^ count, array<hsize_t>^ block);
-        
-        DatasetReader(hid_t h5file, System::String^ h5path, array<hsize_t>^ coord);
-        */
+        StringDatasetReader(hid_t dset, hid_t ftype, hid_t fspace, hid_t mspace);
 
         ~StringDatasetReader()
         {
