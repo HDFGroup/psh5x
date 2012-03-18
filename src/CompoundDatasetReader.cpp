@@ -73,7 +73,6 @@ namespace PSH5X
 
 #pragma endregion
 
-
 #pragma region parse the compound type
 
 			int mcount = H5Tget_nmembers(mtype);
@@ -175,7 +174,6 @@ namespace PSH5X
 			}
 
 #pragma endregion
-
 
 #pragma region create a buffer and read the dataset as a byte array
 

@@ -2175,7 +2175,7 @@ namespace PSH5X
             throw gcnew PSH5XException("This is not a compound type");
         }
 
-        size_t size = H5Tget_size(type_id);
+        //size_t size = H5Tget_size(type_id);
 
         int member_count = H5Tget_nmembers(type_id);
         if (member_count < 0) {
@@ -2195,7 +2195,7 @@ namespace PSH5X
 
         char* name = NULL;
 
-        hid_t mtype = -1, ntype = -1;
+        hid_t mtype = -1, stype = -1, ntype = -1;
 
 		hsize_t* adims = NULL;
 
@@ -2217,7 +2217,9 @@ namespace PSH5X
                     throw gcnew HDF5Exception("H5Tget_member_type failed!");
                 }
 
-				if (H5Tget_class(mtype) == H5T_ARRAY)
+				H5T_class_t cls = H5Tget_class(mtype);
+
+				if (cls == H5T_ARRAY)
 				{
 					StringBuilder^ sb = gcnew StringBuilder();
 					member_is_array[i] = true;
@@ -2239,8 +2241,22 @@ namespace PSH5X
 					array_member_dims[i] = sb->ToString();
 				}
 
-                if (H5Tget_class(mtype) == H5T_BITFIELD) {
+                if (cls == H5T_BITFIELD) {
                     ntype = H5Tget_native_type(mtype, H5T_DIR_DESCEND);
+                }
+				else if (cls == H5T_ENUM)
+				{
+					stype = H5Tget_super(mtype);
+					if (stype < 0) {
+						throw gcnew HDF5Exception("H5Tget_super failed!");
+					}
+
+                    ntype = H5Tget_native_type(stype, H5T_DIR_ASCEND);
+
+					if (H5Tclose(stype) < 0) {
+						throw gcnew HDF5Exception("H5Tclose failed!");
+					}
+					stype = -1;
                 }
                 else {
                     ntype = H5Tget_native_type(mtype, H5T_DIR_ASCEND);
@@ -2367,6 +2383,9 @@ namespace PSH5X
             if (ntype >= 0) {
                 H5Tclose(ntype);
             }
+			if (stype >= 0) {
+                H5Tclose(stype);
+            }
         }
 
         return result;
@@ -2432,10 +2451,11 @@ namespace PSH5X
 	hid_t ProviderUtils::GetH5MemoryType(Type^ t, hid_t ftype)
 	{
 		hid_t result = -1, ntype = -1, stype = -1, fcmtype = -1, mcmtype = -1;
+		H5T_class_t cls = H5Tget_class(ftype);
 
 		try
 		{
-			switch (H5Tget_class(ftype))
+			switch (cls)
 			{
 			case H5T_INTEGER:
 #pragma region integer
@@ -2444,7 +2464,6 @@ namespace PSH5X
 						throw gcnew PSH5XException("INTEGER: Unable to map non-primitive type to HDF5 integer type!");
 					}
 
-					size_t size = H5Tget_size(ftype);
 					ntype = H5Tget_native_type(ftype, H5T_DIR_ASCEND);
 					
 					switch (H5Tget_sign(ftype))
@@ -2618,6 +2637,50 @@ namespace PSH5X
 #pragma endregion
 				break;
 
+            case H5T_ENUM:
+#pragma region enum
+				{
+					if (!t->IsPrimitive) {
+						throw gcnew PSH5XException("Enum: Unable to map non-primitive type to HDF5 enum type!");
+					}
+
+					stype = H5Tget_super(ftype);
+					if (stype < 0) {
+						throw gcnew HDF5Exception("H5Tget_super failed!");
+					}
+					ntype = H5Tget_native_type(stype, H5T_DIR_ASCEND);
+					
+					if (Marshal::SizeOf(t) > H5Tget_size(ntype)) {
+						throw gcnew PSH5XException("Primitve type too large for enum!");
+					}
+
+					result = H5Tget_native_type(ftype, H5T_DIR_ASCEND);
+
+					switch (H5Tget_sign(stype))
+					{
+					case H5T_SGN_NONE:
+						{
+							if (t != Byte::typeid && t != UInt16::typeid && t != UInt32::typeid && t != UInt64::typeid) {
+								throw gcnew PSH5XException("Enum: Primitive type is not a supported unsigned integer type!");
+							}
+						}
+						break;
+					case H5T_SGN_2:
+						{
+							if (t != SByte::typeid && t != Int16::typeid && t != Int32::typeid && t != Int64::typeid) {
+								throw gcnew PSH5XException("Enum: Primitive type is not a supported signed integer type!");
+							}
+						}
+						break;
+
+					default:
+						throw gcnew PSH5XException("Enum: Unknown sign type!");
+						break;
+					}
+				}
+#pragma endregion
+				break;
+
 			case H5T_FLOAT:
 #pragma region float
 				{
@@ -2628,7 +2691,6 @@ namespace PSH5X
 						throw gcnew PSH5XException("FLOAT: Primitive type is not a floating point type!");
 					}
 
-					size_t size = H5Tget_size(ftype);
 					ntype = H5Tget_native_type(ftype, H5T_DIR_ASCEND);
 					
 					if (H5Tequal(ntype, H5T_NATIVE_FLOAT))
@@ -2795,6 +2857,8 @@ namespace PSH5X
 				break;
 
 			default:
+
+				throw gcnew PSH5XException("Unsupported type class!");
 				break;
 			}
 		}
