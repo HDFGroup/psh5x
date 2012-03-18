@@ -466,9 +466,11 @@ namespace PSH5X
 
         IContentWriter^ result = nullptr;
 
-        hid_t dset = -1, ftype = -1, base_type = -1, fspace = -1;
+        hid_t dset = -1, ftype = -1, base_type = -1, fspace = -1, mspace = H5S_ALL;;
 
         char *name = NULL;
+
+		bool sel_flag = false;
 
         try
         {
@@ -499,181 +501,182 @@ namespace PSH5X
                 throw gcnew HDF5Exception("H5Dget_space failed!");
             }
 
-			if (H5Sget_simple_extent_type(fspace) != H5S_NULL)
+
+			Type^ t = nullptr;
+
+			H5T_class_t cls = H5Tget_class(ftype);
+
+			H5T_class_t bcls = H5T_NO_CLASS;
+
+			switch (cls)
 			{
-				Type^ t = nullptr;
+			case H5T_INTEGER:
+			case H5T_FLOAT:
+			case H5T_BITFIELD:
+			case H5T_ENUM:
 
-				H5T_class_t cls = H5Tget_class(ftype);
+				result = gcnew PrimitiveTypeDatasetWriter(drive->FileHandle, h5path);
+				break;
 
-				H5T_class_t bcls = H5T_NO_CLASS;
+			case H5T_STRING:
 
-				switch (cls)
+				result = gcnew StringDatasetWriter(drive->FileHandle, h5path);
+				break;
+
+			case H5T_COMPOUND:
+
+				result = gcnew CompoundDatasetWriter(drive->FileHandle, h5path);
+				break;
+
+			case H5T_VLEN:
+
+				base_type = H5Tget_super(ftype);
+				bcls = H5Tget_class(base_type);
+
+				switch (bcls)
 				{
 				case H5T_INTEGER:
-				case H5T_FLOAT:
-				case H5T_BITFIELD:
 				case H5T_ENUM:
-
-					result = gcnew PrimitiveTypeDatasetWriter(drive->FileHandle, h5path);
-					break;
-
-				case H5T_STRING:
-
-					result = gcnew StringDatasetWriter(drive->FileHandle, h5path);
-					break;
-
-				case H5T_COMPOUND:
-
-					result = gcnew CompoundDatasetWriter(drive->FileHandle, h5path);
-					break;
-
-				case H5T_VLEN:
-
-					base_type = H5Tget_super(ftype);
-					bcls = H5Tget_class(base_type);
-
-					switch (bcls)
-					{
-					case H5T_INTEGER:
-					case H5T_ENUM:
-					case H5T_BITFIELD:
+				case H5T_BITFIELD:
 #pragma region HDF5 integer, enum, bitfield
-						{
-							t = ProviderUtils::H5Type2DotNet(base_type);
-							if (t == SByte::typeid) {
-								result = gcnew VlenDatasetWriterT<SByte>(drive->FileHandle, h5path);
-							}
-							else if (t == Int16::typeid) {
-								result = gcnew VlenDatasetWriterT<Int16>(drive->FileHandle, h5path);
-							}
-							else if (t == Int32::typeid) {
-								result = gcnew VlenDatasetWriterT<Int32>(drive->FileHandle, h5path);
-							}
-							else if (t == Int64::typeid) {
-								result = gcnew VlenDatasetWriterT<Int64>(drive->FileHandle, h5path);
-							}
-							else if (t == Byte::typeid) {
-								result = gcnew VlenDatasetWriterT<Byte>(drive->FileHandle, h5path);
-							}
-							else if (t == UInt16::typeid) {
-								result = gcnew VlenDatasetWriterT<UInt16>(drive->FileHandle, h5path);
-							}
-							else if (t ==  UInt32::typeid) {
-								result = gcnew VlenDatasetWriterT<UInt32>(drive->FileHandle, h5path);
-							}
-							else if (t ==  UInt64::typeid) {
-								result = gcnew VlenDatasetWriterT<UInt64>(drive->FileHandle, h5path);
-							}
-							else {
-								throw gcnew PSH5XException("Unsupported integer, enum, or bitfield type!");
-							}
-						}
-#pragma endregion
-						break;
-
-					case H5T_FLOAT:
-#pragma region HDF5 float
-
+					{
 						t = ProviderUtils::H5Type2DotNet(base_type);
-						if (t == Single::typeid) {
-							result = gcnew VlenDatasetWriterT<Single>(drive->FileHandle, h5path);
+						if (t == SByte::typeid) {
+							result = gcnew VlenDatasetWriterT<SByte>(drive->FileHandle, h5path);
 						}
-						else if (t == Double::typeid) {
-							result = gcnew VlenDatasetWriterT<Double>(drive->FileHandle, h5path);
+						else if (t == Int16::typeid) {
+							result = gcnew VlenDatasetWriterT<Int16>(drive->FileHandle, h5path);
+						}
+						else if (t == Int32::typeid) {
+							result = gcnew VlenDatasetWriterT<Int32>(drive->FileHandle, h5path);
+						}
+						else if (t == Int64::typeid) {
+							result = gcnew VlenDatasetWriterT<Int64>(drive->FileHandle, h5path);
+						}
+						else if (t == Byte::typeid) {
+							result = gcnew VlenDatasetWriterT<Byte>(drive->FileHandle, h5path);
+						}
+						else if (t == UInt16::typeid) {
+							result = gcnew VlenDatasetWriterT<UInt16>(drive->FileHandle, h5path);
+						}
+						else if (t ==  UInt32::typeid) {
+							result = gcnew VlenDatasetWriterT<UInt32>(drive->FileHandle, h5path);
+						}
+						else if (t ==  UInt64::typeid) {
+							result = gcnew VlenDatasetWriterT<UInt64>(drive->FileHandle, h5path);
 						}
 						else {
-							throw gcnew PSH5XException("Unsupported float type!");
+							throw gcnew PSH5XException("Unsupported integer, enum, or bitfield type!");
 						}
-
-#pragma endregion
-						break;
-
-					default:
-
-						throw gcnew PSH5XException("Unsupported base type in vlen!");
-						break;
 					}
-
+#pragma endregion
 					break;
 
-     			case H5T_ARRAY:
-
-					base_type = H5Tget_super(ftype);
-					bcls = H5Tget_class(base_type);
-
-					switch (bcls)
-					{
-					case H5T_INTEGER:
-					case H5T_ENUM:
-					case H5T_BITFIELD:
-#pragma region HDF5 integer, enum, bitfield
-						{
-							t = ProviderUtils::H5Type2DotNet(base_type);
-							if (t == SByte::typeid) {
-								result = gcnew ArrayDatasetWriterT<SByte>(drive->FileHandle, h5path);
-							}
-							else if (t == Int16::typeid) {
-								result = gcnew ArrayDatasetWriterT<Int16>(drive->FileHandle, h5path);
-							}
-							else if (t == Int32::typeid) {
-								result = gcnew ArrayDatasetWriterT<Int32>(drive->FileHandle, h5path);
-							}
-							else if (t == Int64::typeid) {
-								result = gcnew ArrayDatasetWriterT<Int64>(drive->FileHandle, h5path);
-							}
-							else if (t == Byte::typeid) {
-								result = gcnew ArrayDatasetWriterT<Byte>(drive->FileHandle, h5path);
-							}
-							else if (t == UInt16::typeid) {
-								result = gcnew ArrayDatasetWriterT<UInt16>(drive->FileHandle, h5path);
-							}
-							else if (t ==  UInt32::typeid) {
-								result = gcnew ArrayDatasetWriterT<UInt32>(drive->FileHandle, h5path);
-							}
-							else if (t ==  UInt64::typeid) {
-								result = gcnew ArrayDatasetWriterT<UInt64>(drive->FileHandle, h5path);
-							}
-							else {
-								throw gcnew PSH5XException("Unsupported integer, enum, or bitfield type!");
-							}
-						}
-#pragma endregion
-						break;
-
-					case H5T_FLOAT:
+				case H5T_FLOAT:
 #pragma region HDF5 float
-						{
-							t = ProviderUtils::H5Type2DotNet(base_type);
-							if (t == Single::typeid) {
-								result = gcnew ArrayDatasetWriterT<Single>(drive->FileHandle, h5path);
-							}
-							else if (t == Double::typeid) {
-								result = gcnew ArrayDatasetWriterT<Double>(drive->FileHandle, h5path);
-							}
-							else {
-								throw gcnew PSH5XException("Unsupported float type!");
-							}
-						}
-#pragma endregion
-						break;
 
-					default:
-
-						throw gcnew PSH5XException("Unsupported base type in array!");
-						break;
+					t = ProviderUtils::H5Type2DotNet(base_type);
+					if (t == Single::typeid) {
+						result = gcnew VlenDatasetWriterT<Single>(drive->FileHandle, h5path);
+					}
+					else if (t == Double::typeid) {
+						result = gcnew VlenDatasetWriterT<Double>(drive->FileHandle, h5path);
+					}
+					else {
+						throw gcnew PSH5XException("Unsupported float type!");
 					}
 
+#pragma endregion
 					break;
 
 				default:
 
-					throw gcnew PSH5XException("Unsupported type class!");
+					throw gcnew PSH5XException("Unsupported base type in vlen!");
 					break;
 				}
+
+				break;
+
+			case H5T_ARRAY:
+
+				base_type = H5Tget_super(ftype);
+				bcls = H5Tget_class(base_type);
+
+				switch (bcls)
+				{
+				case H5T_INTEGER:
+				case H5T_ENUM:
+				case H5T_BITFIELD:
+#pragma region HDF5 integer, enum, bitfield
+					{
+						t = ProviderUtils::H5Type2DotNet(base_type);
+						if (t == SByte::typeid) {
+							result = gcnew ArrayDatasetWriterT<SByte>(drive->FileHandle, h5path);
+						}
+						else if (t == Int16::typeid) {
+							result = gcnew ArrayDatasetWriterT<Int16>(drive->FileHandle, h5path);
+						}
+						else if (t == Int32::typeid) {
+							result = gcnew ArrayDatasetWriterT<Int32>(drive->FileHandle, h5path);
+						}
+						else if (t == Int64::typeid) {
+							result = gcnew ArrayDatasetWriterT<Int64>(drive->FileHandle, h5path);
+						}
+						else if (t == Byte::typeid) {
+							result = gcnew ArrayDatasetWriterT<Byte>(drive->FileHandle, h5path);
+						}
+						else if (t == UInt16::typeid) {
+							result = gcnew ArrayDatasetWriterT<UInt16>(drive->FileHandle, h5path);
+						}
+						else if (t ==  UInt32::typeid) {
+							result = gcnew ArrayDatasetWriterT<UInt32>(drive->FileHandle, h5path);
+						}
+						else if (t ==  UInt64::typeid) {
+							result = gcnew ArrayDatasetWriterT<UInt64>(drive->FileHandle, h5path);
+						}
+						else {
+							throw gcnew PSH5XException("Unsupported integer, enum, or bitfield type!");
+						}
+					}
+#pragma endregion
+					break;
+
+				case H5T_FLOAT:
+#pragma region HDF5 float
+					{
+						t = ProviderUtils::H5Type2DotNet(base_type);
+						if (t == Single::typeid) {
+							result = gcnew ArrayDatasetWriterT<Single>(drive->FileHandle, h5path);
+						}
+						else if (t == Double::typeid) {
+							result = gcnew ArrayDatasetWriterT<Double>(drive->FileHandle, h5path);
+						}
+						else {
+							throw gcnew PSH5XException("Unsupported float type!");
+						}
+					}
+#pragma endregion
+					break;
+
+				default:
+
+					throw gcnew PSH5XException("Unsupported base type in array!");
+					break;
+				}
+
+				break;
+
+			default:
+
+				throw gcnew PSH5XException("Unsupported type class!");
+				break;
 			}
         }
         finally
         {
+			if (mspace != H5S_ALL) {
+                H5Sclose(mspace); 
+            }
 			if (fspace >= 0) {
                 H5Sclose(fspace); 
             }
@@ -697,6 +700,74 @@ namespace PSH5X
     Object^ Provider::GetContentWriterDynamicParameters(String^ path)
     {
         WriteVerbose(String::Format("HDF5Provider::GetContentWriterDynamicParameters(Path = '{0}')", path));
-        return nullptr;
+       
+		RuntimeDefinedParameterDictionary^ dict = gcnew RuntimeDefinedParameterDictionary();
+
+		// Start
+
+		ParameterAttribute^ attr1 = gcnew ParameterAttribute();
+		attr1->Mandatory = false;
+		attr1->ValueFromPipeline = false;
+
+		RuntimeDefinedParameter^ paramStart = gcnew RuntimeDefinedParameter();
+		paramStart->Name = "Start";
+		paramStart->ParameterType = array<hsize_t>::typeid;
+		paramStart->Attributes->Add(attr1);
+
+		dict->Add("Start", paramStart);
+
+		// Stride
+
+		ParameterAttribute^ attr2 = gcnew ParameterAttribute();
+		attr2->Mandatory = false;
+		attr2->ValueFromPipeline = false;
+
+		RuntimeDefinedParameter^ paramStride = gcnew RuntimeDefinedParameter();
+		paramStride->Name = "Stride";
+		paramStride->ParameterType = array<hsize_t>::typeid;
+		paramStride->Attributes->Add(attr2);
+
+		dict->Add("Stride", paramStride);
+
+		// Count
+
+		ParameterAttribute^ attr3 = gcnew ParameterAttribute();
+		attr3->Mandatory = false;
+		attr3->ValueFromPipeline = false;
+
+		RuntimeDefinedParameter^ paramCount = gcnew RuntimeDefinedParameter();
+		paramCount->Name = "Count";
+		paramCount->ParameterType = array<hsize_t>::typeid;
+		paramCount->Attributes->Add(attr3);
+
+		dict->Add("Count", paramCount);
+
+		// Block
+
+		ParameterAttribute^ attr4 = gcnew ParameterAttribute();
+		attr4->Mandatory = false;
+		attr4->ValueFromPipeline = false;
+
+		RuntimeDefinedParameter^ paramBlock = gcnew RuntimeDefinedParameter();
+		paramBlock->Name = "Block";
+		paramBlock->ParameterType = array<hsize_t>::typeid;
+		paramBlock->Attributes->Add(attr4);
+
+		dict->Add("Block", paramBlock);
+
+		// Elements
+
+		ParameterAttribute^ attr5 = gcnew ParameterAttribute();
+		attr5->Mandatory = false;
+		attr5->ValueFromPipeline = false;
+
+		RuntimeDefinedParameter^ paramElements = gcnew RuntimeDefinedParameter();
+		paramElements->Name = "Elements";
+		paramElements->ParameterType = array<hsize_t>::typeid;
+		paramElements->Attributes->Add(attr5);
+
+		dict->Add("Elements", paramElements);
+
+        return dict;
     }
 }

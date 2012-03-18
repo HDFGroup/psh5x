@@ -117,6 +117,32 @@ namespace PSH5X
 
             dict->Add("Gzip", paramGzip);
 
+			// Scalar
+
+            ParameterAttribute^ attr7 = gcnew ParameterAttribute();
+            attr7->Mandatory = false;
+            attr7->ValueFromPipeline = false;
+
+            RuntimeDefinedParameter^ paramScalar = gcnew RuntimeDefinedParameter();
+            paramScalar->Name = "Scalar";
+            paramScalar->ParameterType = SwitchParameter::typeid;
+            paramScalar->Attributes->Add(attr7);
+
+            dict->Add("Scalar", paramScalar);
+
+			// Null
+
+            ParameterAttribute^ attr8 = gcnew ParameterAttribute();
+            attr8->Mandatory = false;
+            attr8->ValueFromPipeline = false;
+
+            RuntimeDefinedParameter^ paramNull = gcnew RuntimeDefinedParameter();
+            paramNull->Name = "Null";
+            paramNull->ParameterType = SwitchParameter::typeid;
+            paramNull->Attributes->Add(attr8);
+
+            dict->Add("Null", paramNull);
+
 #pragma endregion
 
         }

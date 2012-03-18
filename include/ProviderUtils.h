@@ -170,26 +170,6 @@ namespace PSH5X
 
         static bool IsH5SimpleType(hid_t dtype);
 
-        static bool IsH5IntegerType(hid_t dtype);
-
-        static bool IsH5FloatType(hid_t dtype);
-
-        static bool IsH5StringType(hid_t dtype);
-
-        static bool IsH5BitfieldType(hid_t dtype);
-        
-        static bool IsH5OpaqueType(hid_t dtype);
-
-        static bool IsH5CompoundType(hid_t dtype);
-
-        static bool IsH5ReferenceType(hid_t dtype);
-
-        static bool IsH5EnumType(hid_t dtype);
-
-        static bool IsH5VlenType(hid_t dtype);
-
-        static bool IsH5ArrayType(hid_t dtype);
-
 		static hid_t GetH5MemoryType(System::Type^ t, hid_t ftype);
 
 #pragma endregion

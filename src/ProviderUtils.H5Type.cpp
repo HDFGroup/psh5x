@@ -2439,56 +2439,6 @@ namespace PSH5X
         return (cls != H5T_COMPOUND && cls != H5T_VLEN && cls != H5T_ARRAY);
     }
 
-    bool ProviderUtils::IsH5IntegerType(hid_t dtype)
-    {
-        return (H5Tget_class(dtype) == H5T_INTEGER);
-    }
-
-    bool ProviderUtils::IsH5FloatType(hid_t dtype)
-    {
-        return (H5Tget_class(dtype) == H5T_FLOAT);
-    }
-
-    bool ProviderUtils::IsH5StringType(hid_t dtype)
-    {
-        return (H5Tget_class(dtype) == H5T_STRING);
-    }
-
-    bool ProviderUtils::IsH5BitfieldType(hid_t dtype)
-    {
-        return (H5Tget_class(dtype) == H5T_BITFIELD);
-    }
-
-    bool ProviderUtils::IsH5OpaqueType(hid_t dtype)
-    {
-        return (H5Tget_class(dtype) == H5T_OPAQUE);
-    }
-
-    bool ProviderUtils::IsH5CompoundType(hid_t dtype)
-    {
-        return (H5Tget_class(dtype) == H5T_COMPOUND);
-    }
-
-    bool ProviderUtils::IsH5ReferenceType(hid_t dtype)
-	{
-        return (H5Tget_class(dtype) == H5T_REFERENCE);
-    }
-
-    bool ProviderUtils::IsH5EnumType(hid_t dtype)
-    {
-        return (H5Tget_class(dtype) == H5T_ENUM);
-    }
-
-    bool ProviderUtils::IsH5VlenType(hid_t dtype)
-    {
-        return (H5Tget_class(dtype) == H5T_VLEN);
-    }
-
-    bool ProviderUtils::IsH5ArrayType(hid_t dtype)
-    {
-        return (H5Tget_class(dtype) == H5T_ARRAY);
-    }
-
 	hid_t ProviderUtils::GetH5MemoryType(Type^ t, hid_t ftype)
 	{
 		hid_t result = -1, ntype = -1, stype = -1, fcmtype = -1, mcmtype = -1;
