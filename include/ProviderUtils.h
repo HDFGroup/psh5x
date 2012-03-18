@@ -152,7 +152,7 @@ namespace PSH5X
 
         static System::Type^ ProviderUtils::H5Type2DotNet(hid_t type_id);
 
-        static __wchar_t ProviderUtils::TypeCode(System::Type^ t);
+        static __wchar_t ProviderUtils::TypeCode(System::Type^ t, H5T_class_t cls);
 
         static hid_t ProviderUtils::DotNetType2H5Native(System::Type^ ntype, bool isBitfield);
 

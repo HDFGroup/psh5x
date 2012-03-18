@@ -1989,47 +1989,88 @@ namespace PSH5X
         return result;
     }
 
-    __wchar_t ProviderUtils::TypeCode(Type^ t)
+    __wchar_t ProviderUtils::TypeCode(Type^ t, H5T_class_t cls)
     {
-        if (t == System::String::typeid) {
-            return 's';
-        }
-        else if (t == System::Single::typeid) {
-            return 'f';
-        }
-        else if (t == System::Double::typeid) {
-            return 'd';
-        }
-        else if (t == System::SByte::typeid) {
-            return 'b';
-        }
-        else if (t == System::Byte::typeid) {
-            return 'B';
-        }
-        if (t == System::Int16::typeid) {
-            return 'h';
-        }
-        else if (t == System::UInt16::typeid) {
-            return 'H';
-        }
-        if (t == System::Int32::typeid) {
-            return 'i';
-        }
-        else if (t == System::UInt32::typeid) {
-            return 'I';
-        }
-        if (t == System::Int64::typeid) {
-            return 'l';
-        }
-        else if (t == System::UInt64::typeid) {
-            return 'L';
-        }
-		else if (t->IsArray) {
-			return 'A';
+		__wchar_t result = '\0';
+
+		switch (cls)
+		{
+		case H5T_INTEGER:
+		case H5T_BITFIELD:
+		case H5T_ENUM:
+			{
+				if (t == System::SByte::typeid) {
+					result = 'b';
+				}
+				else if (t == System::Byte::typeid) {
+					result = 'B';
+				}
+				else if (t == System::Int16::typeid) {
+					result = 'h';
+				}
+				else if (t == System::UInt16::typeid) {
+					result = 'H';
+				}
+				else if (t == System::Int32::typeid) {
+					result = 'i';
+				}
+				else if (t == System::UInt32::typeid) {
+					result = 'I';
+				}
+				else if (t == System::Int64::typeid) {
+					result = 'l';
+				}
+				else if (t == System::UInt64::typeid) {
+					result = 'L';
+				}
+				else {
+					throw gcnew PSH5XException("Cannot find type code for this type!");
+				}
+			}
+			break;
+
+		case H5T_FLOAT:
+			{
+				if (t == System::Single::typeid) {
+					result = 'f';
+				}
+				else if (t == System::Double::typeid) {
+					result = 'd';
+				}
+				else {
+					throw gcnew PSH5XException("Cannot find type code for this type!");
+				}
+			}
+			break;
+
+		case H5T_STRING:
+			{
+				if (t == System::String::typeid) {
+					result = 's';
+				}
+				else {
+					throw gcnew PSH5XException("Cannot find type code for this type!");
+				}
+			}
+			break;
+
+		case H5T_ARRAY:
+			{
+				if (t->IsArray) {
+					return 'A';
+				}
+				else {
+					throw gcnew PSH5XException("Cannot find type code for this type!");
+				}
+			}
+			break;
+
+		default:
+			throw gcnew PSH5XException("Cannot find type code for this class!");
+			break;
 		}
-        else {
-            return '\0';
-        }
+
+		return result;
     }
 
     hid_t ProviderUtils::DotNetType2H5Native(Type^ ntype, bool isBitfield)
@@ -2271,7 +2312,7 @@ namespace PSH5X
                 if (t != nullptr)
                 {
                     member_type[i]  = t->ToString();
-                    member_tcode[i] = ProviderUtils::TypeCode(t);
+                    member_tcode[i] = ProviderUtils::TypeCode(t, cls);
                     sbname->Append(member_tcode[i]);
                     member_name[i]  = member_tcode[i] + Convert::ToString(i);
                 }
