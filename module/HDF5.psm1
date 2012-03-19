@@ -16,6 +16,8 @@ Export-ModuleMember -Cmdlet *
 . $ScriptDir\New-H5Hardlink.ps1
 . $ScriptDir\New-H5Image.ps1
 . $ScriptDir\New-H5LinkedDatatype.ps1
+. $ScriptDir\New-H5NullDataset.ps1
+. $ScriptDir\New-H5ScalarDataset.ps1
 . $ScriptDir\New-H5Softlink.ps1
 . $ScriptDir\Remove-H5Drive.ps1
 . $ScriptDir\Set-H5DatasetValue.ps1

@@ -7,6 +7,8 @@ New-Alias Get-H5Member Get-ChildItem
 
 New-Alias Get-H5Object Get-Item
 
+New-Alias gho Get-H5Object
+
 New-Alias Move-H5Attribute Move-ItemProperty
 
 New-Alias Remove-H5Attribute Remove-ItemProperty

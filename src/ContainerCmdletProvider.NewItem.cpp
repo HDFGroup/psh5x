@@ -214,139 +214,212 @@ namespace PSH5X
                     }
 				}
 
-                array<hsize_t>^ dims = (array<hsize_t>^) dynamicParameters["Dimensions"]->Value;
-
-                if (dims->Length < 1 || dims->Length > 32) {
-                    throw gcnew PSH5XException("Invalid rank: the dataset rank must be between 1 and 32!");
-                }
-
-                // optional parameters, determine layout first
+                // optional parameters
 
                 String^ layout = "Contiguous";
 
+				bool isNull = (dynamicParameters["Null"]->IsSet);
+				bool isScalar = (dynamicParameters["Scalar"]->IsSet);
+				bool isSimple = (dynamicParameters["Dimensions"]->Value != nullptr);
                 bool hasMaxDims = (dynamicParameters["MaxDimensions"]->Value != nullptr);
                 bool isChunked = (dynamicParameters["Chunked"]->Value != nullptr);
                 bool isCompact = (dynamicParameters["Compact"]->IsSet);
                 bool applyGzip = (dynamicParameters["Gzip"]->Value != nullptr);
+				
+				if (!(isNull || isScalar || isSimple)) {
+					throw gcnew PSH5XException("Exactly one of -Null, -Scalar, or -Dimensions must be specified!");
+				}
+				else
+				{
+					if (isNull)
+					{
+						if (isScalar || isSimple || hasMaxDims || isChunked || applyGzip) {
+							throw gcnew PSH5XException("The following options are incompatible with the -Null option: -Scalar, -Dimensions, -MaxDimensions, -Chunked, -Gzip.");
+						}
+					}
+					else if (isScalar)
+					{
+						if (isSimple || hasMaxDims || isChunked || applyGzip) {
+							throw gcnew PSH5XException("The following options are incompatible with the -Null option: -Simple, -Dimensions, -MaxDimensions, -Chunked, -Gzip.");
+						}
+					}
+				}
 
-                if (hasMaxDims || isChunked || applyGzip) {
-                    layout = "Chunked";
-                    if (!isChunked) {
-                        throw gcnew PSH5XException("The -MaxDimensions and -Gzip options valid only in conjunction " +
-                            "with the -Chunked option. Please specify!");
-                    }
-                    if (isCompact) {
-                        throw gcnew PSH5XException("The -Compact switch is incompatible with the " +
-                            "-MaxDimensions, -Chunked, and -Gzip options.");
-                    }
-                }
-                else if (isCompact) {
-                    layout = "Compact";
-                }
+				dcplist = H5Pcreate(H5P_DATASET_CREATE);
+				if (dcplist < 0) {
+					throw gcnew HDF5Exception("H5Pcreate failed!");
+				}
 
-                current_dims = new hsize_t [dims->Length];
-                for (int i = 0; i < dims->Length; ++i) {
-                    current_dims[i] = dims[i];
-                }
+				if (isCompact) {
+					layout = "Compact";
+				}
 
-                if (hasMaxDims)
-                {
-                    array<long long>^ maxDims = (array<long long>^) dynamicParameters["MaxDimensions"]->Value;
-                    if (dims->Length != maxDims->Length) {
-                        throw gcnew PSH5XException("Rank mismatch between the dimensions and max. dimensions arrays!");
-                    }
-                    maximum_dims = new hsize_t [dims->Length];
-                    for (int i = 0; i < dims->Length; ++i)
-                    {
-                        current_dims[i] = dims[i];
-                        hsize_t m = safe_cast<hsize_t>(maxDims[i]);
-                        if (maxDims[i] >= 0 && m < dims[i]) {
-                            throw gcnew PSH5XException("Unless unlimited (H5S_UNLIMITED) dimensions are specified" +
-                                " max. dimensions must be >= dimensions (elementwise)!");
-                        }
-                        maximum_dims[i] = (maxDims[i] >= 0) ? m : H5S_UNLIMITED;
-                    }
-                    fspace = H5Screate_simple(dims->Length, current_dims, maximum_dims);
-                    if (fspace < 0) {
-                        throw gcnew HDF5Exception("H5Screate_simple failed!");
-                    }
-                }
-                else {
-                    fspace = H5Screate_simple(dims->Length, current_dims, current_dims);
-                    if (fspace < 0) {
-                        throw gcnew HDF5Exception("H5Screate_simple failed!");
-                    }
-                }
+				if (isSimple)
+				{
+#pragma region simple
 
-                if (fspace >= 0)
-                {
-                    dcplist = H5Pcreate(H5P_DATASET_CREATE);
-                    if (dcplist < 0) {
-                        throw gcnew HDF5Exception("H5Pcreate failed!");
-                    }
+					array<hsize_t>^ dims = (array<hsize_t>^) dynamicParameters["Dimensions"]->Value;
 
-                    if (layout == "Chunked") {
-                        if (H5Pset_layout(dcplist, H5D_CHUNKED) < 0) {
-                            throw gcnew HDF5Exception("H5Pset_layout failed!");
-                        }
+					if (dims->Length < 1 || dims->Length > 32) {
+						throw gcnew PSH5XException("Invalid rank: the dataset rank must be between 1 and 32!");
+					}
 
-                        array<hsize_t>^ cdims = (array<hsize_t>^) dynamicParameters["Chunked"]->Value;
-                        if (cdims->Length != dims->Length) {
-                            throw gcnew PSH5XException("Rank mismatch between the dimensions and chunk dimensions arrays!");
-                        }
+					if (hasMaxDims || isChunked || applyGzip) {
+						layout = "Chunked";
+						if (!isChunked) {
+							throw gcnew PSH5XException("The -MaxDimensions and -Gzip options valid only in conjunction " +
+								"with the -Chunked option. Please specify!");
+						}
+						if (isCompact) {
+							throw gcnew PSH5XException("The -Compact switch is incompatible with the " +
+								"-MaxDimensions, -Chunked, and -Gzip options.");
+						}
+					}
 
-                        dim = new hsize_t [cdims->Length];
-                        for (int i = 0; i < cdims->Length; ++i) { dim[i] = cdims[i]; }
+					current_dims = new hsize_t [dims->Length];
+					for (int i = 0; i < dims->Length; ++i) {
+						current_dims[i] = dims[i];
+					}
 
-                        if (H5Pset_chunk(dcplist, cdims->Length, dim) < 0) {
-                            throw gcnew HDF5Exception("H5Pset_chunk failed!");
-                        }
-                    }
-                    else if (layout == "Contiguous")
-                    {
-                        if (H5Pset_layout(dcplist, H5D_CONTIGUOUS) < 0) {
-                            throw gcnew HDF5Exception("H5Pset_layout failed!");
-                        }
-                    }
-                    else if (layout == "Compact")
-                    {
-                        if (H5Pset_layout(dcplist, H5D_COMPACT) < 0) {
-                            throw gcnew HDF5Exception("H5Pset_layout failed!");
-                        }
-                    }
-                    else {
-                        throw gcnew PSH5XException("Unknown layout!");
-                    }
+					if (hasMaxDims)
+					{
+						array<long long>^ maxDims = (array<long long>^) dynamicParameters["MaxDimensions"]->Value;
+						if (dims->Length != maxDims->Length) {
+							throw gcnew PSH5XException("Rank mismatch between the dimensions and max. dimensions arrays!");
+						}
+						maximum_dims = new hsize_t [dims->Length];
+						for (int i = 0; i < dims->Length; ++i)
+						{
+							current_dims[i] = dims[i];
+							hsize_t m = safe_cast<hsize_t>(maxDims[i]);
+							if (maxDims[i] >= 0 && m < dims[i]) {
+								throw gcnew PSH5XException("Unless unlimited (H5S_UNLIMITED) dimensions are specified" +
+									" max. dimensions must be >= dimensions (elementwise)!");
+							}
+							maximum_dims[i] = (maxDims[i] >= 0) ? m : H5S_UNLIMITED;
+						}
+						fspace = H5Screate_simple(dims->Length, current_dims, maximum_dims);
+						if (fspace < 0) {
+							throw gcnew HDF5Exception("H5Screate_simple failed!");
+						}
+					}
+					else {
+						fspace = H5Screate_simple(dims->Length, current_dims, current_dims);
+						if (fspace < 0) {
+							throw gcnew HDF5Exception("H5Screate_simple failed!");
+						}
+					}
 
+					if (layout == "Chunked") {
+						if (H5Pset_layout(dcplist, H5D_CHUNKED) < 0) {
+							throw gcnew HDF5Exception("H5Pset_layout failed!");
+						}
 
-                    if (applyGzip)
-                    {
-                        unsigned level = (unsigned) dynamicParameters["Gzip"]->Value;
-                        if (level > 9) {
-                            throw gcnew PSH5XException("Invalid compression level! Must be in [0,9].");
-                        }
+						array<hsize_t>^ cdims = (array<hsize_t>^) dynamicParameters["Chunked"]->Value;
+						if (cdims->Length != dims->Length) {
+							throw gcnew PSH5XException("Rank mismatch between the dimensions and chunk dimensions arrays!");
+						}
 
-                        if (H5Pset_deflate(dcplist, level) < 0) {
-                            throw gcnew HDF5Exception("H5Pset_deflate failed!");
-                        }
-                    }
+						dim = new hsize_t [cdims->Length];
+						for (int i = 0; i < cdims->Length; ++i) { dim[i] = cdims[i]; }
 
-                    if (this->ShouldProcess(h5path,
-                        String::Format("HDF5 dataset '{0}' does not exist, create it", linkName)))
-                    {
+						if (H5Pset_chunk(dcplist, cdims->Length, dim) < 0) {
+							throw gcnew HDF5Exception("H5Pset_chunk failed!");
+						}
+					}
+					else if (layout == "Contiguous")
+					{
+						if (H5Pset_layout(dcplist, H5D_CONTIGUOUS) < 0) {
+							throw gcnew HDF5Exception("H5Pset_layout failed!");
+						}
+					}
+					else if (layout == "Compact")
+					{
+						if (H5Pset_layout(dcplist, H5D_COMPACT) < 0) {
+							throw gcnew HDF5Exception("H5Pset_layout failed!");
+						}
+					}
+					else {
+						throw gcnew PSH5XException("Unknown layout!");
+					}
 
-                        dset = H5Dcreate2(drive->FileHandle, name, dtype, fspace, lcplist, dcplist, H5P_DEFAULT);
-                        if (dset < 0) {
-                            throw gcnew HDF5Exception("H5Dcreate2 failed!");
-                        }
+					if (applyGzip)
+					{
+						unsigned level = (unsigned) dynamicParameters["Gzip"]->Value;
+						if (level > 9) {
+							throw gcnew PSH5XException("Invalid compression level! Must be in [0,9].");
+						}
 
-                        if (H5Fflush(dset, H5F_SCOPE_LOCAL) < 0) {
-                            throw gcnew HDF5Exception("H5Fflush failed!");
-                        }
+						if (H5Pset_deflate(dcplist, level) < 0) {
+							throw gcnew HDF5Exception("H5Pset_deflate failed!");
+						}
+					}
+#pragma endregion
+				}
+				else if (isScalar)
+				{
+#pragma region scalar
 
-                        WriteItemObject(gcnew DatasetInfo(dset), path, false);
-                    }
-                }
+					fspace = H5Screate(H5S_SCALAR);
+					if (fspace < 0) {
+						throw gcnew HDF5Exception("H5Screate failed!");
+					}
+
+					if (layout == "Contiguous") {
+						if (H5Pset_layout(dcplist, H5D_CONTIGUOUS) < 0) {
+							throw gcnew HDF5Exception("H5Pset_layout failed!");
+						}
+					}
+					else if (layout == "Compact") {
+						if (H5Pset_layout(dcplist, H5D_COMPACT) < 0) {
+							throw gcnew HDF5Exception("H5Pset_layout failed!");
+						}
+					}
+					else {
+						throw gcnew PSH5XException("Unknown layout!");
+					}
+
+#pragma endregion
+				}
+				else // isNull
+				{
+#pragma region null
+					fspace = H5Screate(H5S_NULL);
+					if (fspace < 0) {
+						throw gcnew HDF5Exception("H5Screate failed!");
+					}
+
+					if (layout == "Contiguous") {
+						if (H5Pset_layout(dcplist, H5D_CONTIGUOUS) < 0) {
+							throw gcnew HDF5Exception("H5Pset_layout failed!");
+						}
+					}
+					else if (layout == "Compact") {
+						if (H5Pset_layout(dcplist, H5D_COMPACT) < 0) {
+							throw gcnew HDF5Exception("H5Pset_layout failed!");
+						}
+					}
+					else {
+						throw gcnew PSH5XException("Unknown layout!");
+					}
+#pragma endregion
+				}
+
+				if (this->ShouldProcess(h5path,
+					String::Format("HDF5 dataset '{0}' does not exist, create it", linkName)))
+				{
+
+					dset = H5Dcreate2(drive->FileHandle, name, dtype, fspace, lcplist, dcplist, H5P_DEFAULT);
+					if (dset < 0) {
+						throw gcnew HDF5Exception("H5Dcreate2 failed!");
+					}
+
+					if (H5Fflush(dset, H5F_SCOPE_LOCAL) < 0) {
+						throw gcnew HDF5Exception("H5Fflush failed!");
+					}
+
+					WriteItemObject(gcnew DatasetInfo(dset), path, false);
+				}
 
 #pragma endregion
 

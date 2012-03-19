@@ -36,7 +36,7 @@ namespace PSH5X
         if (itemTypeName->ToUpper() == "DATASET")
         {
 
-#pragma region dataset
+#pragma region Dataset
 
             // ElementType
 
@@ -55,7 +55,7 @@ namespace PSH5X
             // Dimensions
 
             ParameterAttribute^ attr2 = gcnew ParameterAttribute();
-            attr2->Mandatory = true;
+            attr2->Mandatory = false;
             attr2->ValueFromPipeline = false;
 
             RuntimeDefinedParameter^ paramDimensions = gcnew RuntimeDefinedParameter();

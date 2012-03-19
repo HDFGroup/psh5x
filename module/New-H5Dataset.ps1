@@ -3,9 +3,9 @@ Function New-H5Dataset
 {
 <#
     .SYNOPSIS
-      Creates a new HDF5 dataset 
+      Creates a new HDF5 simple dataset 
     .DESCRIPTION
-      The New-H5Dataset function creates a new HDF5 dataset.
+      The New-H5Dataset function creates a new HDF5 simple dataset.
       Use the -Force switch to automatically create missing intermediate
       groups. Unless the current location is on the targeted H5Drive,
       the path(s) must be drive-qualified.
@@ -16,12 +16,8 @@ Function New-H5Dataset
      1) A pre-defined HDF5 datatype
      2) An HDF5 datatype definition (JSON)
      3) The HDF5 path name of a linked HDF5 datatype
-   .PARAMETER Nulll
-     Create an HDF5 dataset with a null dataspace (empty set).
-   .PARAMETER Scalar
-     Create an HDF5 dataset with a scalar dataspace (singleton).
    .PARAMETER Dimensions
-     Create an HDF5 dataset with a simple dataspace.
+     The dimensions of the simple dataspace
    .PARAMETER MaxDimensions
      Create an HDF5 dataset with a simple extendible dataspace.
    .PARAMETER Chunked 
@@ -56,40 +52,24 @@ Function New-H5Dataset
         $Type,
         [Parameter(Mandatory=$true,
                    Position=2,
-                   ParameterSetName='Null',
-                   HelpMessage='Null dataspace?')]
-        [switch]
-        $Nulll,
-        [Parameter(Mandatory=$true,
-                   Position=2,
-                   ParameterSetName='Scalar',
-                   HelpMessage='Scalar dataspace?')]
-        [switch]
-        $Scalar,
-        [Parameter(Mandatory=$true,
-                   Position=2,
-                   ParameterSetName='Simple',
                    HelpMessage='Dimensions of the simple dataspace')]
         [ValidateCount(1,32)]
         [long[]]
         $Dimensions,
         [Parameter(Mandatory=$false,
                    Position=3,
-                   ParameterSetName='Simple',
                    HelpMessage='Max. dimensions of the simple dataspace')]
         [ValidateCount(1,32)]
         [long[]]
         $MaxDimensions,
         [Parameter(Mandatory=$false,
                    Position=4,
-                   ParameterSetName='Simple',
                    HelpMessage='Chunk dimensions')]
         [ValidateCount(1,32)]
         [long[]]
         $Chunked,
         [Parameter(Mandatory=$false,
                    Position=5,
-                   ParameterSetName='Simple',
                    HelpMessage='Gzip level (0-9)')]
         [ValidateRange(0,9)]
         [int]
@@ -120,80 +100,67 @@ Function New-H5Dataset
         return
     }
 
-    if ($Nulll)
+    for ($i = 0; $i -lt $Dimensions.Length; $i++)
     {
-        Write-Error "`nSupport for null datasets unimplemented!!!"
-        return
+        if (!($Dimensions[$i] -gt 0))
+        {
+            Write-Error "`nDimensions must be positive."
+            return
+        }
     }
-    elseif ($Scalar)
+
+    if ($MaxDimensions)
     {
-        Write-Error "`nSupport for scalar datasets unimplemented!!!"
-        return
-    }
-    else #simple dataspace
-    {
+        if ($Dimensions.Length -ne $MaxDimensions.Length)
+        {
+            Write-Error "`nLength mismatch between dimension ($($Dimensions.Length)) and max. dimension ($($MaxDimensions.Length)) arrays"
+            return
+        }
+
+        $equal = $true
         for ($i = 0; $i -lt $Dimensions.Length; $i++)
         {
-            if (!($Dimensions[$i] -gt 0))
+            if (!(($MaxDimensions[$i] -lt 0) `
+                  -or ($MaxDimensions[$i] -ge $Dimensions[$i])))
             {
-                Write-Error "`nDimensions must be positive."
+                Write-Error "`nMax. dimensions must be either unlimited or greater or equal than the dimensions"
                 return
+            }
+            if ($MaxDimensions[$i] -ne $Dimensions[$i]) {
+                $equal = $false
             }
         }
 
-        if ($MaxDimensions)
+        if (!($equal -or $Chunked))
         {
-            if ($Dimensions.Length -ne $MaxDimensions.Length)
-            {
-                Write-Error "`nLength mismatch between dimension ($($Dimensions.Length)) and max. dimension ($($MaxDimensions.Length)) arrays"
-                return
-            }
-
-            $equal = $true
-            for ($i = 0; $i -lt $Dimensions.Length; $i++)
-            {
-                if (!(($MaxDimensions[$i] -lt 0) `
-                      -or ($MaxDimensions[$i] -ge $Dimensions[$i])))
-                {
-                    Write-Error "`nMax. dimensions must be either unlimited or greater or equal than the dimensions"
-                    return
-                }
-                if ($MaxDimensions[$i] -ne $Dimensions[$i]) {
-                    $equal = $false
-                }
-            }
-
-            if (!($equal -or $Chunked))
-            {
-                Write-Error "`nExtendible datasets must be chunked. Use -Chunked ... !"
-                return
-            }
+            Write-Error "`nExtendible datasets must be chunked. Use -Chunked ... !"
+            return
         }
-        else {
-            $MaxDimensions = $Dimensions
-        }
+    }
+    else {
+        $MaxDimensions = $Dimensions
+    }
 
-        if ($Chunked)
+    if ($Chunked)
+    {
+        if ($Dimensions.Length -ne $Chunked.Length)
         {
-            if ($Dimensions.Length -ne $Chunked.Length)
+            Write-Error "`nLength mismatch between dimension ($($Dimensions.Length)) and chunk dimension ($($Chunked.Length)) arrays"
+            return
+        }
+
+        for ($i = 0; $i -lt $Dimensions.Length; $i++)
+        {
+            if (!($Chunked[$i] -gt 0))
             {
-                Write-Error "`nLength mismatch between dimension ($($Dimensions.Length)) and chunk dimension ($($Chunked.Length)) arrays"
+                Write-Error "`nChunk dimensions must be positive."
                 return
             }
-
-            for ($i = 0; $i -lt $Dimensions.Length; $i++)
+            if (($MaxDimensions[$i] -gt 0) -and
+                !($MaxDimensions[$i] -ge $Chunked[$i]))
             {
-                if (!($Chunked[$i] -gt 0))
-                {
-                    Write-Error "`nChunk dimensions must be positive."
-                    return
-                }
-                if (($MaxDimensions[$i] -gt 0) -and
-                    !($MaxDimensions[$i] -ge $Chunked[$i]))
-                {
-                    Write-Error "`nFor limited maximum dimensions the chunk dimension must not exceed the maximum dimension."
-                    return
-                }
+                Write-Error "`nFor limited maximum dimensions the chunk dimension must not exceed the maximum dimension."
+                return
             }
         }
     }
