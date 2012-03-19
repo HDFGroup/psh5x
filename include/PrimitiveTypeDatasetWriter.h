@@ -11,21 +11,11 @@ namespace PSH5X
     {
     public:
 
-        PrimitiveTypeDatasetWriter(hid_t h5file, System::String^ h5path)
-            : m_h5file(h5file), m_h5path(h5path)
+        PrimitiveTypeDatasetWriter(hid_t h5file, System::String^ h5path,
+			System::Management::Automation::RuntimeDefinedParameterDictionary^ dict)
+            : m_h5file(h5file), m_h5path(h5path), m_dict(dict)
         {
         }
-
-        // TODO: deal with hyperslabs and point sets
-
-        /*
-
-        DatasetWriterT(hid_t h5file, System::String^ h5path,
-        array<hsize_t>^ start, array<hsize_t>^ stride,
-        array<hsize_t>^ count, array<hsize_t>^ block);
-
-        DatasetWriterT(hid_t h5file, System::String^ h5path, array<hsize_t>^ coord);
-        */
 
         ~PrimitiveTypeDatasetWriter() { this->!PrimitiveTypeDatasetWriter(); }
 
@@ -42,6 +32,8 @@ private:
     hid_t m_h5file;
 
     System::String^ m_h5path;
+
+	System::Management::Automation::RuntimeDefinedParameterDictionary^ m_dict;
 };
 
 }

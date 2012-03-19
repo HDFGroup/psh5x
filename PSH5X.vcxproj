@@ -215,6 +215,7 @@
     <ClCompile Include="src\ProviderUtils.GetArray.cpp" />
     <ClCompile Include="src\ProviderUtils.H5Attribute.cpp" />
     <ClCompile Include="src\ProviderUtils.H5Dataset.cpp" />
+    <ClCompile Include="src\ProviderUtils.H5Dataspace.cpp" />
     <ClCompile Include="src\ProviderUtils.H5Type.cpp" />
     <ClCompile Include="src\ShowH5TypesCommand.cpp" />
     <ClCompile Include="src\SimpleChunkedDatasetInfo.cpp" />

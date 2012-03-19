@@ -466,7 +466,7 @@ namespace PSH5X
 
         IContentWriter^ result = nullptr;
 
-        hid_t dset = -1, ftype = -1, base_type = -1, fspace = -1, mspace = H5S_ALL;;
+        hid_t dset = -1, ftype = -1, base_type = -1, fspace = -1;
 
         char *name = NULL;
 
@@ -501,7 +501,6 @@ namespace PSH5X
                 throw gcnew HDF5Exception("H5Dget_space failed!");
             }
 
-
 			Type^ t = nullptr;
 
 			H5T_class_t cls = H5Tget_class(ftype);
@@ -515,7 +514,8 @@ namespace PSH5X
 			case H5T_BITFIELD:
 			case H5T_ENUM:
 
-				result = gcnew PrimitiveTypeDatasetWriter(drive->FileHandle, h5path);
+				result = gcnew PrimitiveTypeDatasetWriter(drive->FileHandle, h5path,
+					(RuntimeDefinedParameterDictionary^) DynamicParameters);
 				break;
 
 			case H5T_STRING:
@@ -674,9 +674,6 @@ namespace PSH5X
         }
         finally
         {
-			if (mspace != H5S_ALL) {
-                H5Sclose(mspace); 
-            }
 			if (fspace >= 0) {
                 H5Sclose(fspace); 
             }

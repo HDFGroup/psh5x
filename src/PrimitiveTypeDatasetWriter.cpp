@@ -24,7 +24,9 @@ namespace PSH5X
         {
             char* name = (char*)(Marshal::StringToHGlobalAnsi(m_h5path)).ToPointer();
 
-            hid_t dset = -1, fspace = -1, ftype = -1, mtype = -1;
+            hid_t dset = -1, ftype = -1, mtype = -1, fspace = -1, mspace = H5S_ALL;
+
+			bool sel_flag = false;
 
             try
             {
@@ -41,9 +43,18 @@ namespace PSH5X
                     throw gcnew HDF5Exception("H5Dget_space failed!");
                 }
 
+				H5S_class_t scls = H5Sget_simple_extent_type(fspace);
+
+				sel_flag = ProviderUtils::WriterCheckSelection(fspace, mspace, safe_cast<hsize_t>(content->Count), m_dict);
+
                 hssize_t npoints = 1;
-				if (H5Sget_simple_extent_type(fspace) == H5S_SIMPLE) {
-				    npoints = H5Sget_simple_extent_npoints(fspace);
+				if (scls == H5S_SIMPLE) {
+					if (sel_flag) {
+						npoints = H5Sget_select_npoints(fspace);
+					}
+					else {
+						npoints = H5Sget_simple_extent_npoints(fspace);
+					}
 				}
 
                 if (content->Count != safe_cast<int>(npoints)) {
@@ -121,7 +132,7 @@ namespace PSH5X
 				array<unsigned char>^ a = ms->ToArray();
 				pin_ptr<unsigned char> ptr = &a[0];
 
-                if (H5Dwrite(dset, mtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, ptr) < 0) {
+                if (H5Dwrite(dset, mtype, mspace, fspace, H5P_DEFAULT, ptr) < 0) {
                     throw gcnew HDF5Exception("H5Dwrite failed!");
                 }
 
@@ -139,6 +150,9 @@ namespace PSH5X
                 }
                 if (fspace >= 0) {
                     H5Sclose(fspace);
+                }
+				if (mspace != H5S_ALL) {
+                    H5Sclose(mspace);
                 }
                 if (dset >= 0) {
                     H5Dclose(dset);

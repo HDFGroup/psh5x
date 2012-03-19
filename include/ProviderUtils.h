@@ -6,6 +6,7 @@
 
 extern "C" {
 #include "H5public.h"
+#include "H5Ipublic.h"
 }
 
 namespace PSH5X
@@ -173,6 +174,14 @@ namespace PSH5X
 		static hid_t GetH5MemoryType(System::Type^ t, hid_t ftype);
 
 #pragma endregion
+
+#pragma region HDF5 Dataspace
+
+		static bool WriterCheckSelection(hid_t% fspace, hid_t% mspace, hsize_t sel_count,
+			System::Management::Automation::RuntimeDefinedParameterDictionary^ dict);
+
+#pragma endregion
+
 
 #pragma region HDF5 Attribute
 
