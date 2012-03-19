@@ -1,5 +1,6 @@
 
 
+#include "ArrayUtils.h"
 #include "NewH5ArrayCommand.h"
 #include "ProviderUtils.h"
 #include "PSH5XException.h"
@@ -22,9 +23,16 @@ namespace PSH5X
 {
     void NewH5ArrayCommand::BeginProcessing()
     {
-        if (m_length <= 0) {
-            throw gcnew ArgumentException("Length must be positive!!!");
+        if (m_dims->Length < 1 || m_dims->Length > 32) {
+            throw gcnew PSH5XException("The rank of the -Dimensions array must be between 1 and 32!");
         }
+
+		for (int i = 0; i < m_dims->Rank; ++i)
+		{
+			if (m_dims[i] == 0) {
+				throw gcnew PSH5XException("All dimensions must be positive!");
+			}
+		}
 
         return;
     }
@@ -33,9 +41,6 @@ namespace PSH5X
     {
         hid_t dtype = -1, ntype = -1, base_type = -1;
         Array^ result = nullptr;
-
-        array<long long>^ dims = gcnew array<long long>(1);
-        dims[0] = m_length;
 
 		try
 		{
@@ -67,18 +72,23 @@ namespace PSH5X
 				}
 			}
 
+			int rank = m_dims->Length;
+			array<long long>^ index = gcnew array<long long>(rank);
+
 			if (dtype != -1)
 			{
 				if (ProviderUtils::IsH5SimpleType(dtype))
 				{
 					System::Type^ t = ProviderUtils::H5Type2DotNet(dtype);
-					result = Array::CreateInstance(t, dims); 
+					result = Array::CreateInstance(t, m_dims); 
 				}
 				else
 				{
 					ntype = H5Tget_native_type(dtype, H5T_DIR_ASCEND);
 
-					if (ProviderUtils::IsH5ArrayType(ntype))
+					H5T_class_t cls = H5Tget_class(ntype);
+
+					if (cls == H5T_ARRAY)
 					{
 #pragma region HDF5 array type
 
@@ -96,10 +106,17 @@ namespace PSH5X
 								dims[i] = safe_cast<int>(adims[i]);
 							}
 							Array^ dummy = Array::CreateInstance(t, dims);
-							result = Array::CreateInstance(dummy->GetType(), m_length);
+							result = Array::CreateInstance(dummy->GetType(), m_dims);
 
-							for (long long i = 0; i < m_length; ++i) {
-								result->SetValue(Array::CreateInstance(t, dims), i);
+							for (long long i = 0; i < result->LongLength; ++i)
+							{
+								if (rank > 1) {
+									index = ArrayUtils::GetIndex(m_dims, i);
+									result->SetValue(dummy, index);
+								}
+								else {
+									result->SetValue(dummy, i);
+								}
 							}
 						}
 						else {
@@ -108,22 +125,29 @@ namespace PSH5X
 
 #pragma endregion
 					}
-					else if (ProviderUtils::IsH5CompoundType(ntype))
+					else if (cls == H5T_COMPOUND)
 					{
 #pragma region HDF5 compound type
 
 						System::Type^ t = ProviderUtils::GetCompundDotNetType(ntype);
 						if (t != nullptr)
 						{
-							result = Array::CreateInstance(t, m_length);
+							result = Array::CreateInstance(t, m_dims);
 
 							array<ConstructorInfo^>^ cinfo = t->GetConstructors();
 							if (cinfo->Length != 2) {
 								throw gcnew PSH5XException("Constructor code generation error!");
 							}
 
-							for (long long i = 0; i < m_length; ++i) {
-								result->SetValue(cinfo[0]->Invoke(nullptr), i);
+							for (long long i = 0; i < result->LongLength; ++i)
+							{
+								if (rank > 1) {
+									index = ArrayUtils::GetIndex(m_dims, i);
+									result->SetValue(cinfo[0]->Invoke(nullptr), index);
+								}
+								else {
+									result->SetValue(cinfo[0]->Invoke(nullptr), i);
+								}
 							}
 						}
 						else {
@@ -132,7 +156,7 @@ namespace PSH5X
 
 #pragma endregion
 					}
-					else if (ProviderUtils::IsH5VlenType(ntype))
+					else if (cls == H5T_VLEN)
 					{
 #pragma region HDF5 variable-length array type
 
@@ -142,9 +166,17 @@ namespace PSH5X
 						if (t != nullptr)
 						{
 							Array^ dummy = Array::CreateInstance(t, 0);
-							result = Array::CreateInstance(dummy->GetType(), m_length);
-							for (long long i = 0; i < m_length; ++i) {
-								result->SetValue(dummy, i);
+							result = Array::CreateInstance(dummy->GetType(), m_dims);
+
+							for (long long i = 0; i < result->LongLength; ++i)
+							{
+								if (rank > 1) {
+									index = ArrayUtils::GetIndex(m_dims, i);
+									result->SetValue(dummy, index);
+								}
+								else {
+									result->SetValue(dummy, i);
+								}
 							}
 						}
 						else {
@@ -159,7 +191,7 @@ namespace PSH5X
 				}
 			}
 			else {
-				throw gcnew PSH5XException("Internal error.");
+				throw gcnew PSH5XException("Internal parser error.");
 			}
 		}
 		finally

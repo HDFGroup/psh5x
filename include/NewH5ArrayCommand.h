@@ -10,9 +10,10 @@ namespace PSH5X
     public:
 
         NewH5ArrayCommand()
-            : m_length(-1), m_type(nullptr) {}
+            : m_dims(nullptr), m_type(nullptr) {}
 
 		[System::Management::Automation::Parameter(Mandatory=true, Position=1)]
+		[System::Management::Automation::ValidateNotNullAttribute()]
         property System::String^ Type
         {
             System::String^ get() { return m_type; }
@@ -20,10 +21,11 @@ namespace PSH5X
         }
 
         [System::Management::Automation::Parameter(Mandatory=true, Position=2)]
-        property long long Length
+		[System::Management::Automation::ValidateNotNullAttribute()]
+        property array<long long>^ Dimensions
         {
-            long long get() { return m_length ; }
-            void set(long long value) { m_length = value; }
+            array<long long>^ get() { return m_dims; }
+            void set(array<long long>^ value) { m_dims = value; }
         }
 
     protected:
@@ -34,7 +36,7 @@ namespace PSH5X
         
     private:
 
-        long long m_length;
+        array<long long>^ m_dims;
 
         System::String^ m_type;
 

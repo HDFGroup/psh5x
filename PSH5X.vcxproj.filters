@@ -180,6 +180,9 @@
     <ClCompile Include="src\ProviderUtils.H5Dataspace.cpp">
       <Filter>Source Files\ProviderUtils</Filter>
     </ClCompile>
+    <ClCompile Include="src\NewH5ArrayCommand.cpp">
+      <Filter>Source Files\Cmdlets</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Snapin.h">
@@ -294,6 +297,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\DatasetReaderT.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\NewH5ArrayCommand.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
