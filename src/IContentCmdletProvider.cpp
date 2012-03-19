@@ -542,28 +542,36 @@ namespace PSH5X
 					{
 						t = ProviderUtils::H5Type2DotNet(base_type);
 						if (t == SByte::typeid) {
-							result = gcnew VlenDatasetWriterT<SByte>(drive->FileHandle, h5path);
+							result = gcnew VlenDatasetWriterT<SByte>(drive->FileHandle, h5path,
+								(RuntimeDefinedParameterDictionary^) DynamicParameters);
 						}
 						else if (t == Int16::typeid) {
-							result = gcnew VlenDatasetWriterT<Int16>(drive->FileHandle, h5path);
+							result = gcnew VlenDatasetWriterT<Int16>(drive->FileHandle, h5path,
+								(RuntimeDefinedParameterDictionary^) DynamicParameters);
 						}
 						else if (t == Int32::typeid) {
-							result = gcnew VlenDatasetWriterT<Int32>(drive->FileHandle, h5path);
+							result = gcnew VlenDatasetWriterT<Int32>(drive->FileHandle, h5path,
+								(RuntimeDefinedParameterDictionary^) DynamicParameters);
 						}
 						else if (t == Int64::typeid) {
-							result = gcnew VlenDatasetWriterT<Int64>(drive->FileHandle, h5path);
+							result = gcnew VlenDatasetWriterT<Int64>(drive->FileHandle, h5path,
+								(RuntimeDefinedParameterDictionary^) DynamicParameters);
 						}
 						else if (t == Byte::typeid) {
-							result = gcnew VlenDatasetWriterT<Byte>(drive->FileHandle, h5path);
+							result = gcnew VlenDatasetWriterT<Byte>(drive->FileHandle, h5path,
+								(RuntimeDefinedParameterDictionary^) DynamicParameters);
 						}
 						else if (t == UInt16::typeid) {
-							result = gcnew VlenDatasetWriterT<UInt16>(drive->FileHandle, h5path);
+							result = gcnew VlenDatasetWriterT<UInt16>(drive->FileHandle, h5path,
+								(RuntimeDefinedParameterDictionary^) DynamicParameters);
 						}
 						else if (t ==  UInt32::typeid) {
-							result = gcnew VlenDatasetWriterT<UInt32>(drive->FileHandle, h5path);
+							result = gcnew VlenDatasetWriterT<UInt32>(drive->FileHandle, h5path,
+								(RuntimeDefinedParameterDictionary^) DynamicParameters);
 						}
 						else if (t ==  UInt64::typeid) {
-							result = gcnew VlenDatasetWriterT<UInt64>(drive->FileHandle, h5path);
+							result = gcnew VlenDatasetWriterT<UInt64>(drive->FileHandle, h5path,
+								(RuntimeDefinedParameterDictionary^) DynamicParameters);
 						}
 						else {
 							throw gcnew PSH5XException("Unsupported integer, enum, or bitfield type!");
@@ -577,10 +585,12 @@ namespace PSH5X
 
 					t = ProviderUtils::H5Type2DotNet(base_type);
 					if (t == Single::typeid) {
-						result = gcnew VlenDatasetWriterT<Single>(drive->FileHandle, h5path);
+						result = gcnew VlenDatasetWriterT<Single>(drive->FileHandle, h5path,
+								(RuntimeDefinedParameterDictionary^) DynamicParameters);
 					}
 					else if (t == Double::typeid) {
-						result = gcnew VlenDatasetWriterT<Double>(drive->FileHandle, h5path);
+						result = gcnew VlenDatasetWriterT<Double>(drive->FileHandle, h5path,
+								(RuntimeDefinedParameterDictionary^) DynamicParameters);
 					}
 					else {
 						throw gcnew PSH5XException("Unsupported float type!");
@@ -611,28 +621,36 @@ namespace PSH5X
 					{
 						t = ProviderUtils::H5Type2DotNet(base_type);
 						if (t == SByte::typeid) {
-							result = gcnew ArrayDatasetWriterT<SByte>(drive->FileHandle, h5path);
+							result = gcnew ArrayDatasetWriterT<SByte>(drive->FileHandle, h5path,
+								(RuntimeDefinedParameterDictionary^) DynamicParameters);
 						}
 						else if (t == Int16::typeid) {
-							result = gcnew ArrayDatasetWriterT<Int16>(drive->FileHandle, h5path);
+							result = gcnew ArrayDatasetWriterT<Int16>(drive->FileHandle, h5path,
+								(RuntimeDefinedParameterDictionary^) DynamicParameters);
 						}
 						else if (t == Int32::typeid) {
-							result = gcnew ArrayDatasetWriterT<Int32>(drive->FileHandle, h5path);
+							result = gcnew ArrayDatasetWriterT<Int32>(drive->FileHandle, h5path,
+								(RuntimeDefinedParameterDictionary^) DynamicParameters);
 						}
 						else if (t == Int64::typeid) {
-							result = gcnew ArrayDatasetWriterT<Int64>(drive->FileHandle, h5path);
+							result = gcnew ArrayDatasetWriterT<Int64>(drive->FileHandle, h5path,
+								(RuntimeDefinedParameterDictionary^) DynamicParameters);
 						}
 						else if (t == Byte::typeid) {
-							result = gcnew ArrayDatasetWriterT<Byte>(drive->FileHandle, h5path);
+							result = gcnew ArrayDatasetWriterT<Byte>(drive->FileHandle, h5path,
+								(RuntimeDefinedParameterDictionary^) DynamicParameters);
 						}
 						else if (t == UInt16::typeid) {
-							result = gcnew ArrayDatasetWriterT<UInt16>(drive->FileHandle, h5path);
+							result = gcnew ArrayDatasetWriterT<UInt16>(drive->FileHandle, h5path,
+								(RuntimeDefinedParameterDictionary^) DynamicParameters);
 						}
 						else if (t ==  UInt32::typeid) {
-							result = gcnew ArrayDatasetWriterT<UInt32>(drive->FileHandle, h5path);
+							result = gcnew ArrayDatasetWriterT<UInt32>(drive->FileHandle, h5path,
+								(RuntimeDefinedParameterDictionary^) DynamicParameters);
 						}
 						else if (t ==  UInt64::typeid) {
-							result = gcnew ArrayDatasetWriterT<UInt64>(drive->FileHandle, h5path);
+							result = gcnew ArrayDatasetWriterT<UInt64>(drive->FileHandle, h5path,
+								(RuntimeDefinedParameterDictionary^) DynamicParameters);
 						}
 						else {
 							throw gcnew PSH5XException("Unsupported integer, enum, or bitfield type!");
@@ -646,10 +664,12 @@ namespace PSH5X
 					{
 						t = ProviderUtils::H5Type2DotNet(base_type);
 						if (t == Single::typeid) {
-							result = gcnew ArrayDatasetWriterT<Single>(drive->FileHandle, h5path);
+							result = gcnew ArrayDatasetWriterT<Single>(drive->FileHandle, h5path,
+								(RuntimeDefinedParameterDictionary^) DynamicParameters);
 						}
 						else if (t == Double::typeid) {
-							result = gcnew ArrayDatasetWriterT<Double>(drive->FileHandle, h5path);
+							result = gcnew ArrayDatasetWriterT<Double>(drive->FileHandle, h5path,
+								(RuntimeDefinedParameterDictionary^) DynamicParameters);
 						}
 						else {
 							throw gcnew PSH5XException("Unsupported float type!");
