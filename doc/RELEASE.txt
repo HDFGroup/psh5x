@@ -1,0 +1,38 @@
+============================================
+PSH5X version 0.9.0 under development.
+============================================
+
+1. Introduction
+===============
+
+This document describes the HDF5 PowerShell module, PSH5X, and contains
+information on platforms tested, changes since last release and any known
+problems.
+
+If you have any questions or comments, please send them to:
+    help@hdfgroup.org
+
+
+2. Platforms Tested
+===================
+
+- Windows 7 32bit and 64bits 
+- .NET 4.0.30319.261
+- PowerShell 2.0, 3.0 CTP2
+
+3. New features and bug fixes since Version 0.9.0
+=================================================
+
+    Configuration
+    -------------
+    
+    Features
+    --------
+
+    Limitations
+    -----------
+
+      
+4. Known problems
+=================
+
