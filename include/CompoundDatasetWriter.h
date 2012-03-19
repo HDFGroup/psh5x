@@ -14,15 +14,8 @@ namespace PSH5X
     {
     public:
 
-        CompoundDatasetWriter(hid_t h5file, System::String^ h5path);
-
-        /*
         CompoundDatasetWriter(hid_t h5file, System::String^ h5path,
-            array<hsize_t>^ start, array<hsize_t>^ stride,
-            array<hsize_t>^ count, array<hsize_t>^ block);
-        
-        CompoundDatasetWriter(hid_t h5file, System::String^ h5path, array<hsize_t>^ coord);
-        */
+			System::Management::Automation::RuntimeDefinedParameterDictionary^ dict);
 
         ~CompoundDatasetWriter() { this->!CompoundDatasetWriter(); }
 
@@ -44,6 +37,8 @@ namespace PSH5X
         System::String^ m_h5path;
 
         System::Array^ m_array;
+
+		System::Management::Automation::RuntimeDefinedParameterDictionary^ m_dict;
 
 		long long m_position;
 

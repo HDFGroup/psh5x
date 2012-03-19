@@ -520,12 +520,14 @@ namespace PSH5X
 
 			case H5T_STRING:
 
-				result = gcnew StringDatasetWriter(drive->FileHandle, h5path);
+				result = gcnew StringDatasetWriter(drive->FileHandle, h5path,
+					(RuntimeDefinedParameterDictionary^) DynamicParameters);
 				break;
 
 			case H5T_COMPOUND:
 
-				result = gcnew CompoundDatasetWriter(drive->FileHandle, h5path);
+				result = gcnew CompoundDatasetWriter(drive->FileHandle, h5path,
+					(RuntimeDefinedParameterDictionary^) DynamicParameters);
 				break;
 
 			case H5T_VLEN:

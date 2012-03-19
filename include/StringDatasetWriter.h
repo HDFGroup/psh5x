@@ -3,7 +3,7 @@
 #include "PSH5XException.h"
 
 extern "C" {
-#include "H5Dpublic.h"
+#include "H5Ipublic.h"
 }
 
 namespace PSH5X
@@ -14,15 +14,8 @@ namespace PSH5X
     {
     public:
 
-        StringDatasetWriter(hid_t h5file, System::String^ h5path);
-
-        /*
-        DatasetWriter(hid_t h5file, System::String^ h5path,
-            array<hsize_t>^ start, array<hsize_t>^ stride,
-            array<hsize_t>^ count, array<hsize_t>^ block);
-        
-        DatasetWriter(hid_t h5file, System::String^ h5path, array<hsize_t>^ coord);
-        */
+        StringDatasetWriter(hid_t h5file, System::String^ h5path,
+			System::Management::Automation::RuntimeDefinedParameterDictionary^ dict);
 
         ~StringDatasetWriter() { this->!StringDatasetWriter(); }
 
@@ -43,7 +36,9 @@ namespace PSH5X
 
         System::String^ m_h5path;
 
-        System::Array^ m_array;
+		System::Array^ m_array;
+
+		System::Management::Automation::RuntimeDefinedParameterDictionary^ m_dict;
 
 		long long m_position;
 
