@@ -1,25 +1,100 @@
 TOPIC
     about_H5String
 
+SHORT DESCRIPTION
+    Explains how to specify an HDF5 string datatype
+
 SYNTAX
 
-    <encoding> ::= ASCII | UTF-8
+    <encoding> ::= "ASCII" | "UTF-8"
 
-    <str_pad> ::= Nullterm | Nullpad | Spacepad
+    <str_pad> ::= "Nullterm" | "Nullpad" | "Spacepad"
     
-    @{
-        Class    = String ;
-        Encoding = <encoding> ;
+    {
+        "Class"    : "String" ,
+        "Encoding" : <encoding> ,
+        "Length"   : <positive integer> , (: fixed-length string only :)
+        "StrPad"   : <str_pad>
+    }
 
-        (: fixed-length string only :)
+ABBREVIATIONS
+    The following abbreviations for HDF5 string types are
+    recognised by the HDF5 module. They are case-insensitive.
 
-        Length   = <positive integer> ;
-        StrPad   = <str_pad> ;
+    'cstringN', where N is a positive integer, is equivalent to:
+
+    {
+        "Class"    : "String" ,
+        "Encoding" : "ASCII" ,
+        "Size"     : N ,
+        "StrPad"   : "Nullterm" 
+    }
+
+    'fstringN', where N is a positive integer, is equivalent to:
+
+    {
+        "Class"    : "String" ,
+        "Encoding" : "ASCII" ,
+        "Size"     : N ,
+        "StrPad"   : "Spacepad" 
+    }
+
+    'string' is equivalent to:
+
+    {
+        "Class"    : "String" ,
+        "Encoding" : "ASCII" ,
+        "StrPad"   : "Nullterm" 
+    }
+
+    'stringN', where N is a positive integer, is equivalent to:
+
+    {
+        "Class"    : "String" ,
+        "Encoding" : "ASCII" ,
+        "Size"     : N ,
+        "StrPad"   : "Spacepad" 
+    }
+
+    'ucstringN', where N is a positive integer, is equivalent to:
+
+    {
+        "Class"    : "String" ,
+        "Encoding" : "UTF-8" ,
+        "Size"     : N ,
+        "StrPad"   : "Nullterm" 
+    }
+
+    'ufstringN', where N is a positive integer, is equivalent to:
+
+    {
+        "Class"    : "String" ,
+        "Encoding" : "UTF-8" ,
+        "Size"     : N ,
+        "StrPad"   : "Spacepad" 
+    }
+
+    'ustring' is equivalent to:
+
+    {
+        "Class"    : "String" ,
+        "Encoding" : "UTF-8" ,
+        "StrPad"   : "Nullterm" 
+    }
+
+    'ustringN', where N is a positive integer, is equivalent to:
+
+    {
+        "Class"    : "String" ,
+        "Encoding" : "UTF-8" ,
+        "Size"     : N ,
+        "StrPad"   : "Nullterm" 
     }
 
 RELATED LINKS
     about_H5Datatypes
+    about_H5Predefined
     New-H5Datatype
+    Show-H5Types
     http://www.hdfgroup.org/HDF5/doc/UG/UG_frame11Datatypes.html
     http://www.hdfgroup.org/HDF5/doc/RM/RM_H5T.html
-

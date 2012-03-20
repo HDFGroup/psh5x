@@ -1,17 +1,40 @@
 TOPIC
     about_H5Opaque
 
+SHORT DESCRIPTION
+    Explains how to specify an HDF5 opaque datatype
+
 SYNTAX
 
-    @{
-        Class = Opaque ;
-        Size  = <positive integer> ;
-        Tag   = <ASCII string> ;
+    {
+        "Class" : "Opaque" ,
+        "Size"  : <positive integer> ,
+        "Tag"   : <ASCII string>
+    }
+
+ABBREVIATIONS
+    The following abbreviations for HDF5 opaque types are
+    recognised by the HDF5 module.
+
+    'opaqueN', where N is a positive integer, is equivalent to
+
+    {
+        "Class" : "Opaque" ,
+        "Size"  : N 
+    }
+
+    'opaqueN["foo"]', where N is a positive integer, is equivalent to
+
+    {
+        "Class" : "Opaque" ,
+        "Size"  : N,
+        "Tag"   : "foo"
     }
 
 RELATED LINKS
     about_H5Datatypes
+    about_H5Predefined
     New-H5Datatype
+    Show-H5Types
     http://www.hdfgroup.org/HDF5/doc/UG/UG_frame11Datatypes.html
     http://www.hdfgroup.org/HDF5/doc/RM/RM_H5T.html
-

@@ -1,24 +1,44 @@
 TOPIC
     about_H5Enum
 
+SHORT DESCRIPTION
+    Explains how to specify an HDF5 enumeration datatype
+
 SYNTAX
 
     <member_name> ::= <string> 
     
-    <member_value> ::= <integer> 
+    <member_value> ::= <integer>
     
-    <enum_member> ::= <member_name> '=' <member_value> ';' |
-                      <member_name> '=' <member_value> ';' , <enum_member>
+    <enum_member> ::= <member_name> ':' <member_value> ',' |
+                      <member_name> ':' <member_value> ',' , <enum_member>
     
-    @{
-        Base    = <native HDF5 integer type> ;
-        Class   = Enum ;
-        Members = @ { <enum_member> } ;
+    {
+        "Base"    : <native HDF5 integer type> ,
+        "Class"   : "Enum" , 
+        "Members" : { <enum_member> }
     }
+
+    ------------------------------ EXAMPLE --------------------------------
+
+    C:\PS>$t = @"
+          {
+              "Base"    : int ,
+              "Class"   : "Enum", 
+              "Members": {
+                  "SOLID"  : 0 ,
+                  "LIQUID" : 256 ,
+                  "GAS"    : 512 ,
+                  "PLASMA" : 768
+              }
+          }
+          "@
+
     
 RELATED LINKS
     about_H5Datatypes
+    about_H5Predefined
     New-H5Datatype
+    Show-H5Types
     http://www.hdfgroup.org/HDF5/doc/UG/UG_frame11Datatypes.html
     http://www.hdfgroup.org/HDF5/doc/RM/RM_H5T.html
-

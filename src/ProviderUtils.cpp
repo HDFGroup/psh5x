@@ -1224,124 +1224,147 @@ namespace PSH5X
 
         m_known_types = gcnew Hashtable();
 
-        m_known_types["B8"] = H5T_NATIVE_B8;
-        m_known_types["H5T_NATIVE_B8"] = H5T_NATIVE_B8;
-        m_known_types["B16"] = H5T_NATIVE_B16;
-        m_known_types["H5T_NATIVE_B16"] = H5T_NATIVE_B16;
-        m_known_types["B32"] = H5T_NATIVE_B32;
-        m_known_types["H5T_NATIVE_B32"] = H5T_NATIVE_B32;
-        m_known_types["B64"] = H5T_NATIVE_B64;
-        m_known_types["H5T_NATIVE_B64"] = H5T_NATIVE_B64;
-        
-        m_known_types["CHAR"] = H5T_NATIVE_CHAR;
+		m_known_types["CHAR"] = H5T_NATIVE_CHAR;
         m_known_types["H5T_NATIVE_CHAR"] = H5T_NATIVE_CHAR;
-        
-		m_known_types["F64"] = H5T_NATIVE_DOUBLE;
-        m_known_types["DOUBLE"] = H5T_NATIVE_DOUBLE;
-        m_known_types["H5T_NATIVE_DOUBLE"] = H5T_NATIVE_DOUBLE;
-        
-		m_known_types["F32"] = H5T_NATIVE_FLOAT;
-        m_known_types["SINGLE"] = H5T_NATIVE_FLOAT;
-        m_known_types["FLOAT"] = H5T_NATIVE_FLOAT;
-        m_known_types["H5T_NATIVE_FLOAT"] = H5T_NATIVE_FLOAT;
-        
-        m_known_types["F32BE"] = H5T_IEEE_F32BE;
-        m_known_types["H5T_IEEE_F32BE"] = H5T_IEEE_F32BE;
-        m_known_types["F32LE"] = H5T_IEEE_F32LE;
-        m_known_types["H5T_IEEE_F32LE"] = H5T_IEEE_F32LE;
-		m_known_types["F64BE"] = H5T_IEEE_F64BE;
-        m_known_types["H5T_IEEE_F64BE"] = H5T_IEEE_F64BE;
-        m_known_types["F64LE"] = H5T_IEEE_F64LE;
-        m_known_types["H5T_IEEE_F64LE"] = H5T_IEEE_F64LE;
 
-        m_known_types["B8BE"] = H5T_STD_B8BE;
-        m_known_types["H5T_STD_B8BE"] = H5T_STD_B8BE;
-        m_known_types["B8LE"] = H5T_STD_B8LE;
-        m_known_types["H5T_STD_B8LE"] = H5T_STD_B8LE;
-        m_known_types["I8BE"] = H5T_STD_I8BE;
-        m_known_types["H5T_STD_I8BE"] = H5T_STD_I8BE;
+#pragma region integer
+
+		m_known_types["I8BE"] = H5T_STD_I8BE;
         m_known_types["I8LE"] = H5T_STD_I8LE;
+		m_known_types["H5T_NATIVE_SCHAR"] = H5T_NATIVE_SCHAR;
+		m_known_types["H5T_STD_I8BE"] = H5T_STD_I8BE;
         m_known_types["H5T_STD_I8LE"] = H5T_STD_I8LE;
-        m_known_types["U8BE"] = H5T_STD_U8BE;
-        m_known_types["H5T_STD_U8BE"] = H5T_STD_U8BE;
-        m_known_types["U8LE"] = H5T_STD_U8LE;
+		m_known_types["SCHAR"] = H5T_NATIVE_SCHAR;
+        
+		m_known_types["H5T_STD_U8BE"] = H5T_STD_U8BE;
         m_known_types["H5T_STD_U8LE"] = H5T_STD_U8LE;
+        m_known_types["H5T_NATIVE_UCHAR"] = H5T_NATIVE_UCHAR;
+		m_known_types["U8"] = H5T_NATIVE_UCHAR;		
+		m_known_types["U8BE"] = H5T_STD_U8BE;
+        m_known_types["U8LE"] = H5T_STD_U8LE;
+        m_known_types["UCHAR"] = H5T_NATIVE_UCHAR;
+       
+		m_known_types["I16"] = H5T_NATIVE_SHORT;
+		m_known_types["I16BE"] = H5T_STD_I16BE;
+		m_known_types["I16LE"] = H5T_STD_I16LE;
+        m_known_types["H5T_NATIVE_SHORT"] = H5T_NATIVE_SHORT;
+		m_known_types["H5T_STD_I16BE"] = H5T_STD_I16BE;
+		m_known_types["H5T_STD_I16LE"] = H5T_STD_I16LE;
+        m_known_types["SHORT"] = H5T_NATIVE_SHORT;
 
-        m_known_types["B16BE"] = H5T_STD_B16BE;
-        m_known_types["H5T_STD_B16BE"] = H5T_STD_B16BE;
-        m_known_types["B16LE"] = H5T_STD_B16LE;
-        m_known_types["H5T_STD_B16LE"] = H5T_STD_B16LE;
-        m_known_types["I16BE"] = H5T_STD_I16BE;
-        m_known_types["H5T_STD_I16BE"] = H5T_STD_I16BE;
-        m_known_types["I16LE"] = H5T_STD_I16LE;
-        m_known_types["H5T_STD_I16LE"] = H5T_STD_I16LE;
-        m_known_types["U16BE"] = H5T_STD_U16BE;
         m_known_types["H5T_STD_U16BE"] = H5T_STD_U16BE;
-        m_known_types["U16LE"] = H5T_STD_U16LE;
-        m_known_types["H5T_STD_U16LE"] = H5T_STD_U16LE;
-
-        m_known_types["B32BE"] = H5T_STD_B32BE;
-        m_known_types["H5T_STD_B32BE"] = H5T_STD_B32BE;
-        m_known_types["B32LE"] = H5T_STD_B32LE;
-        m_known_types["H5T_STD_B32LE"] = H5T_STD_B32LE;
-        m_known_types["I32BE"] = H5T_STD_I32BE;
-        m_known_types["H5T_STD_I32BE"] = H5T_STD_I32BE;
-        m_known_types["I32LE"] = H5T_STD_I32LE;
-        m_known_types["H5T_STD_I32LE"] = H5T_STD_I32LE;
-        m_known_types["U32BE"] = H5T_STD_U32BE;
-        m_known_types["H5T_STD_U32BE"] = H5T_STD_U32BE;
-        m_known_types["U32LE"] = H5T_STD_U32LE;
-        m_known_types["H5T_STD_U32LE"] = H5T_STD_U32LE;
-
-        m_known_types["B64BE"] = H5T_STD_B64BE;
-        m_known_types["H5T_STD_B64BE"] = H5T_STD_B64BE;
-        m_known_types["B64LE"] = H5T_STD_B64LE;
-        m_known_types["H5T_STD_B64LE"] = H5T_STD_B64LE;
-        m_known_types["I64BE"] = H5T_STD_I64BE;
-        m_known_types["H5T_STD_I64BE"] = H5T_STD_I64BE;
-        m_known_types["I64LE"] = H5T_STD_I64LE;
-        m_known_types["H5T_STD_I64LE"] = H5T_STD_I64LE;
-        m_known_types["U64BE"] = H5T_STD_U64BE;
-        m_known_types["H5T_STD_U64BE"] = H5T_STD_U64BE;
-        m_known_types["U64LE"] = H5T_STD_U64LE;
-        m_known_types["H5T_STD_U64LE"] = H5T_STD_U64LE;
-
-        m_known_types["OBJREF"] = H5T_STD_REF_OBJ;
-        m_known_types["REF_OBJ"] = H5T_STD_REF_OBJ;
-        m_known_types["H5T_STD_REF_OBJ"] = H5T_STD_REF_OBJ;
-
-        m_known_types["REGREF"] = H5T_STD_REF_DSETREG;
-        m_known_types["REF_DSETREG"] = H5T_STD_REF_DSETREG;
-        m_known_types["H5T_STD_REF_DSETREG"] = H5T_STD_REF_DSETREG;
+		m_known_types["H5T_STD_U16LE"] = H5T_STD_U16LE;
+        m_known_types["H5T_NATIVE_USHORT"] = H5T_NATIVE_USHORT;
+		m_known_types["U16"] = H5T_NATIVE_USHORT;        
+		m_known_types["U16BE"] = H5T_STD_U16BE;
+		m_known_types["U16LE"] = H5T_STD_U16LE;
+		m_known_types["USHORT"] = H5T_NATIVE_USHORT;
 
 		m_known_types["I32"] = H5T_NATIVE_INT;
+		m_known_types["I32BE"] = H5T_STD_I32BE;
+        m_known_types["I32LE"] = H5T_STD_I32LE;
         m_known_types["INT"] = H5T_NATIVE_INT;
         m_known_types["H5T_NATIVE_INT"] = H5T_NATIVE_INT;
-
-        m_known_types["LDOUBLE"] = H5T_NATIVE_LDOUBLE;
-        m_known_types["H5T_NATIVE_LDOUBLE"] = H5T_NATIVE_LDOUBLE;
-        m_known_types["LLONG"] = H5T_NATIVE_LLONG;
-        m_known_types["H5T_NATIVE_LLONG"] = H5T_NATIVE_LLONG;
-		m_known_types["LONG"] = H5T_NATIVE_LONG;
-        m_known_types["H5T_NATIVE_LONG"] = H5T_NATIVE_LONG;
+		m_known_types["H5T_STD_I32BE"] = H5T_STD_I32BE;
+		m_known_types["H5T_STD_I32LE"] = H5T_STD_I32LE;
         
-		m_known_types["I16"] = H5T_NATIVE_SHORT;
-        m_known_types["SHORT"] = H5T_NATIVE_SHORT;
-        m_known_types["H5T_NATIVE_SHORT"] = H5T_NATIVE_SHORT;
-
-		m_known_types["U8"] = H5T_NATIVE_UCHAR;
-        m_known_types["UCHAR"] = H5T_NATIVE_UCHAR;
-        m_known_types["H5T_NATIVE_UCHAR"] = H5T_NATIVE_UCHAR;
-        m_known_types["U32"] = H5T_NATIVE_UINT;
+		m_known_types["H5T_NATIVE_LONG"] = H5T_NATIVE_LONG;
+        m_known_types["LONG"] = H5T_NATIVE_LONG;
+        
+		m_known_types["H5T_STD_U32BE"] = H5T_STD_U32BE;        
+        m_known_types["H5T_STD_U32LE"] = H5T_STD_U32LE;
+		m_known_types["H5T_NATIVE_UINT"] = H5T_NATIVE_UINT;
+		m_known_types["U32"] = H5T_NATIVE_UINT;
+		m_known_types["U32BE"] = H5T_STD_U32BE;
+        m_known_types["U32LE"] = H5T_STD_U32LE;
 		m_known_types["UINT"] = H5T_NATIVE_UINT;
-        m_known_types["H5T_NATIVE_UINT"] = H5T_NATIVE_UINT;
-        m_known_types["ULLONG"] = H5T_NATIVE_ULLONG;
-        m_known_types["H5T_NATIVE_ULLONG"] = H5T_NATIVE_ULLONG;
-        m_known_types["ULONG"] = H5T_NATIVE_ULONG;
-        m_known_types["H5T_NATIVE_ULONG"] = H5T_NATIVE_ULONG;
-		m_known_types["U16"] = H5T_NATIVE_USHORT;
-        m_known_types["USHORT"] = H5T_NATIVE_USHORT;
-        m_known_types["H5T_NATIVE_USHORT"] = H5T_NATIVE_USHORT;
+        
+		m_known_types["H5T_NATIVE_ULONG"] = H5T_NATIVE_ULONG;
+		m_known_types["ULONG"] = H5T_NATIVE_ULONG;
+
+		m_known_types["H5T_STD_I64BE"] = H5T_STD_I64BE;
+        m_known_types["H5T_STD_I64LE"] = H5T_STD_I64LE;
+		m_known_types["I64BE"] = H5T_STD_I64BE;
+		m_known_types["I64LE"] = H5T_STD_I64LE;
+        
+		m_known_types["I64"] = H5T_NATIVE_LLONG;
+		m_known_types["H5T_NATIVE_LLONG"] = H5T_NATIVE_LLONG;
+		m_known_types["LLONG"] = H5T_NATIVE_LLONG;
+        
+		m_known_types["H5T_STD_U64BE"] = H5T_STD_U64BE;
+        m_known_types["H5T_STD_U64LE"] = H5T_STD_U64LE;
+        m_known_types["U64BE"] = H5T_STD_U64BE;
+        m_known_types["U64LE"] = H5T_STD_U64LE;
+		
+		m_known_types["H5T_NATIVE_ULLONG"] = H5T_NATIVE_ULLONG;
+        m_known_types["U64"] = H5T_NATIVE_ULLONG;
+		m_known_types["ULLONG"] = H5T_NATIVE_ULLONG;
+        
+#pragma endregion
+
+#pragma region bitfield
+
+        m_known_types["B8"] = H5T_NATIVE_B8;
+        m_known_types["B8BE"] = H5T_STD_B8BE;
+		m_known_types["B8LE"] = H5T_STD_B8LE;
+		m_known_types["H5T_NATIVE_B8"] = H5T_NATIVE_B8;
+		m_known_types["H5T_STD_B8BE"] = H5T_STD_B8BE;
+        m_known_types["H5T_STD_B8LE"] = H5T_STD_B8LE;
+
+        m_known_types["B16"] = H5T_NATIVE_B16;
+	    m_known_types["B16BE"] = H5T_STD_B16BE;
+		m_known_types["B16LE"] = H5T_STD_B16LE;
+        m_known_types["H5T_NATIVE_B16"] = H5T_NATIVE_B16;
+		m_known_types["H5T_STD_B16BE"] = H5T_STD_B16BE;
+        m_known_types["H5T_STD_B16LE"] = H5T_STD_B16LE;
+		
+		m_known_types["B32"] = H5T_NATIVE_B32;
+		m_known_types["B32BE"] = H5T_STD_B32BE;
+		m_known_types["B32LE"] = H5T_STD_B32LE;
+		m_known_types["H5T_NATIVE_B32"] = H5T_NATIVE_B32;
+		m_known_types["H5T_STD_B32BE"] = H5T_STD_B32BE;
+		m_known_types["H5T_STD_B32LE"] = H5T_STD_B32LE;
+
+		m_known_types["B64"] = H5T_NATIVE_B64;
+		m_known_types["B64BE"] = H5T_STD_B64BE;
+		m_known_types["B64LE"] = H5T_STD_B64LE;
+		m_known_types["H5T_NATIVE_B64"] = H5T_NATIVE_B64;
+		m_known_types["H5T_STD_B64BE"] = H5T_STD_B64BE;
+		m_known_types["H5T_STD_B64LE"] = H5T_STD_B64LE;
+
+#pragma endregion
+    
+#pragma region float
+
+		m_known_types["F32"] = H5T_NATIVE_FLOAT;
+        m_known_types["F32BE"] = H5T_IEEE_F32BE;
+        m_known_types["F32LE"] = H5T_IEEE_F32LE;
+		m_known_types["FLOAT"] = H5T_NATIVE_FLOAT;
+        m_known_types["H5T_IEEE_F32BE"] = H5T_IEEE_F32BE;
+        m_known_types["H5T_IEEE_F32LE"] = H5T_IEEE_F32LE;
+	    m_known_types["H5T_NATIVE_FLOAT"] = H5T_NATIVE_FLOAT;
+    	m_known_types["SINGLE"] = H5T_NATIVE_FLOAT;
+        
+		m_known_types["DOUBLE"] = H5T_NATIVE_DOUBLE;
+		m_known_types["F64"] = H5T_NATIVE_DOUBLE;
+        m_known_types["F64BE"] = H5T_IEEE_F64BE;
+        m_known_types["F64LE"] = H5T_IEEE_F64LE;
+        m_known_types["H5T_IEEE_F64BE"] = H5T_IEEE_F64BE;
+		m_known_types["H5T_IEEE_F64LE"] = H5T_IEEE_F64LE;
+		m_known_types["H5T_NATIVE_DOUBLE"] = H5T_NATIVE_DOUBLE;
+        
+	    m_known_types["H5T_NATIVE_LDOUBLE"] = H5T_NATIVE_LDOUBLE;
+		m_known_types["LDOUBLE"] = H5T_NATIVE_LDOUBLE;
+        
+#pragma endregion
+
+		m_known_types["H5T_STD_REF_OBJ"] = H5T_STD_REF_OBJ;
+        m_known_types["OBJREF"] = H5T_STD_REF_OBJ;
+        m_known_types["REF_OBJ"] = H5T_STD_REF_OBJ;
+        
+		m_known_types["H5T_STD_REF_DSETREG"] = H5T_STD_REF_DSETREG;
+        m_known_types["REF_DSETREG"] = H5T_STD_REF_DSETREG;
+		m_known_types["REGREF"] = H5T_STD_REF_DSETREG;
 
 #pragma endregion
 

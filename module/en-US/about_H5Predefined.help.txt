@@ -1,2 +1,97 @@
 TOPIC
     about_H5Predefined
+
+SHORT DESCRIPTION
+    A list of predefined HDF5 datatypes recognized by the HDF5 module
+
+IEEE floating point datatypes
+
+    - 32-bit and 64-bit
+    - Big-endian and little-endian
+
+        H5T_IEEE_F32BE
+        H5T_IEEE_F32LE
+        H5T_IEEE_F64BE
+        H5T_IEEE_F64LE
+
+Standard datatypes
+
+    - Signed integer (2's complement), unsigned integer, and bitfield
+    - 8-bit, 16-bit, 32-bit, and 64-bit
+    -  Big-endian and little-endian
+
+        H5T_STD_I8BE
+        H5T_STD_I8LE
+        H5T_STD_I16BE
+        H5T_STD_I16LE
+        H5T_STD_I32BE
+        H5T_STD_I32LE
+        H5T_STD_I64BE
+        H5T_STD_I64LE
+        H5T_STD_U8BE 
+        H5T_STD_U8LE
+        H5T_STD_U16BE
+        H5T_STD_U16LE
+        H5T_STD_U32BE
+        H5T_STD_U32LE
+        H5T_STD_U64BE 
+        H5T_STD_U64LE
+        H5T_STD_B8BE
+        H5T_STD_B8LE
+        H5T_STD_B16BE 
+        H5T_STD_B16LE
+        H5T_STD_B32BE
+        H5T_STD_B32LE
+        H5T_STD_B64BE 
+        H5T_STD_B64LE
+
+Object reference or dataset region reference
+
+        H5T_STD_REF_OBJ
+        H5T_STD_REF_DSETREG 
+
+C-specific string datatype
+
+    - String datatype in C (size defined in bytes rather than in bits)
+
+        H5T_C_S1
+
+Fortran-specific string datatype
+
+    - String datatype in Fortran (as defined for the HDF5 C library)
+
+        H5T_FORTRAN_S1
+
+Predefined native datatypes
+
+        H5T_NATIVE_CHAR
+        H5T_NATIVE_SCHAR        
+        H5T_NATIVE_UCHAR        
+
+        H5T_NATIVE_SHORT        
+        H5T_NATIVE_USHORT       
+
+        H5T_NATIVE_INT          
+        H5T_NATIVE_UINT         
+
+        H5T_NATIVE_LONG         
+        H5T_NATIVE_ULONG        
+        H5T_NATIVE_LLONG        
+        H5T_NATIVE_ULLONG       
+        H5T_NATIVE_FLOAT        
+        H5T_NATIVE_DOUBLE       
+        H5T_NATIVE_LDOUBLE
+
+        H5T_NATIVE_B8
+        H5T_NATIVE_B16
+        H5T_NATIVE_B32
+        H5T_NATIVE_B64
+
+
+RELATED LINKS
+    http://www.hdfgroup.org/HDF5/doc/RM/PredefDTypes.html
+    about_H5Datatypes
+    New-H5Datatype
+    Show-H5Types
+    http://www.hdfgroup.org/HDF5/doc/UG/UG_frame11Datatypes.html
+    http://www.hdfgroup.org/HDF5/doc/RM/RM_H5T.html

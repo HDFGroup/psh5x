@@ -2,34 +2,45 @@ TOPIC
     about_H5Datatypes
 
 SHORT DESCRIPTION
+    Explains how to specify different kinds of HDF5 datatypes
+
+LONG DESCRIPTION
     An HDF5 datatype can be specified as
     
         1) A predefined HDF5 datatype (string)
     
-        2) An HDF5 datatype definition (hashtable)
+        2) An HDF5 datatype definition (JSON)
     
         3) The HDF5 path name of a linked HDF5 datatype (string)
 
-    Frequently, one can get away with the compact notation of predefined
-    datatypes. For a list of pre-defined HDF5 datatypes see about_H5Predefined. 
+    Often, one can get away with the compact notation of predefined
+    datatypes. For a list of pre-defined HDF5 datatypes see about_H5Predefined
+    or run the Show-H5Types cmdlet. 
     
-    For user-defined types, a slightly more complex notation is necessary.
-    The notation is based on PowerShell hastables (@{...}) and arrays (@(...)).
-    See the files below for the different HDF5 datatypes:
+    For user-defined types, a slightly more verbose notation is necessary.
+    The notation is based on JSON objects ({...}) and arrays ([...]).
+    See the files below for the different kinds of HDF5 datatypes:
+
+    HDF5 Integer                  - see about_H5Integer
     
-    HDF5 integer               - see about_H5Integer
+    HDF5 Float                    - see about_H5Float
     
-    HDF5 float                 - see about_H5Float
+    HDF5 Bitfield                 - see about_H5Bitfield
     
-    HDF5 bitfield              - see about_H5Bitfield
+    HDF5 Opaque                   - see about_H5Opaque
     
-    HDF5 opaque                - see about_H5Opaque
+    HDF5 Reference                - see about_H5Reference
     
-    HDF5 reference             - see about_H5Reference
+    HDF5 Variable-length Sequence - see about_H5Vlen
     
-    HDF5 variable-length array - see about_H5Vlen
+    HDF5 Array                    - see about_H5Array
     
-    HDF5 array                 - see about_H5Array
+    HDF5 Compound                 - see about_H5Compound
     
-    HDF5 compound              - see about_H5Compound
-    
+SEE ALSO
+    about_H5Datatypes
+    about_H5Predefined
+    New-H5Datatype
+    Show-H5Types
+    http://www.hdfgroup.org/HDF5/doc/UG/UG_frame11Datatypes.html
+    http://www.hdfgroup.org/HDF5/doc/RM/RM_H5T.html
