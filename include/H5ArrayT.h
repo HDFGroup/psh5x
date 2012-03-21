@@ -252,7 +252,6 @@ namespace PSH5X
             return result;
         }
 
-
         H5Array(array<hsize_t>^ dims)
         {
             if (dims->Length < 1 || dims->Length > 32)

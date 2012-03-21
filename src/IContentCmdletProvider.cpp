@@ -6,6 +6,8 @@
 #include "DatasetReaderT.h"
 #include "DriveInfo.h"
 #include "HDF5Exception.h"
+#include "OpaqueDatasetReader.h"
+#include "OpaqueDatasetWriter.h"
 #include "Provider.h"
 #include "ProviderUtils.h"
 #include "PSH5XException.h"
@@ -276,6 +278,11 @@ namespace PSH5X
 					result = gcnew StringDatasetReader(dset, ftype, fspace, mspace);
 					break;
 
+				case H5T_OPAQUE:
+
+					result = gcnew OpaqueDatasetReader(dset, ftype, fspace, mspace);
+					break;
+
 				case H5T_COMPOUND:
 
 					result = gcnew CompoundDatasetReader(dset, ftype, fspace, mspace);
@@ -287,6 +294,8 @@ namespace PSH5X
 					break;
 
 				case H5T_ARRAY:
+
+#pragma region HDF5 array
 
 					base_type = H5Tget_super(ftype);
 					bcls = H5Tget_class(base_type);
@@ -351,6 +360,8 @@ namespace PSH5X
 						throw gcnew PSH5XException("Unsupported base type in array!");
 						break;
 					}
+
+#pragma endregion
 
 					break;
 
@@ -524,6 +535,12 @@ namespace PSH5X
 					(RuntimeDefinedParameterDictionary^) DynamicParameters);
 				break;
 
+			case H5T_OPAQUE:
+				
+				result = gcnew OpaqueDatasetWriter(drive->FileHandle, h5path,
+					(RuntimeDefinedParameterDictionary^) DynamicParameters);
+				break;
+
 			case H5T_COMPOUND:
 
 				result = gcnew CompoundDatasetWriter(drive->FileHandle, h5path,
@@ -531,6 +548,8 @@ namespace PSH5X
 				break;
 
 			case H5T_VLEN:
+
+#pragma region vlen
 
 				base_type = H5Tget_super(ftype);
 				bcls = H5Tget_class(base_type);
@@ -607,9 +626,13 @@ namespace PSH5X
 					break;
 				}
 
+#pragma endregion
+
 				break;
 
 			case H5T_ARRAY:
+
+#pragma region array
 
 				base_type = H5Tget_super(ftype);
 				bcls = H5Tget_class(base_type);
@@ -685,6 +708,8 @@ namespace PSH5X
 					throw gcnew PSH5XException("Unsupported base type in array!");
 					break;
 				}
+
+#pragma endregion
 
 				break;
 

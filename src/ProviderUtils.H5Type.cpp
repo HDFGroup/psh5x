@@ -2420,7 +2420,7 @@ namespace PSH5X
 
             String^ code = sbcode->ToString() + "}";
 
-            Console::WriteLine(code);
+            //Console::WriteLine(code);
 
             CompilerParameters^ params = gcnew CompilerParameters();
             params->GenerateInMemory = true;

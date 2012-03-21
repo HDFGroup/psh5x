@@ -183,6 +183,12 @@
     <ClCompile Include="src\NewH5ArrayCommand.cpp">
       <Filter>Source Files\Cmdlets</Filter>
     </ClCompile>
+    <ClCompile Include="src\OpaqueDatasetReader.cpp">
+      <Filter>Source Files\Provider\IContentCmdletProvider</Filter>
+    </ClCompile>
+    <ClCompile Include="src\OpaqueDatasetWriter.cpp">
+      <Filter>Source Files\Provider\IContentCmdletProvider</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Snapin.h">
@@ -300,6 +306,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\NewH5ArrayCommand.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OpaqueDatasetReader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OpaqueDatasetWriter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -41,7 +41,7 @@ namespace PSH5X
 
             size_t val_size = info.u.val_size;
 
-			array<char>^ buf = gcnew array<char>(val_size);
+			array<char>^ buf = gcnew array<char>(safe_cast<int>(val_size));
             pin_ptr<char> buf_ptr = &buf[0];
 							
             if (H5Lget_val(locid, name, buf_ptr, val_size, H5P_DEFAULT) < 0) {
@@ -65,18 +65,14 @@ namespace PSH5X
                     m_file_name = gcnew String(filename);
                 }
                 else {
-                    delete [] buf;
                     throw gcnew InvalidOperationException("H5Lunpack_elink_val failed!");
                 }
             }
-
-            delete [] buf;
         }
         else {
             throw gcnew InvalidOperationException("H5Lget_info failed!");
         }
 
-        
         Marshal::FreeHGlobal(IntPtr(name));
     }
 

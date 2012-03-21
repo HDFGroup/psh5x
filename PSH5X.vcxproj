@@ -168,6 +168,8 @@
     <ClInclude Include="include\NewH5ArrayCommand.h" />
     <ClInclude Include="include\ObjectInfo.h" />
     <ClInclude Include="include\ObjectInfoLite.h" />
+    <ClInclude Include="include\OpaqueDatasetReader.h" />
+    <ClInclude Include="include\OpaqueDatasetWriter.h" />
     <ClInclude Include="include\PrimitiveTypeDatasetWriter.h" />
     <ClInclude Include="include\Provider.h" />
     <ClInclude Include="include\ProviderUtils.h" />
@@ -208,6 +210,8 @@
     <ClCompile Include="src\NewH5ArrayCommand.cpp" />
     <ClCompile Include="src\ObjectInfo.cpp" />
     <ClCompile Include="src\ObjectInfoLite.cpp" />
+    <ClCompile Include="src\OpaqueDatasetReader.cpp" />
+    <ClCompile Include="src\OpaqueDatasetWriter.cpp" />
     <ClCompile Include="src\PrimitiveTypeDatasetWriter.cpp" />
     <ClCompile Include="src\Provider.cpp" />
     <ClCompile Include="src\DriveCmdletProvider.cpp" />
