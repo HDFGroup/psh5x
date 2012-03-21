@@ -12,6 +12,8 @@ KNOWN ISSUES
 
 - When copying or moving attributes between drives raise an exception for reference types
 
+- Clean up the attribute code (I[Dynamic]Property)
+
 
 NEW FEATURES
 ------------
