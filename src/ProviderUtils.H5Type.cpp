@@ -1908,7 +1908,7 @@ namespace PSH5X
 
 			case H5T_OPAQUE:
 				{
-					result = Byte::typeid;
+					result = array<unsigned char>::typeid;
 				}
 				break;
 
@@ -2238,8 +2238,6 @@ namespace PSH5X
 
         hid_t mtype = -1, stype = -1, ntype = -1;
 
-		hsize_t* adims = NULL;
-
         try
         {
             for (int i = 0; i < member_count; ++i)
@@ -2265,8 +2263,9 @@ namespace PSH5X
 					StringBuilder^ sb = gcnew StringBuilder();
 					member_is_array[i] = true;
 					int rank = H5Tget_array_ndims(mtype);
-					adims = new hsize_t [rank];
-					rank = H5Tget_array_dims2(mtype, adims);
+					array<hsize_t>^ adims = gcnew array<hsize_t>(rank);
+					pin_ptr<hsize_t> adims_ptr = &adims[0];
+					rank = H5Tget_array_dims2(mtype, adims_ptr);
 					sb->Append("[");
 					for (int r = 0; r < rank; ++r) {
 						if (r > 0) {
@@ -2277,8 +2276,6 @@ namespace PSH5X
 						}
 					}
 					sb->Append("]");
-					delete [] adims;
-					adims = NULL;
 					array_member_dims[i] = sb->ToString();
 				}
 
@@ -2302,9 +2299,33 @@ namespace PSH5X
                 else {
                     ntype = H5Tget_native_type(mtype, H5T_DIR_ASCEND);
                 }
+
                 if (ntype < 0) {
                     throw gcnew HDF5Exception("H5Tget_native_type failed!");
                 }
+
+				if (!ProviderUtils::IsH5SimpleType(mtype))
+				{
+					if (cls == H5T_OPAQUE || cls == H5T_VLEN || cls == H5T_COMPOUND) {
+						throw gcnew PSH5XException("Unsupported compound member type!");
+					}
+					else
+					{
+						stype = H5Tget_super(mtype);
+						if (stype < 0) {
+							throw gcnew HDF5Exception("H5Tget_super failed!");
+						}
+
+						if (!ProviderUtils::IsH5SimpleType(stype)) {
+							throw gcnew PSH5XException("Unsupported compound member type!");
+						}
+
+						if (H5Tclose(stype) < 0) {
+							throw gcnew HDF5Exception("H5Tclose failed!");
+						}
+						stype = -1;
+					}
+				}
 
                 member_size[i] = safe_cast<int>(H5Tget_size(ntype));
 
@@ -2399,7 +2420,7 @@ namespace PSH5X
 
             String^ code = sbcode->ToString() + "}";
 
-            //Console::WriteLine(code);
+            Console::WriteLine(code);
 
             CompilerParameters^ params = gcnew CompilerParameters();
             params->GenerateInMemory = true;
@@ -2415,10 +2436,7 @@ namespace PSH5X
         }
         finally
         {
-			if (adims != NULL) {
-				delete [] adims;
-			}
-            if (mtype >= 0) {
+			if (mtype >= 0) {
                 H5Tclose(mtype);
             }
             if (ntype >= 0) {
@@ -2436,7 +2454,7 @@ namespace PSH5X
     {
         H5T_class_t cls = H5Tget_class(dtype);
 
-        return (cls != H5T_COMPOUND && cls != H5T_VLEN && cls != H5T_ARRAY);
+        return (cls != H5T_OPAQUE && cls != H5T_COMPOUND && cls != H5T_VLEN && cls != H5T_ARRAY);
     }
 
 	hid_t ProviderUtils::GetH5MemoryType(Type^ t, hid_t ftype)
