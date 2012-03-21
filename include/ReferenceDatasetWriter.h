@@ -8,25 +8,25 @@ extern "C" {
 
 namespace PSH5X
 {
-    public ref class OpaqueDatasetWriter
+    public ref class ReferenceDatasetWriter
         : System::Management::Automation::Provider::IContentWriter
     {
     public:
 
-        OpaqueDatasetWriter(hid_t h5file, System::String^ h5path,
+        ReferenceDatasetWriter(hid_t h5file, System::String^ h5path,
 			System::Management::Automation::RuntimeDefinedParameterDictionary^ dict);
 
-        ~OpaqueDatasetWriter() { this->!OpaqueDatasetWriter(); }
+        ~ReferenceDatasetWriter() { this->!ReferenceDatasetWriter(); }
 
-        !OpaqueDatasetWriter() {}
+        !ReferenceDatasetWriter() {}
 
         virtual void Close() {}
 
-        virtual System::Collections::IList^ OpaqueDatasetWriter::Write(System::Collections::IList^ content);
+        virtual System::Collections::IList^ ReferenceDatasetWriter::Write(System::Collections::IList^ content);
 
     virtual void Seek(long long offset, System::IO::SeekOrigin origin)
     {
-        throw gcnew PSH5XException("OpaqueDatasetWriter::Seek() not implemented!");
+        throw gcnew PSH5XException("ReferenceDatasetWriter::Seek() not implemented!");
     }
 
 private:

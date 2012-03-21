@@ -8,16 +8,16 @@ extern "C" {
 
 namespace PSH5X
 {
-    public ref class OpaqueDatasetReader
+    public ref class ReferenceDatasetReader
         : System::Management::Automation::Provider::IContentReader
     {
     public:
 
-        OpaqueDatasetReader(hid_t dset, hid_t ftype, hid_t fspace, hid_t mspace);
+        ReferenceDatasetReader(hid_t dset, hid_t ftype, hid_t fspace, hid_t mspace);
 
-        ~OpaqueDatasetReader() { this->!OpaqueDatasetReader(); }
+        ~ReferenceDatasetReader() { this->!ReferenceDatasetReader(); }
 
-        !OpaqueDatasetReader() {}
+        !ReferenceDatasetReader() {}
 
         virtual void Close() {}
 
@@ -25,7 +25,7 @@ namespace PSH5X
 
         virtual void Seek(long long offset, System::IO::SeekOrigin origin)
         {
-            throw gcnew PSH5XException("OpaqueDatasetReader::Seek() not implemented!");
+            throw gcnew PSH5XException("ReferenceDatasetReader::Seek() not implemented!");
         }
 
     private:
@@ -35,6 +35,8 @@ namespace PSH5X
         System::Collections::IEnumerator^ m_ienum;
 
         long long m_position;
+
+		bool m_isObjectReference;
 
     };
 

@@ -12,6 +12,7 @@
 #include "ProviderUtils.h"
 #include "PSH5XException.h"
 #include "PrimitiveTypeDatasetWriter.h"
+#include "ReferenceDatasetReader.h"
 #include "StringDatasetReader.h"
 #include "StringDatasetWriter.h"
 #include "VlenDatasetReader.h"
@@ -281,6 +282,11 @@ namespace PSH5X
 				case H5T_OPAQUE:
 
 					result = gcnew OpaqueDatasetReader(dset, ftype, fspace, mspace);
+					break;
+
+				case H5T_REFERENCE:
+
+					result = gcnew ReferenceDatasetReader(dset, ftype, fspace, mspace);
 					break;
 
 				case H5T_COMPOUND:

@@ -7,11 +7,12 @@ extern "C" {
 
 #include "H5Ipublic.h"
 #include "H5Spublic.h"
-
+#include "H5Rpublic.h"
 }
 
 using namespace System;
 using namespace System::Collections;
+using namespace System::Collections::Generic;
 using namespace System::Management::Automation;
 using namespace System::Runtime::InteropServices;
 
@@ -159,5 +160,92 @@ namespace PSH5X
 		}
 
 		return sel_flag;
+	}
+
+	KeyValuePair<String^,String^> ProviderUtils::GetObjectReference(hid_t dset, void* ref)
+	{
+		KeyValuePair<String^,String^> result;
+
+		H5O_type_t obj_type;
+		String^ obj_type_str = nullptr;
+
+		IntPtr name = name = Marshal::AllocHGlobal(256);;
+		ssize_t ret_val = 0;
+
+		try
+		{
+			if (H5Rget_obj_type2(dset, H5R_OBJECT, ref, &obj_type) < 0) {
+				throw gcnew HDF5Exception("H5Rget_obj_type2 failed!");
+			}
+
+			switch (obj_type)
+			{
+			case H5O_TYPE_GROUP:
+				obj_type_str = "Group";
+				break;
+
+			case H5O_TYPE_DATASET:
+				obj_type_str = "Dataset";
+				break;
+
+			case H5O_TYPE_NAMED_DATATYPE:
+				obj_type_str = "Datatype";
+				break;
+
+			default:
+				break;
+			}
+
+			ret_val = H5Rget_name(dset, H5R_OBJECT, ref, (char*) name.ToPointer(), 255);
+			if (ret_val < 0) {
+				throw gcnew HDF5Exception("H5Rget_name failed!");
+			}
+
+			result = KeyValuePair<String^,String^>(Marshal::PtrToStringAnsi(name), obj_type_str);
+		}
+		finally
+		{
+			Marshal::FreeHGlobal(name);
+		}
+
+		return result;
+	}
+
+	KeyValuePair<String^,Array^> ProviderUtils::GetRegionReference(hid_t dset, void* ref)
+	{
+		KeyValuePair<String^,Array^> result;
+
+		hid_t sel = -1;
+
+		IntPtr name = name = Marshal::AllocHGlobal(256);
+		ssize_t ret_val = 0;
+
+		try
+		{
+			sel = H5Rget_region(dset, H5R_DATASET_REGION, ref);
+			if (sel < 0) {
+				throw gcnew HDF5Exception("H5Rget_region failed!");
+			}
+
+			
+
+
+
+			ret_val = H5Rget_name(dset, H5R_OBJECT, ref, (char*) name.ToPointer(), 255);
+			if (ret_val < 0) {
+				throw gcnew HDF5Exception("H5Rget_name failed!");
+			}
+
+		}
+		finally
+		{
+			Marshal::FreeHGlobal(name);
+
+			if (sel != -1) {
+				H5Sclose(sel);
+			}
+		}
+
+		return result;
 	}
 }
