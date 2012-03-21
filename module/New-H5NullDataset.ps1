@@ -63,7 +63,7 @@ Function New-H5NullDataset
 
     if ($PSCmdlet.ShouldProcess($Path, 'New HDF5 Scalar Dataset'))
     { 
-        $param = @('-Path', $Path, '-ItemType', 'Dataset', '-ElementType', $Type, '-Null')
+        $param = @('-Path', $Path, '-ItemType', 'Dataset', '-ElementType', "'$Type'", '-Null')
 
         if ($Compact) {
             $param += '-Compact'
