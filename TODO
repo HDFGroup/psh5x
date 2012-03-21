@@ -1,0 +1,34 @@
+
+BUGS
+----
+
+- Bug in writing Vlen datasets with zero length arrays?
+
+- Bug in reader for enum types?
+
+
+KNOWN ISSUES
+------------
+
+- When copying or moving attributes between drives raise an exception for reference types
+
+
+NEW FEATURES
+------------
+
+- Support hyperslab arguments in [G,S]et-H5DatasetValue
+
+- Implement reference dataset reader/writer
+
+- Support DatasetInfo(Lite) argument in Set/Get-Content and New-H5Array
+
+- Implement point selections in reader/writer
+
+- Implement resizing of extendible datasets (Set-Item ...)
+
+
+FUNDAMENTALS
+------------
+
+- Find a cleaner way to generate code in ProviderUtils::GetCompundDotNetType
+  F# type provider?
