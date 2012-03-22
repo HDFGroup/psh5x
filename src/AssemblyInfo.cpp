@@ -6,7 +6,7 @@ using namespace System::Runtime::InteropServices;
 using namespace System::Security::Permissions;
 
 [assembly:AssemblyTitleAttribute("PSH5X.dll")];
-[assembly:AssemblyDescriptionAttribute("PowerShell Extension for HDF5")];
+[assembly:AssemblyDescriptionAttribute("Windows PowerShell Extension for HDF5 : Build")];
 #if DEBUG
 [assembly: AssemblyConfigurationAttribute("Debug")]
 #else
@@ -14,7 +14,7 @@ using namespace System::Security::Permissions;
 #endif
 [assembly:AssemblyCompanyAttribute("The HDF Group")];
 [assembly:AssemblyProductAttribute("PSH5X")];
-[assembly:AssemblyCopyrightAttribute("Copyright (C) The HDF Group 2008-2012. All rights reserved.")];
+[assembly:AssemblyCopyrightAttribute("Copyright (C) 2008-2012 The HDF Group. All rights reserved.")];
 [assembly:AssemblyTrademarkAttribute("")];
 [assembly:AssemblyCultureAttribute("en")];
 
