@@ -169,7 +169,7 @@ namespace PSH5X
 		H5O_type_t obj_type;
 		String^ obj_type_str = nullptr;
 
-		IntPtr name = name = Marshal::AllocHGlobal(256);;
+		IntPtr name = Marshal::AllocHGlobal(256);
 		ssize_t ret_val = 0;
 
 		try
@@ -200,6 +200,16 @@ namespace PSH5X
 			if (ret_val < 0) {
 				throw gcnew HDF5Exception("H5Rget_name failed!");
 			}
+			if (ret_val > 255)  // name is longer than 255 characters?
+			{
+				Marshal::FreeHGlobal(name);
+				name = Marshal::AllocHGlobal(ret_val+1);
+
+				ret_val = H5Rget_name(dset, H5R_OBJECT, ref, (char*) name.ToPointer(), ret_val);
+				if (ret_val < 0) {
+					throw gcnew HDF5Exception("H5Rget_name failed!");
+				}
+			}
 
 			result = KeyValuePair<String^,String^>(Marshal::PtrToStringAnsi(name), obj_type_str);
 		}
@@ -217,7 +227,7 @@ namespace PSH5X
 
 		hid_t sel = -1;
 
-		IntPtr name = name = Marshal::AllocHGlobal(256);
+		IntPtr name = Marshal::AllocHGlobal(256);
 		ssize_t ret_val = 0;
 
 		try
@@ -226,16 +236,123 @@ namespace PSH5X
 			if (sel < 0) {
 				throw gcnew HDF5Exception("H5Rget_region failed!");
 			}
+			if (H5Sget_simple_extent_type(sel) != H5S_SIMPLE) {
+				throw gcnew PSH5XException("Non-simple selection found!");
+			}
 
+			int rank = H5Sget_simple_extent_ndims(sel);
+			if (rank <= 0) {
+				throw gcnew HDF5Exception("H5Sget_simple_extent_ndims failed!");
+			}
+
+			Array^ arr = nullptr;
+
+			array<int>^ result_dims = gcnew array<int>(2); 
+
+			switch(H5Sget_select_type(sel))
+			{
+			case H5S_SEL_NONE:
+				break;
+			case H5S_SEL_POINTS:
+				{
+					hssize_t count = H5Sget_select_elem_npoints(sel);
+					if (count > 0)
+					{
+						result_dims[0] = safe_cast<int>(count);
+						result_dims[1] = rank;
+						arr = Array::CreateInstance(hsize_t::typeid, result_dims);
+
+						array<hsize_t>^ buf = gcnew array<hsize_t>(count*rank);
+						pin_ptr<hsize_t> buf_ptr = &buf[0];
+						if (H5Sget_select_elem_pointlist(sel, 0, count, buf_ptr) < 0) {
+							throw gcnew HDF5Exception("H5Sget_select_elem_pointlist failed!");
+						}
+
+						array<int>^ index = gcnew array<int>(2);
+
+						for (hssize_t i = 0; i < count; ++i) {
+							for (int r = 0; r < rank; ++r) {
+								index[0] = safe_cast<int>(i);
+								index[1] = r;
+								arr->SetValue(buf[i*rank + r], index);
+							}
+						}
+					}
+
+					if (count < 0) {
+						throw gcnew HDF5Exception("H5Sget_select_elem_npoints failed!");
+					}
+				}
+				break;
+			case H5S_SEL_HYPERSLABS:
+				{
+					hssize_t count =  H5Sget_select_hyper_nblocks(sel);
+					if (count > 0)
+					{
+						result_dims[0] = safe_cast<int>(count);
+						result_dims[1] = 2*rank;
+						arr = Array::CreateInstance(hsize_t::typeid, result_dims);
+						
+						array<hsize_t>^ buf = gcnew array<hsize_t>(count*2*rank);
+						pin_ptr<hsize_t> buf_ptr = &buf[0];
+						if (H5Sget_select_hyper_blocklist(sel, 0, count, buf_ptr) < 0) {
+							throw gcnew HDF5Exception("H5Sget_select_hyper_blocklist failed!");
+						}
+
+						array<int>^ index = gcnew array<int>(2);
+
+						for (hssize_t i = 0; i < count; ++i) {
+							for (int r = 0; r < 2*rank; ++r) {
+								index[0] = safe_cast<int>(i);
+								index[1] = r;
+								arr->SetValue(buf[i*2*rank + r], index);
+							}
+						}
+					}
+
+					if (count < 0) {
+						throw gcnew HDF5Exception("H5Sget_select_hyper_nblocks failed!");
+					}
+				}
+				break;
+			case H5S_SEL_ALL:
+				{
+					// return the entire space as two corners (0,..,0) - (dims[0]-1, ..., dims[rank-1]-1)
+
+					array<hsize_t>^ dims = gcnew array<hsize_t>(rank);
+					pin_ptr<hsize_t> dims_ptr = &dims[0];
+					rank = H5Sget_simple_extent_dims(sel, dims_ptr, NULL);
+					if (rank < 0) {
+						throw gcnew HDF5Exception("H5Sget_simple_extent_dims failed!");
+					}
+
+					result_dims[0] = safe_cast<int>(1);
+					result_dims[1] = 2*rank;
+					arr = Array::CreateInstance(hsize_t::typeid, result_dims);
+
+					for (int r = 0; r < rank; ++r) {
+						arr->SetValue(dims[r]-1, rank+r);
+					}
+				}
+				break;
+			}
 			
-
-
-
-			ret_val = H5Rget_name(dset, H5R_OBJECT, ref, (char*) name.ToPointer(), 255);
+			ret_val = H5Rget_name(dset, H5R_DATASET_REGION, ref, (char*) name.ToPointer(), 255);
 			if (ret_val < 0) {
 				throw gcnew HDF5Exception("H5Rget_name failed!");
 			}
+			if (ret_val > 255)  // name is longer than 255 characters?
+			{
+				Marshal::FreeHGlobal(name);
+				name = Marshal::AllocHGlobal(ret_val+1);
 
+				ret_val = H5Rget_name(dset, H5R_OBJECT, ref, (char*) name.ToPointer(), ret_val);
+				if (ret_val < 0) {
+					throw gcnew HDF5Exception("H5Rget_name failed!");
+				}
+			}
+
+			result = KeyValuePair<String^,Array^>(Marshal::PtrToStringAnsi(name), arr);
 		}
 		finally
 		{
