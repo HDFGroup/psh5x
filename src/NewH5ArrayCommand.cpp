@@ -72,6 +72,8 @@ namespace PSH5X
 				}
 			}
 
+			H5T_class_t cls = H5Tget_class(dtype);
+
 			int rank = m_dims->Length;
 			array<long long>^ index = gcnew array<long long>(rank);
 
@@ -80,13 +82,11 @@ namespace PSH5X
 				if (ProviderUtils::IsH5SimpleType(dtype))
 				{
 					System::Type^ t = ProviderUtils::H5Type2DotNet(dtype);
-					result = Array::CreateInstance(t, m_dims); 
+					result = Array::CreateInstance(t, m_dims);
 				}
 				else
 				{
 					ntype = H5Tget_native_type(dtype, H5T_DIR_ASCEND);
-
-					H5T_class_t cls = H5Tget_class(ntype);
 
 					if (cls == H5T_ARRAY)
 					{

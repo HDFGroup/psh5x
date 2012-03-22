@@ -1914,7 +1914,15 @@ namespace PSH5X
 
 			case H5T_REFERENCE:
 				{
-					throw gcnew PSH5XException("Reference types are currently not supported!");
+					if (H5Tequal(dtype, H5T_STD_REF_OBJ) > 0) {
+						result = String::typeid;
+					}
+					else if (H5Tequal(dtype, H5T_STD_REF_DSETREG) > 0) {
+						result = KeyValuePair<String^,Array^>::typeid;
+					}
+					else {
+						throw gcnew PSH5XException("Unsupported reference type found!");
+					}
 				}
 				break;
 
