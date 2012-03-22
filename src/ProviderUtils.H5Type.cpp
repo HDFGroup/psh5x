@@ -2482,7 +2482,7 @@ namespace PSH5X
 					}
 
 					ntype = H5Tget_native_type(ftype, H5T_DIR_ASCEND);
-					
+
 					switch (H5Tget_sign(ftype))
 					{
 					case H5T_SGN_NONE:
@@ -2654,49 +2654,6 @@ namespace PSH5X
 #pragma endregion
 				break;
 
-            case H5T_ENUM:
-#pragma region enum
-				{
-					if (!t->IsPrimitive) {
-						throw gcnew PSH5XException("Enum: Unable to map non-primitive type to HDF5 enum type!");
-					}
-
-					stype = H5Tget_super(ftype);
-					if (stype < 0) {
-						throw gcnew HDF5Exception("H5Tget_super failed!");
-					}
-					ntype = H5Tget_native_type(stype, H5T_DIR_ASCEND);
-					
-					if (Marshal::SizeOf(t) > H5Tget_size(ntype)) {
-						throw gcnew PSH5XException("Primitve type too large for enum!");
-					}
-
-					result = H5Tget_native_type(ftype, H5T_DIR_ASCEND);
-
-					switch (H5Tget_sign(stype))
-					{
-					case H5T_SGN_NONE:
-						{
-							if (t != Byte::typeid && t != UInt16::typeid && t != UInt32::typeid && t != UInt64::typeid) {
-								throw gcnew PSH5XException("Enum: Primitive type is not a supported unsigned integer type!");
-							}
-						}
-						break;
-					case H5T_SGN_2:
-						{
-							if (t != SByte::typeid && t != Int16::typeid && t != Int32::typeid && t != Int64::typeid) {
-								throw gcnew PSH5XException("Enum: Primitive type is not a supported signed integer type!");
-							}
-						}
-						break;
-
-					default:
-						throw gcnew PSH5XException("Enum: Unknown sign type!");
-						break;
-					}
-				}
-#pragma endregion
-				break;
 
 			case H5T_FLOAT:
 #pragma region float
@@ -2709,7 +2666,7 @@ namespace PSH5X
 					}
 
 					ntype = H5Tget_native_type(ftype, H5T_DIR_ASCEND);
-					
+
 					if (H5Tequal(ntype, H5T_NATIVE_FLOAT))
 					{
 						if (t == Single::typeid) {
@@ -2750,6 +2707,121 @@ namespace PSH5X
 #pragma endregion
 				break;
 
+			case H5T_BITFIELD:
+#pragma region bitfield
+				{
+					if (!t->IsPrimitive) {
+						throw gcnew PSH5XException("BITFIELD: Unable to map non-primitive type to HDF5 integer type!");
+					}
+
+					ntype = H5Tget_native_type(ftype, H5T_DIR_DESCEND);
+
+					if (H5Tequal(ntype, H5T_NATIVE_B8))
+					{
+						if (t == Byte::typeid) {
+							result = H5Tcopy(H5T_NATIVE_B8);
+						}
+						else {
+							throw gcnew PSH5XException("BITFIELD: Unable to map primitive type!");
+						}
+					}
+					else if (H5Tequal(ntype, H5T_NATIVE_B16))
+					{
+						if (t == Byte::typeid) {
+							result = H5Tcopy(H5T_NATIVE_B8);
+						}
+						else if (t == UInt16::typeid) {
+							result = H5Tcopy(H5T_NATIVE_B16);
+						}
+						else {
+							throw gcnew PSH5XException("BITFIELD: Unable to map primitive type!");
+						}
+					}
+					else if (H5Tequal(ntype, H5T_NATIVE_B32))
+					{
+						if (t == Byte::typeid) {
+							result = H5Tcopy(H5T_NATIVE_B8);
+						}
+						else if (t == UInt16::typeid) {
+							result = H5Tcopy(H5T_NATIVE_B16);
+						}
+						else if (t == UInt32::typeid) {
+							result = H5Tcopy(H5T_NATIVE_B32);
+						}
+						else {
+							throw gcnew PSH5XException("BITFIELD: Unable to map primitive type!");
+						}
+					}
+					else if (H5Tequal(ntype, H5T_NATIVE_B64))
+					{
+						if (t == Byte::typeid) {
+							result = H5Tcopy(H5T_NATIVE_B8);
+						}
+						else if (t == UInt16::typeid) {
+							result = H5Tcopy(H5T_NATIVE_B16);
+						}
+						else if (t == UInt32::typeid) {
+							result = H5Tcopy(H5T_NATIVE_B32);
+						}
+						else if (t == UInt64::typeid) {
+							result = H5Tcopy(H5T_NATIVE_B64);
+						}
+						else {
+							throw gcnew PSH5XException("BITFIELD: Unable to map primitive type!");
+						}
+					}
+					else {
+						throw gcnew PSH5XException("BITFIELD: Unsupported HDF5 bitfield datatype!");
+					}
+
+				}
+#pragma endregion
+				break;
+
+			case H5T_ENUM:
+#pragma region enum
+				{
+					if (!t->IsPrimitive) {
+						throw gcnew PSH5XException("Enum: Unable to map non-primitive type to HDF5 enum type!");
+					}
+
+					stype = H5Tget_super(ftype);
+					if (stype < 0) {
+						throw gcnew HDF5Exception("H5Tget_super failed!");
+					}
+					ntype = H5Tget_native_type(stype, H5T_DIR_ASCEND);
+
+					if (Marshal::SizeOf(t) > H5Tget_size(ntype)) {
+						throw gcnew PSH5XException("Primitve type too large for enum!");
+					}
+
+					result = H5Tget_native_type(ftype, H5T_DIR_ASCEND);
+
+					switch (H5Tget_sign(stype))
+					{
+					case H5T_SGN_NONE:
+						{
+							if (t != Byte::typeid && t != UInt16::typeid && t != UInt32::typeid && t != UInt64::typeid) {
+								throw gcnew PSH5XException("Enum: Primitive type is not a supported unsigned integer type!");
+							}
+						}
+						break;
+					case H5T_SGN_2:
+						{
+							if (t != SByte::typeid && t != Int16::typeid && t != Int32::typeid && t != Int64::typeid) {
+								throw gcnew PSH5XException("Enum: Primitive type is not a supported signed integer type!");
+							}
+						}
+						break;
+
+					default:
+						throw gcnew PSH5XException("Enum: Unknown sign type!");
+						break;
+					}
+				}
+#pragma endregion
+				break;
+
 			case H5T_STRING:
 #pragma region string
 				{
@@ -2760,7 +2832,7 @@ namespace PSH5X
 					if (is_vlen_str < 0) {
 						throw gcnew HDF5Exception("H5Tis_variable_str failed!");
 					}
-					
+
 					if (is_vlen_str > 0) {
 						result = H5Tcreate(H5T_STRING, H5T_VARIABLE);
 					}
