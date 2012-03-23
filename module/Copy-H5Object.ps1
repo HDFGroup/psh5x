@@ -66,42 +66,54 @@ Function Copy-H5Object
         $Force
     )
 
-    if (!(Test-Path $Source))
+    $src = @((Resolve-Path $Source))
+    $dst = $null
+
+    if (($src.Count -eq 1) -and (!(Test-Path $Destination)))
     {
-        Write-Error "`nThe source path name '$Source' cannot be resolved."
+        $dst = @($Destination)
+    }
+    else
+    {
+        $dst = @((Resolve-Path $Source | Split-Path -NoQualifier | %{Join-Path $Destination $_ }))
+    }
+
+    if ($src.Count -ne $dst.Count)
+    {
+        Write-Error "`nUnable to resolve all paths."
         return
     }
-    if (Test-Path $Destination)
+
+    foreach ($i in 0..$($src.Count-1))
     {
-        $trial_path = Join-Path $Destination (Get-H5Object $Source).PSChildName
-        if (Test-Path $trial_path)
+        $Source = $src[$i]
+        $Destination = $dst[$i]
+
+        if (Test-Path $Destination)
         {
             Write-Error "`nThe destination path name '$Destination' is in use."
             return
         }
-        else {
-            $Destination = $trial_path
-        }
-    }
 
-    if ($PSCmdlet.ShouldProcess($Path, 'Copy HDF5 object'))
-    { 
-        $param = @("'$Source'", "'$Destination'")
-
-        if ($Force) {
-            $param += '-Force'
-        }
-        if ($IgnoreAttributes) {
-            $param += '-IgnoreAttributes'
-        }
-        if ($Recurse) {
-            $param += '-Recurse'
-        }
-
-        Write-Output(Invoke-Expression "Copy-Item $param")
-
-        if (Test-Path $Destination) {
-            Write-Host "`nSuccess: HDF5 object '$Source' copied to '$Destination'."
+        if ($PSCmdlet.ShouldProcess($Path, 'Copy HDF5 object'))
+        { 
+            $param = @("'$Source'", "'$Destination'")
+    
+            if ($Force) {
+                $param += '-Force'
+            }
+            if ($IgnoreAttributes) {
+                $param += '-IgnoreAttributes'
+            }
+            if ($Recurse) {
+                $param += '-Recurse'
+            }
+    
+            Write-Output(Invoke-Expression "Copy-Item $param")
+    
+            if (Test-Path $Destination) {
+                Write-Host "`nSuccess: HDF5 object '$Source' copied to '$Destination'."
+            }
         }
     }
 }

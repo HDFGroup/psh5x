@@ -13,6 +13,7 @@
 #include "PSH5XException.h"
 #include "PrimitiveTypeDatasetWriter.h"
 #include "ReferenceDatasetReader.h"
+#include "ReferenceDatasetWriter.h"
 #include "StringDatasetReader.h"
 #include "StringDatasetWriter.h"
 #include "VlenDatasetReader.h"
@@ -544,6 +545,12 @@ namespace PSH5X
 			case H5T_OPAQUE:
 				
 				result = gcnew OpaqueDatasetWriter(drive->FileHandle, h5path,
+					(RuntimeDefinedParameterDictionary^) DynamicParameters);
+				break;
+
+			case H5T_REFERENCE:
+
+				result = gcnew ReferenceDatasetWriter(drive->FileHandle, h5path,
 					(RuntimeDefinedParameterDictionary^) DynamicParameters);
 				break;
 

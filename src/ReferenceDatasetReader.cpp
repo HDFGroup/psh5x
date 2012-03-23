@@ -93,9 +93,8 @@ namespace PSH5X
 
 			if (isObjectReference)
 			{
-				// (path name, object kind)
-				KeyValuePair<String^,String^> dummy(nullptr, nullptr);
-			    m_array = Array::CreateInstance(dummy.GetType(), (array<long long>^) dims);
+				// path name
+				m_array = Array::CreateInstance(String::typeid, (array<long long>^) dims);
 			}
 			else
 			{
@@ -171,7 +170,7 @@ namespace PSH5X
 	{
 		if (m_isObjectReference)
 		{
-			array< KeyValuePair<String^,String^> >^ result = nullptr;
+			array<String^>^ result = nullptr;
 
 			long long remaining = m_array->LongLength - m_position;
 			if (remaining > 0)
@@ -193,11 +192,11 @@ namespace PSH5X
 					}
 				}
 
-				result = gcnew array< KeyValuePair<String^,String^> >(safe_cast<int>(length));
+				result = gcnew array<String^>(safe_cast<int>(length));
 
 				for (long long i = 0; i < length; ++i)
 				{
-					result[i] = safe_cast< KeyValuePair<String^,String^> >(m_ienum->Current);
+					result[i] = safe_cast<String^>(m_ienum->Current);
 					m_ienum->MoveNext();
 				}
 

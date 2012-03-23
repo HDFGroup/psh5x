@@ -180,8 +180,7 @@ namespace PSH5X
 		static bool WriterCheckSelection(hid_t% fspace, hid_t% mspace, hsize_t sel_count,
 			System::Management::Automation::RuntimeDefinedParameterDictionary^ dict);
 
-		static System::Collections::Generic::KeyValuePair<System::String^, System::String^>
-			GetObjectReference(hid_t dset, void* ref);
+		static System::String^ GetObjectReference(hid_t dset, void* ref);
 
 		static System::Collections::Generic::KeyValuePair<System::String^, System::Array^>
 			GetRegionReference(hid_t dset, void* ref);
