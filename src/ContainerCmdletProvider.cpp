@@ -61,9 +61,24 @@ namespace PSH5X
                 throw gcnew PSH5XException("The destination drive is read-only and cannot be modified!");
             }
 			// Can we create the destination object(s)?
-			if (!(ProviderUtils::CanCreateItemAt(copyDrive->FileHandle, copyH5Path) ||
-				(Force && ProviderUtils::CanForceCreateItemAt(copyDrive->FileHandle, copyH5Path))))	{
-				throw gcnew PSH5XException(String::Format("The destination object '{0}' cannot be created!", copyPath));
+			if (ProviderUtils::CanCreateItemAt(copyDrive->FileHandle, copyH5Path) ||
+				(Force && ProviderUtils::CanForceCreateItemAt(copyDrive->FileHandle, copyH5Path)))
+			{
+				// we are good
+			}
+			else if (ProviderUtils::IsResolvableH5Path(drive->FileHandle, copyH5Path) &&
+				ProviderUtils::IsH5Group(drive->FileHandle, copyH5Path))
+			{
+					String^ checkH5path = copyH5Path + "/" + ProviderUtils::ChildName(h5path);
+					if (ProviderUtils::CanCreateItemAt(copyDrive->FileHandle, checkH5path)) {
+						copyH5Path = checkH5path;
+					}
+					else {
+						throw gcnew PSH5XException(String::Format("Unable to create the destination object '{0}'!", copyPath));
+					}
+			}
+			else {
+				throw gcnew PSH5XException(String::Format("Unable to create the destination object '{0}'!", copyPath));
 			}
 
 #pragma endregion
