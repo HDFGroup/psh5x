@@ -32,9 +32,6 @@ namespace PSH5X
 
         char *name = NULL, *soft = NULL, *file = NULL, *link = NULL;
 
-        hsize_t* maxDims = NULL;
-        hsize_t* size = NULL;
-
         try
         {
             DriveInfo^ drive = nullptr;
@@ -56,7 +53,7 @@ namespace PSH5X
                 array<hsize_t>^ newDims = nullptr;
                 if (!ProviderUtils::TryGetValue(value, newDims)) {
                     throw gcnew PSH5XException(
-                        "Cannot convert the -Dimensions argument to hsize_t[]!");
+                        "Cannot convert the Value argument to hsize_t[]!");
                 }
 
                 if (ProviderUtils::IsH5ChunkedDataset(drive->FileHandle, h5path))
@@ -72,19 +69,24 @@ namespace PSH5X
                         throw gcnew HDF5Exception("H5Dget_space failed.");
                     }
 
+					if (H5Sget_simple_extent_type(fspace) != H5S_SIMPLE) {
+						throw gcnew PSH5XException("This is not a simple HDF5 dataset!");
+					}
+
                     int rank = H5Sget_simple_extent_ndims(fspace);
                     if (rank <= 0) {
-                        throw gcnew HDF5Exception("Rank must be positive!");
+                        throw gcnew HDF5Exception("H5Sget_simple_extent_ndims failed!");
                     }
 
                     if (rank != newDims->Length) {
                         throw gcnew PSH5XException(
-                            "Rank mismatch. The rank of the -Dimensions argument must equal the HDF5 dataset rank!");
+                            "Rank mismatch. The rank of the dimensions array must match the HDF5 dataset rank!");
                     }
 
-                    maxDims = new hsize_t [rank];
-                    if (H5Sget_simple_extent_dims(fspace, NULL, maxDims) != rank)
-                    {
+					array<hsize_t>^ maxDims = gcnew array<hsize_t>(rank);
+					pin_ptr<hsize_t> maxDims_ptr = &maxDims[0];
+
+                    if (H5Sget_simple_extent_dims(fspace, NULL, maxDims_ptr) != rank) {
                         throw gcnew HDF5Exception("H5Sget_simple_extent_dims failed.");
                     }
 
@@ -98,13 +100,17 @@ namespace PSH5X
                         }
                     }
 
-                    size = new hsize_t [rank];
-                    for (int i = 0; i < rank; ++i) { size[i] = newDims[i]; }
+                    array<hsize_t>^ size = gcnew array<hsize_t>(rank);
+					pin_ptr<hsize_t> size_ptr = &size[0];
+
+                    for (int i = 0; i < rank; ++i) {
+						size[i] = newDims[i];
+					}
 
                     if (this->ShouldProcess(h5path,
                         String::Format("Resizing HDF5 dataset '{0}'", path)))
                     {
-                        if (H5Dset_extent(dset, size) < 0) {
+                        if (H5Dset_extent(dset, size_ptr) < 0) {
                             throw gcnew HDF5Exception("H5Sget_simple_extent_dims failed.");
                         }
                     }
@@ -218,14 +224,6 @@ namespace PSH5X
         }
         finally
         {
-            if (size) {
-                delete [] size;
-            }
-
-            if (maxDims) {
-                delete [] maxDims;
-            }
-
             if (fspace >= 0) {
                 H5Sclose(fspace);
             }

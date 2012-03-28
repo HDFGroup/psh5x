@@ -856,11 +856,10 @@ namespace PSH5X
 
         try
         {
-            array<Object^>^ tmp = safe_cast<array<Object^>^>(obj);
+			Array^ tmp = safe_cast<Array^>(ProviderUtils::GetDotNetObject(obj));
             arr = gcnew array<hsize_t>(tmp->Length);
-            for (int i = 0; i < tmp->Length; ++i)
-            {
-                arr[i] = Convert::ToUInt64(tmp[i]);
+            for (int i = 0; i < tmp->Length; ++i) {
+                arr[i] = Convert::ToUInt64(tmp->GetValue(i));
             }
 
             result = true;

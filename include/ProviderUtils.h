@@ -187,7 +187,6 @@ namespace PSH5X
 
 #pragma endregion
 
-
 #pragma region HDF5 Attribute
 
         static System::Collections::Hashtable^ H5Attribute(hid_t attr_id, System::String^ attributeName);
