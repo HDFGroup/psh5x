@@ -69,16 +69,22 @@ Function New-H5Attribute
         [Parameter(Mandatory=$false,
                    Position=2,
                    ParameterSetName='Scalar',
-                   HelpMessage='Attribute value')]
+                   HelpMessage='Scalar attribute value')]
         [ValidateNotNull()]
         [object]
-        $Value,
+        $Scalar,
         [Parameter(Mandatory=$false,
                    Position=3,
                    HelpMessage='The element type of the new HDF5 attribute')]
         [ValidateNotNull()]
         [string]
-        $Type='string'
+        $Type='string',
+        [Parameter(Mandatory=$false,
+                   Position=4,
+                   HelpMessage='Non-scalar attribute value')]
+        [ValidateNotNull()]
+        [object]
+        $Value
     )
 
     if (!(Test-Path $Path))
@@ -125,16 +131,23 @@ Function New-H5Attribute
         }
         elseif ($Simple) # simple attribute
         {
-            Write-Output(
-                New-ItemProperty $Path -Name $Name -ElementType $Type `
-                                 -Simple $Simple)
-        }
-        else
-        {
             if ($Value) {
                 Write-Output(
                     New-ItemProperty $Path -Name $Name -ElementType $Type `
-                                     -Value $Value)
+                                     -Simple $Simple -Value $Value)
+            }
+            else {
+                Write-Output(
+                    New-ItemProperty $Path -Name $Name -ElementType $Type `
+                                     -Simple $Simple)
+            }
+        }
+        else
+        {
+            if ($Scalar) {
+                Write-Output(
+                    New-ItemProperty $Path -Name $Name -ElementType $Type `
+                                     -Value $Scalar)
             }
             else {
                 Write-Output(

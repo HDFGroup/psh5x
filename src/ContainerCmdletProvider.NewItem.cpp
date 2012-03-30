@@ -1,5 +1,5 @@
 
-#include "DatasetInfo.h"
+#include "SimpleChunkedDatasetInfo.h"
 #include "DatatypeInfo.h"
 #include "GroupInfo.h"
 #include "HDF5Exception.h"
@@ -418,7 +418,17 @@ namespace PSH5X
 						throw gcnew HDF5Exception("H5Fflush failed!");
 					}
 
-					WriteItemObject(gcnew DatasetInfo(dset), path, false);
+					if (!isSimple) {
+						WriteItemObject(gcnew DatasetInfo(dset), path, false);
+					}
+					else {
+						if (!isChunked) {
+							WriteItemObject(gcnew SimpleDatasetInfo(dset), path, false);
+						}
+						else {
+							WriteItemObject(gcnew SimpleChunkedDatasetInfo(dset), path, false);
+						}
+					}
 				}
 
 #pragma endregion
