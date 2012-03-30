@@ -2,14 +2,30 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
     <head>
         <title>HDF Group - PSH5X</title>
+        <style type="text/css">
+            .code{
+                display:block;
+                font:1em 'Courier New', Courier, Fixed, monospace;
+                font-size:80%;
+                color:#000;
+                background:#fff;
+                overflow:auto;
+                text-align:left;
+                border:1px solid #5581C0;
+                padding:0px 20px 0 30px;
+                margin:1em 0 1em 0;
+                line-height:17px;
+                font-weight:normal !important;
+            }</style>
     </head>
     <body>
         <img src="psh5x_logo_100x75.gif" alt="PSH5X logo" align="right" />
         <h1>PSH5X</h1>
         <p>
             <b>PSH5X</b> is a <a href="http://en.wikipedia.org/wiki/Windows_PowerShell">Windows
-                PowerShell</a> module for HDF5. </p>
-        <img src="PS%20Window.gif" alt="PowerShell Window" align="middle" />
+                PowerShell</a> module for HDF5. Please send your questions/comments/suggestions to
+            the <a href="http://www.hdfgroup.org/services/community_support.html">HDF forum</a> or
+            send an <a href="mailto:gheber@hdfgroup.org">email</a>. </p>
         <h3>Prerequisites</h3>
         <dl>
             <dt>Operating system:</dt>
@@ -37,13 +53,45 @@
                     3.5, but this arrangement has not been tested.</p>
             </dd>
         </dl>
-        <h2>Download</h2>
+        <h2>Download (coming soon)</h2>
         <ul>
-            <li><a href="">PSH5X Alpha .NET 4 (x86)</a></li>
-            <li><a href="">PSH5X Alpha .NET 4 (x86_64)</a></li>
-            <li><a href="">PSH5X Examples</a></li>
+            <li>PSH5X Alpha .NET 4 (x86) built against <a
+                    href="http://www.hdfgroup.org/ftp/HDF5/current/bin/windows/HDF5188-win32-shared.zip"
+                    > HDF5 1.8.8</a></li>
+            <li>PSH5X Alpha .NET 4 (x86_64) built against <a
+                    href="http://www.hdfgroup.org/ftp/HDF5/current/bin/windows/HDF5188-win64-shared.zip"
+                    >HDF5 1.8.8</a></li>
+            <li>PSH5X Examples</li>
         </ul>
         <h2>Installation</h2>
+        <ol>
+            <li>Make sure you have the latest and greatest version of <a
+                    href="http://www.hdfgroup.org/HDF5/release/obtain5.html#obtain">HDF5</a>. You
+                can use your own binaries (of the required HDF5 version) as long as you built the
+                dynamically linked libraries (DLLs) and they are located in a directory listed in
+                your <tt>Path</tt> environment variable.</li>
+            <li>Unpack the zip archive and copy the HDF5 folder into a directory in
+                    <tt>$ENV:PSModulePath</tt>. For example, on Windows 7 you'd most likely copy it
+                into <tt>C:\Users\{your username}\Documents\WindowsPowerShell\Modules</tt>. </li>
+            <li>If you are running PowerShell version 2.0, make sure that it runs with .NET 4.0 (and
+                not the default .NET 2.0). You can either modify the registry or add a configuration
+                file to the directory which contains <tt>powershell.exe</tt>. Instructions can be
+                found in this <a
+                    href="http://tfl09.blogspot.com/2010/08/using-newer-versions-of-net-with.html"
+                    >blog entry</a> and this <a
+                    href="http://stackoverflow.com/questions/2094694/how-can-i-run-powershell-with-the-net-4-runtime"
+                    >forum post</a>. </li>
+        </ol>
+        <p>If you did everything right, when importing the HDF5 module, you should see something
+            like this:</p>
+        <img src="PS%20Window.gif" alt="PowerShell Window" align="middle" />
+        <p>Each session has its own sandbox HDF5 drive named <tt>h5tmp</tt>. The full path to the
+            HDF5 file backing this drive is stored in the <tt>PSH5XTmpFile</tt> environment
+            variable. (The file does not have an <tt>.h5</tt> extension, but it is an HDF5 file.
+            Trust me!) This file remains open and writeable as long as the drive is mapped. You can
+            close it either via <tt>Remove-H5Drive h5tmp</tt> or by closing the session (window).
+                <u>PSH5X does not delete the sandbox file!</u> (in case you'd like to recover some
+            of the objects later...)</p>
         <h2>PowerShell Resources</h2>
         <dl>
             <dt><a href="http://technet.microsoft.com/en-us/scriptcenter/dd742419">Windows
@@ -92,5 +140,150 @@
                 PowerShell that members of the community have expressed interest in.</dd>
         </dl>
         <h2>Tutorial</h2>
+        <p> In the following example, we create an HDF5 file whose BNF representation is shown in
+            section 4, &quot;An Example of an HDF5 File in DDL&quot;, of <a
+                href="http://www.hdfgroup.org/HDF5/doc/ddl.html">DDL in BNF for HDF5</a>. (Get the
+            script and image files, and the expected outcome, from here: <a
+                href="./Create-BNFSample.ps1">Create-BNFSample.ps1</a>&nbsp;,&nbsp;<a
+                href="./hdf_logo.jpg">hdf_logo.jpg</a>&nbsp;,&nbsp;<a href="./sample.h5"
+                >sample.h5</a>) </p>
+        <pre class="code">
+Import-Module HDF5
+
+# determine the HDF5 file's name
+$name = 'sample'
+$file = Join-Path (Split-Path $MyInvocation.MyCommand.Path) "$name.h5"
+
+if (Test-Path $file) {
+    Write-Error "File $file exists!"
+    return
+}
+
+# create a new PSDrive and a new HDF5 file as a side-effect (-Force)
+$drive = New-H5Drive $name $file -RW -Force
+  
+# make the HDF5 root of the new drive our "working directory"
+cd "$($name):\"
+
+# create a scalar string attribute of the root group
+$attr = New-H5Attribute . attr1 'string attribute' cstring17
+            
+# create &amp; initialize a new simple 10x10 integer dataset at /dset1
+$dset = New-H5Dataset dset1 H5T_STD_I32BE 10,10
+$value = New-Object 'int[,]' 10,10
+foreach ($i in 0..9) {
+    foreach ($j in 0..9) {
+        $value[$i,$j] = $j
+    }
+}
+Set-H5DatasetValue dset1 $value
+            
+# define a new compound datatype (JSON)
+$t = @"{
+    "Class": "Compound",
+    "Size": 16,
+    "Members": {
+        "a": [0, "H5T_STD_I32BE"],
+        "b": [4, "H5T_IEEE_F32BE"],
+        "c": [8, "H5T_IEEE_F64BE"]
+    }
+}"@          
+
+# define a new .NET type to represent $t in memory
+Add-Type @"
+    public class cmpd_a_b_c
+    {
+        public int a;
+        public float b;
+        public double c;
+    }
+"@
+
+# create &amp; initialize a new dataset /dset2 of type $t
+$dset = New-H5Dataset dset2 $t 5
+$value = New-Object 'cmpd_a_b_c[]' 5
+foreach ($i in 0..4)
+{
+    $value[$i] = New-Object cmpd_a_b_c
+    $value[$i].a = $i+1
+    $value[$i].b = ($i+1)/10
+    $value[$i].c = ($i+1)/100
+}
+Set-H5DatasetValue dset2 $value
+
+# create a new group /group1
+$group = New-H5Group group1
+
+# create a new linked datatype at /type 1 and its .NET in-memory representation
+$t = @"{
+    "Class": "Compound",
+    "Size": 136,
+    "Members": {
+        "a": [0, {"Class": "Array", "Base": "H5T_STD_I32BE", "Dims": [4]}],
+        "b": [16,{"Class": "Array", "Base": "H5T_IEEE_F32BE", "Dims":[5,6]}]
+    }
+}"@
+
+Add-Type @"
+    public class cmpd_a_b
+    {
+        public int[] a = new int[4];
+        public float[,] b = new float [5,6];
+    }
+"@
+
+$dtype = New-H5LinkedDatatype type1 $t
+
+#make /group1 the "working directory" and create &amp; initialize a new dataset at /group1/dset3
+
+cd group1
+
+$dset = New-H5Dataset dset3 /type1 5
+$value = New-Object 'cmpd_a_b[]' 5
+foreach ($i in 0..4)
+{
+    $value[$i] = New-Object cmpd_a_b
+    foreach ($j in 0..3) {
+        $value[$i].a[$j] = $j
+    }
+    foreach ($r in 0..4) {
+        foreach ($c in 0..5) {
+            $value[$i].b[$r,$c] = ($r+1)/10
+        }
+    }
+}
+Set-H5DatasetValue dset3 $value 
+
+#go back to the root group
+cd ..
+
+# create and initialize a new dataset at /dset3
+$t = '{"Class": "Vlen", "Base": "H5T_STD_I32LE"}'
+$dset = New-H5Dataset dset3 $t 4
+$value = @(@(0), @(10,11), @(20,21,22), @(30,31,32,33))
+Set-H5DatasetValue dset3 $value
+
+# hard link the group at /group1 as /group2 
+$hlink = New-H5Hardlink group2 /group1
+
+# create a new soft link at /slink1
+$slink = New-H5Softlink slink1 somevalue
+
+# bonus material: add a JPEG image as an HDF5 image
+$image = Join-Path (Split-Path $MyInvocation.MyCommand.Path) 'hdf_logo.jpg'
+if (Test-Path $image) {
+    $logo = New-H5Image hdf_logo $image
+}
+
+# leave &amp; remove the HDF5 drive
+C:
+Remove-H5Drive $name
+
+# open the new HDF5 file in HDFView (if found)
+$hdfview = 'C:\Program Files\TheHDFGroup\HDFView2.8\HDFView.exe'
+if (Test-Path $hdfview) {
+    $hdfview $file
+}
+        </pre>
     </body>
 </html>
