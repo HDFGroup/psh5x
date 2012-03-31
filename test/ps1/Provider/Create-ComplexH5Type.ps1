@@ -39,6 +39,7 @@ $t = @"
     "Color": [36,
       {
         "Class": "Enum",
+        "Base": "uchar",
         "Members": {
           "Red": 0,
           "Green": 1,
@@ -47,7 +48,7 @@ $t = @"
       }
     ],
 
-    "Location": [40,
+    "Location": [37,
       {
         "Class": "Array",
         "Base": "double",
@@ -55,12 +56,12 @@ $t = @"
       }
     ],
 
-    "Group": [64, { "Class": "Reference", "Kind": "Object" }],
+    "Group": [61, { "Class": "Reference", "Kind": "Object" }],
 
-    "Surveyed areas": [72, { "Class": "Reference", "Kind": "Region" } ]
+    "Surveyed areas": [69, { "Class": "Reference", "Kind": "Region" } ]
   },
 
-  "Size": 84 
+  "Size": 81 
 }
 "@
 

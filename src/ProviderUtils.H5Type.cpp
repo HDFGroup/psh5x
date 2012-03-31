@@ -61,269 +61,269 @@ namespace PSH5X
             switch (H5Tget_class(type))
             {
             case H5T_INTEGER:
-
+				{
 #pragma region Integer
 
-				result->Add("Class", "Integer");
-                size = H5Tget_size(type);
-				result->Add("Size", size);
-                size = H5Tget_precision(type);
-                result->Add("Precision", size);
-                i = H5Tget_offset(type);
-                result->Add("BitOffset", i);
+					result->Add("Class", "Integer");
+					size = H5Tget_size(type);
+					result->Add("Size", size);
+					size = H5Tget_precision(type);
+					result->Add("Precision", size);
+					i = H5Tget_offset(type);
+					result->Add("BitOffset", i);
 
-                if (H5Tget_pad(type, &lsb, &msb) >= 0)
-                {
-                    switch (lsb)
-                    {
-                    case H5T_PAD_ZERO:
-						result->Add("LSBitPadding", "Zero");
-                        break;
-                    case H5T_PAD_ONE:
-                        result->Add("LSBitPadding", "One");
-                        break;
-                    case H5T_PAD_BACKGROUND:
-                        result->Add("LSBitPadding", "Background");
-                        break;
-                    default:
-                        result->Add("LSBitPadding", "UNKONWN");
-                        break;
-                    }
+					if (H5Tget_pad(type, &lsb, &msb) >= 0)
+					{
+						switch (lsb)
+						{
+						case H5T_PAD_ZERO:
+							result->Add("LSBitPadding", "Zero");
+							break;
+						case H5T_PAD_ONE:
+							result->Add("LSBitPadding", "One");
+							break;
+						case H5T_PAD_BACKGROUND:
+							result->Add("LSBitPadding", "Background");
+							break;
+						default:
+							result->Add("LSBitPadding", "UNKONWN");
+							break;
+						}
 
-                    switch (msb)
-                    {
-                    case H5T_PAD_ZERO:
-                        result->Add("MSBitPadding", "Zero");
-                        break;
-                    case H5T_PAD_ONE:
-                        result->Add("MSBitPadding", "One");
-                        break;
-                    case H5T_PAD_BACKGROUND:
-                        result->Add("MSBitPadding", "Background");
-                        break;
-                    default:
-                        result->Add("MSBitPadding", "UNKNOWN");
-                        break;
-                    }
-                }
-                else {
-                    throw gcnew HDF5Exception("H5Tget_pad failed!");
-                }
+						switch (msb)
+						{
+						case H5T_PAD_ZERO:
+							result->Add("MSBitPadding", "Zero");
+							break;
+						case H5T_PAD_ONE:
+							result->Add("MSBitPadding", "One");
+							break;
+						case H5T_PAD_BACKGROUND:
+							result->Add("MSBitPadding", "Background");
+							break;
+						default:
+							result->Add("MSBitPadding", "UNKNOWN");
+							break;
+						}
+					}
+					else {
+						throw gcnew HDF5Exception("H5Tget_pad failed!");
+					}
 
-                switch (H5Tget_sign(type))
-                {
-                case H5T_SGN_NONE:
-                    result->Add("SignType", "None");
-                    break;
-                case H5T_SGN_2:
-                    result->Add("SignType", "2");
-                    break;
-                default:
-                    result->Add("SignType", "UNKNOWN");
-                    break;
-                }
+					switch (H5Tget_sign(type))
+					{
+					case H5T_SGN_NONE:
+						result->Add("SignType", "None");
+						break;
+					case H5T_SGN_2:
+						result->Add("SignType", "2");
+						break;
+					default:
+						result->Add("SignType", "UNKNOWN");
+						break;
+					}
 
-                switch (H5Tget_order(type))
-                {
-                case H5T_ORDER_LE:
-                    result->Add("ByteOrder", "LE");
-                    break;
-                case H5T_ORDER_BE:
-                    result->Add("ByteOrder", "BE");
-                    break;
-                case H5T_ORDER_VAX:
-                    result->Add("ByteOrder", "VAX");
-					break;
-                case H5T_ORDER_MIXED:
-                    result->Add("ByteOrder", "Mixed");
-                    break;
-                case H5T_ORDER_NONE:
-                    result->Add("ByteOrder", "None");
-                    break;
-                default:
-                    result->Add("ByteOrder", "UNKNOWN");
-                    break;
-                }
+					switch (H5Tget_order(type))
+					{
+					case H5T_ORDER_LE:
+						result->Add("ByteOrder", "LE");
+						break;
+					case H5T_ORDER_BE:
+						result->Add("ByteOrder", "BE");
+						break;
+					case H5T_ORDER_VAX:
+						result->Add("ByteOrder", "VAX");
+						break;
+					case H5T_ORDER_MIXED:
+						result->Add("ByteOrder", "Mixed");
+						break;
+					case H5T_ORDER_NONE:
+						result->Add("ByteOrder", "None");
+						break;
+					default:
+						result->Add("ByteOrder", "UNKNOWN");
+						break;
+					}
 
 #pragma endregion
-
+				}
                 break;
 
             case H5T_FLOAT:
-
+				{
 #pragma region Float
 
-                result->Add("Class", "Float");
-                size = H5Tget_size(type);
-                result->Add("Size", size);
-                size = H5Tget_precision(type);
-                result->Add("Precision", size);
-                i = H5Tget_offset(type);
-                result->Add("BitOffset", i);
+					result->Add("Class", "Float");
+					size = H5Tget_size(type);
+					result->Add("Size", size);
+					size = H5Tget_precision(type);
+					result->Add("Precision", size);
+					i = H5Tget_offset(type);
+					result->Add("BitOffset", i);
 
-                if (H5Tget_pad(type, &lsb, &msb) >= 0)
-                {
-                    switch (lsb)
-                    {
-                    case H5T_PAD_ZERO:
-                		result->Add("LSBitPadding", "Zero");
-                        break;
-                    case H5T_PAD_ONE:
-                		result->Add("LSBitPadding", "One");
-                        break;
-                    case H5T_PAD_BACKGROUND:
-                		result->Add("LSBitPadding", "Background");
-                        break;
-                    default:
-                		result->Add("LSBitPadding", "UNKNOWN");
-                        break;
-                    }
+					if (H5Tget_pad(type, &lsb, &msb) >= 0)
+					{
+						switch (lsb)
+						{
+						case H5T_PAD_ZERO:
+							result->Add("LSBitPadding", "Zero");
+							break;
+						case H5T_PAD_ONE:
+							result->Add("LSBitPadding", "One");
+							break;
+						case H5T_PAD_BACKGROUND:
+							result->Add("LSBitPadding", "Background");
+							break;
+						default:
+							result->Add("LSBitPadding", "UNKNOWN");
+							break;
+						}
 
-                    switch (msb)
-                    {
-                    case H5T_PAD_ZERO:
-                		result->Add("MSBitPadding", "Zero");
-                        break;
-                    case H5T_PAD_ONE:
-                		result->Add("MSBitPadding", "One");
-                        break;
-                    case H5T_PAD_BACKGROUND:
-                		result->Add("MSBitPadding", "Background");
-                        break;
-                    default:
-                		result->Add("MSBitPadding", "UNKNOWN");
-                        break;
-                    }
-                }
-                else {
-                    throw gcnew HDF5Exception("H5Tget_pad failed!");
-                }
+						switch (msb)
+						{
+						case H5T_PAD_ZERO:
+							result->Add("MSBitPadding", "Zero");
+							break;
+						case H5T_PAD_ONE:
+							result->Add("MSBitPadding", "One");
+							break;
+						case H5T_PAD_BACKGROUND:
+							result->Add("MSBitPadding", "Background");
+							break;
+						default:
+							result->Add("MSBitPadding", "UNKNOWN");
+							break;
+						}
+					}
+					else {
+						throw gcnew HDF5Exception("H5Tget_pad failed!");
+					}
 
-                switch (H5Tget_inpad(type))
-                {
-                case H5T_PAD_ZERO:
-                	result->Add("IntlBitPadding", "Zero");
-                    break;
-                case H5T_PAD_ONE:
-                	result->Add("IntlBitPadding", "One");
-                    break;
-                case H5T_PAD_BACKGROUND:
-                	result->Add("IntlBitPadding", "Background");
-                    break;
-                default:
-                	result->Add("IntlBitPadding", "UNKNOWN");
-                    break;
-                }
+					switch (H5Tget_inpad(type))
+					{
+					case H5T_PAD_ZERO:
+						result->Add("IntlBitPadding", "Zero");
+						break;
+					case H5T_PAD_ONE:
+						result->Add("IntlBitPadding", "One");
+						break;
+					case H5T_PAD_BACKGROUND:
+						result->Add("IntlBitPadding", "Background");
+						break;
+					default:
+						result->Add("IntlBitPadding", "UNKNOWN");
+						break;
+					}
 
-                switch (H5Tget_order(type))
-                {
-                case H5T_ORDER_LE:
-                	result->Add("ByteOrder", "LE");
-                    break;
-                case H5T_ORDER_BE:
-                	result->Add("ByteOrder", "BE");
-                    break;
-                case H5T_ORDER_VAX:
-                	result->Add("ByteOrder", "VAX");
-                    break;
-                case H5T_ORDER_MIXED:
-                	result->Add("ByteOrder", "Mixed");
-                    break;
-                case H5T_ORDER_NONE:
-                	result->Add("ByteOrder", "None");
-                    break;
-                default:
-                	result->Add("ByteOrder", "UNKNOWN");
-                    break;
-                }
+					switch (H5Tget_order(type))
+					{
+					case H5T_ORDER_LE:
+						result->Add("ByteOrder", "LE");
+						break;
+					case H5T_ORDER_BE:
+						result->Add("ByteOrder", "BE");
+						break;
+					case H5T_ORDER_VAX:
+						result->Add("ByteOrder", "VAX");
+						break;
+					case H5T_ORDER_MIXED:
+						result->Add("ByteOrder", "Mixed");
+						break;
+					case H5T_ORDER_NONE:
+						result->Add("ByteOrder", "None");
+						break;
+					default:
+						result->Add("ByteOrder", "UNKNOWN");
+						break;
+					}
 
-                if (H5Tget_fields(type, &spos, &epos, &esize, &mpos, &msize) >= 0)
-                {
-                	result->Add("SignBitPos", spos);
-                	result->Add("ExpBitPos", epos);
-                	result->Add("ExpBits", esize);
-                 	result->Add("MantBitPos", mpos);
-                 	result->Add("MantBits", msize);
-                }
-                else {
-                    throw gcnew HDF5Exception("H5Tget_fields failed!");
-                }
+					if (H5Tget_fields(type, &spos, &epos, &esize, &mpos, &msize) >= 0)
+					{
+						result->Add("SignBitPos", spos);
+						result->Add("ExpBitPos", epos);
+						result->Add("ExpBits", esize);
+						result->Add("MantBitPos", mpos);
+						result->Add("MantBits", msize);
+					}
+					else {
+						throw gcnew HDF5Exception("H5Tget_fields failed!");
+					}
 
-                size = H5Tget_ebias(type);
-                result->Add("ExpBias", size);
+					size = H5Tget_ebias(type);
+					result->Add("ExpBias", size);
 
-                switch (H5Tget_norm(type))
-                {
-                case H5T_NORM_IMPLIED:
-                	result->Add("MantNorm", "Implied");
-                    break;
-                case H5T_NORM_MSBSET:
-                	result->Add("MantNorm", "MsbSet");
-                    break;
-                case H5T_NORM_NONE:
-                	result->Add("MantNorm", "None");
-                    break;
-                default:
-                	result->Add("MantNorm", "UNKNOWN");
-                    break;
-                }
+					switch (H5Tget_norm(type))
+					{
+					case H5T_NORM_IMPLIED:
+						result->Add("MantNorm", "Implied");
+						break;
+					case H5T_NORM_MSBSET:
+						result->Add("MantNorm", "MsbSet");
+						break;
+					case H5T_NORM_NONE:
+						result->Add("MantNorm", "None");
+						break;
+					default:
+						result->Add("MantNorm", "UNKNOWN");
+						break;
+					}
 
 #pragma endregion
-
+				}
                 break;
 
             case H5T_STRING:
-
+				{
 #pragma region String
 
-               result->Add("Class", "String");
-                cset = H5Tget_cset(type);
-                switch (cset)
-                {
-                case H5T_CSET_ASCII:
-               	result->Add("Encoding", "Ascii");
-                    break;
-                case H5T_CSET_UTF8:
-               	result->Add("Encoding", "Utf8");
-                    break;
-                default:
-               	result->Add("Encoding", "UNKNOWN");
-                    break;
-                }
+					result->Add("Class", "String");
+					cset = H5Tget_cset(type);
+					switch (cset)
+					{
+					case H5T_CSET_ASCII:
+						result->Add("Encoding", "Ascii");
+						break;
+					case H5T_CSET_UTF8:
+						result->Add("Encoding", "Utf8");
+						break;
+					default:
+						result->Add("Encoding", "UNKNOWN");
+						break;
+					}
 
-                ierr = H5Tis_variable_str(type);
-                if (ierr == 0)
-                {
-                    size = H5Tget_size(type);
-                 	result->Add("Length", size);
-                    strpad = H5Tget_strpad(type);
-                    switch (strpad)
-                    {
-                    case H5T_STR_NULLTERM:
-                 		result->Add("StrPad", "Nullterm");
-                        break;
-                    case H5T_STR_NULLPAD:
-                 		result->Add("StrPad", "Nullpad");
-                        break;
-                    case H5T_STR_SPACEPAD:
-                 		result->Add("StrPad", "SpacePad");
-                        break;
-                    default:
-                 		result->Add("StrPad", "UNKNOWN");
-                        break;
-                    }
-                 	result->Add("IsVariableLength", false);
-                }
-                else if (ierr > 0) {
-                 	result->Add("IsVariableLength", true);
-                }
-                else {
-                    throw gcnew HDF5Exception("H5Tis_variable_str failed!!!");
-                }
+					ierr = H5Tis_variable_str(type);
+					if (ierr == 0)
+					{
+						size = H5Tget_size(type);
+						result->Add("Length", size);
+						strpad = H5Tget_strpad(type);
+						switch (strpad)
+						{
+						case H5T_STR_NULLTERM:
+							result->Add("StrPad", "Nullterm");
+							break;
+						case H5T_STR_NULLPAD:
+							result->Add("StrPad", "Nullpad");
+							break;
+						case H5T_STR_SPACEPAD:
+							result->Add("StrPad", "SpacePad");
+							break;
+						default:
+							result->Add("StrPad", "UNKNOWN");
+							break;
+						}
+						result->Add("IsVariableLength", false);
+					}
+					else if (ierr > 0) {
+						result->Add("IsVariableLength", true);
+					}
+					else {
+						throw gcnew HDF5Exception("H5Tis_variable_str failed!!!");
+					}
 
 #pragma endregion
-
-                break;
+				}
+				break;
 
             case H5T_BITFIELD:
 
@@ -467,7 +467,7 @@ namespace PSH5X
 					}
 					result->Add("Size", size);
 					unwnd = H5Tget_super(type);
-					result->Add("Type", ProviderUtils::ParseH5Type(unwnd));
+					result->Add("Base", ProviderUtils::ParseH5Type(unwnd));
 					sign = H5Tget_sign(unwnd);
 
 					members = gcnew Dictionary<String^,Object^>();
@@ -596,7 +596,6 @@ namespace PSH5X
 #pragma endregion
 				}
                 break;
-
 
             case H5T_ARRAY:
 				{
@@ -1396,9 +1395,29 @@ namespace PSH5X
 #pragma region ENUM
 					// TODO: finish this and support arbitrary native integer types
 
+					if (dict->ContainsKey("Base"))
+					{
+						String^ ref_type = dict["Base"]->ToString()->ToUpper();
+						base_type = ParseH5Type(dict["Base"]);
+						if (base_type < 0) {
+							throw gcnew PSH5XException(
+								String::Format("ENUM: Invalid base type '{0}'!", ref_type));
+						}
+
+						if (H5Tget_class(base_type) != H5T_INTEGER) {
+							throw gcnew PSH5XException("ENUM: 'Base' must be an integer type!");
+						}
+					}
+					else {
+						throw gcnew PSH5XException("ENUM: No 'Base' key found.");
+					}
+
 					if (dict->ContainsKey("Members"))
 					{
-						result = H5Tenum_create(H5Tcopy(H5T_NATIVE_INT));
+						result = H5Tenum_create(base_type);
+						if (result < 0) {
+							throw gcnew HDF5Exception("H5Tenum_create failed!");
+						}
 
 						Dictionary<String^,Object^>^ members = nullptr;
 						if (TryGetValue(dict["Members"], members))
