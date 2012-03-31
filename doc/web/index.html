@@ -23,9 +23,28 @@
         <h1>PSH5X</h1>
         <p>
             <b>PSH5X</b> is a <a href="http://en.wikipedia.org/wiki/Windows_PowerShell">Windows
-                PowerShell</a> module for HDF5. Please send your questions/comments/suggestions to
-            the <a href="http://www.hdfgroup.org/services/community_support.html">HDF forum</a> or
-            send an <a href="mailto:gheber@hdfgroup.org">email</a>. </p>
+                PowerShell</a> module for HDF5. It leverages the <a
+                href="http://msdn.microsoft.com/en-us/library/windows/desktop/ee126196(v=vs.85).aspx"
+                >PowerShell provider interface</a> to put a file system metaphor around HDF5,
+            resulting in a user experience that is quite different from Andrew Collette's excellent
+                <a href="http://alfven.org/wp/hdf5-for-python/">h5py</a> Python module. The choice
+            is yours and probably most people would agree that there can't be too many good
+            interfaces for somehing as wonderful as HDF5.</p>
+        <p>Let me guess, sooner or later you'll ponder over what makes the difference between
+            scripting languages and shells. I keep returning to this question about every 3 months
+            and an answer still eludes me. The following comment by <a
+                href="http://manning.com/payette2/">Bruce Payette</a> has been a steady source of
+            consolation (Windows PowerShell in Action, 2nd Edition, Manning 2011, page 7):</p>
+        <q>In the end, there's no hard-and-fast distinction between a shell language and a scripting
+            language. Some of the features that make a good scripting language result in a poor
+            shell user experience. Conversely, some of the features that make for a good interactive
+            shell experience can interfere with scripting. Because PowerShell's goal is to be both a
+            good scripting language and a good interactive shell, balancing the tradeoffs between
+            user experience and scripting authoring was one of the major language design
+            challenges.</q>
+        <p> Please send your questions/comments/suggestions to the <a
+                href="http://www.hdfgroup.org/services/community_support.html">HDF forum</a> or
+            contact us by <a href="mailto:gheber@hdfgroup.org">email</a>. </p>
         <h3>Prerequisites</h3>
         <dl>
             <dt>Operating system:</dt>
@@ -142,11 +161,10 @@
         <h2>Tutorial</h2>
         <p> In the following example, we create an HDF5 file whose BNF representation is shown in
             section 4, &quot;An Example of an HDF5 File in DDL&quot;, of <a
-                href="http://www.hdfgroup.org/HDF5/doc/ddl.html">DDL in BNF for HDF5</a>. (Get the
-            script and image files, and the expected outcome, from here: <a
-                href="./Create-BNFSample.ps1">Create-BNFSample.ps1</a>&nbsp;,&nbsp;<a
-                href="./hdf_logo.jpg">hdf_logo.jpg</a>&nbsp;,&nbsp;<a href="./sample.h5"
-                >sample.h5</a>) </p>
+                href="http://www.hdfgroup.org/HDF5/doc/ddl.html">DDL in BNF for HDF5</a>. (Download
+            the script, the image file, and the expected outcome: <a href="./Create-BNFSample.ps1"
+                >Create-BNFSample.ps1</a>&nbsp;,&nbsp;<a href="./hdf_logo.jpg"
+                >hdf_logo.jpg</a>&nbsp;,&nbsp;<a href="./sample.h5">sample.h5</a>) </p>
         <pre class="code">
 Import-Module HDF5
 
