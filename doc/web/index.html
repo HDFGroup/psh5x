@@ -19,14 +19,13 @@
             }</style>
     </head>
     <body>
-        <img src="psh5x_logo_100x75.gif" alt="PSH5X logo" align="right" />
-        <h1>PSH5X</h1>
+        <img src="psh5x_logo_100x75.gif" alt="PSH5X logo" align="bottom" />
         <p>
             <b>PSH5X</b> is a <a href="http://en.wikipedia.org/wiki/Windows_PowerShell">Windows
-                PowerShell</a> module for HDF5. It leverages the <a
+                PowerShell</a> module for HDF5. It leverages PowerShell's <a
                 href="http://msdn.microsoft.com/en-us/library/windows/desktop/ee126196(v=vs.85).aspx"
-                >PowerShell provider interface</a> to put a file system metaphor around HDF5,
-            resulting in a user experience that is quite different from Andrew Collette's excellent
+                >provider model</a> to produce a file system-like experience for HDF5 (an often
+            cited metaphor), resulting in a user experience quite unlike Andrew Collette's excellent
                 <a href="http://alfven.org/wp/hdf5-for-python/">h5py</a> Python module. The choice
             is yours and probably most people would agree that there can't be too many good
             interfaces for something as wonderful as HDF5.</p>
@@ -42,37 +41,28 @@
             good scripting language and a good interactive shell, balancing the tradeoffs between
             user experience and scripting authoring was one of the major language design
             challenges.</q>
-        <p> Please send your questions/comments/suggestions to the <a
+        <p>Quesions? Check out the <a href="#FAQ">FAQ</a>.</p>
+        <p>Please send your questions/comments/suggestions to the <a
                 href="http://www.hdfgroup.org/services/community_support.html">HDF forum</a> or
             contact us by <a href="mailto:gheber@hdfgroup.org">email</a>. </p>
+        
+        
         <h3>Prerequisites</h3>
-        <dl>
-            <dt>Operating system:</dt>
-            <dd>
-                <ul>
-                    <li>Windows XP, Vista, 7, 8</li>
-                    <li>Windows Server 2003, 2008, 2008 R2, 8</li>
-                </ul>
-            </dd>
-            <dt>PowerShell:</dt>
-            <dd>
-                <ul>
-                    <li>Version 2.0</li>
-                    <li>Version 3.0</li>
-                </ul>
-                <p> Version 1.0 is <b>not</b> supported.</p>
-            </dd>
-            <dt>.NET Framework</dt>
-            <dd>
-                <ul>
-                    <li>Version 4</li>
-                    <li>Version 4.5</li>
-                </ul>
-                <p> Earlier versions are currently <b>not</b> supported. PSH5X may work with .NET
-                    3.5, but this arrangement has not been tested.</p>
-            </dd>
-        </dl>
-        <h2>Download (coming soon)</h2>
+        <table>
+            <tr>
+                <td><u>Operating system:</u></td>
+                <td>Windows XP, Vista, 7, 8, Windows Server 2003, 2008, 2008 R2, 8</td>
+            </tr>
+            <tr>
+                <td><u>.NET Framework:</u></td>
+                <td> Version 4 or higher; earlier versions are currently <b>not</b> supported. </td>
+            </tr>
+            <tr>
+                <td><u>PowerShell:</u></td>
+                <td>Version 2.0 or higher, Version 1.0 is <b>not</b> supported.</td>
+            </tr>
+        </table>
+        <h2>Downloads (coming soon)</h2>
         <ul>
             <li>PSH5X Alpha .NET 4 (x86) built against <a
                     href="http://www.hdfgroup.org/ftp/HDF5/current/bin/windows/HDF5188-win32-shared.zip"
@@ -112,6 +102,7 @@
                 <u>PSH5X does not delete the sandbox file!</u> (in case you'd like to recover some
             of the objects later...)</p>
         <h2>PowerShell Resources</h2>
+        <img src="sample.gif" alt="PSH5X logo" align="right" />
         <dl>
             <dt><a href="http://technet.microsoft.com/en-us/scriptcenter/dd742419">Windows
                     PowerShell: Learn It Now Before It's an Emergency</a></dt>
@@ -161,8 +152,12 @@
         <h2>Tutorial</h2>
         <p> In the following example, we create an HDF5 file whose BNF representation is shown in
             section 4, &quot;An Example of an HDF5 File in DDL&quot;, of <a
-                href="http://www.hdfgroup.org/HDF5/doc/ddl.html">DDL in BNF for HDF5</a>. (Download
-            the script, the image file, and the expected outcome: <a href="./Create-BNFSample.ps1"
+                href="http://www.hdfgroup.org/HDF5/doc/ddl.html">DDL in BNF for HDF5</a>. The
+            (multi-)graph structure is shown in the figure above. The different shapes represent
+            different kinds of HDF5 objects: circles - HDF5 groups, rectangles - HDF5 datasets,
+            triangles - HDF5 committed datatypes, hexagons - HDF5 attributes. Arrows represent HDF5
+            links labelled with their respective link name. (Download the script, the image file,
+            and the expected outcome here: <a href="./Create-BNFSample.ps1"
                 >Create-BNFSample.ps1</a>&nbsp;,&nbsp;<a href="./hdf_logo.jpg"
                 >hdf_logo.jpg</a>&nbsp;,&nbsp;<a href="./sample.h5">sample.h5</a>) </p>
         <pre class="code">
@@ -303,5 +298,18 @@ if (Test-Path $hdfview) {
     $hdfview $file
 }
         </pre>
+        
+        <h2><a name="FAQ">Frequently Asked Questions</a></h2>
+        
+        <h3>Introduction</h3>
+        
+        <h4>1.01 Where do I get help on PSH5X cmdlets?</h4>
+        <p>Answer</p>
+        
+        <h3>The Windows Platform</h3>
+        
+        <h4>2.01 How do I get data from HDF5 into Excel?</h4>
+        <p>Answer</p>
+        
     </body>
 </html>
