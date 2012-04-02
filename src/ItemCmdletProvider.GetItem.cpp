@@ -148,13 +148,13 @@ namespace PSH5X
 
                     case H5L_TYPE_SOFT:
 
-                        WriteItemObject(gcnew LinkInfo(group_id, linkName, "SoftLink"),
+                        WriteItemObject(gcnew LinkInfo(group_id, linkName),
                             path, false);
                         break;
 
                     case H5L_TYPE_EXTERNAL:
 
-                        WriteItemObject(gcnew LinkInfo(group_id, linkName, "ExtLink"),
+                        WriteItemObject(gcnew LinkInfo(group_id, linkName),
                             path, false);
                         break;
 

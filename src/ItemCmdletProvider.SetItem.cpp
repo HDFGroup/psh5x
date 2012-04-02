@@ -160,7 +160,7 @@ namespace PSH5X
                                 throw gcnew HDF5Exception("H5Fflush failed!");
                             }
 
-                            WriteItemObject(gcnew LinkInfo(drive->FileHandle, h5path, "SoftLink"), path, false);
+                            WriteItemObject(gcnew LinkInfo(drive->FileHandle, h5path), path, false);
                         }
                     }
                     else {
@@ -207,7 +207,7 @@ namespace PSH5X
                                 throw gcnew HDF5Exception("H5Fflush failed!");
                             }
 
-                            WriteItemObject(gcnew LinkInfo(drive->FileHandle, h5path, "ExtLink"), path, false);
+                            WriteItemObject(gcnew LinkInfo(drive->FileHandle, h5path), path, false);
                         }
                     }
                     else {

@@ -465,7 +465,6 @@ namespace PSH5X
 					if (size != 1 && size != 2 && size != 4 && size != 8) {
 						throw gcnew PSH5XException("Unsupported enum size!");
 					}
-					result->Add("Size", size);
 					unwnd = H5Tget_super(type);
 					result->Add("Base", ProviderUtils::ParseH5Type(unwnd));
 					sign = H5Tget_sign(unwnd);

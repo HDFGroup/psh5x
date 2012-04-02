@@ -38,6 +38,22 @@ namespace PSH5X
 		
 		try
 		{
+			RuntimeDefinedParameterDictionary^ dynamicParameters =
+                (RuntimeDefinedParameterDictionary^) DynamicParameters;
+
+			bool ignoreAttributes = false;
+            if (dynamicParameters != nullptr && dynamicParameters->ContainsKey("IgnoreAttributes")) {
+                ignoreAttributes = dynamicParameters["IgnoreAttributes"]->IsSet;
+            }
+			bool copyLink = false;
+            if (dynamicParameters != nullptr && dynamicParameters->ContainsKey("copyLink")) {
+                copyLink = dynamicParameters["copyLink"]->IsSet;
+            }
+
+			if (copyLink && (ignoreAttributes || recurse)) {
+				WriteWarning("The -IgnoreAttributes and -Recurse switches have no effect when -CopyLink is specified!");
+			}
+
 #pragma region sanity check
 
 			DriveInfo^ drive = nullptr;
@@ -52,10 +68,18 @@ namespace PSH5X
                 throw gcnew PSH5XException("Ill-formed HDF5 path name and/or unable to obtain drive name!");
             }
 
-			// Does the source object exist?
-			if (!ProviderUtils::IsResolvableH5Path(drive->FileHandle, h5path)) { 
-				throw gcnew PSH5XException(String::Format("The source object '{0}' does not exist", path));
+			if (!copyLink) {
+				// Does the source object exist?
+				if (!ProviderUtils::IsResolvableH5Path(drive->FileHandle, h5path)) { 
+					throw gcnew PSH5XException(String::Format("The source object '{0}' does not exist", path));
+				}
 			}
+			else {
+				if (!ProviderUtils::IsValidH5Path(drive->FileHandle, h5path)) { 
+					throw gcnew PSH5XException(String::Format("The source link '{0}' does not exist", path));
+				}
+			}
+
 			// Is the destination drive writable?
 			if (copyDrive->ReadOnly) {
                 throw gcnew PSH5XException("The destination drive is read-only and cannot be modified!");
@@ -66,8 +90,8 @@ namespace PSH5X
 			{
 				// we are good
 			}
-			else if (ProviderUtils::IsResolvableH5Path(drive->FileHandle, copyH5Path) &&
-				ProviderUtils::IsH5Group(drive->FileHandle, copyH5Path))
+			else if (ProviderUtils::IsResolvableH5Path(copyDrive->FileHandle, copyH5Path) &&
+				ProviderUtils::IsH5Group(copyDrive->FileHandle, copyH5Path))
 			{
 					String^ checkH5path = copyH5Path + "/" + ProviderUtils::ChildName(h5path);
 					if (ProviderUtils::CanCreateItemAt(copyDrive->FileHandle, checkH5path)) {
@@ -85,50 +109,64 @@ namespace PSH5X
 
 			if (Force) {
 				if (H5Pset_create_intermediate_group(lcpl, 1) < 0) {
-					throw gcnew HDF5Exception("H5Pset_create_intermediate_group failed!!!");
+					throw gcnew HDF5Exception("H5Pset_create_intermediate_group failed!");
 				}
 			}
-
 			if (!recurse) {
 				if(H5Pset_copy_object(ocpypl, H5O_COPY_SHALLOW_HIERARCHY_FLAG) < 0) {
-					throw gcnew HDF5Exception("H5Pset_copy_object failed!!!");
+					throw gcnew HDF5Exception("H5Pset_copy_object failed!");
 				}
 			}
-
-			bool ignoreAttributes = false;
-            RuntimeDefinedParameterDictionary^ dynamicParameters =
-                (RuntimeDefinedParameterDictionary^) DynamicParameters;
-            if (dynamicParameters != nullptr && dynamicParameters->ContainsKey("IgnoreAttributes")) {
-                ignoreAttributes = dynamicParameters["IgnoreAttributes"]->IsSet;
-            }
 			if (ignoreAttributes) {
 				if(H5Pset_copy_object(ocpypl, H5O_COPY_WITHOUT_ATTR_FLAG) < 0) {
-					throw gcnew HDF5Exception("H5Pset_copy_object failed!!!");
+					throw gcnew HDF5Exception("H5Pset_copy_object failed!");
 				}
 			}
 
 			path_str = (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
 			copy_path_str = (char*)(Marshal::StringToHGlobalAnsi(copyH5Path)).ToPointer();
 
-			if (H5Ocopy(drive->FileHandle, path_str, copyDrive->FileHandle, copy_path_str, ocpypl, lcpl) >= 0)
+			if (this->ShouldProcess(h5path, String::Format("Copying HDF5 item '{0}'", path)))
 			{
-				if (H5Fflush(copyDrive->FileHandle, H5F_SCOPE_LOCAL) >= 0)
+				if (!copyLink)
 				{
-					oid = H5Oopen(copyDrive->FileHandle, copy_path_str, H5P_DEFAULT);
-					if (oid >= 0) {
-						WriteItemObject(gcnew ObjectInfo(oid), copyPath,
-							ProviderUtils::IsH5Group(copyDrive->FileHandle, copyH5Path));
+					if (H5Ocopy(drive->FileHandle, path_str, copyDrive->FileHandle, copy_path_str, ocpypl, lcpl) >= 0)
+					{
+						if (H5Fflush(copyDrive->FileHandle, H5F_SCOPE_LOCAL) >= 0)
+						{
+							oid = H5Oopen(copyDrive->FileHandle, copy_path_str, H5P_DEFAULT);
+							if (oid >= 0) {
+								WriteItemObject(gcnew ObjectInfo(oid), copyPath,
+									ProviderUtils::IsH5Group(copyDrive->FileHandle, copyH5Path));
+							}
+							else {
+								throw gcnew HDF5Exception("H5Oopen failed!");
+							}
+						}
+						else {
+							throw gcnew HDF5Exception("H5Fflush failed!");
+						}
 					}
 					else {
-						throw gcnew HDF5Exception("H5Oopen failed!!!");
+						throw gcnew HDF5Exception("H5Ocopy failed!");
 					}
 				}
-				else {
-					throw gcnew HDF5Exception("H5Fflush failed!!!");
+				else 
+				{
+					if (H5Lcopy(drive->FileHandle, path_str, copyDrive->FileHandle, copy_path_str, lcpl,
+						H5P_DEFAULT) >= 0)
+					{
+						if (H5Fflush(copyDrive->FileHandle, H5F_SCOPE_LOCAL) >= 0) {
+							WriteItemObject(gcnew LinkInfo(copyDrive->FileHandle, copyH5Path), copyPath, false);
+						}
+						else {
+							throw gcnew HDF5Exception("H5Fflush failed!");
+						}
+					}
+					else {
+						throw gcnew HDF5Exception("H5Lcopy failed!");
+					}
 				}
-			}
-			else {
-				throw gcnew HDF5Exception("H5Ocopy failed!!!");
 			}
 		}
 		finally
@@ -173,6 +211,14 @@ namespace PSH5X
         atts1->Add(paramAttr1);
         dynamicParameters->Add("IgnoreAttributes",
             gcnew RuntimeDefinedParameter("IgnoreAttributes", SwitchParameter::typeid, atts1));
+        
+		Collection<Attribute^>^ atts2 = gcnew Collection<Attribute^>();
+        ParameterAttribute^ paramAttr2 = gcnew ParameterAttribute();
+        paramAttr2->Mandatory = false;
+        paramAttr2->ValueFromPipeline = false;
+        atts2->Add(paramAttr2);
+        dynamicParameters->Add("CopyLink",
+            gcnew RuntimeDefinedParameter("CopyLink", SwitchParameter::typeid, atts2));
         
         return dynamicParameters;
     }
@@ -378,7 +424,7 @@ namespace PSH5X
                                 break;
                             }
 
-                            WriteItemObject(gcnew LinkInfo(gid, linkName, "SoftLink"),
+                            WriteItemObject(gcnew LinkInfo(gid, linkName),
                                 childPath, false);
                             
                             break;
@@ -389,7 +435,7 @@ namespace PSH5X
                                 break;
                             }
 
-                            WriteItemObject(gcnew LinkInfo(gid, linkName, "ExtLink"),
+                            WriteItemObject(gcnew LinkInfo(gid, linkName),
                                 childPath, false);
                             
                             break;

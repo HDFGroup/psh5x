@@ -23,7 +23,7 @@ SYNTAX
 
     C:\PS>$t = @"
           {
-              "Base"    : int ,
+              "Base"    : "int" ,
               "Class"   : "Enum", 
               "Members": {
                   "SOLID"  : 0 ,

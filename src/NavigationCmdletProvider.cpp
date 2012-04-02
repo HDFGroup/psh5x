@@ -1,7 +1,13 @@
 
+#include "HDF5Exception.h"
 #include "Provider.h"
 #include "ProviderUtils.h"
 #include "PSH5XException.h"
+
+extern "C" {
+#include "H5Gpublic.h"
+#include "H5Ppublic.h"
+}
 
 using namespace System;
 using namespace System::Collections::Generic;
@@ -48,91 +54,109 @@ namespace PSH5X
         return __super::MakePath(parent, child);
     }
 
+	// TODO
+
     void Provider::MoveItem(String^ path, String^ destination)
     {
         WriteVerbose(String::Format(
             "HDF5Provider::MoveItem(Path = '{0}', Destination = '{1}')", path, destination));
         
-        throw gcnew PSH5XException("Not implemented!");
+		hid_t lcpl = H5Pcreate(H5P_LINK_CREATE), sgid = -1, dgid = -1;
 
-        /*
-        if (newName->Contains("/") || newName->Contains("\\")) {
-            throw gcnew PSH5XException("The new link name must not contain forward- or backslashes!");
-        }
+		char *src_path = NULL, *dst_path = NULL;
+		
+		try
+		{
+#pragma region sanity check
 
-        hid_t gid = -1;
+			DriveInfo^ drive = nullptr;
+			String^ h5path = nullptr;
+			if (!ProviderUtils::TryGetDriveEtH5Path(path, ProviderInfo, drive, h5path)) {
+				throw gcnew PSH5XException("Ill-formed HDF5 path name and/or unable to obtain drive name!");
+			}
 
-        char *group_path = NULL, *link_name = NULL, *new_name = NULL;
+			DriveInfo^ destDrive = nullptr;
+			String^ destH5Path = nullptr;
+			if (!ProviderUtils::TryGetDriveEtH5Path(destination, ProviderInfo, destDrive, destH5Path)) {
+				throw gcnew PSH5XException("Ill-formed HDF5 path name and/or unable to obtain drive name!");
+			}
 
-        try
-        {
-            DriveInfo^ drive = nullptr;
-            String^ h5path = nullptr;
-            if (!ProviderUtils::TryGetDriveEtH5Path(path, ProviderInfo, drive, h5path))
-            {
-                throw gcnew PSH5XException("Ill-formed HDF5 path name and/or unable to obtain drive name!");
+			if (drive != destDrive) {
+				throw gcnew PSH5XException("The source and destination must be in the same HDF5 file/H5Drive!");
+			}
+
+			// Does the source object exist?
+			if (!ProviderUtils::IsResolvableH5Path(drive->FileHandle, h5path)) { 
+				throw gcnew PSH5XException(String::Format("The source object '{0}' does not exist", path));
+			}
+			// Is the destination drive writable?
+			if (destDrive->ReadOnly) {
+				throw gcnew PSH5XException("The destination drive is read-only and cannot be modified!");
+			}
+			// Can we create the destination object(s)?
+			if (ProviderUtils::CanCreateItemAt(destDrive->FileHandle, destH5Path) ||
+				(Force && ProviderUtils::CanForceCreateItemAt(destDrive->FileHandle, destH5Path)))
+			{
+				// we are good
+			}
+			else if (ProviderUtils::IsResolvableH5Path(destDrive->FileHandle, destH5Path) &&
+				ProviderUtils::IsH5Group(destDrive->FileHandle, destH5Path))
+			{
+				String^ checkH5path = destH5Path + "/" + ProviderUtils::ChildName(h5path);
+				if (ProviderUtils::CanCreateItemAt(destDrive->FileHandle, checkH5path)) {
+					destH5Path = checkH5path;
+				}
+				else {
+					throw gcnew PSH5XException(String::Format("Unable to create the destination object '{0}'!", destination));
+				}
+			}
+			else {
+				throw gcnew PSH5XException(String::Format("Unable to create the destination object '{0}'!", destination));
+			}
+
+#pragma endregion
+
+			if (Force) {
+				if (H5Pset_create_intermediate_group(lcpl, 1) < 0) {
+					throw gcnew HDF5Exception("H5Pset_create_intermediate_group failed!!!");
+				}
+			}
+
+			src_path = (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
+			dst_path = (char*)(Marshal::StringToHGlobalAnsi(destH5Path)).ToPointer();
+			
+			if (this->ShouldProcess(h5path, String::Format("Moving HDF5 item '{0}'", path)))
+			{
+				if (H5Lmove(drive->FileHandle, src_path, destDrive->FileHandle, dst_path,
+					lcpl, H5P_DEFAULT) >= 0)
+				{
+					if (H5Fflush(drive->FileHandle, H5F_SCOPE_LOCAL) < 0) {
+						throw gcnew Exception("H5Fflush failed!");
+					}
+				}
+				else {
+					throw gcnew Exception("H5Lmove failed!!!");
+				}
+			}
+		}
+		finally
+		{
+			if (dgid >= 0) {
+				H5Gclose(dgid);
+			}
+			if (sgid >= 0) {
+				H5Gclose(sgid);
+			}
+			if (dst_path != NULL) {
+                Marshal::FreeHGlobal(IntPtr(dst_path));
             }
-
-            if (drive->ReadOnly)
-            {
-                throw gcnew PSH5XException("The drive is read-only and cannot be modified!");
+			if (src_path != NULL) {
+                Marshal::FreeHGlobal(IntPtr(src_path));
             }
-
-            if (ProviderUtils::IsH5RootPathName(h5path)) // root group, TODO: refine with address check!
-            {
-                throw gcnew PSH5XException(String::Format("Cannot rename the root group '{0}'", h5path));
+			if (lcpl >= 0) {
+                H5Pclose(lcpl);
             }
-            else
-            {
-                String^ groupPath = ProviderUtils::ParentPath(h5path);
-                group_path = (char*)(Marshal::StringToHGlobalAnsi(groupPath)).ToPointer();
-
-                gid = H5Gopen2(drive->FileHandle, group_path, H5P_DEFAULT);
-                if (gid < 0) {
-                    throw gcnew HDF5Exception("H5Gopen2 failed!");
-                }
-
-                String^ linkName = ProviderUtils::ChildName(h5path);
-                link_name = (char*)(Marshal::StringToHGlobalAnsi(linkName)).ToPointer();
-                new_name = (char*)(Marshal::StringToHGlobalAnsi(newName)).ToPointer();
-
-                if (H5Lexists(gid, link_name, H5P_DEFAULT) > 0)
-                {
-                    if (this->ShouldProcess(h5path,
-                        String::Format("Renaming HDF5 item '{0}'", path)))
-                    {
-                        if (H5Lmove(gid, link_name, gid, new_name, H5P_DEFAULT, H5P_DEFAULT) >= 0)
-                        {
-                            if (H5Fflush(gid, H5F_SCOPE_LOCAL) < 0) {
-                                throw gcnew Exception("H5Fflush failed!");
-                            }
-                        }
-                        else {
-                            throw gcnew Exception("H5Lmove failed!!!");
-                        }
-                    }
-                }
-            }
-        }
-        finally
-        {
-            if (gid >= 0) {
-                H5Gclose(gid);
-            }
-
-            if (new_name != NULL) {
-                Marshal::FreeHGlobal(IntPtr(new_name));
-            }
-
-            if (link_name != NULL) {
-                Marshal::FreeHGlobal(IntPtr(link_name));
-            }
-
-            if (group_path != NULL) {
-                Marshal::FreeHGlobal(IntPtr(group_path));
-            }
-        }
-        */
+		}
 
         return;
     }

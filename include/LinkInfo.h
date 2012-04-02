@@ -38,7 +38,7 @@ namespace PSH5X
             System::String^ get() { return m_cset; }
         }
 
-        LinkInfo(hid_t locid, System::String^ linkName, System::String^ itemType);
+        LinkInfo(hid_t locid, System::String^ linkName);
 
         ~LinkInfo()
         {

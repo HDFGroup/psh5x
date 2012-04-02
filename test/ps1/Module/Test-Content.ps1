@@ -34,12 +34,12 @@ foreach ($n in $names)
         Set-H5DatasetValue h5tmp:\DS1 $dummy
 
         if ($n -eq 'objref') {
-            Remove-H5Object h5tmp:\DS1,h5tmp:\DS2
+            Remove-H5Item h5tmp:\DS1,h5tmp:\DS2
         }
     }
 }
 
-Remove-H5Object h5tmp:\*
+Remove-H5Item h5tmp:\*
 
 c:
 

@@ -15,14 +15,30 @@ using namespace System::Runtime::InteropServices;
 namespace PSH5X
 {
 
-    LinkInfo::LinkInfo(hid_t locid, System::String^ linkName, System::String^ itemType)
-        : ItemInfo(itemType)
+    LinkInfo::LinkInfo(hid_t locid, System::String^ linkName)
+        : ItemInfo("Unknown")
     {
         H5L_info_t info;
         char* name = (char*)(Marshal::StringToHGlobalAnsi(linkName)).ToPointer();
 
         if (H5Lget_info(locid, name, &info, H5P_DEFAULT) >= 0)
         {
+			switch (info.type)
+			{
+			case H5L_TYPE_HARD:
+				m_item_type = "HardLink";
+				break;
+			case H5L_TYPE_SOFT:
+				m_item_type = "SoftLink";
+				break;
+			case H5L_TYPE_EXTERNAL:
+				m_item_type = "ExternalLink";
+				break;
+			case H5L_TYPE_ERROR:
+				m_item_type = "Unknown";
+				break;
+			}
+
             m_corder_valid = info.corder_valid;
             m_corder = info.corder;
 
@@ -48,12 +64,12 @@ namespace PSH5X
                 throw gcnew InvalidOperationException("H5Lget_val failed!");
             }
 
-            if (itemType == "SoftLink")
+            if (m_item_type == "SoftLink")
             {
                 m_h5_path_name = gcnew String(buf_ptr);
                 m_file_name = ".";
             }
-            else if (itemType == "ExtLink")
+            else if (m_item_type == "ExtLink")
             {
                 unsigned flags;
                 const char* filename;

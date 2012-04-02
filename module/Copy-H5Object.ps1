@@ -20,6 +20,8 @@ Function Copy-H5Object
 
       Unless the current location is on the targeted H5Drive,
       the path(s) must be drive-qualified.
+
+      The source and destination may refer to different H5Drives.
    .PARAMETER Source
      The path of the HDF5 object to be copied.
    .PARAMETER Destination
