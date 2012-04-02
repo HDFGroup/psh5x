@@ -291,7 +291,7 @@ if (Test-Path $image) {
 C:
 Remove-H5Drive $name
 
-# open the new HDF5 file in HDFView (if found)
+# open the new HDF5 file in HDFView (if present)
 $hdfview = 'C:\Program Files\TheHDFGroup\HDFView2.8\HDFView.exe'
 if (Test-Path $hdfview) {
     $hdfview $file
