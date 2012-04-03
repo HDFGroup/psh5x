@@ -19,18 +19,80 @@
             }</style>
     </head>
     <body>
-        <img src="psh5x_logo_100x75.gif" alt="PSH5X logo" align="bottom" />
+        <a href="./index.html"><img src="psh5x_logo_100x75.gif" alt="PSH5X logo" align="bottom" /></a>
         <h1>Frequently Asked Questions</h1>
-        
         <h2>Introduction</h2>
-        
-        <h3>1.01 Where do I get help on PSH5X cmdlets?</h3>
-        <p>Answer</p>
-        
+        <h3>1.01 Where do I get help?</h3>
+        <p>In PowerShell, the <tt>Get-Help</tt> cmdlet is your one-stop shop for help about cmdlets
+            and topics. All PSH5X cmdlets come with some form of help. For example, to get help on
+                <tt>New-H5Drive</tt> type <tt>help New-H5Drive</tt> or <tt>New-H5Drive -?</tt>. You can get a
+        list of HDF5 related topics by typing <tt>help about_H5*</tt> .</p>
         <h2>The Windows Platform</h2>
-        
         <h3>2.01 How do I get data from HDF5 into Excel?</h3>
-        <p>Answer</p>
-        
+        <p>Assume that we have a 5553 (rows) by 86 (colums) twodimensional dataset of floating point
+            numbers at <tt>h5:/my/floats</tt> that we would like to load into Excel. There's a
+            simple four step process to get this done.</p>
+        <ol>
+            <li>Create an Excel COM object</li>
+            <li>Add a blank workbook and select the target range</li>
+            <li>Pump the values into the range</li>
+            <li>Clean up</li>
+        </ol>
+        <p>The PowerShell skeleton is shown below. Note that you have to work out the corners of the
+            range in Excel notation, e.g., A1-CH5554, which is well documented (check the links
+            following the code).</p>
+        <pre class="code">
+# create an Excel COM object
+$excel = New-Object -ComObject Excel.Application
+$excel.Visible = $True
+
+# add a workbook and select the target range
+$workbook = $excel.Workbooks.Add() 
+$range = $workbook.ActiveSheet.Range('A1','CH5554')
+
+# pump the values in
+$range.Value2 = Get-H5DatasetValue h5:/my/floats
+
+# cleanup
+$excel.Application.DisplayAlerts = $False
+$excel.Quit()
+Get-Process Excel | Stop-Process
+[System.Runtime.Interopservices.Marshal]::ReleaseComObject($excel)
+        </pre>
+        <p>Related information:</p>
+        <ul>
+
+            <li><a href="http://support.microsoft.com/kb/833402">How to convert Excel column numbers
+                    into alphabetical characters</a></li>
+            <li><a href="http://msdn.microsoft.com/en-us/library/ff846392.aspx">Excel 2010 Developer
+                    Reference</a></li>
+            <li><a
+                    href="http://powertoe.wordpress.com/2010/11/05/how-to-get-data-into-an-excel-spreadsheet-very-quickly-with-powershell-contd/"
+                    >How to Get Data into an Excel Spreadsheet Very Quickly with PowerShell</a></li>
+            <li><a href="http://www.powershellpraxis.de/Excel-COM.982.0.html">PowerShell Excel (COM)
+                    (in German)</a></li>
+        </ul>
+        <h3>2.02 Can I use HDF5DotNet objects in PowerShell?</h3>
+        <p>Yes, use the <tt>Add-Type</tt> cmdlet to load the HDF5DotNet assembly. You can then
+            create HDF5DotNet .NET objects with the <tt>New-Object</tt> cmdlet.</p>
+        <pre class="code">
+PS:11 >Add-Type -Path 'C:\Program Files\HDF Group\HDF5\1.8.8\bin\HDF5DotNet.dll'
+
+PS:12 >[System.AppDomain]::CurrentDomain.GetAssemblies()
+
+GAC    Version        Location
+---    -------        --------
+...
+True   v4.0.30319     C:\Windows\Microsoft.Net\assembly\GAC_MSIL\System.Core\v4.0_4.0.0.0__b77a5c5...
+False  v4.0.30319     C:\Users\gheber\Documents\WindowsPowerShell\Modules\HDF5\PSH5X.dll
+True   v4.0.30319     C:\Windows\Microsoft.Net\assembly\GAC_MSIL\Microsoft.VisualC\v4.0_10.0.0.0__...
+False  v4.0.30319     C:\Program Files\HDF Group\HDF5\1.8.8\bin\HDF5DotNet.dll
+
+PS:13 >[HDF5DotNet.H5]::Version
+
+                   Release                      Minor                     Major
+                   -------                      -----                     -----
+                         8                          8                         1
+        </pre>
     </body>
 </html>
