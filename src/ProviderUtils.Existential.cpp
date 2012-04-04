@@ -1,4 +1,5 @@
 
+#include "HDF5Exception.h"
 #include "ProviderUtils.h"
 
 extern "C" {
@@ -28,23 +29,34 @@ namespace PSH5X
     {
         bool result = false;
 
-        if (ProviderUtils::IsH5Object(file, h5path))
-        {
-            char* name = (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
-            hid_t obj_id = H5Oopen(file, name, H5P_DEFAULT);
-            if (obj_id >= 0)
-            {
-                H5O_info_t info;
-                if (H5Oget_info(obj_id, &info) >= 0)
-                {
-                    result = (info.type == H5O_TYPE_GROUP);
-                }
-             
-                H5Oclose(obj_id);
-            }
+		char* name = NULL;
 
-            Marshal::FreeHGlobal(IntPtr(name));
-        }
+		hid_t obj_id = -1;
+
+		try
+		{
+			if (ProviderUtils::IsH5Object(file, h5path))
+			{
+				name = (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
+				if ((obj_id = H5Oopen(file, name, H5P_DEFAULT)) < 0) {
+					throw gcnew HDF5Exception("H5Oopen failed!");
+				}
+
+				H5O_info_t info;
+				if (H5Oget_info(obj_id, &info) >= 0) {
+					result = (info.type == H5O_TYPE_GROUP);
+				}
+			}
+		}
+		finally
+		{
+			if (obj_id >= 0) {
+				H5Oclose(obj_id);
+			}
+			if (name != NULL) {
+				Marshal::FreeHGlobal(IntPtr(name));
+			}
+		}
 
         return result;
     }
@@ -53,21 +65,37 @@ namespace PSH5X
     {
         bool result = false;
 
-        if (ProviderUtils::IsH5Object(file, h5path))
-        {
-            char* name = (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
-            hid_t obj_id = H5Oopen(file, name, H5P_DEFAULT);
-            if (obj_id >= 0)
-            {
-                H5O_info_t info;
-                if (H5Oget_info(obj_id, &info) >= 0) {
-                    result = (info.type == H5O_TYPE_DATASET);
-                }
-                
-                H5Oclose(obj_id);
-            }
-            Marshal::FreeHGlobal(IntPtr(name));
-        }
+		char* name = NULL;
+
+		hid_t obj_id = -1;
+
+		try
+		{
+			if (ProviderUtils::IsH5Object(file, h5path))
+			{
+				if (ProviderUtils::IsH5Object(file, h5path))
+				{
+					name = (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
+					if ((obj_id = H5Oopen(file, name, H5P_DEFAULT)) < 0) {
+						throw gcnew HDF5Exception("H5Oopen failed!");
+					}
+
+					H5O_info_t info;
+					if (H5Oget_info(obj_id, &info) >= 0) {
+						result = (info.type == H5O_TYPE_DATASET);
+					}
+				}
+			}
+		}
+		finally
+		{
+			if (obj_id >= 0) {
+				H5Oclose(obj_id);
+			}
+			if (name != NULL) {
+				Marshal::FreeHGlobal(IntPtr(name));
+			}
+		}
 
         return result;
     }
@@ -75,24 +103,38 @@ namespace PSH5X
     bool ProviderUtils::IsH5ChunkedDataset(hid_t file, String^ h5path)
     {
         bool result = false;
+		
+		char* name = NULL;
 
-        if (ProviderUtils::IsH5Dataset(file, h5path))
-        {
-            char* name = (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
-            hid_t dset = H5Dopen2(file, name, H5P_DEFAULT);
-            if (dset >= 0)
-            {
-                hid_t plist = H5Dget_create_plist(dset);
-                if (plist >= 0)
-                {
-                    result = (H5Pget_layout(plist) == H5D_CHUNKED);
-                    H5Pclose(plist);
-                }
+		hid_t dset = -1, plist = -1;
 
-                H5Dclose(dset);
-            }
-            Marshal::FreeHGlobal(IntPtr(name));
-        }
+		try
+		{
+			if (ProviderUtils::IsH5Dataset(file, h5path))
+			{
+				name = (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
+				if ((dset = H5Dopen2(file, name, H5P_DEFAULT)) < 0) {
+					throw gcnew HDF5Exception("H5Dopen2 failed!");
+				}
+				if ((plist = H5Dget_create_plist(dset)) < 0) {
+					throw gcnew HDF5Exception("H5Dget_create_plist failed!");
+				}
+
+				result = (H5Pget_layout(plist) == H5D_CHUNKED);
+			}
+		}
+		finally
+		{
+			if (plist >= 0) {
+				H5Pclose(plist);
+			}
+			if (dset >= 0) {
+				H5Dclose(dset);
+			}
+			if (name != NULL) {
+				Marshal::FreeHGlobal(IntPtr(name));
+			}
+		}
 
         return result;
     }
@@ -101,21 +143,37 @@ namespace PSH5X
     {
         bool result = false;
 
-        if (ProviderUtils::IsH5Object(file, h5path))
-        {
-            char* name = (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
-            hid_t obj_id = H5Oopen(file, name, H5P_DEFAULT);
-            if (obj_id >= 0)
-            {
-                H5O_info_t info;
-                if (H5Oget_info(obj_id, &info) >= 0) {
-                    result = (info.type == H5O_TYPE_NAMED_DATATYPE);
-                }
+		char* name = NULL;
 
-                H5Oclose(obj_id);
-            }
-            Marshal::FreeHGlobal(IntPtr(name));
-        }
+		hid_t obj_id = -1;
+
+		try
+		{
+			if (ProviderUtils::IsH5Object(file, h5path))
+			{
+				if (ProviderUtils::IsH5Object(file, h5path))
+				{
+					name = (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
+					if ((obj_id = H5Oopen(file, name, H5P_DEFAULT)) < 0) {
+						throw gcnew HDF5Exception("H5Oopen failed!");
+					}
+
+					H5O_info_t info;
+					if (H5Oget_info(obj_id, &info) >= 0) {
+						result = (info.type == H5O_TYPE_NAMED_DATATYPE);
+					}
+				}
+			}
+		}
+		finally
+		{
+			if (obj_id >= 0) {
+				H5Oclose(obj_id);
+			}
+			if (name != NULL) {
+				Marshal::FreeHGlobal(IntPtr(name));
+			}
+		}
 
         return result;
     }
@@ -125,53 +183,84 @@ namespace PSH5X
         if (ProviderUtils::IsH5RootPathName(h5path)) { return false; }
 
         bool result = false;
+		char* name = NULL;
 
-        if (ProviderUtils::IsValidH5Path(file, h5path))
-        {
-            char* name = (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
-            H5L_info_t info;
-            if (H5Lget_info(file, name, &info, H5P_DEFAULT) >= 0)
-            {
-                result = (info.type == H5L_TYPE_SOFT || info.type == H5L_TYPE_EXTERNAL);
-            }
-            Marshal::FreeHGlobal(IntPtr(name));
-        }
+		try
+		{
+			if (ProviderUtils::IsValidH5Path(file, h5path))
+			{
+				name = (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
+				H5L_info_t info;
+				if (H5Lget_info(file, name, &info, H5P_DEFAULT) >= 0)
+				{
+					result = (info.type == H5L_TYPE_SOFT || info.type == H5L_TYPE_EXTERNAL);
+				}
+			}
+		}
+		finally
+		{
+			if (name != NULL) {
+				Marshal::FreeHGlobal(IntPtr(name));
+			}
+		}
 
         return result;
     }
 
     bool ProviderUtils::IsH5SoftLink(hid_t file, String^ h5path)
     {
-        bool result = false;
+        if (ProviderUtils::IsH5RootPathName(h5path)) { return false; }
 
-        if (ProviderUtils::IsValidH5Path(file, h5path))
-        {
-            char* name = (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
-            H5L_info_t info;
-            if (H5Lget_info(file, name, &info, H5P_DEFAULT) >= 0)
-            {
-                result = (info.type == H5L_TYPE_SOFT);
-            }
-            Marshal::FreeHGlobal(IntPtr(name));
-        }
+        bool result = false;
+		char* name = NULL;
+
+		try
+		{
+			if (ProviderUtils::IsValidH5Path(file, h5path))
+			{
+				name = (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
+				H5L_info_t info;
+				if (H5Lget_info(file, name, &info, H5P_DEFAULT) >= 0)
+				{
+					result = (info.type == H5L_TYPE_SOFT);
+				}
+			}
+		}
+		finally
+		{
+			if (name != NULL) {
+				Marshal::FreeHGlobal(IntPtr(name));
+			}
+		}
 
         return result;
     }
 
     bool ProviderUtils::IsH5ExternalLink(hid_t file, String^ h5path)
     {
-        bool result = false;
+        if (ProviderUtils::IsH5RootPathName(h5path)) { return false; }
 
-        if (ProviderUtils::IsValidH5Path(file, h5path))
-        {
-            char* name = (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
-            H5L_info_t info;
-            if (H5Lget_info(file, name, &info, H5P_DEFAULT) >= 0)
-            {
-                result = (info.type == H5L_TYPE_EXTERNAL);
-            }
-            Marshal::FreeHGlobal(IntPtr(name));
-        }
+        bool result = false;
+		char* name = NULL;
+
+		try
+		{
+			if (ProviderUtils::IsValidH5Path(file, h5path))
+			{
+				name = (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
+				H5L_info_t info;
+				if (H5Lget_info(file, name, &info, H5P_DEFAULT) >= 0)
+				{
+					result = (info.type == H5L_TYPE_EXTERNAL);
+				}
+			}
+		}
+		finally
+		{
+			if (name != NULL) {
+				Marshal::FreeHGlobal(IntPtr(name));
+			}
+		}
 
         return result;
     }

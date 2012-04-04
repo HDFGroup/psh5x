@@ -47,8 +47,10 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="ReadMe.txt" />
     <None Include="app.config" />
+    <None Include="COPYING" />
+    <None Include="README" />
+    <None Include="TODO" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\AssemblyInfo.cpp">
@@ -224,6 +226,9 @@
     </ClCompile>
     <ClCompile Include="src\DriveCmdletProvider.NewDrive.cpp">
       <Filter>Source Files\Provider\DriveCmdletProvider</Filter>
+    </ClCompile>
+    <ClCompile Include="src\NavigationCmdletProvider.MoveItem.cpp">
+      <Filter>Source Files\Provider\NavigationCmdletProvider</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -143,7 +143,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="ReadMe.txt" />
+    <None Include="COPYING" />
+    <None Include="README" />
+    <None Include="TODO" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\ArrayDatasetReaderT.h" />
@@ -219,6 +221,7 @@
     <ClCompile Include="src\ItemCmdletProvider.SetItem.cpp" />
     <ClCompile Include="src\LinkInfo.cpp" />
     <ClCompile Include="src\NavigationCmdletProvider.cpp" />
+    <ClCompile Include="src\NavigationCmdletProvider.MoveItem.cpp" />
     <ClCompile Include="src\NewH5ArrayCommand.cpp" />
     <ClCompile Include="src\ObjectInfo.cpp" />
     <ClCompile Include="src\ObjectInfoLite.cpp" />
