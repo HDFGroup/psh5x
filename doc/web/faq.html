@@ -12,8 +12,20 @@
             and topics. All PSH5X cmdlets come with some form of help. For example, to get help on
                 <tt>New-H5Drive</tt> type <tt>help New-H5Drive</tt> or <tt>New-H5Drive -?</tt>. You can get a
         list of HDF5 related topics by typing <tt>help about_H5*</tt> .</p>
+        <h3>1.02 What's the difference between between scripting languages and shell languages?</h3>
+        <p>I keep returning to this question about every 3 months
+            and an answer still eludes me. The following comment by <a
+                href="http://manning.com/payette2/">Bruce Payette</a> has been a steady source of
+            consolation (Windows PowerShell in Action, 2nd Edition, Manning 2011, page 7):</p>
+        <q>In the end, there's no hard-and-fast distinction between a shell language and a scripting
+            language. Some of the features that make a good scripting language result in a poor
+            shell user experience. Conversely, some of the features that make for a good interactive
+            shell experience can interfere with scripting. Because PowerShell's goal is to be both a
+            good scripting language and a good interactive shell, balancing the tradeoffs between
+            user experience and scripting authoring was one of the major language design
+            challenges.</q>
         <h2>The Windows Platform</h2>
-        <h3>2.01 How do I get data from HDF5 into Excel?</h3>
+        <h3 title="hdf52excel">2.01 How do I get data from HDF5 into Excel?</h3>
         <p>Assume that we have a 5553 (rows) by 86 (colums) twodimensional dataset of floating point
             numbers at <tt>h5:/my/floats</tt> that we would like to load into Excel. There's a
             simple four step process to get this done.</p>

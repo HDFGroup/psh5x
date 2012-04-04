@@ -12,22 +12,25 @@
                 PowerShell</a> module for HDF5. It leverages PowerShell's <a
                 href="http://msdn.microsoft.com/en-us/library/windows/desktop/ee126196(v=vs.85).aspx"
                 >provider model</a> to produce a file system-like experience for HDF5 (an often
-            cited metaphor), resulting in a user experience that is quite different from Andrew
-            Collette's excellent <a href="http://alfven.org/wp/hdf5-for-python/">h5py</a> Python
-            module. The choice is yours and probably most people would agree that there can't be too
-            many good interfaces for something as wonderful as HDF5.</p>
-        <p>Let me guess, sooner or later you'll ponder over what makes the difference between
-            scripting languages and shells. I keep returning to this question about every 3 months
-            and an answer still eludes me. The following comment by <a
-                href="http://manning.com/payette2/">Bruce Payette</a> has been a steady source of
-            consolation (Windows PowerShell in Action, 2nd Edition, Manning 2011, page 7):</p>
-        <q>In the end, there's no hard-and-fast distinction between a shell language and a scripting
-            language. Some of the features that make a good scripting language result in a poor
-            shell user experience. Conversely, some of the features that make for a good interactive
-            shell experience can interfere with scripting. Because PowerShell's goal is to be both a
-            good scripting language and a good interactive shell, balancing the tradeoffs between
-            user experience and scripting authoring was one of the major language design
-            challenges.</q>
+            cited metaphor). PSH5X helps you perform simple housekeeping tasks like renaming HDF5
+            links or copying HDF5 objects, but it can also create new HDF5 items (HDF5 objects,
+            links, attributes) and read or write HDF5 dataset and attribute values. Did you ever ask
+            questions similar to the following?</p>
+        <ul>
+            <li>How many groups and datasets there are in an HDF5 file?</li>
+            <li>What fraction of the total file size can be accounted for by HDF5 datasets?</li>
+            <li>Which path names containing the string 'H2O' lead to HDF5 datasets?</li>
+        </ul>
+        <p> You'll find that these are examples of the proverbial 'one-liners' in PSH5X. </p>
+        <p>As a user on the Windows platform you might be bewildered by the maze of Windows
+            scripting technologies. We would like to assure you that Windows PowerShell puts an end
+            to these "pagan excesses" of the past and that, henceforth, it will reign supreme and be
+            the single, unchallenged automation hub on this platform. </p>
+        
+        <p> , resulting in a user experience that is quite different from Andrew Collette's
+            excellent <a href="http://alfven.org/wp/hdf5-for-python/">h5py</a> Python module. The
+            choice is yours and probably most people would agree that there can't be too many good
+            interfaces for something as wonderful as HDF5.</p>
         <p>Questions? Check out a list of <a href="./cmdlets.html">PSH5X cmdlets</a>, the <a
                 href="./faq.html">FAQ</a>, and several <a href="./nolimits.html">limitations and
                 known issues</a>.</p>
