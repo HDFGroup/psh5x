@@ -625,16 +625,16 @@ namespace PSH5X
         return 0;
     }
 
-        herr_t H5LIterateCallback(
-        hid_t             group,
-        const char*       name,
-        const H5L_info_t* info,
-        void*             op_data)
-    {
-        vector<string>* v = static_cast<vector<string>*>(op_data);
-        v->push_back(string(name));
-        return 0;
-    }
+	herr_t H5LIterateCallback(
+		hid_t             group,
+		const char*       name,
+		const H5L_info_t* info,
+		void*             op_data)
+	{
+		vector<string>* v = static_cast<vector<string>*>(op_data);
+		v->push_back(string(name));
+		return 0;
+	}
 
     array<String^>^ ProviderUtils::GetGroupLinkNames(hid_t group_id, bool recurse)
     {

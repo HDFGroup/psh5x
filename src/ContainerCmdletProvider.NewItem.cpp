@@ -73,8 +73,7 @@ namespace PSH5X
 #pragma region structural check
 
             // check if we should automatically create intermediate groups
-            String^ parentPath = ProviderUtils::ParentPath(h5path);
-
+            
             if (Force)
             {
                 bool allClear = ProviderUtils::CanForceCreateItemAt(drive->FileHandle, h5path);
@@ -115,7 +114,6 @@ namespace PSH5X
 
 			if (itemTypeName->ToUpper() == "GROUP")
             {
-
 #pragma region HDF5 group
 
 				gcplist = H5Pcreate(H5P_GROUP_CREATE);
@@ -157,11 +155,9 @@ namespace PSH5X
                 }
 
 #pragma endregion
-
             }
             else if (itemTypeName->ToUpper() == "DATASET")
             {
-
 #pragma region HDF5 dataset
 
                 RuntimeDefinedParameterDictionary^ dynamicParameters =
@@ -432,11 +428,9 @@ namespace PSH5X
 				}
 
 #pragma endregion
-
             }
             else if (itemTypeName->ToUpper() == "DATATYPE")
             {
-
 #pragma region HDF5 datatype object
 
                 RuntimeDefinedParameterDictionary^ dynamicParameters =
@@ -488,11 +482,9 @@ namespace PSH5X
                 }
 
 #pragma endregion
-
             }
             else if (itemTypeName->ToUpper() == "HARDLINK")
             {
-
 #pragma region HDF5 hard link
 
                 // mandatory parameters -Value
@@ -558,11 +550,9 @@ namespace PSH5X
                 }
 
 #pragma endregion
-
             }
             else if (itemTypeName->ToUpper() == "SOFTLINK")
             {
-
 #pragma region HDF5 soft link
 
                 // mandatory parameters -Value
@@ -597,11 +587,9 @@ namespace PSH5X
                 }
 
 #pragma endregion
-
             }
             else if (itemTypeName->ToUpper() == "EXTLINK")
             {
-
 #pragma region HDF5 external link
 
                 // mandatory parameters -Value
@@ -642,7 +630,6 @@ namespace PSH5X
                 }
 
 #pragma endregion
-
             }
             else if (itemTypeName->ToUpper() == "DIMENSIONSCALE")
             {
@@ -650,7 +637,6 @@ namespace PSH5X
             }
             else if (itemTypeName->ToUpper() == "IMAGE")
             {
-
 #pragma region HDF5 image
 
                 unsigned bits = 0;
@@ -853,7 +839,6 @@ namespace PSH5X
                 WriteItemObject(gcnew DatasetInfo(dset), path, false);
 
 #pragma endregion
-
             }
             else if (itemTypeName->ToUpper() == "PALETTE")
             {
@@ -861,7 +846,6 @@ namespace PSH5X
             }
             else if (itemTypeName->ToUpper() == "PACKETTABLE")
             {
-
 #pragma region HDF5 packet table
 
                 RuntimeDefinedParameterDictionary^ dynamicParameters =
@@ -953,7 +937,6 @@ namespace PSH5X
                 }
 
 #pragma endregion
-
             }
             else if (itemTypeName->ToUpper() == "TABLE")
             {
@@ -969,83 +952,63 @@ namespace PSH5X
             if (rgbValues != NULL) {
                 delete [] rgbValues;
             }
-
             if (rgbPal != NULL) {
                 delete [] rgbPal;
             }
-
             if (oid >= 0) {
                 H5Oclose(oid);
             }
-
             if (dim != NULL) {
                 delete [] dim;
             }
-
             if (dcplist >= 0) {
                 H5Pclose(dcplist);
             }
-
             if (maximum_dims != NULL) {
                 delete [] maximum_dims;
             }
-
             if (current_dims != NULL) {
                 delete [] current_dims;
             }
-
             if (dtype >= 0) {
                 H5Tclose(dtype);
             }
-
             if (fspace >= 0) {
                 H5Sclose(fspace);
             }
-
             if (dset >= 0) {
                 H5Dclose(dset);
             }
-
             if (gid >= 0) {
                 H5Gclose(gid);
             }
-
 			if (gcplist >= 0) {
                 H5Pclose(gcplist);
             }
-
             if (lcplist >= 0) {
                 H5Pclose(lcplist);
             }
-
             if (name != NULL) {
                 Marshal::FreeHGlobal(IntPtr(name));
             }
-
             if (topath != NULL) {
                 Marshal::FreeHGlobal(IntPtr(topath));
             }
-
             if (hard != NULL) {
                 Marshal::FreeHGlobal(IntPtr(hard));
             }
-
             if (soft != NULL) {
                 Marshal::FreeHGlobal(IntPtr(soft));
             }
-
             if (file != NULL) {
                 Marshal::FreeHGlobal(IntPtr(file));
             }
-
             if (link != NULL) {
                 Marshal::FreeHGlobal(IntPtr(link));
             }
-
             if (mode != NULL) {
                 Marshal::FreeHGlobal(IntPtr(mode));
             }
-
             if (pal_name != NULL) {
                 Marshal::FreeHGlobal(IntPtr(pal_name));
             }

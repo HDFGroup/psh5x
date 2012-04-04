@@ -76,6 +76,11 @@ namespace PSH5X
             int get() { return m_nfilters; }
         }
 
+		property System::Collections::ArrayList^ Filters
+        {
+            System::Collections::ArrayList^ get() { return m_filters; }
+        }
+
         ~DatasetInfo()
         {
             delete m_elem_type_class;
@@ -86,37 +91,40 @@ namespace PSH5X
             delete m_fill_value_def;
             delete m_fill_time;
             delete m_alloc_time;
+			delete m_filters;
         }
 
     protected:
 
-        int               m_rank;
+        int                m_rank;
 
     private:
 
-        haddr_t           m_offset;
+        haddr_t            m_offset;
 
-        System::String^   m_elem_type_class;
+        System::String^    m_elem_type_class;
 
-        System::String^   m_elem_type;
+        System::String^    m_elem_type;
 
-        hsize_t           m_storage_size;
+        hsize_t            m_storage_size;
 
-        System::String^   m_dataspace_alloc_status;
+        System::String^    m_dataspace_alloc_status;
 
-        System::String^   m_simple_extent_type;
+        System::String^    m_simple_extent_type;
 
-        hssize_t          m_npoints;
+        hssize_t           m_npoints;
 
-        System::String^   m_layout;
+        System::String^    m_layout;
 
-        System::String^   m_fill_value_def;
+        System::String^    m_fill_value_def;
 
-        System::String^   m_fill_time;
+        System::String^    m_fill_time;
 
-        System::String^   m_alloc_time;
+        System::String^    m_alloc_time;
 
-        int               m_nfilters;
+        int                m_nfilters;
+
+		System::Collections::ArrayList^ m_filters;
 
     };
 

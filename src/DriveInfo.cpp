@@ -29,8 +29,7 @@ namespace PSH5X
 
 		try
 		{
-			if (!m_readonly)
-			{
+			if (!m_readonly) {
 				flags = H5F_ACC_RDWR;
 			}
 
