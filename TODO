@@ -18,15 +18,9 @@ KNOWN ISSUES
 NEW FEATURES
 ------------
 
-- Support hyperslab arguments in [G,S]et-H5DatasetValue
-
-- Implement reference dataset reader/writer
-
-- Support DatasetInfo(Lite) argument in Set/Get-Content and New-H5Array
+- Support DatasetInfo(Lite) argument in Set/Get-Content and New-H5Array?
 
 - Implement point selections in reader/writer
-
-- Implement resizing of extendible datasets (Set-Item ...)
 
 
 FUNDAMENTALS
