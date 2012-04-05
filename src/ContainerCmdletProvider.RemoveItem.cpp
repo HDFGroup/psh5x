@@ -216,7 +216,7 @@ namespace PSH5X
 										for (size_t i = 0; i < op_data.second.size(); ++i)
 										{
 											String^ s = gcnew String(op_data.second[i].c_str());
-											if (ProviderUtils::IsValidH5Path(gid, s)) // guard against cycles
+											if (ProviderUtils::IsValidH5Path(drive->FileHandle, s)) // guard against cycles
 											{
 												if (H5Ldelete(drive->FileHandle, op_data.second[i].c_str(), H5P_DEFAULT) >= 0)
 												{
