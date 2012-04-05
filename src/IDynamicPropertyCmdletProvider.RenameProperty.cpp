@@ -37,7 +37,6 @@ namespace PSH5X
 
         try
         {
-
 #pragma region sanity check
 
             DriveInfo^ drive = nullptr;

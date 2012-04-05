@@ -72,6 +72,18 @@ namespace PSH5X
 			if (this->ShouldProcess(h5path,
 				String::Format("Removing HDF5 attribute '{0}' from item '{1}'", propertyName, path)))
 			{
+				Hashtable^ ht = nullptr;
+				hid_t attr = -1;
+				
+				if ((attr = H5Aopen(oid, attr_name, H5P_DEFAULT)) >= 0)
+				{
+					ht = ProviderUtils::H5Attribute(attr, propertyName);
+					H5Aclose(attr);
+				}
+				else {
+					throw gcnew HDF5Exception("H5Aopen failed!");
+				}
+
 				if (H5Adelete(oid, attr_name) >= 0)
 				{
 					if (H5Fflush(oid, H5F_SCOPE_LOCAL) < 0) {
@@ -81,6 +93,8 @@ namespace PSH5X
 				else {
 					throw gcnew HDF5Exception("H5Adelete failed!");
 				}
+
+				WritePropertyObject(ht, path);
 			}
 		}
 		finally

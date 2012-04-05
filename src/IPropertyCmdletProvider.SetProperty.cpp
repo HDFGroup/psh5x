@@ -93,6 +93,8 @@ namespace PSH5X
 							if (H5Fflush(oid, H5F_SCOPE_LOCAL) < 0) {
 								throw gcnew HDF5Exception("H5Fflush failed!");
 							}
+
+							WritePropertyObject(ProviderUtils::H5Attribute(attr, attributeName), path);
 						}
 					}
 					else {

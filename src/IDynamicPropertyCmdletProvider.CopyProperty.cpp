@@ -126,6 +126,8 @@ namespace PSH5X
 						throw gcnew HDF5Exception("H5Awrite failed!!!");
 					}
 				}
+
+				WritePropertyObject(ProviderUtils::H5Attribute(dst_attr, destinationProperty), destinationPath);
 			}
 		}
 		finally

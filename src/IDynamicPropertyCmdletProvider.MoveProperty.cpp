@@ -137,6 +137,8 @@ namespace PSH5X
 				if (H5Adelete_by_name(sourceDrive->FileHandle, src_path_str, src_attr_name_str, H5P_DEFAULT) < 0) {
 					throw gcnew HDF5Exception("H5Adelete_by_name failed!!!");
 				}
+
+				WritePropertyObject(ProviderUtils::H5Attribute(dst_attr, destinationProperty), destinationPath);
 			}
 		}
 		finally
