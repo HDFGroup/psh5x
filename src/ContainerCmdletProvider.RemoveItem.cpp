@@ -148,18 +148,25 @@ namespace PSH5X
 						{
 							for (size_t i = 0; i < op_data.size(); ++i)
 							{
-								if (this->ShouldProcess(h5path,
-									String::Format("Recursively removing HDF5 group '{0}'", gcnew String(op_data[i].c_str()))))
+								String^ s = gcnew String(op_data[i].c_str());
+								if (ProviderUtils::IsResolvableH5Path(gid, s)) // guard against cycles
 								{
-									if (H5Ldelete(gid, op_data[i].c_str(), H5P_DEFAULT) >= 0)
+									if (this->ShouldProcess(h5path,
+										String::Format("Recursively removing HDF5 group '{0}'", s)))
 									{
-										if (H5Fflush(drive->FileHandle, H5F_SCOPE_LOCAL) < 0) {
-											throw gcnew HDF5Exception("H5Fflush failed!");
+										if (H5Ldelete(gid, op_data[i].c_str(), H5P_DEFAULT) >= 0)
+										{
+											if (H5Fflush(drive->FileHandle, H5F_SCOPE_LOCAL) < 0) {
+												throw gcnew HDF5Exception("H5Fflush failed!");
+											}
+										}
+										else {
+											throw gcnew HDF5Exception("H5Ldelete failed!!!");
 										}
 									}
-									else {
-										throw gcnew HDF5Exception("H5Ldelete failed!!!");
-									}
+								}
+								else {
+									WriteWarning(String::Format("As part of a recursive deletion the path '{0}' was no longer resolvable and skipped.", s));
 								}
 							}
 						}
@@ -175,89 +182,101 @@ namespace PSH5X
 #pragma endregion
 					}
 
-					if (Force)  // delete all links leading to the object
+					if (ProviderUtils::IsResolvableH5Path(drive->FileHandle, h5path)) // guard against cycles
 					{
+						if (Force)  // delete all links leading to the object
+						{
 #pragma region total unlink
 
-						opath = (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
-						if ((obj_id = H5Oopen(drive->FileHandle, opath, H5P_DEFAULT)) < 0) {
-							throw gcnew HDF5Exception("H5Oopen failed!");
-						}
-						H5O_info_t info;
-						if (H5Oget_info(obj_id, &info) < 0) {
-							throw gcnew HDF5Exception("H5Oget_info failed!");
-						}
-						H5Oclose(obj_id);
-						obj_id = -1;
+							opath = (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
+							if ((obj_id = H5Oopen(drive->FileHandle, opath, H5P_DEFAULT)) < 0) {
+								throw gcnew HDF5Exception("H5Oopen failed!");
+							}
+							H5O_info_t info;
+							if (H5Oget_info(obj_id, &info) < 0) {
+								throw gcnew HDF5Exception("H5Oget_info failed!");
+							}
+							H5Oclose(obj_id);
+							obj_id = -1;
 
-						pair<haddr_t, vector<string> > op_data;
-						// ignore this for now...
-						unsigned long fileno = info.fileno;
-						op_data.first = info.addr;
+							pair<haddr_t, vector<string> > op_data;
+							// ignore this for now...
+							unsigned long fileno = info.fileno;
+							op_data.first = info.addr;
 
-						if (this->ShouldProcess(h5path,
-							String::Format("Collecting and removing ALL HDF5 links to object '{0}'", path)))
-						{
-							do
+							if (this->ShouldProcess(h5path,
+								String::Format("Collecting and removing ALL HDF5 links to object '{0}'", path)))
 							{
-								op_data.second.clear();
-
-								if(H5Lvisit(drive->FileHandle, H5_INDEX_NAME, H5_ITER_NATIVE, &H5LVisitByAddr, (void*) &op_data) >= 0)
+								do
 								{
-									for (size_t i = 0; i < op_data.second.size(); ++i)
-									{
+									op_data.second.clear();
 
-										if (H5Ldelete(drive->FileHandle, op_data.second[i].c_str(), H5P_DEFAULT) >= 0)
+									if(H5Lvisit(drive->FileHandle, H5_INDEX_NAME, H5_ITER_NATIVE, &H5LVisitByAddr, (void*) &op_data) >= 0)
+									{
+										for (size_t i = 0; i < op_data.second.size(); ++i)
 										{
-											if (H5Fflush(drive->FileHandle, H5F_SCOPE_LOCAL) < 0) {
-												throw gcnew HDF5Exception("H5Fflush failed!");
+											String^ s = gcnew String(op_data.second[i].c_str());
+											if (ProviderUtils::IsValidH5Path(gid, s)) // guard against cycles
+											{
+												if (H5Ldelete(drive->FileHandle, op_data.second[i].c_str(), H5P_DEFAULT) >= 0)
+												{
+													if (H5Fflush(drive->FileHandle, H5F_SCOPE_LOCAL) < 0) {
+														throw gcnew HDF5Exception("H5Fflush failed!");
+													}
+												}
+												else {
+													throw gcnew HDF5Exception("H5Ldelete failed!!!");
+												}
+
+											}
+											else {
+												WriteWarning(String::Format("In the course of a forced deletion the path '{0}' was no longer valid and skipped.", s));
 											}
 										}
-										else {
-											throw gcnew HDF5Exception("H5Ldelete failed!!!");
-										}
-
+									}
+									else {
+										throw gcnew HDF5Exception("H5Lvisit failed!");
 									}
 								}
-								else {
-									throw gcnew HDF5Exception("H5Lvisit failed!");
+								while (op_data.second.size() > 0);
+							}
+#pragma endregion
+						}
+						else
+						{
+#pragma region just this one
+
+							String^ groupPath = ProviderUtils::ParentPath(h5path);
+							group_path = (char*)(Marshal::StringToHGlobalAnsi(groupPath)).ToPointer();
+							gid = H5Gopen2(drive->FileHandle, group_path, H5P_DEFAULT);
+							if (gid < 0) {
+								throw gcnew HDF5Exception("H5Gopen2 failed!");
+							}
+							String^ linkName = ProviderUtils::ChildName(h5path);
+							link_name = (char*)(Marshal::StringToHGlobalAnsi(linkName)).ToPointer();
+
+							if (H5Lexists(gid, link_name, H5P_DEFAULT) > 0)
+							{
+								if (this->ShouldProcess(h5path,
+									String::Format("Removing HDF5 object '{0}'", path)))
+								{
+									if (H5Ldelete(gid, link_name, H5P_DEFAULT) >= 0)
+									{
+										if (H5Fflush(gid, H5F_SCOPE_LOCAL) < 0) {
+											throw gcnew HDF5Exception("H5Fflush failed!");
+										}
+									}
+									else {
+										throw gcnew HDF5Exception("H5Ldelete failed!!!");
+									}
 								}
 							}
-							while (op_data.second.size() > 0);
-						}
-
 #pragma endregion
+						}
 					}
 					else
 					{
-#pragma region just this one
-
-						String^ groupPath = ProviderUtils::ParentPath(h5path);
-						group_path = (char*)(Marshal::StringToHGlobalAnsi(groupPath)).ToPointer();
-						gid = H5Gopen2(drive->FileHandle, group_path, H5P_DEFAULT);
-						if (gid < 0) {
-							throw gcnew HDF5Exception("H5Gopen2 failed!");
-						}
-						String^ linkName = ProviderUtils::ChildName(h5path);
-						link_name = (char*)(Marshal::StringToHGlobalAnsi(linkName)).ToPointer();
-
-						if (H5Lexists(gid, link_name, H5P_DEFAULT) > 0)
-						{
-							if (this->ShouldProcess(h5path,
-								String::Format("Removing HDF5 object '{0}'", path)))
-							{
-								if (H5Ldelete(gid, link_name, H5P_DEFAULT) >= 0)
-								{
-									if (H5Fflush(gid, H5F_SCOPE_LOCAL) < 0) {
-										throw gcnew HDF5Exception("H5Fflush failed!");
-									}
-								}
-								else {
-									throw gcnew HDF5Exception("H5Ldelete failed!!!");
-								}
-							}
-						}
-#pragma endregion
+						WriteWarning(String::Format("In the course of a recursive deletion the path '{0}' was no longer resolvable and skipped.", h5path));
 					}
 				}
 			}
