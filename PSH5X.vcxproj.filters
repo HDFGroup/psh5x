@@ -65,9 +65,6 @@
     <ClCompile Include="src\DriveCmdletProvider.cpp">
       <Filter>Source Files\Provider\DriveCmdletProvider</Filter>
     </ClCompile>
-    <ClCompile Include="src\DriveInfo.cpp">
-      <Filter>Source Files\Provider\DriveCmdletProvider</Filter>
-    </ClCompile>
     <ClCompile Include="src\ItemCmdletProvider.cpp">
       <Filter>Source Files\Provider\ItemCmdletProvider</Filter>
     </ClCompile>
@@ -229,6 +226,9 @@
     </ClCompile>
     <ClCompile Include="src\NavigationCmdletProvider.MoveItem.cpp">
       <Filter>Source Files\Provider\NavigationCmdletProvider</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DriveInfo.cpp">
+      <Filter>Source Files\Info</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
