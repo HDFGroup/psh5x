@@ -14,8 +14,16 @@
 table{
     border-style:solid;
 }
-.leftcol{
+.leftcoltitle{
     font-weight:bold;
     text-align:left;
-    width:175px;
+    border-top: 1px solid #CCC;
+    border-bottom: 1px solid #CCC;
+}
+.leftcol{
+    text-align:left;
+    width:220px;
+}
+tt{
+    font-size:120%;
 }

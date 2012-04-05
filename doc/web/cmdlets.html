@@ -5,107 +5,102 @@
         <link rel="stylesheet" type="text/css" href="./style.css" />
     </head>
     <body>
-        <a href="./index.html"><img src="psh5x_logo_100x75.gif" alt="PSH5X logo" align="bottom" /></a>
-        <p> The purpose of the table below is to provide an overview of the cmdlets available in PSH5X.
-            Detailed help is provided with each cmdlet via the PowerShell help system.</p>
+        <a href="./index.html"><img src="psh5x_logo_100x75.gif" alt="PSH5X logo" align="bottom"
+             /></a>
+        <p> The purpose of the table below is to provide an overview of the cmdlets available in
+            PSH5X. Detailed help is provided with each cmdlet via the PowerShell help system. Note
+            that some cmdlets are just aliases for core provider cmdlets.</p>
         <table>
             <tr>
-                <th> Cmdlet</th>
+                <th>Cmdlet</th>
                 <th>Description</th>
             </tr>
             <tr>
-                <td colspan="2" style="border-bottom: 1px solid #CCC;"><tt>Copy-...</tt></td>
+                <td colspan="2" class="leftcoltitle"><tt>Copy-...</tt></td>
             </tr>
             <tr>
                 <td class="leftcol"><tt>Copy-H5Attribute</tt></td>
-                <td>Copies HDF5 attributes of objects on the same or different HDF5 drives. This is
-                    an alias for the core provider's <tt>Copy-ItemProperty</tt> cmdlet.</td>
+                <td>Copies HDF5 attributes of objects on the same or different HDF5 drives.</td>
             </tr>
             <tr>
-                <td class="leftcol"><tt>Copy-H5Object</tt></td>
+                <td><tt>Copy-H5Object</tt></td>
                 <td>Copies HDF5 objects (dataset, group, linked datatype) on the same or between
                     different HDF5 drives.</td>
             </tr>
             <tr>
-                <td class="leftcol"><tt>Copy-H5SymbolicLink</tt></td>
+                <td><tt>Copy-H5SymbolicLink</tt></td>
                 <td>Copies HDF5 symbolic links (soft link and external link) on the same or between
                     different HDF5 drives.</td>
             </tr>
             <tr>
-                <td class="leftcol"><tt>Format-H5Dataset</tt></td>
+                <td><tt>Format-H5Dataset</tt></td>
                 <td>Changes the extent (dimension sizes) of extendible HDF5 datasets.</td>
             </tr>
             <tr>
-                <td colspan="2" style="border-bottom: 1px solid #CCC;"><tt>Get-...</tt></td>
+                <td colspan="2" class="leftcoltitle"><tt>Get-...</tt></td>
             </tr>
             <tr>
-                <td class="leftcol"><tt>Get-H5Attribute</tt></td>
-                <td>Gets a representation of an HDF5 attribute. This is an alias for the core
-                    provider's <tt>Get-ItemProperty</tt> cmdlet.</td>
+                <td><tt>Get-H5Attribute</tt></td>
+                <td>Gets a representation of an HDF5 attribute.</td>
             </tr>
             <tr>
-                <td class="leftcol"><tt>Get-H5DatasetValue</tt></td>
-                <td>Gets a, generally multidimensional, .NET array representing the value of an HDF5
+                <td><tt>Get-H5DatasetValue</tt></td>
+                <td>Gets a (generally multidimensional) .NET array representing the value of an HDF5
                     dataset or a hyperslab selection.</td>
             </tr>
             <tr>
-                <td class="leftcol"><tt>Get-H5Drive</tt></td>
-                <td>Get a representation of an HDF5 drive (H5Drive).</td>
+                <td><tt>Get-H5Drive</tt></td>
+                <td>Gets a representation of an HDF5 drive (H5Drive).</td>
             </tr>
             <tr>
-                <td class="leftcol"><tt>Get-H5Member</tt></td>
-                <td>Gets a list representing the links in an HDF5 group (group members). This is an
-                    alias for the core provider's <tt>Get-ChildItem</tt> cmdlet.</td>
+                <td><tt>Get-H5Member</tt></td>
+                <td>Gets a list representing the links in an HDF5 group (group members).</td>
             </tr>
             <tr>
-                <td class="leftcol"><tt>Get-H5Item</tt></td>
-                <td>Gets a representation of an HDF5 item (HDF5 object or symbolic link). This is an
-                    alias for the core provider's <tt>Get-Item</tt> cmdlet.</td>
+                <td><tt>Get-H5Item</tt></td>
+                <td>Gets a representation of an HDF5 item (HDF5 object or symbolic link).</td>
             </tr>
             <tr>
-                <td colspan="2" style="border-bottom: 1px solid #CCC;"><tt>Move-...</tt></td>
+                <td colspan="2" class="leftcoltitle"><tt>Move-...</tt></td>
             </tr>
             <tr>
-                <td class="leftcol"><tt>Move-H5Attribute</tt></td>
+                <td><tt>Move-H5Attribute</tt></td>
                 <td>Moves an HDF5 attribute between HDF5 objects on the same or different HDF5
-                    drives. This is an alias for the core provider's <tt>Move-ItemProperty</tt>
-                    cmdlet.</td>
+                    drives.</td>
             </tr>
             <tr>
-                <td class="leftcol"><tt>Move-H5Item</tt></td>
-                <td>Moves an HDF5 item to a new location on the <u>same</u> HDF5 drive. (Nothing is
-                    really moved. Link acrobatics only.) This is an alias for the core provider's
-                        <tt>Move-Item</tt> cmdlet.</td>
+                <td><tt>Move-H5Item</tt></td>
+                <td>Moves an HDF5 item to a new location on the <u>same</u> HDF5 drive.</td>
             </tr>
             <tr>
-                <td colspan="2" style="border-bottom: 1px solid #CCC;"><tt>New-...</tt></td>
+                <td colspan="2" class="leftcoltitle"><tt>New-...</tt></td>
             </tr>
             <tr>
-                <td class="leftcol"><tt>New-H5Attribute</tt></td>
+                <td><tt>New-H5Attribute</tt></td>
                 <td>Creates a new HDF5 attribute on an HDF5 object.</td>
             </tr>
             <tr>
-                <td class="leftcol"><tt>New-H5Dataset</tt></td>
+                <td><tt>New-H5Dataset</tt></td>
                 <td>Creates a new HDF5 dataset with a simple dataspace.</td>
             </tr>
             <tr>
-                <td class="leftcol"><tt>New-H5Drive</tt></td>
-                <td>Create a new HDF5 drive backed by an HDF5 file.</td>
+                <td><tt>New-H5Drive</tt></td>
+                <td>Creates a new HDF5 drive backed by an HDF5 file.</td>
             </tr>
             <tr>
-                <td class="leftcol"><tt>New-H5File</tt></td>
-                <td>Create a new HDF5 file.</td>
+                <td><tt>New-H5File</tt></td>
+                <td>Creates a new HDF5 file.</td>
             </tr>
             <tr>
-                <td class="leftcol"><tt>New-H5Group</tt></td>
+                <td><tt>New-H5Group</tt></td>
                 <td>Creates a new HDF5 group.</td>
             </tr>
             <tr>
-                <td class="leftcol"><tt>New-H5Hardlink</tt></td>
+                <td><tt>New-H5Hardlink</tt></td>
                 <td>Creates a new hard link to an HDF5 object in an HDF5 group.</td>
             </tr>
             <tr>
-                <td class="leftcol"><tt>New-H5Image</tt></td>
+                <td><tt>New-H5Image</tt></td>
                 <td>Creates a new HDF5 image from an image file. (See <a
                         href="http://www.hdfgroup.org/HDF5/doc/ADGuide/ImageSpec.html">HDF5 Image
                         and Palette Specification</a> and <a
@@ -113,71 +108,65 @@
                         >gif2h5</a>.)</td>
             </tr>
             <tr>
-                <td class="leftcol"><tt>New-H5LinkedDatatype</tt></td>
+                <td><tt>New-H5LinkedDatatype</tt></td>
                 <td>Creates a new HDF5 linked (named) datatype object.</td>
             </tr>
             <tr>
-                <td class="leftcol"><tt>New-H5NullDataset</tt></td>
+                <td><tt>New-H5NullDataset</tt></td>
                 <td>Creates a new HDF5 dataset with a null dataspace (empty set).</td>
             </tr>
             <tr>
-                <td class="leftcol"><tt>New-H5ScalarDataset</tt></td>
+                <td><tt>New-H5ScalarDataset</tt></td>
                 <td>Creates a new HDF5 dataset with a scalar dataspace (singleton).</td>
             </tr>
             <tr>
-                <td class="leftcol"><tt>New-H5Softlink</tt></td>
+                <td><tt>New-H5Softlink</tt></td>
                 <td>Creates a soft link in an HDF5 group.</td>
             </tr>
             <tr>
-                <td colspan="2" style="border-bottom: 1px solid #CCC;"><tt>Remove-...</tt></td>
+                <td colspan="2" class="leftcoltitle"><tt>Remove-...</tt></td>
             </tr>
             <tr>
-                <td class="leftcol"><tt>Remove-H5Attribute</tt></td>
-                <td>Removes an HDF5 attribute from an HDF5 object. This is an alias for the core
-                    provider's <tt>Remove-ItemProperty</tt> cmdlet.</td>
+                <td><tt>Remove-H5Attribute</tt></td>
+                <td>Removes an HDF5 attribute from an HDF5 object.</td>
             </tr>
             <tr>
-                <td class="leftcol"><tt>Remove-H5Item</tt></td>
-                <td>Removes and HDF5 item (HDF5 object or symbolic link). This cmdlet sounds grander
-                    than what it really does: All it does is remove links (hard or symbolic). This
-                    is an alias for the core provider's <tt>Remove-Item</tt> cmdlet.</td>
+                <td><tt>Remove-H5Item</tt></td>
+                <td>Removes and HDF5 item (HDF5 object or symbolic link).</td>
             </tr>
             <tr>
-                <td colspan="2" style="border-bottom: 1px solid #CCC;"><tt>Rename-...</tt></td>
+                <td colspan="2" class="leftcoltitle"><tt>Rename-...</tt></td>
             </tr>
             <tr>
-                <td class="leftcol"><tt>Rename-H5Attribute</tt></td>
-                <td> Renames HDF5 attribute of an HDF5 object. This is an alias for the core
-                    provider's <tt>Rename-ItemProperty</tt> cmdlet.</td>
+                <td><tt>Rename-H5Attribute</tt></td>
+                <td> Renames HDF5 attribute of an HDF5 object.</td>
             </tr>
             <tr>
-                <td class="leftcol"><tt>Rename-H5Item</tt></td>
-                <td> Renames HDF5 symbloc links or a hard link to an HDF5 object. This is an alias
-                    for the core provider's <tt>Rename-Item</tt> cmdlet.</td>
+                <td><tt>Rename-H5Item</tt></td>
+                <td> Renames HDF5 symbloc links or a hard link to an HDF5 object.</td>
             </tr>
             <tr>
-                <td colspan="2" style="border-bottom: 1px solid #CCC;"><tt>Set-...</tt></td>
+                <td colspan="2" class="leftcoltitle"><tt>Set-...</tt></td>
             </tr>
             <tr>
-                <td class="leftcol"><tt>Set-H5Attribute</tt></td>
-                <td>Sets the value of an HDF5 attribute. This is an alias for the core provider's
-                        <tt>Set-ItemProperty</tt> cmdlet.</td>
+                <td><tt>Set-H5Attribute</tt></td>
+                <td>Sets the value of an HDF5 attribute.</td>
             </tr>
             <tr>
-                <td class="leftcol"><tt>Set-H5DatasetValue</tt></td>
+                <td><tt>Set-H5DatasetValue</tt></td>
                 <td>Sets the value of an HDF5 dataset or a hyperslab selection.</td>
             </tr>
             <tr>
-                <td colspan="2" style="border-bottom: 1px solid #CCC;"><tt>Test-...</tt></td>
+                <td colspan="2" class="leftcoltitle"><tt>Test-...</tt></td>
             </tr>
             <tr>
-                <td class="leftcol"><tt>Test-H5Attribute</tt></td>
-                <td>Tests if an HDF5 object has an HDF5 attribute of a given name.</td>
+                <td><tt>Test-H5Attribute</tt></td>
+                <td>Tests whether an HDF5 object has an HDF5 attribute of a given name.</td>
             </tr>
             <tr>
-                <td class="leftcol"><tt>Test-H5Path</tt></td>
-                <td>Tests if an HDF5 path name is in use or can be resolved to an HDF5 object. This
-                    is an alias for the core provider's <tt>Test-Path</tt> cmdlet.</td>
+                <td><tt>Test-H5Path</tt></td>
+                <td>Tests whether an HDF5 path name is in use or can be resolved to an HDF5
+                    object.</td>
             </tr>
         </table>
     </body>
