@@ -33,7 +33,7 @@ namespace PSH5X
 		ArrayList^ member = nullptr;
 
         hid_t unwnd = -1;
-        size_t size = 0, offset;
+        size_t size = 0, precision, offset;
         int nmembers = 0, rank;
         unsigned ui;
         char* name;
@@ -45,7 +45,7 @@ namespace PSH5X
         H5T_str_t strpad;
         H5T_pad_t lsb, msb;
         H5T_sign_t sign;
-        size_t spos, epos, esize, mpos, msize;
+        size_t spos, epos, esize, ebias, mpos, msize;
         
         char b;
         unsigned char B;
@@ -67,8 +67,8 @@ namespace PSH5X
 					result->Add("Class", "Integer");
 					size = H5Tget_size(type);
 					result->Add("Size", size);
-					size = H5Tget_precision(type);
-					result->Add("Precision", size);
+					precision = H5Tget_precision(type);
+					result->Add("Precision", precision);
 					i = H5Tget_offset(type);
 					result->Add("BitOffset", i);
 
@@ -110,7 +110,8 @@ namespace PSH5X
 						throw gcnew HDF5Exception("H5Tget_pad failed!");
 					}
 
-					switch (H5Tget_sign(type))
+					H5T_sign_t sign = H5Tget_sign(type);
+					switch (sign)
 					{
 					case H5T_SGN_NONE:
 						result->Add("SignType", "None");
@@ -123,7 +124,8 @@ namespace PSH5X
 						break;
 					}
 
-					switch (H5Tget_order(type))
+					H5T_order_t order = H5Tget_order(type);
+					switch (order)
 					{
 					case H5T_ORDER_LE:
 						result->Add("ByteOrder", "LE");
@@ -145,6 +147,123 @@ namespace PSH5X
 						break;
 					}
 
+					switch (size)
+					{
+					case 1:
+						{
+							if (sign == H5T_SGN_NONE) {
+								if (order == H5T_ORDER_LE) {
+									if (H5Tequal(type, H5T_STD_U8LE) > 0) {
+										result->Add("StandardType", "H5T_STD_U8LE");
+									}
+								}
+								else if (order == H5T_ORDER_BE) {
+									if (H5Tequal(type, H5T_STD_U8BE) > 0) {
+										result->Add("StandardType", "H5T_STD_U8BE");
+									}
+								}
+							}
+							else {
+								if (order == H5T_ORDER_LE) {
+									if (H5Tequal(type, H5T_STD_I8LE) > 0) {
+										result->Add("StandardType", "H5T_STD_I8LE");
+									}
+								}
+								else if (order == H5T_ORDER_BE) {
+									if (H5Tequal(type, H5T_STD_I8BE) > 0) {
+										result->Add("StandardType", "H5T_STD_I8BE");
+									}
+								}
+							}
+						}
+						break;
+					case 2:
+						{
+							if (sign == H5T_SGN_NONE) {
+								if (order == H5T_ORDER_LE) {
+									if (H5Tequal(type, H5T_STD_U16LE) > 0) {
+										result->Add("StandardType", "H5T_STD_U16LE");
+									}
+								}
+								else if (order == H5T_ORDER_BE) {
+									if (H5Tequal(type, H5T_STD_U16BE) > 0) {
+										result->Add("StandardType", "H5T_STD_U16BE");
+									}
+								}
+							}
+							else {
+								if (order == H5T_ORDER_LE) {
+									if (H5Tequal(type, H5T_STD_I16LE) > 0) {
+										result->Add("StandardType", "H5T_STD_I16LE");
+									}
+								}
+								else if (order == H5T_ORDER_BE) {
+									if (H5Tequal(type, H5T_STD_I16BE) > 0) {
+										result->Add("StandardType", "H5T_STD_I16BE");
+									}
+								}
+							}
+						}
+						break;
+					case 4:
+						{
+							if (sign == H5T_SGN_NONE) {
+								if (order == H5T_ORDER_LE) {
+									if (H5Tequal(type, H5T_STD_U32LE) > 0) {
+										result->Add("StandardType", "H5T_STD_U32LE");
+									}
+								}
+								else if (order == H5T_ORDER_BE) {
+									if (H5Tequal(type, H5T_STD_U32BE) > 0) {
+										result->Add("StandardType", "H5T_STD_U32BE");
+									}
+								}
+							}
+							else {
+								if (order == H5T_ORDER_LE) {
+									if (H5Tequal(type, H5T_STD_I32LE) > 0) {
+										result->Add("StandardType", "H5T_STD_I32LE");
+									}
+								}
+								else if (order == H5T_ORDER_BE) {
+									if (H5Tequal(type, H5T_STD_I32BE) > 0) {
+										result->Add("StandardType", "H5T_STD_I32BE");
+									}
+								}
+							}
+						}
+						break;
+					case 8:
+						{
+							if (sign == H5T_SGN_NONE) {
+								if (order == H5T_ORDER_LE) {
+									if (H5Tequal(type, H5T_STD_U64LE) > 0) {
+										result->Add("StandardType", "H5T_STD_U64LE");
+									}
+								}
+								else if (order == H5T_ORDER_BE) {
+									if (H5Tequal(type, H5T_STD_U64BE) > 0) {
+										result->Add("StandardType", "H5T_STD_U64BE");
+									}
+								}
+							}
+							else {
+								if (order == H5T_ORDER_LE) {
+									if (H5Tequal(type, H5T_STD_I64LE) > 0) {
+										result->Add("StandardType", "H5T_STD_I64LE");
+									}
+								}
+								else if (order == H5T_ORDER_BE) {
+									if (H5Tequal(type, H5T_STD_I64BE) > 0) {
+										result->Add("StandardType", "H5T_STD_I64BE");
+									}
+								}
+							}
+						}
+						break;
+					default:
+						break;
+					}
 #pragma endregion
 				}
                 break;
@@ -156,8 +275,8 @@ namespace PSH5X
 					result->Add("Class", "Float");
 					size = H5Tget_size(type);
 					result->Add("Size", size);
-					size = H5Tget_precision(type);
-					result->Add("Precision", size);
+					precision = H5Tget_precision(type);
+					result->Add("Precision", precision);
 					i = H5Tget_offset(type);
 					result->Add("BitOffset", i);
 
@@ -215,7 +334,8 @@ namespace PSH5X
 						break;
 					}
 
-					switch (H5Tget_order(type))
+					H5T_order_t order = H5Tget_order(type);
+					switch (order)
 					{
 					case H5T_ORDER_LE:
 						result->Add("ByteOrder", "LE");
@@ -249,8 +369,8 @@ namespace PSH5X
 						throw gcnew HDF5Exception("H5Tget_fields failed!");
 					}
 
-					size = H5Tget_ebias(type);
-					result->Add("ExpBias", size);
+					ebias = H5Tget_ebias(type);
+					result->Add("ExpBias", ebias);
 
 					switch (H5Tget_norm(type))
 					{
@@ -265,6 +385,42 @@ namespace PSH5X
 						break;
 					default:
 						result->Add("MantNorm", "UNKNOWN");
+						break;
+					}
+
+					switch (size)
+					{
+					case 4:
+						{
+							if (order == H5T_ORDER_LE) {
+								if (H5Tequal(type, H5T_IEEE_F32LE) > 0) {
+									result->Add("StandardType", "H5T_IEEE_F32LE");
+								}
+							}
+							else if (order == H5T_ORDER_BE) {
+								if (H5Tequal(type, H5T_IEEE_F32BE) > 0) {
+									result->Add("StandardType", "H5T_IEEE_F32BE");
+								}
+							}
+						}
+						break;
+
+					case 8:
+						{
+							if (order == H5T_ORDER_LE) {
+								if (H5Tequal(type, H5T_IEEE_F64LE) > 0) {
+									result->Add("StandardType", "H5T_IEEE_F64LE");
+								}
+							}
+							else if (order == H5T_ORDER_BE) {
+								if (H5Tequal(type, H5T_IEEE_F64BE) > 0) {
+									result->Add("StandardType", "H5T_IEEE_F64BE");
+								}
+							}
+						}
+						break;
+
+					default:
 						break;
 					}
 
@@ -326,79 +482,142 @@ namespace PSH5X
 				break;
 
             case H5T_BITFIELD:
-
+				{
 #pragma region Bitfield
 
-                result->Add("Class", "Bitfield");
-                size = H5Tget_size(type);
-                result->Add("Size", size);
-                size = H5Tget_precision(type);
-                result->Add("Precision", size);
-                i = H5Tget_offset(type);
-                result->Add("BitOffset", i);
+					result->Add("Class", "Bitfield");
+					size = H5Tget_size(type);
+					result->Add("Size", size);
+					precision = H5Tget_precision(type);
+					result->Add("Precision", precision);
+					i = H5Tget_offset(type);
+					result->Add("BitOffset", i);
 
-                if (H5Tget_pad(type, &lsb, &msb) >= 0)
-                {
-                    switch (lsb)
-                    {
-                    case H5T_PAD_ZERO:
-                		result->Add("LSBitPadding", "Zero");
-                        break;
-                    case H5T_PAD_ONE:
-                		result->Add("LSBitPadding", "One");
-                        break;
-                    case H5T_PAD_BACKGROUND:
-                		result->Add("LSBitPadding", "Background");
-                        break;
-                    default:
-                		result->Add("LSBitPadding", "UNKNOWN");
-                        break;
-                    }
+					if (H5Tget_pad(type, &lsb, &msb) >= 0)
+					{
+						switch (lsb)
+						{
+						case H5T_PAD_ZERO:
+							result->Add("LSBitPadding", "Zero");
+							break;
+						case H5T_PAD_ONE:
+							result->Add("LSBitPadding", "One");
+							break;
+						case H5T_PAD_BACKGROUND:
+							result->Add("LSBitPadding", "Background");
+							break;
+						default:
+							result->Add("LSBitPadding", "UNKNOWN");
+							break;
+						}
 
-                    switch (msb)
-                    {
-                    case H5T_PAD_ZERO:
-                		result->Add("MSBitPadding", "Zero");
-                        break;
-                    case H5T_PAD_ONE:
-                		result->Add("MSBitPadding", "One");
-                        break;
-                    case H5T_PAD_BACKGROUND:
-                		result->Add("MSBitPadding", "Background");
-                        break;
-                    default:
-                		result->Add("MSBitPadding", "UNKNOWN");
-                        break;
-                    }
-                }
-                else {
-                    throw gcnew HDF5Exception("H5Tget_pad failed!");
-                }
+						switch (msb)
+						{
+						case H5T_PAD_ZERO:
+							result->Add("MSBitPadding", "Zero");
+							break;
+						case H5T_PAD_ONE:
+							result->Add("MSBitPadding", "One");
+							break;
+						case H5T_PAD_BACKGROUND:
+							result->Add("MSBitPadding", "Background");
+							break;
+						default:
+							result->Add("MSBitPadding", "UNKNOWN");
+							break;
+						}
+					}
+					else {
+						throw gcnew HDF5Exception("H5Tget_pad failed!");
+					}
 
-                switch (H5Tget_order(type))
-                {
-                case H5T_ORDER_LE:
-                	result->Add("ByteOrder", "LE");
-                    break;
-                case H5T_ORDER_BE:
-                	result->Add("ByteOrder", "BE");
-                    break;
-                case H5T_ORDER_VAX:
-                	result->Add("ByteOrder", "VAX");
-                    break;
-                case H5T_ORDER_MIXED:
-                	result->Add("ByteOrder", "Mixed");
-                    break;
-                case H5T_ORDER_NONE:
-                	result->Add("ByteOrder", "None");
-                    break;
-                default:
-                	result->Add("ByteOrder", "UNKNOWN");
-                    break;
-                }
+					H5T_order_t order = H5Tget_order(type);
+					switch (order)
+					{
+					case H5T_ORDER_LE:
+						result->Add("ByteOrder", "LE");
+						break;
+					case H5T_ORDER_BE:
+						result->Add("ByteOrder", "BE");
+						break;
+					case H5T_ORDER_VAX:
+						result->Add("ByteOrder", "VAX");
+						break;
+					case H5T_ORDER_MIXED:
+						result->Add("ByteOrder", "Mixed");
+						break;
+					case H5T_ORDER_NONE:
+						result->Add("ByteOrder", "None");
+						break;
+					default:
+						result->Add("ByteOrder", "UNKNOWN");
+						break;
+					}
+
+					switch (size)
+					{
+					case 1:
+						{
+							if (order == H5T_ORDER_LE) {
+								if (H5Tequal(type, H5T_STD_B8LE) > 0) {
+									result->Add("StandardType", "H5T_STD_B8LE");
+								}
+							}
+							else if (order == H5T_ORDER_BE) {
+								if (H5Tequal(type, H5T_STD_B8BE) > 0) {
+									result->Add("StandardType", "H5T_STD_B8BE");
+								}
+							}
+						}
+						break;
+					case 2:
+						{
+							if (order == H5T_ORDER_LE) {
+								if (H5Tequal(type, H5T_STD_B16LE) > 0) {
+									result->Add("StandardType", "H5T_STD_B16LE");
+								}
+							}
+							else if (order == H5T_ORDER_BE) {
+								if (H5Tequal(type, H5T_STD_B16BE) > 0) {
+									result->Add("StandardType", "H5T_STD_B16BE");
+								}
+							}
+						}
+						break;
+					case 4:
+						{
+							if (order == H5T_ORDER_LE) {
+								if (H5Tequal(type, H5T_STD_B32LE) > 0) {
+									result->Add("StandardType", "H5T_STD_B32LE");
+								}
+							}
+							else if (order == H5T_ORDER_BE) {
+								if (H5Tequal(type, H5T_STD_B32BE) > 0) {
+									result->Add("StandardType", "H5T_STD_B32BE");
+								}
+							}
+						}
+						break;
+					case 8:
+						{
+							if (order == H5T_ORDER_LE) {
+								if (H5Tequal(type, H5T_STD_B64LE) > 0) {
+									result->Add("StandardType", "H5T_STD_B64LE");
+								}
+							}
+							else if (order == H5T_ORDER_BE) {
+								if (H5Tequal(type, H5T_STD_B64BE) > 0) {
+									result->Add("StandardType", "H5T_STD_B64BE");
+								}
+							}
+						}
+						break;
+					default:
+						break;
+					}
 
 #pragma endregion
-
+				}
                 break;
 
             case H5T_OPAQUE:
@@ -585,9 +804,11 @@ namespace PSH5X
 
 					if (H5Tequal(type, H5T_STD_REF_OBJ) > 0) {
 						result->Add("Kind", "Object");
+						result->Add("StandardType", "H5T_STD_REF_OBJ");
 					}
 					else if (H5Tequal(type, H5T_STD_REF_DSETREG) > 0) {
 						result->Add("Kind", "Region");
+						result->Add("StandardType", "H5T_STD_REF_DSETREG");
 					}
 					else {
 						result->Add("Kind", "UNKNOWN");

@@ -33,7 +33,7 @@ Description = 'This is the coolest HDF5 module for the Windows PowerShell.'
 PowerShellVersion = '2.0'
 
 # Name of the Windows PowerShell host required by this module
-PowerShellHostName = 'ConsoleHost'
+PowerShellHostName = ''
 
 # Minimum version of the Windows PowerShell host required by this module
 PowerShellHostVersion = '2.0'
