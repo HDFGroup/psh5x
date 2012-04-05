@@ -156,8 +156,11 @@ Import-Module HDF5
 # create a drive called 'aura' backed by an HDF5 file 
 New-H5Drive aura C:\h5\HIRDLS-Aura_L2_v02-04-09-c03_2008d001.he5
 
+# make the HDF5 root of 'aura' our "working directory"
+cd aura:
+
 # How many HDF5 groups and datasets are there in this file?
-dir aura:/ -Recurse -Filter dg | %{ switch($_.ItemType) `
+dir . -Recurse -Filter dg | %{ switch($_.ItemType) `
     { 'Group' {$groups++} 'Dataset' {$datasets++} } };  `
     "Groups: $groups - Datsets: $datasets"
     
@@ -165,14 +168,25 @@ dir aura:/ -Recurse -Filter dg | %{ switch($_.ItemType) `
 dir . -r -Filter d | ?{$_.PSChildName -like '*H2O*'} | select PSPath    
     
 # How much data is stored in HDF5 datasets vs. the total file size?
-dir aura:\ -Recurse -Filter d | %{ $dsetBytes += $_.StorageSizeBytes }; `
+dir . -Recurse -Filter d | %{ $dsetBytes += $_.StorageSizeBytes }; `
     "In datasets: $dsetBytes - File: $((Get-H5Drive aura).FileSizeBytes)"    
+ 
+# switch to the HDF5 sandbox drive 'h5tmp'
+cd h5tmp:
  
 # remove the 'aura' drive
 Remove-H5Drive aura
 
-# create a chunked, compressed, extendible HDF5 dataset
-New-H5Dataset 'h5:\My Doubles' double 10,20,40 -MaxDim -1,50,-1 -Chunk 10,10,10 -Gzip 6
+# create a chunked, compressed, extendible dataset and force intermediate group creation
+New-H5Dataset '/A/B/My Doubles' double 10,20,40 -MaxDim -1,50,-1 -Chunk 10,10,10 -Gzip 6 -Force
+
+# create a .NET array and set the value of '/A/B/My Doubles' (value initialization not shown)
+$value = New-H5Object 'double[,,]' 10,20,30
+...
+Set-H5DatasetValue '/A\B/My Doubles' $value
         </pre>
+        <p>Questions? Check out a list of <a href="./cmdlets.html">PSH5X cmdlets</a>, the <a
+                href="./faq.html">FAQ</a>, the <a href="./tutorial.html">tutorial</a>, and several
+                <a href="./nolimits.html">limitations and known issues</a>.</p>
     </body>
 </html>
