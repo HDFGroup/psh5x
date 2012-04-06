@@ -10,13 +10,13 @@ if (Test-Path $file) {
     return
 }
 
-$drive = New-H5Drive $name $file -RW -Force
+New-H5Drive $name $file -RW -Force
 
 cd "$($name):\"
 
-$attr = New-H5Attribute . attr1 'string attribute' cstring17
+New-H5Attribute . attr1 'string attribute' cstring17
 
-$dset = New-H5Dataset dset1 H5T_STD_I32BE 10,10
+New-H5Dataset dset1 H5T_STD_I32BE 10,10
 
 $value = New-Object 'int[,]' 10,10
 
@@ -52,7 +52,7 @@ public class cmpd_a_b_c
 }
 "@
 
-$dset = New-H5Dataset dset2 $t 5 
+New-H5Dataset dset2 $t 5 
 
 $value = New-Object 'cmpd_a_b_c[]' 5
 
@@ -69,7 +69,7 @@ Set-H5DatasetValue dset2 $value
 
 $a = Get-H5DatasetValue dset2
 
-$group = New-H5Group group1
+New-H5Group group1
 
 $t = @"
 {
@@ -91,11 +91,11 @@ public class cmpd_a_b
 }
 "@
 
-$dtype = New-H5LinkedDatatype type1 $t
+New-H5LinkedDatatype type1 $t
 
 cd group1
 
-$dset = New-H5Dataset dset3 /type1 5 
+New-H5Dataset dset3 /type1 5 
 
 $value = New-Object 'cmpd_a_b[]' 5
 
@@ -121,7 +121,7 @@ cd ..
 
 $t = '{"Class": "Vlen", "Base": "H5T_STD_I32LE"}'
 
-$dset = New-H5Dataset dset3 $t 4 
+New-H5Dataset dset3 $t 4 
 
 $value = @(@(0), @(10,11), @(20,21,22), @(30,31,32,33))
 
@@ -129,9 +129,9 @@ Set-H5DatasetValue dset3 $value
 
 $a = Get-H5DatasetValue dset3
 
-$hlink = New-H5Hardlink group2 /group1
+New-H5Hardlink group2 /group1
 
-$slink = New-H5Softlink slink1 somevalue
+New-H5Softlink slink1 somevalue
 
 # bonus material
 
@@ -139,7 +139,7 @@ $image = Join-Path (Split-Path $MyInvocation.MyCommand.Path) 'hdf_logo.jpg'
 
 if (Test-Path $image)
 {
-    $logo = New-H5Image hdf_logo $image
+    New-H5Image hdf_logo $image
 }
 
 C:
