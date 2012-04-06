@@ -41,16 +41,14 @@ namespace PSH5X
         {
             DriveInfo^ drive = nullptr;
             String^ h5path = nullptr;
-            if (!ProviderUtils::TryGetDriveEtH5Path(path, ProviderInfo, drive, h5path))
-            {
+            if (!ProviderUtils::TryGetDriveEtH5Path(path, ProviderInfo, drive, h5path)) {
                 throw gcnew PSH5XException("Ill-formed HDF5 path name and/or unable to obtain drive name!");
             }
 
             bool detailed = false;
             RuntimeDefinedParameterDictionary^ dynamicParameters =
                 (RuntimeDefinedParameterDictionary^) DynamicParameters;
-            if (dynamicParameters != nullptr && dynamicParameters->ContainsKey("Detailed"))
-            {
+            if (dynamicParameters != nullptr && dynamicParameters->ContainsKey("Detailed")) {
                 detailed = dynamicParameters["Detailed"]->IsSet;
             }
 
@@ -92,70 +90,126 @@ namespace PSH5X
                 {
                     H5L_info_t linfo;
                     if (H5Lget_info(group_id, link_name, &linfo, H5P_DEFAULT) < 0) {
-                        throw gcnew Exception("H5Lget_info failed!");
+                        throw gcnew HDF5Exception("H5Lget_info failed!");
                     }
 
                     switch (linfo.type)
                     {
                     case H5L_TYPE_HARD:
-
+						{
 #pragma region HDF5 hard link
+							path_name =  (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
+							obj_id = H5Oopen(drive->FileHandle, path_name, H5P_DEFAULT);
+							if (obj_id < 0) {
+								throw gcnew HDF5Exception("H5Oopen failed!");
+							}
 
-                        path_name =  (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
-                        obj_id = H5Oopen(drive->FileHandle, path_name, H5P_DEFAULT);
-                        if (obj_id < 0) {
-                            throw gcnew Exception("H5Oopen failed!!!");
-                        }
+							H5O_info_t oinfo;
+							if (H5Oget_info(obj_id, &oinfo) >= 0)
+							{
+								switch (oinfo.type)
+								{
+								case H5O_TYPE_GROUP:
 
-                        H5O_info_t oinfo;
-                        if (H5Oget_info(obj_id, &oinfo) >= 0)
-                        {
-                            switch (oinfo.type)
-                            {
-                            case H5O_TYPE_GROUP:
+									if (!detailed) {
+										WriteItemObject(gcnew GroupInfoLite(obj_id), path, true);
+									}
+									else {
+										WriteItemObject(gcnew GroupInfo(obj_id), path, true);
+									}
+									break;
 
-                                if (!detailed) {
-                                    WriteItemObject(gcnew GroupInfoLite(obj_id), path, true);
-                                }
-                                else {
-                                    WriteItemObject(gcnew GroupInfo(obj_id), path, true);
-                                }
-                                break;
+								case H5O_TYPE_DATASET:
 
-                            case H5O_TYPE_DATASET:
+									if (!detailed) {
+										WriteItemObject(ProviderUtils::GetDatasetInfoLite(obj_id), path, false);
+									}
+									else {
+										WriteItemObject(ProviderUtils::GetDatasetInfo(obj_id), path, false);
+									}
+									break;
 
-                                if (!detailed) {
-                                    WriteItemObject(ProviderUtils::GetDatasetInfoLite(obj_id), path, false);
-                                }
-                                else {
-                                    WriteItemObject(ProviderUtils::GetDatasetInfo(obj_id), path, false);
-                                }
-                                break;
+								case H5O_TYPE_NAMED_DATATYPE:
 
-                            case H5O_TYPE_NAMED_DATATYPE:
+									WriteItemObject(gcnew DatatypeInfo(obj_id), path, false);
+									break;
 
-                                WriteItemObject(gcnew DatatypeInfo(obj_id), path, false);
-                                break;
+								default:
 
-                            default:
-
-                                WriteItemObject(gcnew ObjectInfo(obj_id), path, false);
-                                break;
-                            }
-                        }
+									WriteItemObject(gcnew ObjectInfo(obj_id), path, false);
+									break;
+								}
+							}
+							else {
+								throw gcnew HDF5Exception("H5Oget_info failed!");
+							}
 #pragma endregion
+						}
                         break;
 
-                    case H5L_TYPE_SOFT:
+					case H5L_TYPE_SOFT:
+					case H5L_TYPE_EXTERNAL:
+						{
+							if (!Force) {
+								WriteItemObject(gcnew LinkInfo(group_id, linkName), path, false);
+							}
+							else  // try to resolve the link
+							{
+								if (!ProviderUtils::IsResolvableH5Path(drive->FileHandle, h5path)) {
+									WriteItemObject(gcnew LinkInfo(group_id, linkName), path, false);
+								}
+								else
+								{
+#pragma region resolve the link
+									path_name =  (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
+									obj_id = H5Oopen(drive->FileHandle, path_name, H5P_DEFAULT);
+									if (obj_id < 0) {
+										throw gcnew HDF5Exception("H5Oopen failed!");
+									}
 
-                        WriteItemObject(gcnew LinkInfo(group_id, linkName),
-                            path, false);
-                        break;
+									H5O_info_t oinfo;
+									if (H5Oget_info(obj_id, &oinfo) >= 0)
+									{
+										switch (oinfo.type)
+										{
+										case H5O_TYPE_GROUP:
 
-                    case H5L_TYPE_EXTERNAL:
+											if (!detailed) {
+												WriteItemObject(gcnew GroupInfoLite(obj_id), path, true);
+											}
+											else {
+												WriteItemObject(gcnew GroupInfo(obj_id), path, true);
+											}
+											break;
 
-                        WriteItemObject(gcnew LinkInfo(group_id, linkName),
-                            path, false);
+										case H5O_TYPE_DATASET:
+
+											if (!detailed) {
+												WriteItemObject(ProviderUtils::GetDatasetInfoLite(obj_id), path, false);
+											}
+											else {
+												WriteItemObject(ProviderUtils::GetDatasetInfo(obj_id), path, false);
+											}
+											break;
+
+										case H5O_TYPE_NAMED_DATATYPE:
+
+											WriteItemObject(gcnew DatatypeInfo(obj_id), path, false);
+											break;
+
+										default:
+
+											WriteItemObject(gcnew ObjectInfo(obj_id), path, false);
+											break;
+										}
+									}
+									else {
+										throw gcnew HDF5Exception("H5Oget_info failed!");
+									}
+#pragma endregion
+								}
+							}
+						}
                         break;
 
                     default:
@@ -175,23 +229,18 @@ namespace PSH5X
             if (group_id >= 0) {
                 H5Gclose(group_id);
             }
-
             if (obj_id >= 0) {
                 H5Oclose(obj_id);
             }
-
             if (path_name != NULL) {
                 Marshal::FreeHGlobal(IntPtr(path_name));
-            }
-
+			}
             if (link_name != NULL) {
                 Marshal::FreeHGlobal(IntPtr(link_name));
             }
-
             if (group_path != NULL) {
                 Marshal::FreeHGlobal(IntPtr(group_path));
             }
-
             if (root_name != NULL) {
                 Marshal::FreeHGlobal(IntPtr(root_name));
             }
