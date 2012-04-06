@@ -4,6 +4,7 @@
 #include "Provider.h"
 #include "ProviderUtils.h"
 #include "PSH5XException.h"
+#include "SimpleChunkedDatasetInfo.h"
 
 extern "C" {
 #include "H5Dpublic.h"
@@ -113,6 +114,13 @@ namespace PSH5X
                         if (H5Dset_extent(dset, size_ptr) < 0) {
                             throw gcnew HDF5Exception("H5Sget_simple_extent_dims failed.");
                         }
+
+						if (H5Fflush(dset, H5F_SCOPE_LOCAL) < 0) {
+							throw gcnew HDF5Exception("H5Fflush failed!");
+						}
+
+						// extendible datasets must be simple and chunked (at the moment)
+						WriteItemObject(gcnew SimpleChunkedDatasetInfo(dset), path, false);
                     }
                 }
                 else {
@@ -130,7 +138,6 @@ namespace PSH5X
                 if (ProviderUtils::IsH5SoftLink(drive->FileHandle, h5path))
                 {
 #pragma region HDF5 soft link
-
 
                     String^ dest = nullptr;
                     if (ProviderUtils::TryGetValue(value, dest))
@@ -216,8 +223,7 @@ namespace PSH5X
 
 #pragma endregion
                 }
-                else
-                {
+                else {
                     throw gcnew PSH5XException("What kind of symbolic link is this?");
                 }
             }
@@ -227,23 +233,18 @@ namespace PSH5X
             if (fspace >= 0) {
                 H5Sclose(fspace);
             }
-
             if (dset >= 0) {
                 H5Dclose(dset);
             }
-
             if (link != NULL) {
                 Marshal::FreeHGlobal(IntPtr(link));
             }
-
             if (file != NULL) {
                 Marshal::FreeHGlobal(IntPtr(file));
             }
-
             if (soft != NULL) {
                 Marshal::FreeHGlobal(IntPtr(soft));
             }
-
             if (name != NULL) {
                 Marshal::FreeHGlobal(IntPtr(name));
             }

@@ -62,6 +62,7 @@ namespace PSH5X
 
                 String^ linkName = ProviderUtils::ChildName(h5path);
                 link_name = (char*)(Marshal::StringToHGlobalAnsi(linkName)).ToPointer();
+
                 new_name = (char*)(Marshal::StringToHGlobalAnsi(newName)).ToPointer();
 
                 if (H5Lexists(gid, link_name, H5P_DEFAULT) > 0)
@@ -74,6 +75,22 @@ namespace PSH5X
                             if (H5Fflush(gid, H5F_SCOPE_LOCAL) < 0) {
                                 throw gcnew HDF5Exception("H5Fflush failed!");
                             }
+
+							// support -PassThru
+
+							String^ newpath = nullptr;
+							if (path->EndsWith(linkName))
+							{
+								int idx = path->LastIndexOf(linkName);
+								newpath = String::Concat(path->Substring(0, idx), newName);
+							}
+							else {
+								throw gcnew PSH5XException("Can't find link name in path!");
+							}
+
+							bool isContainer = false;
+							ItemInfo^ iinfo = passThru(gid, newName, isContainer);
+							WriteItemObject(iinfo, newpath, isContainer);
                         }
                         else {
                             throw gcnew HDF5Exception("H5Lmove failed!!!");

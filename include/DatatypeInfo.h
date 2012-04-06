@@ -4,7 +4,7 @@
 #include "ProviderUtils.h"
 
 extern "C" {
-#include "H5Tpublic.h"
+#include "H5Ipublic.h"
 }
 
 namespace PSH5X

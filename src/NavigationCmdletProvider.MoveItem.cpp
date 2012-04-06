@@ -66,6 +66,12 @@ namespace PSH5X
 				String^ checkH5path = destH5Path + "/" + ProviderUtils::ChildName(h5path);
 				if (ProviderUtils::CanCreateItemAt(destDrive->FileHandle, checkH5path)) {
 					destH5Path = checkH5path;
+					if (!destination->EndsWith("\\")) {
+							destination = destination + "\\" + ProviderUtils::ChildName(h5path);
+						}
+						else {
+							destination += ProviderUtils::ChildName(h5path);
+						}
 				}
 				else {
 					throw gcnew PSH5XException(String::Format("Unable to create the destination object '{0}'!", destination));
@@ -94,6 +100,11 @@ namespace PSH5X
 					if (H5Fflush(drive->FileHandle, H5F_SCOPE_LOCAL) < 0) {
 						throw gcnew Exception("H5Fflush failed!");
 					}
+
+					// support -PassThru
+					bool isContainer = false;
+					ItemInfo^ iinfo = passThru(drive->FileHandle, destH5Path, isContainer);
+					WriteItemObject(iinfo, destination, isContainer);
 				}
 				else {
 					throw gcnew Exception("H5Lmove failed!!!");

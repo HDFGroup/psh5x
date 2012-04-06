@@ -1,5 +1,4 @@
 
-#include "SimpleChunkedDatasetInfo.h"
 #include "DatatypeInfo.h"
 #include "GroupInfo.h"
 #include "HDF5Exception.h"
@@ -9,6 +8,7 @@
 #include "Provider.h"
 #include "ProviderUtils.h"
 #include "PSH5XException.h"
+#include "SimpleChunkedDatasetInfo.h"
 
 extern "C" {
 #include "H5Gpublic.h"
@@ -150,8 +150,6 @@ namespace PSH5X
                     if (H5Fflush(gid, H5F_SCOPE_LOCAL) < 0) {
                         throw gcnew Exception("H5Fflush failed!");
                     }
-
-                    WriteItemObject(gcnew GroupInfo(gid), path, true);   
                 }
 
 #pragma endregion
@@ -413,18 +411,6 @@ namespace PSH5X
 					if (H5Fflush(dset, H5F_SCOPE_LOCAL) < 0) {
 						throw gcnew HDF5Exception("H5Fflush failed!");
 					}
-
-					if (!isSimple) {
-						WriteItemObject(gcnew DatasetInfo(dset), path, false);
-					}
-					else {
-						if (!isChunked) {
-							WriteItemObject(gcnew SimpleDatasetInfo(dset), path, false);
-						}
-						else {
-							WriteItemObject(gcnew SimpleChunkedDatasetInfo(dset), path, false);
-						}
-					}
 				}
 
 #pragma endregion
@@ -477,8 +463,6 @@ namespace PSH5X
                     if (H5Fflush(drive->FileHandle, H5F_SCOPE_LOCAL) < 0) {
                         throw gcnew HDF5Exception("H5Fflush failed!");
                     }
-
-                    WriteItemObject(gcnew DatatypeInfo(dtype), path, false);
                 }
 
 #pragma endregion
@@ -507,32 +491,6 @@ namespace PSH5X
 
                                 if (H5Fflush(drive->FileHandle, H5F_SCOPE_LOCAL) < 0) {
                                     throw gcnew HDF5Exception("H5Fflush failed!");
-                                }
-
-                                oid = H5Oopen(drive->FileHandle, hard, H5P_DEFAULT);
-                                if (oid < 0) {
-                                    throw gcnew HDF5Exception("H5Oopen failed!");
-                                }
-
-                                H5I_type_t t = H5Iget_type(oid);
-                                String^ objType = nullptr;
-                                if (t == H5I_GROUP) {
-                                    objType = "Group";
-                                }
-                                else if (t == H5I_DATASET) {
-                                    objType = "Dataset";
-                                }
-                                else if (t == H5I_DATATYPE) {
-                                    objType = "Datatype";
-                                }
-
-                                if (objType != nullptr) {
-                                    if (objType != "Group") {
-                                        WriteItemObject(gcnew ObjectInfoLite(oid), path, false);
-                                    }
-                                    else {
-                                        WriteItemObject(gcnew ObjectInfoLite(oid), path, true);
-                                    }
                                 }
                             }
                         }
@@ -574,8 +532,6 @@ namespace PSH5X
                             if (H5Fflush(drive->FileHandle, H5F_SCOPE_LOCAL) < 0) {
                                 throw gcnew Exception("H5Fflush failed!");
                             }
-
-                            WriteItemObject(gcnew LinkInfo(drive->FileHandle, h5path), path, false);
                         }
                     }
                     else {
@@ -617,8 +573,6 @@ namespace PSH5X
                             if (H5Fflush(drive->FileHandle, H5F_SCOPE_LOCAL) < 0) {
                                 throw gcnew HDF5Exception("H5Fflush failed!");
                             }
-
-                            WriteItemObject(gcnew LinkInfo(drive->FileHandle, h5path), path, false);
                         }
                     }
                     else {
@@ -830,14 +784,6 @@ namespace PSH5X
                 if (H5Fflush(drive->FileHandle, H5F_SCOPE_LOCAL) < 0) {
                     throw gcnew HDF5Exception("H5Fflush failed!");
                 }
-
-                dset = H5Dopen2(drive->FileHandle, name, H5P_DEFAULT);
-                if (dset < 0) {
-                    throw gcnew HDF5Exception("H5Dopen2 failed!");
-                }
-
-                WriteItemObject(gcnew DatasetInfo(dset), path, false);
-
 #pragma endregion
             }
             else if (itemTypeName->ToUpper() == "PALETTE")
@@ -927,13 +873,6 @@ namespace PSH5X
                     if (H5Fflush(drive->FileHandle, H5F_SCOPE_LOCAL) < 0) {
                         throw gcnew HDF5Exception("H5Fflush failed!");
                     }
-
-                    dset = H5Dopen2(drive->FileHandle, name, H5P_DEFAULT);
-                    if (dset < 0) {
-                        throw gcnew HDF5Exception("H5Dopen2 failed!");
-                    }
-
-                    WriteItemObject(gcnew DatasetInfo(dset), path, false);
                 }
 
 #pragma endregion

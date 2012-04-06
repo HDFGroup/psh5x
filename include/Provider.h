@@ -1,5 +1,10 @@
-
 #pragma once
+
+#include "ItemInfo.h"
+
+extern "C" {
+#include "H5Ipublic.h"
+}
 
 namespace PSH5X
 {
@@ -193,6 +198,10 @@ namespace PSH5X
         virtual System::Object^ GetContentWriterDynamicParameters(System::String^ path);
 
 #pragma endregion
+
+	private:
+
+		static ItemInfo^ passThru(hid_t file_id, System::String^ h5path, bool& isContainer);
 
     };
 
