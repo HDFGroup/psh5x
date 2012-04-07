@@ -5,8 +5,7 @@ Import-Module $ScriptDir\PSH5X.dll
 Export-ModuleMember -Cmdlet * 
 
 . $ScriptDir\Aliases.ps1
-. $ScriptDir\Copy-H5Object.ps1
-. $ScriptDir\Copy-H5SymbolicLink.ps1
+. $ScriptDir\Copy-H5Item.ps1
 . $ScriptDir\Format-H5Dataset.ps1
 . $ScriptDir\Get-H5Drive.ps1
 . $ScriptDir\Get-H5DatasetValue.ps1
