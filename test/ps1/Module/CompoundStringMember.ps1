@@ -37,7 +37,7 @@ public class cmpd
 }
 "@
 
-$dset = New-H5Dataset dset1 $t 4 
+New-H5Dataset dset1 $t 4 
 
 $a = New-Object 'cmpd[]' 4
 foreach ($i in 0..3)
@@ -80,7 +80,7 @@ $t = @"
 }
 "@
 
-$dset = New-H5Dataset dset2 $t 4 
+New-H5Dataset dset2 $t 4 
 
 $a = New-Object 'cmpd[]' 4
 foreach ($i in 0..3)

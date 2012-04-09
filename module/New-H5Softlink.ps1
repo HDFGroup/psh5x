@@ -3,11 +3,9 @@ Function New-H5Softlink
 {
 <#
     .SYNOPSIS
-      Creates a new HDF5 softlink ("adds a group member")
+      Creates a new HDF5 soft link
     .DESCRIPTION
-      The New-H5Softlink function creates a new HDF5 softlink.
-      Unless the current location is on the targeted H5Drive,
-      the source path name must be drive-qualified.
+      The New-H5Softlink function creates a new HDF5 soft link.
    .PARAMETER Source 
      The path name of the source
    .PARAMETER Destination 
@@ -16,42 +14,29 @@ Function New-H5Softlink
      New-H5Softlink -Source h5:/group2 -Destination /group1
    .LINK
      New-Item
-   .NOTES
-     Forward- (/) and backslash (\) seprators are supported in path names.
-     They MUST NOT be used as part of link names.
+   .LINK
+     http://www.hdfgroup.org/HDF5/doc/RM/RM_H5L.html#Link-CreateSoft
  #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param
     (
         [Parameter(Mandatory=$true,
+                   ValueFromPipelineByPropertyName=$true,
+                   Position=0,
                    HelpMessage='The source path name.')]
-        [string]
+        [string[]]
         $Source,
         [Parameter(Mandatory=$true,
-                   HelpMessage='A path to the destination HDF5 object')]
+                   ValueFromPipelineByPropertyName=$true,
+                   Position=1,
+                   HelpMessage='An HDF5 path name to the destination HDF5 object')]
         [string]
         $Destination
     )
 
-    if ((Test-Path $Source))
-    {
-        Write-Error "`nThe source path '$Destination' is in use."
-        return
-    }
-
+   
     if ($PSCmdlet.ShouldProcess($Source, "New HDF5 Softlink -> '$Destination'"))
-    { 
-        try
-        {
-            Write-Output(
-                New-Item -Path $Source -ItemType SoftLink -Value $Destination)
-            if (Test-Path $Source) {
-                Write-Host "`nSuccess: HDF5 softlink '$Source' -> '$Destination' created."
-            }
-        }
-        catch {
-            Write-Debug($_|Out-String)
-            Write-Error "`nUnable to create HDF5 softlink '$Source'."
-        }
+    {
+        New-Item -Path $Source -ItemType SoftLink -Value $Destination
     }
 }

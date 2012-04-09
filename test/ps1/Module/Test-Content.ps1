@@ -23,13 +23,13 @@ foreach ($n in $names)
 
     if (($n -ne 'objref') -and ($n -ne 'regref'))
     {
-        Copy-H5Object $dset "h5tmp:\$n" -Force
+        Copy-H5Item $dset "h5tmp:\$n" -Force
 
         Set-H5DatasetValue "h5tmp:\$n" $dummy
     }
     else
     {
-        Copy-H5Object "$($n):*" h5tmp:\
+        Copy-H5Item "$($n):*" h5tmp:\
 
         Set-H5DatasetValue h5tmp:\DS1 $dummy
 

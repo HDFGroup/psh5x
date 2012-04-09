@@ -23,21 +23,26 @@ Function Get-H5Drive
     param
     (
         [Parameter(Mandatory=$false,
+                   ValueFromPipelineByPropertyName=$true,
+                   Position=0,
                    HelpMessage='The name(s) of the H5Drive(s).')]
+        
+        [ValidateNotNull()]
         [string[]]
         $Name,
         [Parameter(Mandatory=$false,
+                   ValueFromPipelineByPropertyName=$true,
+                   Position=1,
                    HelpMessage='The scope of the H5Drives. See about_Scopes.')]
-        [int]
+        [ValidateNotNull()]
+        [string]
         $Scope = 2
     )
 
-    if ($Name)
-    {
-        Write-Output(Get-PSDrive -PSProvider HDF5 -Name $Name -Scope $Scope)
+    if ($Name) {
+        Get-PSDrive -PSProvider HDF5 -Name $Name -Scope $Scope
     }
-    else
-    {
-        Write-Output(Get-PSDrive -PSProvider HDF5 -Scope $Scope)
+    else {
+        Get-PSDrive -PSProvider HDF5 -Scope $Scope
     }
 }

@@ -18,48 +18,34 @@ Function Remove-H5Drive
       Remove-H5Drive -Name h5,h51
     .LINK
       Remove-PSDrive
+    .LINK
       about_Scopes
  #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param
     (
         [Parameter(Mandatory=$true,
+                   ValueFromPipelineByPropertyName=$true,
+                   Position=0,
                    HelpMessage='The name of the H5Drive.')]
         [string[]]
         $Name,
         [Parameter(Mandatory=$false,
+                   ValueFromPipelineByPropertyName=$true,
+                   Position=1,
                    HelpMessage='The scope of the H5Drive. See about_Scopes.')]
-        [int]
+        [string]
         $Scope = 2
     )
-
-    foreach ($n in $Name)
+    
+    $cmd = 'Remove-PSDrive -Name $Name'
+    
+    if ($Scope) {
+        $cmd += ' -Scope $Scope'
+    }
+    
+    if ($PSCmdlet.ShouldProcess($Name, 'Remove HDF5 Drive'))
     {
-        $count = 0
-        Get-PSDrive -PSProvider HDF5 | ?{$_.Name -eq $n} | %{$count++}
-        if ($count -eq 1)
-        {
-            if ($PSCmdlet.ShouldProcess($n, 'Remove HDF5 Drive'))
-            {
-                try
-                {
-                    Write-Output(Remove-PSDrive -Name $n -Scope $Scope)
-                    $count = 0
-                    Get-PSDrive -PSProvider HDF5 | ?{$_.Name -eq $n} | %{$count++}
-                    if ($count -eq 0) {
-                        Write-Host "`nSuccess: H5Drive '$n' removed."
-                    }
-                }
-                catch
-                {
-                    Write-Debug($_|Out-String)
-                    Write-Error "`nCannot remove drive '$n'. Check current location!"
-                }
-            }
-        }
-        else
-        {
-            Write-Host "`nWarning: '$n' - no such H5Drive."
-        }
+        Invoke-Expression $cmd
     }
 }

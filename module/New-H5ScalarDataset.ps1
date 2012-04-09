@@ -13,32 +13,34 @@ Function New-H5ScalarDataset
      The path of the new HDF5 Dataset.
    .PARAMETER Type
      The element type of the HDF5 Dataset. The type can be specified as
-     1) A pre-defined HDF5 datatype
+     1) A pre-defined HDF5 datatype (string)
      2) An HDF5 datatype definition (JSON)
-     3) The HDF5 path name of a linked HDF5 datatype
+     3) The HDF5 path name of a linked HDF5 datatype (string)
    .PARAMETER Compact 
      Create an HDF5 dataset with compact layout.
    .PARAMETER Force
-     Force the creation of intermediates.
+     Force the automatic creation of intermediate HDF5 groups.
    .EXAMPLE
    .LINK
      New-Item
-   .NOTES
-     Forward- (/) and backslash (\) seprators are supported in path names.
-     The must not be used as part of link names.
+   .LINK
+      New-H5Dataset
+   .LINK
+      http://www.hdfgroup.org/HDF5/doc/RM/RM_H5S.html#Dataspace-Create
  #>
     [CmdletBinding(SupportsShouldProcess=$true,
                    DefaultParametersetName='Simple')]
     param
     (
         [Parameter(Mandatory=$true,
+                   ValueFromPipelineByPropertyName=$true,
                    Position=0,
                    HelpMessage='The path to the new HDF5 dataset.')]
-        [string]
+        [string[]]
         $Path,
         [Parameter(Mandatory=$true,
                    Position=1,
-                   HelpMessage='The element type of the new HDF5 dataset.')]
+                   HelpMessage='The element type of the new scalar HDF5 dataset.')]
         [ValidateNotNull()]
         [string]
         $Type,
@@ -52,27 +54,17 @@ Function New-H5ScalarDataset
         $Force
     )
 
-    if ((Test-Path $Path))
-    {
-        Write-Error "`nThe path name '$Path' is in use."
-        return
+    $cmd = 'New-Item -Path $Path -ItemType Dataset -ElementType $Type -Scalar'
+    
+    if ($Compact) {
+        $cmd += ' -Compact'
+    }
+    if ($Force) {
+        $cmd += ' -Force'
     }
 
-    if ($PSCmdlet.ShouldProcess($Path, 'New HDF5 Scalar Dataset'))
+    if ($PSCmdlet.ShouldProcess($Path, 'New HDF5 Null Dataset'))
     { 
-        $param = @('-Path', $Path, '-ItemType', 'Dataset', '-ElementType', $Type, '-Scalar')
-
-        if ($Compact) {
-            $param += '-Compact'
-        }
-        if ($Force) {
-            $param += '-Force'
-        }
-        
-        Write-Output(Invoke-Expression "New-Item $param")
-
-        if (Test-Path $Path -Resolvable) {
-            Write-Host "`nSuccess: HDF5 scalar dataset '$Path' created."
-        }
+        Invoke-Expression $cmd
     }
 }

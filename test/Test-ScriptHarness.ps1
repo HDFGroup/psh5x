@@ -2,7 +2,7 @@
 # Ed Wilson, Windows PowerShell 2.0 - Best Practices, p. 503
 #
 
-Import-Module HDF5
+Import-Module HDF5 -Force
 
 $path = Join-Path (Split-Path $MyInvocation.MyCommand.Path) ps1
 $report = [IO.Path]::GetTempFileName()

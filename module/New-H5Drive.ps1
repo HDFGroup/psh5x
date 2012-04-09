@@ -19,6 +19,8 @@ Function New-H5Drive
       The HDF5 root group is the default.
     .PARAMETER Scope
       The scope in which the drive is to be created. See about_Scopes.
+    .PARAMETER Force
+      If the HDF5 does not exist, force the creation of a new HDF5 file.
     .EXAMPLE
       New-H5Drive -Name h5 -File C:\tmp\foo.h5
     .EXAMPLE
@@ -32,11 +34,16 @@ Function New-H5Drive
     param
     (
         [Parameter(Mandatory=$true,
+                   ValueFromPipelineByPropertyName=$true,
+                   Position=1,
                    HelpMessage='The name of the H5Drive.')]
+        [ValidateNotNull()]
         [string]
         $Name,
         [Parameter(Mandatory=$true,
+                   Position=2,
                    HelpMessage='The name of an HDF5 file.')]
+        [ValidateNotNull()]
         [string]
         $File,
         [Parameter(Mandatory=$false,
@@ -49,8 +56,8 @@ Function New-H5Drive
         $Root,
         [Parameter(Mandatory=$false,
                    HelpMessage='The scope of the H5Drive. See about_Scopes.')]
-        [int]
-        $Scope=2,
+        [string]
+        $Scope='2',
         [Parameter(Mandatory=$false,
                    HelpMessage='Force the creation of a new file?')]
         [switch]
@@ -62,7 +69,7 @@ Function New-H5Drive
         Write-Error "`nFile '$File' is not an HDF5 file."
         return
     }
-
+    
     $count = 0
     Get-PSDrive | ?{$_.Name -eq $Name} | %{$count++}
     if ($count -eq 1)
@@ -70,49 +77,29 @@ Function New-H5Drive
         Write-Error "`nDrive name '$Name' is in use."
         return
     }
-
+    
     if (!$Root)
     {
         $Root = "$($Name):\"
     }
-
+    
+    $cmd = 'New-PSDrive -Name $Name -PSProvider HDF5 -Path $File -Root $Root'
+        
+    if ($RW) {
+        $cmd += ' -Mode RW'
+    }
+        
+    if ($Scope) {
+        $cmd += ' -Scope $Scope'
+    }
+        
+    if ($Force) {
+        $cmd += ' -Force'
+    }
+        
     if ($PSCmdlet.ShouldProcess($File, "New HDF5 Drive '$Name'"))
-    { 
-        try
-        {
-            if ($RW)
-            {
-                if ($Force) {
-                    Write-Output(
-                        New-PSDrive -Name $Name -PSProvider HDF5 -Path $File `
-                                    -Root $Root -Mode RW -Scope $Scope -Force)
-                }
-                else {
-                    Write-Output(
-                        New-PSDrive -Name $Name -PSProvider HDF5 -Path $File `
-                                    -Root $Root -Mode RW -Scope $Scope)
-                }
-                $count = 0
-                Get-PSDrive | ?{$_.Name -eq $Name} | %{$count++}
-                if ($count -eq 1) {
-                    Write-Host "`nSuccess: WRITEABLE H5Drive '$Name' created."
-                }
-            }
-            else
-            {
-                Write-Output(
-                    New-PSDrive -Name $Name -PSProvider HDF5 -Path $File `
-                                -Root $Root -Scope $Scope)
-                $count = 0
-                Get-PSDrive | ?{$_.Name -eq $Name} | %{$count++}
-                if ($count -eq 1) {
-                    Write-Host "`nSuccess: READ-ONLY H5Drive '$Name' created."
-                }
-            }
-        }
-        catch {
-            Write-Debug ($_| Out-String)
-            Write-Error "`nCreation of HDF5 drive '$Name' failed."
-        }
+    {
+       
+        Invoke-Expression $cmd
     }
 }

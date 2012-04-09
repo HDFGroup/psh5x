@@ -3,9 +3,9 @@ Function Set-H5DatasetValue
 {
 <#
     .SYNOPSIS
-      Sets the value of an HDF5 dataset
+      Sets the value of an HDF5 dataset (scalar and simple)
     .PARAMETER Path
-      The path to an HDF5 dataset
+      The path name(s) to HDF5 datasets
     .PARAMETER Value
       The value of the HDF5 dataset
     .PARAMETER Start
@@ -17,80 +17,91 @@ Function Set-H5DatasetValue
       The (mulitdimensional) block count of the hyperslab selection
     .PARAMETER Block
       The (mulitdimensional) block size of the hyperslab selection
+    .PARAMETER PassThru
+      Return a PowerShell object representing each updated HDF5 dataset.
     .LINK
       Set-Content
+    .LINK
+      http://www.hdfgroup.org/HDF5/doc/RM/RM_H5D.html#Dataset-Write
+    .LINK
       http://www.hdfgroup.org/HDF5/doc/UG/12_Dataspaces.html#DTransfer
  #>
     param
     (
         [Parameter(Mandatory=$true,
-                   Position=1,
+                   ValueFromPipelineByPropertyName=$true,
+                   Position=0,
                    HelpMessage='The path to an HDF5 dataset')]
         [ValidateNotNull()]
         [string]
         $Path,
         [Parameter(Mandatory=$true,
-                   Position=2,
+                   ValueFromPipeline=$true,
+                   ValueFromPipelineByPropertyName=$true,
+                   Position=1,
                    HelpMessage='The value of the HDF5 dataset')]
         [ValidateNotNull()]
-        [object]
+        [object[]]
         $Value,
         [Parameter(Mandatory=$false,
                    ParameterSetName='Hyperslab',
-                   Position=3,
+                   Position=2,
                    HelpMessage='The start of the hyperslab selection')]
         [ValidateNotNull()]
+        [ValidateCount(1,32)]
         [uint64[]]
         $Start,
         [Parameter(Mandatory=$false,
                    ParameterSetName='Hyperslab',
-                   Position=4,
+                   Position=3,
                    HelpMessage='The stride of the hyperslab selection')]
         [ValidateNotNull()]
+        [ValidateCount(1,32)]
         [uint64[]]
         $Stride,
         [Parameter(Mandatory=$false,
                    ParameterSetName='Hyperslab',
-                   Position=5,
+                   Position=4,
                    HelpMessage='The block count of the hyperslab selection')]
         [ValidateNotNull()]
+        [ValidateCount(1,32)]
         [uint64[]]
         $Count,
         [Parameter(Mandatory=$false,
                    ParameterSetName='Hyperslab',
-                   Position=6,
+                   Position=5,
                    HelpMessage='The block size of the hyperslab selection')]
         [ValidateNotNull()]
+        [ValidateCount(1,32)]
         [uint64[]]
-        $Block
+        $Block,
+        [Parameter(Mandatory=$false,
+                   HelpMessage='Write objects to pipeline?')]
+        [switch]
+        $PassThru
     )
 
-    if (!(Test-Path $Path -Resolvable))
-    {
-        Write-Error "`nDataset '$Path' not found!"
-        return
+    $cmd = 'Set-Content -Path $Path -Value $Value'
+    
+    if ($Start) {
+        $cmd += ' -Start $Start'
     }
-
-    if (!($Start -or $Stride -or $Count -or $Block))
-    {
-        Set-Content $Path $Value
+    if ($Stride) {
+        $cmd += ' -Stride $Stride'
     }
-    else
+    if ($Count) {
+        $cmd += ' -Count $Count'
+    }
+    if ($Block) {
+        $cmd += ' -Block $Block'
+    }
+    
+    if ($PassThru) {
+        $cmd += ' -PassThru'
+    }
+    
+    if ($PSCmdlet.ShouldProcess($Path, 'Setting HDF5 dataset value'))
     {
-        $cmd = 'Set-Content $Path $Value'
-        if ($Start) {
-            $cmd += ' -Start $Start'
-        }
-        if ($Stride) {
-            $cmd += ' -Stride $Stride'
-        }
-        if ($Count) {
-            $cmd += ' -Count $Count'
-        }
-        if ($Block) {
-            $cmd += ' -Block $Block'
-        }
-
         Invoke-Expression $cmd
     }
 }

@@ -3,21 +3,20 @@ Function New-H5Attribute
 {
 <#
     .SYNOPSIS
-      Creates a new HDF5 Attribute 
+      Creates new HDF5 Attributes 
     .DESCRIPTION
       The New-H5Attribute function creates a new HDF5 attribute
-      of an HDF5 object (group, dataset, linked datatype).
-      If only a path, name and value are specified, the function attempts
-      to create a variable-length string, scalar HDF5 attribute.
-
-      Unless the current location is on the targeted H5Drive,
-      the path(s) must be drive-qualified.
+      of one or more HDF5 objects (group, dataset, linked datatype).
+      
+      If only a path name, an attribute name, and a value are specified,
+      the function attempts to create a variable-length string,
+      scalar HDF5 attribute.
    .PARAMETER Path
-     The path to the HDF5 object (group, dataset, linked datatype) to decorate.
+     The path to the HDF5 object(s) (group, dataset, linked datatype) to decorate.
    .PARAMETER Name
      The name of the HDF5 attribute
-   .PARAMETER Value 
-     The HDF5 attribute value
+   .PARAMETER Scalar 
+     The HDF5 attribute value of a scalar attribute
    .PARAMETER Simple 
      Create an HDF5 attribute with a simple dataspace.
    .PARAMETER Nulll
@@ -27,10 +26,12 @@ Function New-H5Attribute
      1) A pre-defined HDF5 datatype (string)
      2) An HDF5 datatype definition (hashtable)
      3) The HDF5 path name of a linked HDF5 datatype
+   .PARAMETER Value 
+     The HDF5 attribute value (simple attributes only)
    .EXAMPLE
-     New-H5Attribute h5:\groupA foo bar
-
-     New-H5Attribute h5:\groupA intAttr 4711 -Type int
+     New-H5Attribute /groupA stringAttr 'bar one'
+   .EXAMPLE
+     New-H5Attribute -Path h5:\groupA -Name intAttr -Scalar 4711 -Type int
    .LINK
      New-ItemProperty
    .NOTES
@@ -45,9 +46,10 @@ Function New-H5Attribute
                    Position=0,
                    HelpMessage='The path to the HDF5 object to decorate')]
         [ValidateNotNull()]
-        [string]
+        [string[]]
         $Path,
         [Parameter(Mandatory=$true,
+                   ValueFromPipelineByPropertyName=$true,
                    Position=1,
                    HelpMessage='The name of the new HDF5 attribute')]
         [ValidateNotNull()]
@@ -57,8 +59,9 @@ Function New-H5Attribute
                    Position=2,
                    ParameterSetName='Simple',
                    HelpMessage='Dimensions of the simple dataspace')]
+        [ValidateNotNull()]
         [ValidateCount(1,32)]
-        [long[]]
+        [uint64[]]
         $Simple,
         [Parameter(Mandatory=$true,
                    Position=2,
@@ -80,6 +83,8 @@ Function New-H5Attribute
         [string]
         $Type='string',
         [Parameter(Mandatory=$false,
+                   ParameterSetName='Simple',
+                   ValueFromPipelineByPropertyName=$true,
                    Position=4,
                    HelpMessage='Non-scalar attribute value')]
         [ValidateNotNull()]
@@ -87,72 +92,32 @@ Function New-H5Attribute
         $Value
     )
 
-    if (!(Test-Path $Path))
-    {
-        Write-Error "`nThe path name '$Path' is invalid."
-        return
-    }
-    if (Test-H5Attribute $Path $Name)
-    {
-        Write-Error "`nThe object '$Path' already has a '$Name' attribute."
-        return
-    }
-
     if ($Nulll -and $Value) {
         Write-Host "`nWarning: -Value has no effect for attributes with null dataspaces."
     }
-
-    $typedef = $Type.GetType().FullName
-    if (!(($typedef -eq 'System.String') `
-          -or ($typedef -eq 'System.Collections.Hashtable')))
-    {
-        Write-Error "`nInvalid type specification '$Type' found."
-        return
+    
+    $cmd = 'New-ItemProperty $Path -Name $Name -ElementType $Type'
+    
+    if ($Nulll) {
+        $cmd += ' -Null'
     }
-
-    if ($Simple) #simple dataspace
+    elseif ($Simple) # simple attribute
     {
-        for ($i = 0; $i -lt $Simple.Length; $i++)
-        {
-            if (!($Simple[$i] -gt 0))
-            {
-                Write-Error "`nDimensions must be positive."
-                return
-            }
+        $cmd += ' -Simple $Simple'
+            
+        if ($Value) {
+            $cmd += '-Value $Value'
+        }
+    }
+    else # scalar attribute
+    {
+        if ($Scalar) {
+            $cmd += ' -Value $Scalar'
         }
     }
 
     if ($PSCmdlet.ShouldProcess($Path, "New HDF5 Attribute '$Name'"))
-    { 
-        if ($Nulll)
-        {
-            Write-Output(
-                New-ItemProperty $Path -Name $Name -ElementType $Type -Null)
-        }
-        elseif ($Simple) # simple attribute
-        {
-            if ($Value) {
-                Write-Output(
-                    New-ItemProperty $Path -Name $Name -ElementType $Type `
-                                     -Simple $Simple -Value $Value)
-            }
-            else {
-                Write-Output(
-                    New-ItemProperty $Path -Name $Name -ElementType $Type `
-                                     -Simple $Simple)
-            }
-        }
-        else
-        {
-            if ($Scalar) {
-                Write-Output(
-                    New-ItemProperty $Path -Name $Name -ElementType $Type `
-                                     -Value $Scalar)
-            }
-            else {
-                Write-Output(
-                    New-ItemProperty $Path -Name $Name -ElementType $Type)
-            }
-        }
+    {     
+        Invoke-Expression $cmd
     }
 }

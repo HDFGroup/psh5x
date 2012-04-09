@@ -20,7 +20,7 @@ Function New-H5Group
    .PARAMETER IndexLinkOrder
      Maintain an index by link creation order.
    .PARAMETER Force
-     Force the creation of intermediates.
+     Force the automatic creation of intermediate HDF5 groups.
    .EXAMPLE
      New-H5Group -Path h5:\group1
    .EXAMPLE
@@ -31,14 +31,20 @@ Function New-H5Group
      New-H5Group -Path h5:/group1/group2
    .LINK
      New-Item
-   .NOTES
-     Forward- (/) and backslash (\) seprators are supported in path names.
-     The must not be used as part of link names.
+   .LINK
+     http://www.hdfgroup.org/HDF5/doc/RM/RM_H5G.html#Group-Create2
+   .LINK
+     http://www.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-SetAttrCreationOrder
+   .LINK
+     http://www.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-SetLinkCreationOrder
+     
  #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param
     (
         [Parameter(Mandatory=$true,
+                   ValueFromPipelineByPropertyName=$true,
+                   Position=0,
                    HelpMessage='The path of the new HDF5 group(s).')]
         [string[]]
         $Path,
@@ -64,47 +70,26 @@ Function New-H5Group
         $Force
     )
 
-    foreach ($p in $Path)
+    $cmd = 'New-Item -Path $Path -ItemType Group'
+    
+    if ($TrackAttributeOrder) {
+        $cmd += ' -TrackAttributeOrder'
+    }
+    if ($IndexAttributeOrder) {
+        $cmd += ' -IndexAttributeOrder'
+    }
+    if ($TrackLinkOrder) {
+        $cmd += ' -TrackLinkOrder'
+    }
+    if ($IndexLinkOrder) {
+        $param += ' -IndexLinkOrder'
+    }
+    if ($Force) {
+        $param += ' -Force'
+    }
+    
+    if ($PSCmdlet.ShouldProcess($Path, 'New HDF5 Group'))
     {
-        if (!(Test-Path $p))
-        {
-            if ($PSCmdlet.ShouldProcess($p, 'New HDF5 Group'))
-            { 
-                try
-                {
-                    $param = @('-Path', "'$p'", '-ItemType', 'Group')
-
-                    if ($TrackAttributeOrder) {
-                        $param += '-TrackAttributeOrder'
-                    }
-                    if ($IndexAttributeOrder) {
-                        $param += '-IndexAttributeOrder'
-                    }
-                    if ($TrackLinkOrder) {
-                        $param += '-TrackLinkOrder'
-                    }
-                    if ($IndexLinkOrder) {
-                        $param += '-IndexLinkOrder'
-                    }
-                    if ($Force) {
-                        $param += '-Force'
-                    }
-
-                    Write-Output(Invoke-Expression "New-Item $param")
-
-                    if (Test-Path $p) {
-                        Write-Host "`nSuccess: HDF5 group '$p' created."
-                    }
-                }
-                catch {
-                    Write-Debug($_|Out-String)
-                    Write-Error "`nUnable to create HDF5 group '$p'. Intermediates missing? Is your current location an H5Drive?"
-                }
-            }
-        }
-        else
-        {
-            Write-Error "`nPath name '$p' is in use."
-        }
+        Invoke-Expression $cmd            
     }
 }

@@ -19,7 +19,13 @@ Function New-H5Image
     .PARAMETER Interlace 
       The interlace mode, by 'Plane' or by 'Pixel'
     .PARAMETER Force 
-      Force the creation of intermediate groups
+      Force the automatic creation of intermediate HDF5 groups
+    .LINK
+      New-Item
+    .LINK
+      http://www.hdfgroup.org/HDF5/doc/ADGuide/ImageSpec.html
+    .LINK
+      http://www.hdfgroup.org/HDF5/doc/HL/RM_H5IM.html
     .EXAMPLE
       New-H5Image h5:/image C:\tmp\foo.gif
  #>
@@ -27,9 +33,10 @@ Function New-H5Image
     param
     (
         [Parameter(Mandatory=$true,
+                   ValueFromPipelineByPropertyName=$true,
                    Position=0,
                    HelpMessage='The path name of the new HDF5 Image')]
-        [string]
+        [string[]]
         $Path,
         [Parameter(Mandatory=$true,
                    Position=1,
@@ -72,11 +79,6 @@ Function New-H5Image
         $Force
     )
 
-    if((Test-Path $Path))
-    {
-        Write-Error "`nThe path name '$Path' is in use."
-        return
-    }
     if ($FromImage)
     {
         if (!(Test-Path $FromFile))
@@ -86,44 +88,22 @@ Function New-H5Image
         }
     }
 
+    $cmd = 'New-Item -Path $Path -ItemType Image'
+    
+    if ($Force) {
+        $cmd += ' -Force'
+    }
+    
+    if ($FromFile) {
+        $cmd += ' -Value $FromFile'
+    }
+    else {
+        $cmd += ' -Bits $Bits -WxH @($Width,$Height) -InterlaceMode $Interlace'
+    }
+
+
     if ($PSCmdlet.ShouldProcess($Path, 'New HDF5 image'))
     { 
-        try
-        {
-            if ($FromFile)
-            {
-                if ($Force) {
-                    Write-Output(
-                        New-Item $Path -ItemType Image -Value $FromFile -Force)
-                }
-                else {
-                    Write-Output(
-                        New-Item $Path -ItemType Image -Value $FromFile)
-                }
-            }
-            else
-            {
-                if ($Force) {
-                    Write-Output(New-Item $Path -ItemType Image `
-                                          -Bits $Bits `
-                                          -WxH @($Width,$Height) `
-                                          -InterlaceMode $Interlace -Force)
-                }
-                else {
-                    Write-Output(New-Item $Path -ItemType Image `
-                                          -Bits $Bits `
-                                          -WxH @($Width,$Height) `
-                                          -InterlaceMode $Interlace)
-                }
-            }
-            if (Test-Path $Path) {
-                Write-Host "`nSuccess: HDF5 image '$Path' created."
-            }
-        }
-        catch
-        {
-            Write-Debug ($_|Out-String)
-            Write-Error "`nCreation of HDF5 image '$Path' failed."
-        }
+        Invoke-Expression $cmd
     }
 }

@@ -3,9 +3,9 @@ Function Get-H5DatasetValue
 {
 <#
     .SYNOPSIS
-      Gets the value of an HDF5 dataset
+      Gets the value of one or more HDF5 datasets
     .PARAMETER Path
-      The path to an HDF5 dataset
+      The path to one or more HDF5 datasets
     .PARAMETER Start
       The (multidimensional) offset where the hyperslab selection begins
     .PARAMETER Stride
@@ -15,53 +15,54 @@ Function Get-H5DatasetValue
       The (mulitdimensional) block count of the hyperslab selection
     .PARAMETER Block
       The (mulitdimensional) block size of the hyperslab selection
+    .NOTES
+      The Get-H5DatasetValue function is essentially a wrapper of the Get-Content
+      cmdlet with a -ReadCount 0 argument (retrieve all data elements on one shot).
     .LINK
       Get-Content
+    .LINK
+      http://www.hdfgroup.org/HDF5/doc/RM/RM_H5D.html#Dataset-Read
+    .LINK
       http://www.hdfgroup.org/HDF5/doc/UG/12_Dataspaces.html#DTransfer
  #>
     param
     (
         [Parameter(Mandatory=$true,
-                   Position=1,
+                   ValueFromPipelineByPropertyName=$true,
+                   Position=0,
                    HelpMessage='The path to an HDF5 dataset')]
         [ValidateNotNull()]
-        [string]
+        [string[]]
         $Path,
         [Parameter(Mandatory=$false,
                    ParameterSetName='Hyperslab',
-                   Position=2,
+                   Position=1,
                    HelpMessage='The start of the hyperslab selection')]
         [ValidateNotNull()]
         [uint64[]]
         $Start,
         [Parameter(Mandatory=$false,
                    ParameterSetName='Hyperslab',
-                   Position=3,
+                   Position=2,
                    HelpMessage='The stride of the hyperslab selection')]
         [ValidateNotNull()]
         [uint64[]]
         $Stride,
         [Parameter(Mandatory=$false,
                    ParameterSetName='Hyperslab',
-                   Position=4,
+                   Position=3,
                    HelpMessage='The block count of the hyperslab selection')]
         [ValidateNotNull()]
         [uint64[]]
         $Count,
         [Parameter(Mandatory=$false,
                    ParameterSetName='Hyperslab',
-                   Position=5,
+                   Position=4,
                    HelpMessage='The block size of the hyperslab selection')]
         [ValidateNotNull()]
         [uint64[]]
         $Block
     )
-
-    if (!(Test-Path $Path -Resolvable))
-    {
-        Write-Error "`nDataset '$Path' not found!"
-        return
-    }
 
     if (!($Start -or $Stride -or $Count -or $Block))
     {

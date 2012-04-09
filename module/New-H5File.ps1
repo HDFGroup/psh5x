@@ -19,7 +19,7 @@ Function New-H5File
     param
     (
         [Parameter(Mandatory=$true,
-                   HelpMessage='The path name of the new HDF5 file.')]
+                   HelpMessage='The path name of the new HDF5 file(s).')]
         [string[]]
         $Path
     )

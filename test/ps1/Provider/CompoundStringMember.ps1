@@ -37,7 +37,7 @@ public class cmpd
 }
 "@
 
-$dset = New-Item dset1 -ItemType Dataset -ElementType $t -Dimensions 4 
+New-Item dset1 -ItemType Dataset -ElementType $t -Dimensions 4 
 
 $a = New-Object 'cmpd[]' 4
 foreach ($i in 0..3)
@@ -81,7 +81,7 @@ $t = @"
 }
 "@
 
-$dset = New-Item dset2 -ItemType Dataset -ElementType $t -Dimensions 4 
+New-Item dset2 -ItemType Dataset -ElementType $t -Dimensions 4 
 
 $a = New-Object 'cmpd[]' 4
 foreach ($i in 0..3)
