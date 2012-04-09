@@ -20,10 +20,10 @@ foreach ($d in $drives)
     # work around a bug in H5Ocopy
     if (($d.Name -ne 'cmpdatt') -and ($d.Name -ne 'cpxcmpdatt'))
     {
-        Copy-H5Object "$($d.Name):\*" "h5tmp:\$($d.Name)"
-        Copy-H5Object "$($d.Name):\*" "h5tmp:\$($d.Name)1" -IgnoreAttributes
-        Copy-H5Object "$($d.Name):\*" "h5tmp:\$($d.Name)2" -Recurse
-        Copy-H5Object "$($d.Name):\*" "h5tmp:\$($d.Name)3" -Recurse -IgnoreAttributes
+        Copy-H5Item "$($d.Name):\*" "h5tmp:\$($d.Name)"
+        Copy-H5Item "$($d.Name):\*" "h5tmp:\$($d.Name)1" -IgnoreAttributes
+        Copy-H5Item "$($d.Name):\*" "h5tmp:\$($d.Name)2" -Recurse
+        Copy-H5Item "$($d.Name):\*" "h5tmp:\$($d.Name)3" -Recurse -IgnoreAttributes
     }
 }
 
