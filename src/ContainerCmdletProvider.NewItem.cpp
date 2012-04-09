@@ -799,44 +799,50 @@ namespace PSH5X
 
                 // mandatory parameters -PacketType and -ChunkByteSize
 
-                Object^ packetType = dynamicParameters["PacketType"]->Value;
+				String^ elemType = (String^) dynamicParameters["PacketType"]->Value;
 
-                Hashtable^ ht = nullptr;
-                String^ typeOrPath = nullptr;
-
-                if (ProviderUtils::TryGetValue(packetType, ht)) {
-                    dtype = ProviderUtils::ParseH5Type(ht);
-                    if (dtype < 0) {
-                        throw gcnew PSH5XException("Invalid HDF5 datatype specified!");
-                    }
-                }
-                else if (ProviderUtils::TryGetValue(packetType, typeOrPath))
-                {
-                    if (typeOrPath->StartsWith("/")) {
-                        if (ProviderUtils::IsH5DatatypeObject(drive->FileHandle, typeOrPath))
+				if (!elemType->Trim()->StartsWith("{")) // not JSON, alias or predefined type
+				{
+					if (elemType->StartsWith("/")) {
+                        if (ProviderUtils::IsH5DatatypeObject(drive->FileHandle, elemType))
                         {
-                            topath = (char*)(Marshal::StringToHGlobalAnsi(typeOrPath)).ToPointer();
+                            topath = (char*)(Marshal::StringToHGlobalAnsi(elemType)).ToPointer();
                             dtype = H5Topen2(drive->FileHandle, topath, H5P_DEFAULT);
                             if (dtype < 0) {
-                                throw gcnew HDF5Exception("H5Topen2 failed!");
+                                throw gcnew HDF5Exception("H5Topen2 failed!!!");
                             }
                         }
                         else {
-                            throw gcnew
-                                PSH5XException("The HDF5 path name specified does not refer to an datatype object.");
+                            throw gcnew PSH5XException("The HDF5 path name specified does not refer to an datatype object.");
                         }
                     }
                     else
                     {
-                        dtype = ProviderUtils::H5Type(typeOrPath);
+                        dtype = ProviderUtils::H5Type(elemType);
                         if (dtype < 0) {
                             throw gcnew PSH5XException("Invalid HDF5 datatype specified!");
                         }
                     }
-                }
-                else {
-                    throw gcnew PSH5XException("Unrecognized type: must be string or hashtable.");
-                }
+				}
+				else
+				{
+					JavaScriptSerializer^ serializer = gcnew JavaScriptSerializer();
+					Dictionary<String^,Object^>^ type = nullptr;
+					try
+					{
+						type = safe_cast<Dictionary<String^,Object^>^>(serializer->DeserializeObject(elemType));
+						
+					}
+					catch (...)
+					{
+						throw gcnew PSH5XException("JSON format error.");
+					}
+
+					dtype = ProviderUtils::ParseH5Type(type);
+                    if (dtype < 0) {
+                        throw gcnew PSH5XException("Invalid HDF5 datatype specified!");
+                    }
+				}
 
                 hsize_t chunk_size = (hsize_t) dynamicParameters["ChunkByteSize"]->Value;
                 if (chunk_size == 0)
@@ -869,6 +875,8 @@ namespace PSH5X
                     if (H5PTclose(dset) < 0) {
                         throw gcnew HDF5Exception("H5PTclose failed!");
                     }
+					dset = -1;
+
                     // We can't call H5Fflush on a packet table...
                     if (H5Fflush(drive->FileHandle, H5F_SCOPE_LOCAL) < 0) {
                         throw gcnew HDF5Exception("H5Fflush failed!");
