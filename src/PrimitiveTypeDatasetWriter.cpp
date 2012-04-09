@@ -161,7 +161,7 @@ namespace PSH5X
                 Marshal::FreeHGlobal(IntPtr(name));
             }
 
-        return nullptr;
+        return content;
     }
 
 		void PrimitiveTypeDatasetWriter::Seek(long long offset, System::IO::SeekOrigin origin)

@@ -264,6 +264,6 @@ namespace PSH5X
             Marshal::FreeHGlobal(IntPtr(name));
 		}
 
-		return nullptr;
+		return content;
 	}
 }
