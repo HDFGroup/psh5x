@@ -60,7 +60,7 @@ Function New-H5PacketTable
         $Force
     )
 
-    $cmd = 'New-Item -Path $Path -ItemType PacketTable -PacketType $PacketType -ChunkByteSize $ChunkSize'
+    $cmd = 'New-Item -Path $Path -ItemType PacketTable -PacketType $PacketType -ChunkSize $ChunkSize'
         
     if ($Force) {
         $cmd += ' -Force'

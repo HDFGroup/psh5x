@@ -163,7 +163,7 @@ namespace PSH5X
                 Marshal::FreeHGlobal(IntPtr(name));
             }
 
-        return nullptr;
+        return content;
     }
 
     virtual void Seek(long long offset, System::IO::SeekOrigin origin)

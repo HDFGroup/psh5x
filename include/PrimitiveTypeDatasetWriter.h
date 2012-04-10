@@ -13,7 +13,7 @@ namespace PSH5X
 
         PrimitiveTypeDatasetWriter(hid_t h5file, System::String^ h5path,
 			System::Management::Automation::RuntimeDefinedParameterDictionary^ dict)
-            : m_h5file(h5file), m_h5path(h5path), m_dict(dict)
+            : m_h5file(h5file), m_h5path(h5path), m_dict(dict), m_is_pkttable(false)
         {
         }
 
@@ -34,6 +34,8 @@ private:
     System::String^ m_h5path;
 
 	System::Management::Automation::RuntimeDefinedParameterDictionary^ m_dict;
+
+	bool m_is_pkttable;
 };
 
 }

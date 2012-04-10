@@ -844,10 +844,10 @@ namespace PSH5X
                     }
 				}
 
-                hsize_t chunk_size = (hsize_t) dynamicParameters["ChunkByteSize"]->Value;
+                hsize_t chunk_size = (hsize_t) dynamicParameters["ChunkSize"]->Value;
                 if (chunk_size == 0)
                 {
-                    throw gcnew PSH5XException("Chunk size (bytes) must be positive.");
+                    throw gcnew PSH5XException("Chunk size must be positive.");
                 }
 
                 int compression = 5;

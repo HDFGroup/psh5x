@@ -294,11 +294,11 @@ namespace PSH5X
             attr4->ValueFromPipeline = false;
 
             RuntimeDefinedParameter^ paramChunkSize = gcnew RuntimeDefinedParameter();
-            paramChunkSize->Name = "ChunkByteSize";
+            paramChunkSize->Name = "ChunkSize";
             paramChunkSize->ParameterType = hsize_t::typeid;
             paramChunkSize->Attributes->Add(attr4);
 
-            dict->Add("ChunkByteSize", paramChunkSize);
+            dict->Add("ChunkSize", paramChunkSize);
 
             ParameterAttribute^ attr6 = gcnew ParameterAttribute();
             attr6->Mandatory = false;
