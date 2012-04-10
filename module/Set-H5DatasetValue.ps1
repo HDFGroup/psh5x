@@ -18,7 +18,7 @@ Function Set-H5DatasetValue
     .PARAMETER Block
       The (mulitdimensional) block size of the hyperslab selection
     .PARAMETER PassThru
-      Return a PowerShell object representing each updated HDF5 dataset.
+      Return an object representing the update value.
     .LINK
       Set-Content
     .LINK
@@ -33,7 +33,7 @@ Function Set-H5DatasetValue
                    Position=0,
                    HelpMessage='The path to an HDF5 dataset')]
         [ValidateNotNull()]
-        [string]
+        [string[]]
         $Path,
         [Parameter(Mandatory=$true,
                    ValueFromPipeline=$true,

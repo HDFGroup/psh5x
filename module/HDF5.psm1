@@ -5,6 +5,7 @@ Import-Module $ScriptDir\PSH5X.dll
 Export-ModuleMember -Cmdlet * 
 
 . $ScriptDir\Aliases.ps1
+. $ScriptDir\Add-H5Packets.ps1
 . $ScriptDir\Copy-H5Item.ps1
 . $ScriptDir\Format-H5Dataset.ps1
 . $ScriptDir\Get-H5Drive.ps1
@@ -17,6 +18,7 @@ Export-ModuleMember -Cmdlet *
 . $ScriptDir\New-H5Hardlink.ps1
 . $ScriptDir\New-H5Image.ps1
 . $ScriptDir\New-H5LinkedDatatype.ps1
+. $ScriptDir\New-H5PacketTable.ps1
 . $ScriptDir\New-H5NullDataset.ps1
 . $ScriptDir\New-H5ScalarDataset.ps1
 . $ScriptDir\New-H5Softlink.ps1
