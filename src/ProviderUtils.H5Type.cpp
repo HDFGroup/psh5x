@@ -32,29 +32,18 @@ namespace PSH5X
 
 		ArrayList^ member = nullptr;
 
-        hid_t unwnd = -1;
+        hid_t unwnd = -1, ntype = -1;
         size_t size = 0, precision, offset;
-        int nmembers = 0, rank;
+        int i, nmembers = 0, rank;
         unsigned ui;
         char* name;
         String^ s;
-        hsize_t* dims = NULL;
-        array<hsize_t>^ d;
         htri_t ierr;
         H5T_cset_t cset;
         H5T_str_t strpad;
         H5T_pad_t lsb, msb;
         H5T_sign_t sign;
         size_t spos, epos, esize, ebias, mpos, msize;
-        
-        char b;
-        unsigned char B;
-        short h;
-        unsigned short H;
-        int i;
-        unsigned int I;
-        long long l;
-        unsigned long long L;
 
         try
         {            
@@ -694,6 +683,20 @@ namespace PSH5X
 					if (nmembers < 0) {
 						throw gcnew HDF5Exception("H5Tget_nmembers failed!");
 					}
+
+					if ((ntype = H5Tget_native_type(type, H5T_DIR_ASCEND)) < 0) {
+						throw gcnew HDF5Exception("H5Tget_native_type failed!");
+					}
+
+					char b;
+					unsigned char B;
+					short h;
+					unsigned short H;
+					int i;
+					unsigned int I;
+					long long l;
+					unsigned long long L;
+
 					for (ui = 0; ui < safe_cast<unsigned>(nmembers); ++ui)
 					{
 						name = H5Tget_member_name(type, ui);
@@ -705,7 +708,7 @@ namespace PSH5X
 							{
 							case 1:
 
-								if (H5Tget_member_value(type, ui, &B) < 0) {
+								if (H5Tget_member_value(ntype, ui, &B) < 0) {
 									throw gcnew HDF5Exception("H5Tget_member_value failed!");
 								}
 								members->Add(s, B);                            
@@ -713,7 +716,7 @@ namespace PSH5X
 
 							case 2:
 
-								if (H5Tget_member_value(type, ui, &H) < 0) {
+								if (H5Tget_member_value(ntype, ui, &H) < 0) {
 									throw gcnew HDF5Exception("H5Tget_member_value failed!");
 								}
 								members->Add(s, H);
@@ -721,7 +724,7 @@ namespace PSH5X
 
 							case 4:
 
-								if (H5Tget_member_value(type, ui, &I) < 0) {
+								if (H5Tget_member_value(ntype, ui, &I) < 0) {
 									throw gcnew HDF5Exception("H5Tget_member_value failed!");
 								}
 								members->Add(s, I);
@@ -729,7 +732,7 @@ namespace PSH5X
 
 							case 8:
 
-								if (H5Tget_member_value(type, ui, &L) < 0) {
+								if (H5Tget_member_value(ntype, ui, &L) < 0) {
 									throw gcnew HDF5Exception("H5Tget_member_value failed!");
 								}
 								members->Add(s, L);
@@ -742,7 +745,7 @@ namespace PSH5X
 							{
 							case 1:
 
-								if (H5Tget_member_value(type, ui, &b) < 0) {
+								if (H5Tget_member_value(ntype, ui, &b) < 0) {
 									throw gcnew HDF5Exception("H5Tget_member_value failed!");
 								}
 								members->Add(s, b);
@@ -750,7 +753,7 @@ namespace PSH5X
 
 							case 2:
 
-								if (H5Tget_member_value(type, ui, &h) < 0) {
+								if (H5Tget_member_value(ntype, ui, &h) < 0) {
 									throw gcnew HDF5Exception("H5Tget_member_value failed!");
 								}
 								members->Add(s, h);            
@@ -758,7 +761,7 @@ namespace PSH5X
 
 							case 4:
 
-								if (H5Tget_member_value(type, ui, &i) < 0) {
+								if (H5Tget_member_value(ntype, ui, &i) < 0) {
 									throw gcnew HDF5Exception("H5Tget_member_value failed!");
 								}
 								members->Add(s, i);
@@ -767,7 +770,7 @@ namespace PSH5X
 
 							case 8:
 
-								if (H5Tget_member_value(type, ui, &l) < 0) {
+								if (H5Tget_member_value(ntype, ui, &l) < 0) {
 									throw gcnew HDF5Exception("H5Tget_member_value failed!");
 								}
 								members->Add(s, l);
@@ -821,18 +824,18 @@ namespace PSH5X
 				{
 #pragma region Array
 					result->Add("Class", "Array");
-					rank = H5Tget_array_ndims(type);
-					dims = new hsize_t [rank];
-					rank = H5Tget_array_dims2(type, dims);
-					d = gcnew array<hsize_t>(rank);
-					for (i = 0; i < rank; ++i) {
-						d[i] = dims[i];
+					if ((rank = H5Tget_array_ndims(type)) < 0) {
+						throw gcnew HDF5Exception("H5Tget_array_ndims failed!");
 					}
-					result->Add("Dims", d);
+					array<hsize_t>^ dims = gcnew array<hsize_t>(rank);
+					pin_ptr<hsize_t> dims_ptr = &dims[0];
+					if ((rank = H5Tget_array_dims2(type, dims_ptr)) < 0) {
+						throw gcnew HDF5Exception("H5Tget_array_dims2 failed!");
+					}
+					result->Add("Dims", dims);
 
 					unwnd = H5Tget_super(type);
-					if (unwnd >= 0)
-					{
+					if (unwnd >= 0) {
 						result->Add("Base", ProviderUtils::ParseH5Type(unwnd));
 					}
 					else {
@@ -849,11 +852,11 @@ namespace PSH5X
         }
         finally
         {
-            if (dims != NULL) {
-                delete [] dims;
-            }
             if (unwnd >= 0) {    
                 H5Tclose(unwnd);
+            }
+			if (ntype >= 0) {    
+                H5Tclose(ntype);
             }
         }
 

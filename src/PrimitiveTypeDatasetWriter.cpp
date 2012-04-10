@@ -65,8 +65,7 @@ namespace PSH5X
 						throw gcnew PSH5XException("Size mismatch!");
 					}
 				}
-				else
-				{
+				else {
 					ptable = H5PTopen(m_h5file, name);
 				}
 
