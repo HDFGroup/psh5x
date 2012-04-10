@@ -134,7 +134,7 @@
                 </a>, 2nd Ed. Manning 2011.</dt>
             <dd><i>Must read!</i></dd>
             <dt>Arul Kumaravel, Jon White, Michael Naixin Li, Scott Happell, Guohui Xie, Krishna C.
-                    Vutukuri: <a
+                Vutukuri: <a
                     href="http://www.wrox.com/WileyCDA/WroxTitle/Professional-Windows-PowerShell-Programming-Snapins-Cmdlets-Hosts-and-Providers.productCd-0470173939.html"
                     >Professional Windows PowerShell Programming: Snapins, Cmdlets, Hosts and
                     Providers.</a> Wrox 2008.</dt>
@@ -154,7 +154,9 @@
         <p>PSH5X manages HDF5 files in the form of drives that one can assign drive names such as
                 <tt>h5</tt> or <tt>aura</tt>. Such drives can be dynamically (un-)mounted in a
             PowerShell session. Below are a few sample commands that might give you an idea of what
-            it feels like to work in PowerShell/PSH5X.</p>
+            it feels like to work in PowerShell/PSH5X. (Sample file <a
+                href="ftp://ftp.hdfgroup.uiuc.edu/pub/outgoing/NASAHDFPOOL/GESDISC/HIRDLS/HIRDLS-Aura_L2_v02-04-09-c03_2008d001.he5"
+                >download</a>)</p>
         <pre class="code">
 # load the PSH5X module into a PowerShell session (not necessary in PS v.3)
 Import-Module HDF5
@@ -179,7 +181,10 @@ dir . -Recurse -Filter d | %{ $dsetBytes += $_.StorageSizeBytes }; `
  
 # switch to the HDF5 sandbox drive 'h5tmp'
 cd h5tmp:
- 
+
+# create a new HDF5 group 'copy of aura' and populate it with HDF5 objetcs from 'aura:'
+mkdir 'copy of aura'; Copy-H5Item aura:\* 'copy of aura' -Recurse
+
 # remove the 'aura' drive
 Remove-H5Drive aura
 
