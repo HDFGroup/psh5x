@@ -69,6 +69,9 @@ namespace PSH5X
 				if (mtype < 0) {
 					throw gcnew HDF5Exception("H5Tcreate failed!");
 				}
+				if (H5Tset_cset(mtype, H5Tget_cset(ftype)) < 0) {
+					throw gcnew HDF5Exception("H5Tset_cset failed!");
+				}
 
 				vrdata = new char* [npoints];
 
@@ -115,6 +118,9 @@ namespace PSH5X
 				mtype = H5Tcreate(H5T_STRING, size);
 				if (mtype < 0) {
 					throw gcnew HDF5Exception("H5Tcreate failed!");
+				}
+				if (H5Tset_cset(mtype, H5Tget_cset(ftype)) < 0) {
+					throw gcnew HDF5Exception("H5Tset_cset failed!");
 				}
 
 				rdata = new char* [npoints];
