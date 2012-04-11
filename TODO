@@ -4,13 +4,8 @@ BUGS
 
 - Bug in writing Vlen datasets with zero length arrays?
 
-- Bug in reader for enum types?
-
-
 KNOWN ISSUES
 ------------
-
-- When copying or moving attributes between drives raise an exception for reference types
 
 - Clean up the attribute code (I[Dynamic]Property)
 
@@ -22,6 +17,7 @@ NEW FEATURES
 
 - Implement point selections in reader/writer
 
+- Implement Invoke-Item and Clear-Item
 
 FUNDAMENTALS
 ------------
