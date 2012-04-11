@@ -1,5 +1,5 @@
 TOPIC
-    about_Vlen
+    about_H5Vlen
 
 SHORT DESCRIPTION
     Explains how to specify an HDF5 variable-length sequence datatype
