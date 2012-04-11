@@ -1,0 +1,64 @@
+<!DOCTYPE html SYSTEM "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>HDF Group - PSH5X Terminology</title>
+        <link rel="stylesheet" type="text/css" href="./style.css" />
+    </head>
+    <body>
+        <a href="./index.html"><img src="img/psh5x_logo_100x75.gif" alt="PSH5X logo" align="bottom"
+             /></a>
+        <h2>Terminology</h2>
+        <p> At the heart of the PSH5X module sits a so-called PowerShell provider. Through provider
+            cmdlets, PowerShell providers present a set of consistent interfaces to custom data
+            stores. Such data stores (e.g., HDF5 files) are presented to the user as PowerShell
+            drives (PSDrive). Very much like HDF5 path names, PowerShell paths are used to locate
+            PowerShell items in a provider. PowerShell items come in two flavors: container items
+            and leaf-node (non-container) items. A PowerShell item might have content. A PowerShell
+            item might also be decorated with PowerShell item properties. The collection of such
+            properties of a PowerShell item can be thought of as a hash table (key/value pairs)
+            associated with the item. </p>
+        <p> For a quick listing of generic (i.e., not every provider necessarily implements all of
+            them) provider cmdlets type <tt>help *-Item*</tt> and <tt>help *-Content</tt> in a
+            PowerShell session. You'll see names such as <tt>New-Item</tt> and
+                <tt>Move-ItemProperty</tt>, names that are suggestive of the cmdlet's purpose. </p>
+        <table>
+            <thead>
+                <tr>
+                    <th>PowerShell</th>
+                    <th>HDF5</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="leftcol">Drive</td>
+                    <td>File</td>
+                </tr>
+                <tr>
+                    <td>Item</td>
+                    <td>Object or Link</td>
+                </tr>
+                <tr>
+                    <td>Container Item</td>
+                    <td>Group</td>
+                </tr>
+                <tr>
+                    <td>Leaf Node Item</td>
+                    <td>Dataset, Committed Datatype, or Link</td>
+                </tr>
+                <tr>
+                    <td>Item Property</td>
+                    <td>Attribute</td>
+                </tr>
+                <tr>
+                    <td>Content</td>
+                    <td>Dataset Value</td>
+                </tr>
+            </tbody>
+        </table>
+        <p>Anything in HDF5 that's not an attribute, content, or file is an item. Every HDF5 object
+            is an item and HDF5 links are also considered items. HDF5 groups are the only kind of
+            container item.</p>
+        <p>In the figure below, a pseudo-mindmap of the PSH5X core provider is shown.</p>
+        <a href="img/PSH5X.png"><img src="img/PSH5X.gif" alt="PS5HX Provider Overview" /></a>
+    </body>
+</html>

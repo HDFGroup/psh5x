@@ -5,7 +5,7 @@
         <link rel="stylesheet" type="text/css" href="./style.css" />
     </head>
     <body>
-        <a href="./index.html"><img src="psh5x_logo_100x75.gif" alt="PSH5X logo" align="bottom"
+        <a href="./index.html"><img src="img/psh5x_logo_100x75.gif" alt="PSH5X logo" align="bottom"
              /></a>
         <p>
             <b>PSH5X</b> is a <a href="http://en.wikipedia.org/wiki/Windows_PowerShell">Windows
@@ -35,9 +35,10 @@
             multi-faceted as HDF5 there can hardly be too many good choices. With PSH5X we're adding
             another powerful tool to the arsenal and hope that, with your help, it will find its
             "niche" in the ecosystem.</p>
-        <p>Questions? Check out a list of <a href="./cmdlets.html">PSH5X cmdlets</a>, the <a
-                href="./faq.html">FAQ</a>, the <a href="./tutorial.html">tutorial</a>, and several
-                <a href="./nolimits.html">limitations and known issues</a>.</p>
+        <p>Questions? Check out <a href="terminology.html">a few remarks on terminology</a>, a list
+            of <a href="./cmdlets.html">PSH5X cmdlets</a>, the <a href="./faq.html">FAQ</a>, the <a
+                href="./tutorial.html">tutorial</a>, and several <a href="./nolimits.html"
+                >limitations and known issues</a>.</p>
         <p>Please send your questions/comments/suggestions to the <a
                 href="http://www.hdfgroup.org/services/community_support.html">HDF forum</a> or
             contact us by <a href="mailto:gheber@hdfgroup.org">email</a>. </p>
@@ -88,7 +89,7 @@
         </ol>
         <p>If you did everything right, when importing the HDF5 module, you should see something
             like this:</p>
-        <img src="PS%20Window.gif" alt="PowerShell Window" align="middle" />
+        <img src="img/PS%20Window.gif" alt="PowerShell Window" align="middle" />
         <p>Each session has its own sandbox HDF5 drive named <tt>h5tmp</tt>. The full path to the
             HDF5 file backing this drive is stored in the <tt>PSH5XTmpFile</tt> environment
             variable. (The file does not have an <tt>.h5</tt> extension, but it is an HDF5 file.
@@ -196,8 +197,9 @@ $value = New-H5Object 'double[,,]' 10,20,30
 ...
 Set-H5DatasetValue '/A\B/My Doubles' $value
         </pre>
-        <p>Questions? Check out a list of <a href="./cmdlets.html">PSH5X cmdlets</a>, the <a
-                href="./faq.html">FAQ</a>, the <a href="./tutorial.html">tutorial</a>, and several
-                <a href="./nolimits.html">limitations and known issues</a>.</p>
+        <p>Questions? Check out <a href="terminology.html">a few remarks on terminology</a>, a list
+            of <a href="./cmdlets.html">PSH5X cmdlets</a>, the <a href="./faq.html">FAQ</a>, the <a
+                href="./tutorial.html">tutorial</a>, and several <a href="./nolimits.html"
+                >limitations and known issues</a>.</p>
     </body>
 </html>
