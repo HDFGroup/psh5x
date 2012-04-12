@@ -178,7 +178,7 @@ namespace PSH5X
 			if (ret_val > 255)  // name is longer than 255 characters?
 			{
 				Marshal::FreeHGlobal(name);
-				name = Marshal::AllocHGlobal(ret_val+1);
+				name = Marshal::AllocHGlobal(safe_cast<int>(ret_val+1));
 
 				ret_val = H5Rget_name(dset, H5R_OBJECT, ref, (char*) name.ToPointer(), ret_val);
 				if (ret_val < 0) {
@@ -237,7 +237,7 @@ namespace PSH5X
 						result_dims[1] = rank;
 						arr = Array::CreateInstance(hsize_t::typeid, result_dims);
 
-						array<hsize_t>^ buf = gcnew array<hsize_t>(count*rank);
+						array<hsize_t>^ buf = gcnew array<hsize_t>(safe_cast<int>(count*rank));
 						pin_ptr<hsize_t> buf_ptr = &buf[0];
 						if (H5Sget_select_elem_pointlist(sel, 0, count, buf_ptr) < 0) {
 							throw gcnew HDF5Exception("H5Sget_select_elem_pointlist failed!");
@@ -268,7 +268,7 @@ namespace PSH5X
 						result_dims[1] = 2*rank;
 						arr = Array::CreateInstance(hsize_t::typeid, result_dims);
 						
-						array<hsize_t>^ buf = gcnew array<hsize_t>(count*2*rank);
+						array<hsize_t>^ buf = gcnew array<hsize_t>(safe_cast<int>(count*2*rank));
 						pin_ptr<hsize_t> buf_ptr = &buf[0];
 						if (H5Sget_select_hyper_blocklist(sel, 0, count, buf_ptr) < 0) {
 							throw gcnew HDF5Exception("H5Sget_select_hyper_blocklist failed!");
@@ -319,7 +319,7 @@ namespace PSH5X
 			if (ret_val > 255)  // name is longer than 255 characters?
 			{
 				Marshal::FreeHGlobal(name);
-				name = Marshal::AllocHGlobal(ret_val+1);
+				name = Marshal::AllocHGlobal(safe_cast<int>(ret_val+1));
 
 				ret_val = H5Rget_name(dset, H5R_OBJECT, ref, (char*) name.ToPointer(), ret_val);
 				if (ret_val < 0) {

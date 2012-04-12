@@ -148,7 +148,7 @@ namespace PSH5X
 #pragma region signed
 								if (size == 1)
 								{
-									array<char>^ achar = gcnew array<char>(npoints);
+									array<char>^ achar = gcnew array<char>(safe_cast<int>(npoints));
 									pin_ptr<char> achar_ptr = &achar[0];
 									mtype = H5Tcopy(H5T_NATIVE_CHAR);
 									if (H5Aread(aid, mtype, achar_ptr) < 0) {
@@ -166,7 +166,7 @@ namespace PSH5X
 								}
 								else if (size == 2)
 								{
-									array<short>^ ashort = gcnew array<short>(npoints);
+									array<short>^ ashort = gcnew array<short>(safe_cast<int>(npoints));
 									pin_ptr<short> ashort_ptr = &ashort[0];
 									mtype = H5Tcopy(H5T_NATIVE_SHORT);
 									if (H5Aread(aid, mtype, ashort_ptr) < 0) {
@@ -184,7 +184,7 @@ namespace PSH5X
 								}
 								else if (size == 4)
 								{
-									array<int>^ aint = gcnew array<int>(npoints);
+									array<int>^ aint = gcnew array<int>(safe_cast<int>(npoints));
 									pin_ptr<int> aint_ptr = &aint[0];
 									mtype = H5Tcopy(H5T_NATIVE_INT);
 									if (H5Aread(aid, mtype, aint_ptr) < 0) {
@@ -202,7 +202,7 @@ namespace PSH5X
 								}
 								else if (size == 8)
 								{
-									array<long long>^ allong = gcnew array<long long>(npoints);
+									array<long long>^ allong = gcnew array<long long>(safe_cast<int>(npoints));
 									pin_ptr<long long> allong_ptr = &allong[0];
 									mtype = H5Tcopy(H5T_NATIVE_LLONG);
 									if (H5Aread(aid, mtype, allong_ptr) < 0) {
@@ -228,7 +228,7 @@ namespace PSH5X
 #pragma region unsigned
 								if (size == 1)
 								{
-									array<unsigned char>^ auchar = gcnew array<unsigned char>(npoints);
+									array<unsigned char>^ auchar = gcnew array<unsigned char>(safe_cast<int>(npoints));
 									pin_ptr<unsigned char> auchar_ptr = &auchar[0];
 									mtype = H5Tcopy(H5T_NATIVE_UCHAR);
 									if (H5Aread(aid, mtype, auchar_ptr) < 0) {
@@ -246,7 +246,7 @@ namespace PSH5X
 								}
 								else if (size == 2)
 								{
-									array<unsigned short>^ aushort = gcnew array<unsigned short>(npoints);
+									array<unsigned short>^ aushort = gcnew array<unsigned short>(safe_cast<int>(npoints));
 									pin_ptr<unsigned short> aushort_ptr = &aushort[0];
 									mtype = H5Tcopy(H5T_NATIVE_USHORT);
 									if (H5Aread(aid, mtype, aushort_ptr) < 0) {
@@ -264,7 +264,7 @@ namespace PSH5X
 								}
 								else if (size == 4)
 								{
-									array<unsigned int>^ auint = gcnew array<unsigned int>(npoints);
+									array<unsigned int>^ auint = gcnew array<unsigned int>(safe_cast<int>(npoints));
 									pin_ptr<unsigned int> auint_ptr = &auint[0];
 									mtype = H5Tcopy(H5T_NATIVE_UINT);
 									if (H5Aread(aid, mtype, auint_ptr) < 0) {
@@ -282,7 +282,7 @@ namespace PSH5X
 								}
 								else if (size == 8)
 								{
-									array<unsigned long long>^ aullong = gcnew array<unsigned long long>(npoints);
+									array<unsigned long long>^ aullong = gcnew array<unsigned long long>(safe_cast<int>(npoints));
 									pin_ptr<unsigned long long> aullong_ptr = &aullong[0];
 									mtype = H5Tcopy(H5T_NATIVE_ULLONG);
 									if (H5Aread(aid, mtype, aullong_ptr) < 0) {
@@ -317,7 +317,7 @@ namespace PSH5X
 
 							if (size == 4)
 							{
-								array<float>^ afloat = gcnew array<float>(npoints);
+								array<float>^ afloat = gcnew array<float>(safe_cast<int>(npoints));
 								pin_ptr<float> afloat_ptr = &afloat[0];
 								mtype = H5Tcopy(H5T_NATIVE_FLOAT);
 								if (H5Aread(aid, mtype, afloat_ptr) < 0) {
@@ -335,7 +335,7 @@ namespace PSH5X
 							}
 							else if (size == 8)
 							{
-								array<double>^ adouble = gcnew array<double>(npoints);
+								array<double>^ adouble = gcnew array<double>(safe_cast<int>(npoints));
 								pin_ptr<double> adouble_ptr = &adouble[0];
 								mtype = H5Tcopy(H5T_NATIVE_DOUBLE);
 								if (H5Aread(aid, mtype, adouble_ptr) < 0) {
@@ -386,7 +386,7 @@ namespace PSH5X
 									}
 									else
 									{
-										array<String^>^ astring = gcnew array<String^>(npoints);
+										array<String^>^ astring = gcnew array<String^>(safe_cast<int>(npoints));
 										for (i = 0; i < npoints; ++i) {
 											astring[i] = gcnew String(vrdata[i]);
 										}
@@ -422,7 +422,7 @@ namespace PSH5X
 									}
 									else
 									{
-										array<String^>^ astring = gcnew array<String^>(npoints);
+										array<String^>^ astring = gcnew array<String^>(safe_cast<int>(npoints));
 										for (i = 0; i < npoints; ++i)
 										{
 											astring[i] = gcnew String(rdata[i]);
@@ -866,7 +866,7 @@ namespace PSH5X
 #pragma region signed
 						if (size == 1)
 						{
-							array<char>^ achar = gcnew array<char>(npoints);
+							array<char>^ achar = gcnew array<char>(safe_cast<int>(npoints));
 							if (ProviderUtils::TryGetValue(value, achar))
 							{
 								pin_ptr<char> achar_ptr = &achar[0];
@@ -880,7 +880,7 @@ namespace PSH5X
 						}
 						else if (size == 2)
 						{
-							array<short>^ ashort = gcnew array<short>(npoints);
+							array<short>^ ashort = gcnew array<short>(safe_cast<int>(npoints));
 							if (ProviderUtils::TryGetValue(value, ashort))
 							{
 								pin_ptr<short> ashort_ptr = &ashort[0];
@@ -894,7 +894,7 @@ namespace PSH5X
 						}
 						else if (size == 4)
 						{
-							array<int>^ aint = gcnew array<int>(npoints);
+							array<int>^ aint = gcnew array<int>(safe_cast<int>(npoints));
 							if (ProviderUtils::TryGetValue(value, aint))
 							{
 								pin_ptr<int> aint_ptr = &aint[0];
@@ -908,7 +908,7 @@ namespace PSH5X
 						}
 						else if (size == 8)
 						{
-							array<long long>^ allong = gcnew array<long long>(npoints);
+							array<long long>^ allong = gcnew array<long long>(safe_cast<int>(npoints));
 							if (ProviderUtils::TryGetValue(value, allong))
 							{
 								pin_ptr<long long> allong_ptr = &allong[0];
@@ -930,7 +930,7 @@ namespace PSH5X
 #pragma region unsigned
 						if (size == 1)
 						{
-							array<unsigned char>^ auchar = gcnew array<unsigned char>(npoints);
+							array<unsigned char>^ auchar = gcnew array<unsigned char>(safe_cast<int>(npoints));
 							if (ProviderUtils::TryGetValue(value, auchar))
 							{
 								pin_ptr<unsigned char> auchar_ptr = &auchar[0];
@@ -944,7 +944,7 @@ namespace PSH5X
 						}
 						else if (size == 2)
 						{
-							array<unsigned short>^ aushort = gcnew array<unsigned short>(npoints);
+							array<unsigned short>^ aushort = gcnew array<unsigned short>(safe_cast<int>(npoints));
 							if (ProviderUtils::TryGetValue(value, aushort))
 							{
 								pin_ptr<unsigned short> aushort_ptr = &aushort[0];
@@ -958,7 +958,7 @@ namespace PSH5X
 						}
 						else if (size == 4)
 						{
-							array<unsigned int>^ auint = gcnew array<unsigned int>(npoints);
+							array<unsigned int>^ auint = gcnew array<unsigned int>(safe_cast<int>(npoints));
 							if (ProviderUtils::TryGetValue(value, auint))
 							{
 								pin_ptr<unsigned int> auint_ptr = &auint[0];
@@ -972,7 +972,7 @@ namespace PSH5X
 						}
 						else if (size == 8)
 						{
-							array<unsigned long long>^ aullong = gcnew array<unsigned long long>(npoints);
+							array<unsigned long long>^ aullong = gcnew array<unsigned long long>(safe_cast<int>(npoints));
 							if (ProviderUtils::TryGetValue(value, aullong))
 							{
 								pin_ptr<unsigned long long> aullong_ptr = &aullong[0];
@@ -1001,7 +1001,7 @@ namespace PSH5X
 #pragma region HDF5 FLOAT
 					if (size == 4)
 					{
-						array<float>^ afloat = gcnew array<float>(npoints);
+						array<float>^ afloat = gcnew array<float>(safe_cast<int>(npoints));
 						if (ProviderUtils::TryGetValue(value, afloat))
 						{
 							pin_ptr<float> afloat_ptr = &afloat[0];
@@ -1015,7 +1015,7 @@ namespace PSH5X
 					}
 					else if (size == 8)
 					{
-						array<double>^ adouble = gcnew array<double>(npoints);
+						array<double>^ adouble = gcnew array<double>(safe_cast<int>(npoints));
 						if (ProviderUtils::TryGetValue(value, adouble))
 						{
 							pin_ptr<double> adouble_ptr = &adouble[0];
@@ -1044,7 +1044,7 @@ namespace PSH5X
 					{
 						vwdata = new char* [npoints];
 
-						array<String^>^ astring = gcnew array<String^>(npoints);
+						array<String^>^ astring = gcnew array<String^>(safe_cast<int>(npoints));
 
 						if (ProviderUtils::TryGetValue(value, astring))
 						{
@@ -1075,7 +1075,7 @@ namespace PSH5X
 							wdata[i] = wdata[0] + i*(size+1);
 						}
 
-						array<String^>^ astring = gcnew array<String^>(npoints);
+						array<String^>^ astring = gcnew array<String^>(safe_cast<int>(npoints));
 
 						if (ProviderUtils::TryGetValue(value, astring))
 						{

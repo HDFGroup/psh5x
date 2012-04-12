@@ -137,4 +137,12 @@ namespace PSH5X
 
 		return content;
 	}
+
+	void OpaqueDatasetWriter::Seek(long long offset, System::IO::SeekOrigin origin)
+	{
+		offset = 0;
+		origin = System::IO::SeekOrigin::End;
+		throw gcnew PSH5XException("OpaqueDatasetWriter::Seek() not implemented!");
+	}
+
 }

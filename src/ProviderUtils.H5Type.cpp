@@ -3478,10 +3478,202 @@ namespace PSH5X
 	bool ProviderUtils::TryGetFillValue(hid_t dtype, array<unsigned char>^ fill, Object^% value)
 	{
 		bool result = false;
-		fill = nullptr;
+		value = nullptr;
 
+		hid_t ntype = -1;
 
+		IntPtr iptr = IntPtr::Zero;
 
+		try
+		{
+			if ((ntype = H5Tget_native_type(dtype, H5T_DIR_ASCEND)) < 0) {
+				throw gcnew HDF5Exception("H5Tget_native_type failed!");
+			}
+
+			size_t size = H5Tget_size(ntype);
+
+			switch (H5Tget_class(ntype))
+			{
+			case H5T_INTEGER:
+				{
+#pragma region integer
+
+					switch (H5Tget_sign(ntype))
+					{
+					case H5T_SGN_NONE:
+						{
+							switch (size)
+							{
+							case 1:
+								{
+									unsigned char B = fill[0];
+									value = B;
+									result = true;
+								}
+								break;
+							case 2:
+								{
+									unsigned short S = BitConverter::ToUInt16(fill, 0);
+									value = S;
+									result = true;
+								}
+								break;
+							case 4:
+								{
+									unsigned int I = BitConverter::ToUInt32(fill, 0);
+									value = I;
+									result = true;
+								}
+								break;
+							case 8:
+								{
+									unsigned long long L = BitConverter::ToUInt64(fill, 0);
+									value = L;
+									result = true;
+								}
+								break;
+
+							default:
+								break;
+							}
+						}
+						break;
+
+					case H5T_SGN_2:
+						{
+							switch (size)
+							{
+							case 1:
+								{
+									char b = safe_cast<char>(fill[0]);
+									value = b;
+									result = true;
+								}
+								break;
+							case 2:
+								{
+									short s = BitConverter::ToInt16(fill, 0);
+									value = s;
+									result = true;
+								}
+								break;
+							case 4:
+								{
+									int i = BitConverter::ToInt32(fill, 0);
+									value = i;
+									result = true;
+								}
+								break;
+							case 8:
+								{
+									long long l = BitConverter::ToInt64(fill, 0);
+									value = l;
+									result = true;
+								}
+								break;
+
+							default:
+								break;
+							}
+						}
+						break;
+
+					default:
+						break;
+					}
+#pragma endregion
+				}
+				break;
+
+			case H5T_BITFIELD:
+				{
+#pragma region bitfield
+
+					switch (size)
+					{
+					case 1:
+						{
+							unsigned char B = fill[0];
+							value = B;
+							result = true;
+						}
+						break;
+					case 2:
+						{
+							unsigned short S = BitConverter::ToUInt16(fill, 0);
+							value = S;
+							result = true;
+						}
+						break;
+					case 4:
+						{
+							unsigned int I = BitConverter::ToUInt32(fill, 0);
+							value = I;
+							result = true;
+						}
+						break;
+					case 8:
+						{
+							unsigned long long L = BitConverter::ToUInt64(fill, 0);
+							value = L;
+							result = true;
+						}
+						break;
+
+					default:
+						break;
+					}
+#pragma endregion
+				}
+				break;
+
+			case H5T_FLOAT:
+				{
+#pragma region float
+					if (size == 4)
+					{
+						float f = BitConverter::ToSingle(fill, 0);
+						value = f;
+						result = true;
+					}
+					else if (size == 8)
+					{
+						double d = BitConverter::ToDouble(fill, 0);
+						value = d;
+						result = true;
+					}
+#pragma endregion
+				}
+				break;
+
+			case H5T_STRING:
+				{
+#pragma region string
+
+					String^ s;
+					iptr = Marshal::AllocHGlobal(fill->Length);
+					Marshal::Copy(fill, 0, iptr, fill->Length);
+					s = Marshal::PtrToStringAnsi(iptr);
+					value = s;
+					result = true;
+
+#pragma endregion
+				}
+				break;
+
+			default:
+				break;
+			}
+		}
+		finally
+		{
+			if (iptr != IntPtr::Zero) {
+				Marshal::FreeHGlobal(iptr);
+			}
+			if (ntype >= 0) {
+				H5Tclose(ntype);
+			}
+		}
 
 		return result;
 	}

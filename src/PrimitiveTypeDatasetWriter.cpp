@@ -27,7 +27,9 @@ namespace PSH5X
 
             hid_t dset = -1, ftype = -1, mtype = -1, fspace = -1, mspace = H5S_ALL, ptable = -1;
 
-			bool sel_flag = false;
+			bool sel_flag = false, same_value_flag = false;
+
+			hssize_t npoints = 1;
 
             try
             {
@@ -51,7 +53,6 @@ namespace PSH5X
 
 					sel_flag = ProviderUtils::WriterCheckSelection(fspace, mspace, safe_cast<hsize_t>(content->Count), m_dict);
 
-					hssize_t npoints = 1;
 					if (scls == H5S_SIMPLE) {
 						if (sel_flag) {
 							npoints = H5Sget_select_npoints(fspace);
@@ -61,8 +62,16 @@ namespace PSH5X
 						}
 					}
 
-					if (content->Count != safe_cast<int>(npoints)) {
-						throw gcnew PSH5XException("Size mismatch!");
+					if (content->Count == 1 &&
+						H5Sget_simple_extent_type(fspace) != H5S_SCALAR) // assign the same value to all (selected) elements (or scalar)
+					{
+						same_value_flag = true;
+					}
+					else
+					{
+						if (content->Count != safe_cast<int>(npoints)) {
+							throw gcnew PSH5XException("Size mismatch!");
+						}
 					}
 				}
 				else {
@@ -84,53 +93,144 @@ namespace PSH5X
 				BinaryWriter^ writer = gcnew BinaryWriter(ms);
 
 				if (t == Byte::typeid) {
-					while (ienum->MoveNext()) {
-						writer->Write((Byte) ienum->Current);
+					if (!same_value_flag) {
+						while (ienum->MoveNext()) {
+							writer->Write((Byte) ienum->Current);
+						}
+					}
+					else {
+						ienum->MoveNext();
+						Byte x = safe_cast<Byte>(ienum->Current);
+						for (hssize_t i = 0; i < npoints; ++i) {
+							writer->Write(x);
+						}
 					}
 				}
 				else if (t == SByte::typeid) {
-					while (ienum->MoveNext()) {
-						writer->Write((SByte) ienum->Current);
+					if (!same_value_flag) {
+						while (ienum->MoveNext()) {
+							writer->Write((SByte) ienum->Current);
+						}
 					}
+					else {
+						ienum->MoveNext();
+						SByte x = safe_cast<SByte>(ienum->Current);
+						for (hssize_t i = 0; i < npoints; ++i) {
+							writer->Write(x);
+						}
+					}
+
 				}
 				else if (t == UInt16::typeid) {
-					while (ienum->MoveNext()) {
-						writer->Write((UInt16) ienum->Current);
+					if (!same_value_flag) {
+						while (ienum->MoveNext()) {
+							writer->Write((UInt16) ienum->Current);
+						}
+					}
+					else {
+						ienum->MoveNext();
+						UInt16 x = safe_cast<UInt16>(ienum->Current);
+						for (hssize_t i = 0; i < npoints; ++i) {
+							writer->Write(x);
+						}
 					}
 				}
 				else if (t == Int16::typeid) {
-					while (ienum->MoveNext()) {
-						writer->Write((Int16) ienum->Current);
+					if (!same_value_flag) {
+						while (ienum->MoveNext()) {
+							writer->Write((Int16) ienum->Current);
+						}
+					}
+					else {
+						ienum->MoveNext();
+						Int16 x = safe_cast<Int16>(ienum->Current);
+						for (hssize_t i = 0; i < npoints; ++i) {
+							writer->Write(x);
+						}
 					}
 				}
 				else if (t == UInt32::typeid) {
-					while (ienum->MoveNext()) {
-						writer->Write((UInt32) ienum->Current);
+					if (!same_value_flag) {
+						while (ienum->MoveNext()) {
+							writer->Write((UInt32) ienum->Current);
+						}
+					}
+					else {
+						ienum->MoveNext();
+						UInt32 x = safe_cast<UInt32>(ienum->Current);
+						for (hssize_t i = 0; i < npoints; ++i) {
+							writer->Write(x);
+						}
 					}
 				}
 				else if (t == Int32::typeid) {
-					while (ienum->MoveNext()) {
-						writer->Write((Int32) ienum->Current);
+					if (!same_value_flag) {
+						while (ienum->MoveNext()) {
+							writer->Write((Int32) ienum->Current);
+						}
+					}
+					else {
+						ienum->MoveNext();
+						Int32 x = safe_cast<Int32>(ienum->Current);
+						for (hssize_t i = 0; i < npoints; ++i) {
+							writer->Write(x);
+						}
 					}
 				}
 				else if (t == UInt64::typeid) {
-					while (ienum->MoveNext()) {
-						writer->Write((UInt64) ienum->Current);
+					if (!same_value_flag) {
+						while (ienum->MoveNext()) {
+							writer->Write((UInt64) ienum->Current);
+						}
+					}
+					else {
+						ienum->MoveNext();
+						UInt64 x = safe_cast<UInt64>(ienum->Current);
+						for (hssize_t i = 0; i < npoints; ++i) {
+							writer->Write(x);
+						}
 					}
 				}
 				else if (t == Int64::typeid) {
-					while (ienum->MoveNext()) {
-						writer->Write((Int64) ienum->Current);
+					if (!same_value_flag) {
+						while (ienum->MoveNext()) {
+							writer->Write((Int64) ienum->Current);
+						}
+					}
+					else {
+						ienum->MoveNext();
+						Int64 x = safe_cast<Int64>(ienum->Current);
+						for (hssize_t i = 0; i < npoints; ++i) {
+							writer->Write(x);
+						}
 					}
 				}
 				else if (t == Single::typeid) {
-					while (ienum->MoveNext()) {
-						writer->Write((Single) ienum->Current);
+					if (!same_value_flag) {
+						while (ienum->MoveNext()) {
+							writer->Write((Single) ienum->Current);
+						}
+					}
+					else {
+						ienum->MoveNext();
+						Single x = safe_cast<Single>(ienum->Current);
+						for (hssize_t i = 0; i < npoints; ++i) {
+							writer->Write(x);
+						}
 					}
 				}
 				else if (t == Double::typeid) {
-					while (ienum->MoveNext()) {
-						writer->Write((Double) ienum->Current);
+					if (!same_value_flag) {
+						while (ienum->MoveNext()) {
+							writer->Write((Double) ienum->Current);
+						}
+					}
+					else {
+						ienum->MoveNext();
+						Double x = safe_cast<Double>(ienum->Current);
+						for (hssize_t i = 0; i < npoints; ++i) {
+							writer->Write(x);
+						}
 					}
 				}
 				else {
@@ -186,15 +286,18 @@ namespace PSH5X
             }
 
         return content;
-    }
+	}
 
-		void PrimitiveTypeDatasetWriter::Seek(long long offset, System::IO::SeekOrigin origin)
-		{
-			if (ProviderUtils::IsH5PacketTable(m_h5file, m_h5path)) {
-				m_is_pkttable = true;
-			}
-			else {
-				throw gcnew PSH5XException("Add-Content is only available for HDF5 packet tables!");
-			}
+	void PrimitiveTypeDatasetWriter::Seek(long long offset, System::IO::SeekOrigin origin)
+	{
+		offset = 0;
+		origin = System::IO::SeekOrigin::End;
+
+		if (ProviderUtils::IsH5PacketTable(m_h5file, m_h5path)) {
+			m_is_pkttable = true;
 		}
+		else {
+			throw gcnew PSH5XException("Add-Content is only available for HDF5 packet tables!");
+		}
+	}
 }

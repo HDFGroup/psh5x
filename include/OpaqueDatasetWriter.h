@@ -24,10 +24,7 @@ namespace PSH5X
 
         virtual System::Collections::IList^ OpaqueDatasetWriter::Write(System::Collections::IList^ content);
 
-    virtual void Seek(long long offset, System::IO::SeekOrigin origin)
-    {
-        throw gcnew PSH5XException("OpaqueDatasetWriter::Seek() not implemented!");
-    }
+    virtual void Seek(long long offset, System::IO::SeekOrigin origin);
 
 private:
 

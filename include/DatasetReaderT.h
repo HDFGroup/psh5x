@@ -112,7 +112,7 @@ namespace PSH5X
                 // I have no idea how to efficiently copy a multidimensional array
                 // into a onedimensional array
 
-                for (long long i = 0; i < length; ++i) {
+                for (int i = 0; i < length; ++i) {
                     result[i] = safe_cast<T>(m_ienum->Current);
                     m_ienum->MoveNext();
                 }
@@ -125,6 +125,8 @@ namespace PSH5X
 
         virtual void Seek(long long offset, System::IO::SeekOrigin origin)
         {
+			offset = 0;
+			origin = System::IO::SeekOrigin::End;
             System::Console::WriteLine("DatasetReaderT::Seek()");
         }
 

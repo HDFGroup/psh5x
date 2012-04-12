@@ -25,10 +25,7 @@ namespace PSH5X
 
         virtual System::Collections::IList^ Write(System::Collections::IList^ content);
 
-        virtual void Seek(long long offset, System::IO::SeekOrigin origin)
-        {
-            throw gcnew PSH5XException("CompoundDatasetWriter::Seek() not implemented!");
-        }
+        virtual void Seek(long long offset, System::IO::SeekOrigin origin);
 
     private:
 

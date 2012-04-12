@@ -7,7 +7,12 @@ Function Set-H5DatasetValue
     .PARAMETER Path
       The path name(s) to HDF5 datasets
     .PARAMETER Value
-      The value of the HDF5 dataset
+      A collection of data elements of the same type that can be converted
+      to the dataset's file type.
+
+      The number of data element must be equal either to one or match the
+      total number of data elements in the dataset or the selection (if
+      a selection was specified).
     .PARAMETER Start
       The (multidimensional) offset where the hyperslab selection begins
     .PARAMETER Stride

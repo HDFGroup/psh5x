@@ -47,10 +47,6 @@ namespace PSH5X
 
         try
         {
-            size_t size = H5Tget_size(base_type);
-
-            array<unsigned char>^ tmp = gcnew array<unsigned char>(size);
-
 			H5T_class_t cls = H5Tget_class(base_type);
 			if (cls == H5T_BITFIELD) {
 				ntype = H5Tget_native_type(base_type, H5T_DIR_DESCEND);
@@ -378,7 +374,7 @@ namespace PSH5X
         {
             size_t size = H5Tget_size(base_type);
 
-            array<unsigned char>^ tmp = gcnew array<unsigned char>(size);
+            array<unsigned char>^ tmp = gcnew array<unsigned char>(safe_cast<int>(size));
 
 			ntype = H5Tget_native_type(base_type, H5T_DIR_ASCEND);
 			if (ntype < 0) {
@@ -567,7 +563,7 @@ namespace PSH5X
         {
             size_t size = H5Tget_size(type_id);
 
-            array<unsigned char>^ tmp = gcnew array<unsigned char>(size);
+            array<unsigned char>^ tmp = gcnew array<unsigned char>(safe_cast<int>(size));
 
             H5T_class_t cls = H5Tget_class(type_id);
 
@@ -584,13 +580,13 @@ namespace PSH5X
 
                 if (H5Tequal(ntype, H5T_NATIVE_CHAR) > 0)
                 {
-                    array<char>^ a = gcnew array<char>(nelems);
+                    array<char>^ a = gcnew array<char>(safe_cast<int>(nelems));
                     Marshal::Copy(IntPtr(ptr), tmp, 0, nelems);
                     result = a;
                 }
                 else if (H5Tequal(ntype, H5T_NATIVE_SHORT) > 0)
                 {
-                    array<short>^ a = gcnew array<short>(nelems);
+                    array<short>^ a = gcnew array<short>(safe_cast<int>(nelems));
                     for (size_t i = 0; i < nelems; ++i)
                     {
                         Marshal::Copy(IntPtr(ptr+i*size), tmp, 0, size);
@@ -600,7 +596,7 @@ namespace PSH5X
                 }
                 else if (H5Tequal(ntype, H5T_NATIVE_INT) > 0)
                 {
-                    array<int>^ a = gcnew array<int>(nelems);
+                    array<int>^ a = gcnew array<int>(safe_cast<int>(nelems));
                     for (size_t i = 0; i < nelems; ++i)
                     {
                         Marshal::Copy(IntPtr(ptr+i*size), tmp, 0, size);
@@ -610,7 +606,7 @@ namespace PSH5X
                 }
                 else if (H5Tequal(ntype, H5T_NATIVE_LONG) > 0)
                 {
-                    array<int>^ a = gcnew array<int>(nelems);
+                    array<int>^ a = gcnew array<int>(safe_cast<int>(nelems));
                     for (size_t i = 0; i < nelems; ++i)
                     {
                         Marshal::Copy(IntPtr(ptr+i*size), tmp, 0, size);
@@ -620,7 +616,7 @@ namespace PSH5X
                 }
                 else if (H5Tequal(ntype, H5T_NATIVE_LLONG) > 0)
                 {
-                    array<long long>^ a = gcnew array<long long>(nelems);
+                    array<long long>^ a = gcnew array<long long>(safe_cast<int>(nelems));
                     for (size_t i = 0; i < nelems; ++i)
                     {
                         Marshal::Copy(IntPtr(ptr+i*size), tmp, 0, size);
@@ -630,13 +626,13 @@ namespace PSH5X
                 }
                 else if (H5Tequal(ntype, H5T_NATIVE_UCHAR) > 0)
                 {
-                    array<unsigned char>^ a = gcnew array<unsigned char>(nelems);
+                    array<unsigned char>^ a = gcnew array<unsigned char>(safe_cast<int>(nelems));
                     Marshal::Copy(IntPtr(ptr), tmp, 0, nelems);
                     result = a;
                 }
                 else if (H5Tequal(ntype, H5T_NATIVE_USHORT) > 0)
                 {
-                    array<unsigned short>^ a = gcnew array<unsigned short>(nelems);
+                    array<unsigned short>^ a = gcnew array<unsigned short>(safe_cast<int>(nelems));
                     for (size_t i = 0; i < nelems; ++i)
                     {
                         Marshal::Copy(IntPtr(ptr+i*size), tmp, 0, size);
@@ -646,7 +642,7 @@ namespace PSH5X
                 }
                 else if (H5Tequal(ntype, H5T_NATIVE_UINT) > 0)
                 {
-                    array<unsigned int>^ a = gcnew array<unsigned int>(nelems);
+                    array<unsigned int>^ a = gcnew array<unsigned int>(safe_cast<int>(nelems));
                     for (size_t i = 0; i < nelems; ++i)
                     {
                         Marshal::Copy(IntPtr(ptr+i*size), tmp, 0, size);
@@ -656,7 +652,7 @@ namespace PSH5X
                 }
                 else if (H5Tequal(ntype, H5T_NATIVE_ULONG) > 0)
                 {
-                    array<unsigned int>^ a = gcnew array<unsigned int>(nelems);
+                    array<unsigned int>^ a = gcnew array<unsigned int>(safe_cast<int>(nelems));
                     for (size_t i = 0; i < nelems; ++i)
                     {
                         Marshal::Copy(IntPtr(ptr+i*size), tmp, 0, size);
@@ -666,7 +662,7 @@ namespace PSH5X
                 }
                 else if (H5Tequal(ntype, H5T_NATIVE_ULLONG) > 0)
                 {
-                    array<unsigned long long>^ a = gcnew array<unsigned long long>(nelems);
+                    array<unsigned long long>^ a = gcnew array<unsigned long long>(safe_cast<int>(nelems));
                     for (size_t i = 0; i < nelems; ++i)
                     {
                         Marshal::Copy(IntPtr(ptr+i*size), tmp, 0, size);
@@ -731,21 +727,17 @@ namespace PSH5X
 
 
             case H5T_STRING:
-
+				{
 #pragma region HDF5 string
 
-                if (true)
-                {
-                    array<String^>^ a = gcnew array<String^>(nelems);
-                    for (size_t i = 0; i < nelems; ++i)
-                    {
-                        a[i] = Marshal::PtrToStringAnsi(IntPtr(ptr[i]));
-                    }
-                    result = a;
-                }
-
+					array<String^>^ a = gcnew array<String^>(safe_cast<int>(nelems));
+					for (size_t i = 0; i < nelems; ++i)
+					{
+						a[i] = Marshal::PtrToStringAnsi(IntPtr(ptr[i]));
+					}
+					result = a;
 #pragma endregion
-
+				}
                 break;
 
             case H5T_BITFIELD:
@@ -905,8 +897,7 @@ namespace PSH5X
                 break;
 
             case H5T_STRING:
-
-				if (true) {
+				{
 					result = array<String^>::typeid;
 				}
                 break;

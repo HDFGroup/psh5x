@@ -252,21 +252,21 @@ namespace PSH5X
             return result;
         }
 
-        H5Array(array<hsize_t>^ dims)
+        H5Array(array<hsize_t>^ hdims)
         {
-            if (dims->Length < 1 || dims->Length > 32)
+            if (hdims->Length < 1 || hdims->Length > 32)
             {
                 System::String^ message = System::String::Format(
                     "H5Array does not support more than 32 dimension.\n"
                     " - attempting to create array with {0} dimensions.\n",
-                    dims->Length);
+                    hdims->Length);
                 throw gcnew PSH5XException(message);
             }
 
-            for (int i = 0; i < dims->Length; ++i) {
-                if (dims[i] <= 0) {
-                    throw gcnew PSH5XException("Dimensions must be positive!");
-                }
+			array<int>^ dims = gcnew array<int>(hdims->Length);
+
+            for (int i = 0; i < hdims->Length; ++i) {
+				dims[i] = safe_cast<int>(hdims[i]);
             }
 
 #pragma region Do not ruin your eyes!

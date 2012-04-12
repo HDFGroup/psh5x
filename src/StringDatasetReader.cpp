@@ -208,4 +208,11 @@ namespace PSH5X
 
         return result;
     }
+
+	void StringDatasetReader::Seek(long long offset, System::IO::SeekOrigin origin)
+	{
+		offset = 0;
+		origin = System::IO::SeekOrigin::End;
+		System::Console::WriteLine("StringDatasetReader->Seek()");
+	}
 }

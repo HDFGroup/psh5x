@@ -78,12 +78,12 @@ namespace PSH5X
 				if (H5Tget_array_dims2(ftype, adims_ptr) < 0) {
 					throw gcnew HDF5Exception("H5Tget_array_dims2 failed!");
 				}
-				hsize_t arrayLength = 1;
+				int arrayLength = 1;
 				for (int i = 0; i < arank; ++i) {
-					arrayLength *= adims[i];
+					arrayLength *= safe_cast<int>(adims[i]);
 				}
 
-				array<T>^ rdata = gcnew array<T>(npoints*arrayLength);
+				array<T>^ rdata = gcnew array<T>(safe_cast<int>(npoints*arrayLength));
 				pin_ptr<T> rdata_ptr = &rdata[0];
 
 				if (H5Dread(dset, mtype, mspace, fspace, H5P_DEFAULT, rdata_ptr) < 0) {
@@ -96,11 +96,11 @@ namespace PSH5X
 				if (rank > 1)
 				{
 					array<long long>^ index = gcnew array<long long>(rank);
-					for (long long i = 0; i < npoints; ++i)
+					for (int i = 0; i < npoints; ++i)
 					{
 						H5Array<T>^ arr = gcnew H5Array<T>(adims);
 						interior_ptr<T> arr_ptr = arr->GetHandle();
-						for (hsize_t j = 0; j < arrayLength; ++j) {
+						for (int j = 0; j < arrayLength; ++j) {
 							arr_ptr[j] = rdata[i*arrayLength+j];
 						}
 						index = ArrayUtils::GetIndex((array<long long>^)dims, i);
@@ -109,11 +109,11 @@ namespace PSH5X
 				}
 				else
 				{
-					for (long long i = 0; i < npoints; ++i)
+					for (int i = 0; i < npoints; ++i)
 					{
 						H5Array<T>^ arr = gcnew H5Array<T>(adims);
 						interior_ptr<T> arr_ptr = arr->GetHandle();
-						for (hsize_t j = 0; j < arrayLength; ++j) {
+						for (int j = 0; j < arrayLength; ++j) {
 							arr_ptr[j] = rdata[i*arrayLength+j];
 						}
 						m_array->SetValue(arr->GetArray(), i);
@@ -167,7 +167,7 @@ namespace PSH5X
                 // I have no idea how to efficiently copy a multidimensional array
                 // into a onedimensional array
 
-                for (long long i = 0; i < length; ++i) {
+                for (int i = 0; i < length; ++i) {
                     result[i] = safe_cast<Array^>(m_ienum->Current);
                     m_ienum->MoveNext();
                 }
@@ -180,6 +180,8 @@ namespace PSH5X
 
         virtual void Seek(long long offset, System::IO::SeekOrigin origin)
         {
+			offset = 0;
+			origin = System::IO::SeekOrigin::End;
             throw gcnew PSH5XException("ArrayDatasetReaderT::Seek() not implemented!");
         }
 

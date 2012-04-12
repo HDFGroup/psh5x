@@ -85,9 +85,9 @@ namespace PSH5X
 
 				// count the elements per array and initialize offsets into a global array
 
-				array<int>^ len = gcnew array<int>(npoints);
-				array<int>^ offset = gcnew array<int>(npoints);
-				array<Object^>^ amaster = gcnew array<Object^>(npoints);
+				array<int>^ len = gcnew array<int>(safe_cast<int>(npoints));
+				array<int>^ offset = gcnew array<int>(safe_cast<int>(npoints));
+				array<Object^>^ amaster = gcnew array<Object^>(safe_cast<int>(npoints));
 
 				int total = 0;
 
@@ -168,6 +168,8 @@ namespace PSH5X
 
     virtual void Seek(long long offset, System::IO::SeekOrigin origin)
     {
+		offset = 0;
+		origin = System::IO::SeekOrigin::End;
         throw gcnew PSH5XException("DatasetWriter::Seek() not implemented!");
     }
 

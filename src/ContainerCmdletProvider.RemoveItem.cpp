@@ -201,7 +201,7 @@ namespace PSH5X
 
 							pair<haddr_t, vector<string> > op_data;
 							// ignore this for now...
-							unsigned long fileno = info.fileno;
+							// unsigned long fileno = info.fileno;
 							op_data.first = info.addr;
 
 							if (this->ShouldProcess(h5path,

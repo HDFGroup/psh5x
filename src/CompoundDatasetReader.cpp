@@ -177,7 +177,7 @@ namespace PSH5X
 
 #pragma region create a buffer and read the dataset as a byte array
 
-			array<unsigned char>^ buf = gcnew array<unsigned char>(safe_cast<size_t>(npoints*size));
+			array<unsigned char>^ buf = gcnew array<unsigned char>(safe_cast<int>(npoints*size));
 			pin_ptr<unsigned char> buf_ptr = &buf[0];
 
 			if (H5Dread(dset, mtype, mspace, fspace, H5P_DEFAULT, buf_ptr) < 0) {
@@ -325,7 +325,7 @@ namespace PSH5X
                 }
             }
 
-            result = Array::CreateInstance(m_type, length);
+            result = Array::CreateInstance(m_type, safe_cast<int>(length));
 
             for (long long i = 0; i < length; ++i) {
                 result->SetValue(m_ienum->Current, i);
@@ -337,4 +337,12 @@ namespace PSH5X
 
         return result;
     }
+
+	void CompoundDatasetReader::Seek(long long offset, System::IO::SeekOrigin origin)
+	{
+		offset = 0;
+		origin = System::IO::SeekOrigin::End;
+		System::Console::WriteLine("CompoundDatasetReader->Seek()");
+	}
+
 }

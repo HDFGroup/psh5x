@@ -27,10 +27,7 @@ namespace PSH5X
 
         virtual System::Collections::IList^ Read(long long readCount);
 
-        virtual void Seek(long long offset, System::IO::SeekOrigin origin)
-        {
-            System::Console::WriteLine("CompoundDatasetReader->Seek()");
-        }
+        virtual void Seek(long long offset, System::IO::SeekOrigin origin);
 
     private:
 

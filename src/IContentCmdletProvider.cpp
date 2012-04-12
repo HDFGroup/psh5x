@@ -488,8 +488,6 @@ namespace PSH5X
 
         char *name = NULL;
 
-		bool sel_flag = false;
-
         try
         {
             DriveInfo^ drive = nullptr;

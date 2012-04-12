@@ -89,8 +89,8 @@ namespace PSH5X
 					arrayLength *= adims[i];
 				}
 
-				m_array = gcnew array<T>(content->Count*arrayLength);
-				size_t count = 0;
+				m_array = gcnew array<T>(safe_cast<int>(content->Count*arrayLength));
+				int count = 0;
 
 				IEnumerator^ ienum = content->GetEnumerator();
 				ienum->MoveNext();
@@ -154,6 +154,8 @@ namespace PSH5X
 
     virtual void Seek(long long offset, System::IO::SeekOrigin origin)
     {
+		offset = 0;
+		origin = System::IO::SeekOrigin::End;
         throw gcnew PSH5XException("DatasetWriter::Seek() not implemented!");
     }
 

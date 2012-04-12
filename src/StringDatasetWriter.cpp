@@ -38,7 +38,7 @@ namespace PSH5X
         char** wdata = NULL;
         char** vwdata = NULL;
 
-		bool sel_flag = false;
+		bool sel_flag = false, same_value_flag = false;
 
 		hssize_t npoints = 0;
 
@@ -71,9 +71,17 @@ namespace PSH5X
 				}
 			}
 
-            if (content->Count != safe_cast<int>(npoints)) {
-                throw gcnew PSH5XException("Size mismatch!");
-            }
+			if (content->Count == 1 &&
+				H5Sget_simple_extent_type(fspace) != H5S_SCALAR) // assign the same value to all (selected) elements (or scalar)
+			{
+				same_value_flag = true;
+			}
+			else
+			{
+				if (content->Count != safe_cast<int>(npoints)) {
+					throw gcnew PSH5XException("Size mismatch!");
+				}
+			}
 
 			is_vlen = H5Tis_variable_str(ftype);
 
@@ -87,8 +95,17 @@ namespace PSH5X
 
 				if (ProviderUtils::TryGetValue(content, astring))
 				{
-					for (i = 0; i < npoints; ++i) {
-						vwdata[i] = (char*) Marshal::StringToHGlobalAnsi(astring[i]).ToPointer();
+					if (!same_value_flag) {
+						for (i = 0; i < npoints; ++i) {
+							vwdata[i] = (char*) Marshal::StringToHGlobalAnsi(astring[i]).ToPointer();
+						}
+					}
+					else
+					{
+						char* ptr = (char*) Marshal::StringToHGlobalAnsi(astring[0]).ToPointer();
+						for (i = 0; i < npoints; ++i) {
+							vwdata[i] = ptr;
+						}
 					}
 
 					mtype = ProviderUtils::GetH5MemoryType(String::typeid, ftype);
@@ -96,7 +113,6 @@ namespace PSH5X
 					if (H5Dwrite(dset, mtype, mspace, fspace, H5P_DEFAULT, vwdata) < 0) {
 						throw gcnew HDF5Exception("H5Dwrite failed!");
 					}
-
 					if (H5Fflush(dset, H5F_SCOPE_LOCAL) < 0) {
 						throw gcnew HDF5Exception("H5Fflush failed!");
 					}
@@ -120,23 +136,39 @@ namespace PSH5X
 
 				if (ProviderUtils::TryGetValue(content, astring))
 				{
-					for (i = 0; i < npoints; ++i) {
-						if (astring[i]->Length >= size) {
+					size_t length = 0;
+
+					if (!same_value_flag)
+					{
+						for (i = 0; i < npoints; ++i)
+						{
+							length = safe_cast<size_t>(astring[i]->Length);
+							if (length >= size) {
 								throw gcnew PSH5XException(String::Format("String >{0}< too long!", astring[i]));
+							}
+						
+							char* buf = (char*) Marshal::StringToHGlobalAnsi(astring[i]).ToPointer();
+							memcpy((void*) wdata[i], (void*) buf, length+1);
+							Marshal::FreeHGlobal(IntPtr(buf));
 						}
 					}
-
-					for (i = 0; i < npoints; ++i)
+					else // same value everywhere
 					{
-						char* buf = (char*) Marshal::StringToHGlobalAnsi(astring[i]).ToPointer();
-						memcpy((void*) wdata[i], (void*) buf, size);
+						length = safe_cast<size_t>(astring[0]->Length);
+						if (length >= size) {
+							throw gcnew PSH5XException(String::Format("String >{0}< too long!", astring[0]));
+						}
+
+						char* buf = (char*) Marshal::StringToHGlobalAnsi(astring[0]).ToPointer();
+						for (i = 0; i < npoints; ++i) {
+							memcpy((void*) wdata[i], (void*) buf, length+1);
+						}
 						Marshal::FreeHGlobal(IntPtr(buf));
 					}
 
 					if (H5Dwrite(dset, mtype, mspace, fspace, H5P_DEFAULT, wdata[0]) < 0) {
 						throw gcnew HDF5Exception("H5Dwrite failed!");
 					}
-
 					if (H5Fflush(dset, H5F_SCOPE_LOCAL) < 0) {
 						throw gcnew HDF5Exception("H5Fflush failed!");
 					}
@@ -154,9 +186,14 @@ namespace PSH5X
         finally
         {
             if (vwdata != NULL) {
-                for (i = 0; i < npoints; ++i) {   
-                    Marshal::FreeHGlobal(IntPtr(vwdata[i]));
-                }
+				if (!same_value_flag) {
+					for (i = 0; i < npoints; ++i) {   
+						Marshal::FreeHGlobal(IntPtr(vwdata[i]));
+					}
+				}
+				else {
+					Marshal::FreeHGlobal(IntPtr(vwdata[0]));
+				}
                 delete [] vwdata;
             }
 
@@ -187,5 +224,11 @@ namespace PSH5X
         return content;
     }
 
+	void StringDatasetWriter::Seek(long long offset, System::IO::SeekOrigin origin)
+	{
+		offset = 0;
+		origin = System::IO::SeekOrigin::End;
 
+		throw gcnew PSH5XException("StringDatasetWriter::Seek() not implemented!");
+	}
 }

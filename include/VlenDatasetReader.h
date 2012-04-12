@@ -26,10 +26,7 @@ namespace PSH5X
 
         virtual System::Collections::IList^ Read(long long readCount);
 
-        virtual void Seek(long long offset, System::IO::SeekOrigin origin)
-        {
-            throw gcnew PSH5XException("VlenDatasetReader->Seek() not implemented!");
-        }
+        virtual void Seek(long long offset, System::IO::SeekOrigin origin);
 
     private:
 

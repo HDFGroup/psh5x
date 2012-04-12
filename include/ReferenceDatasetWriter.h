@@ -22,12 +22,9 @@ namespace PSH5X
 
         virtual void Close() {}
 
-        virtual System::Collections::IList^ ReferenceDatasetWriter::Write(System::Collections::IList^ content);
+		virtual System::Collections::IList^ ReferenceDatasetWriter::Write(System::Collections::IList^ content);
 
-    virtual void Seek(long long offset, System::IO::SeekOrigin origin)
-    {
-        throw gcnew PSH5XException("ReferenceDatasetWriter::Seek() not implemented!");
-    }
+		virtual void Seek(long long offset, System::IO::SeekOrigin origin);
 
 private:
 

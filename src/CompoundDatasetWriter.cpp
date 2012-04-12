@@ -266,4 +266,11 @@ namespace PSH5X
 
 		return content;
 	}
+
+	void CompoundDatasetWriter::Seek(long long offset, System::IO::SeekOrigin origin)
+	{
+		offset = 0;
+		origin = System::IO::SeekOrigin::End;
+		throw gcnew PSH5XException("CompoundDatasetWriter::Seek() not implemented!");
+	}
 }

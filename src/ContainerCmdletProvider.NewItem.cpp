@@ -737,11 +737,11 @@ namespace PSH5X
 
                     if (bits == 24) {
                         rgbValues = new unsigned char [3*wxh[0]*wxh[1]];
-                        rand_bytes = gcnew array<unsigned char>(3*wxh[0]*wxh[1]);
+                        rand_bytes = gcnew array<unsigned char>(safe_cast<int>(3*wxh[0]*wxh[1]));
                     }
                     else {
                         rgbValues = new unsigned char [wxh[0]*wxh[1]];
-                        rand_bytes = gcnew array<unsigned char>(wxh[0]*wxh[1]);
+                        rand_bytes = gcnew array<unsigned char>(safe_cast<int>(wxh[0]*wxh[1]));
                     }
 
                     Random^ random = gcnew Random();

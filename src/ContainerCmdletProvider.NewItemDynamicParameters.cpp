@@ -22,6 +22,7 @@ namespace PSH5X
         WriteVerbose(String::Format("HDF5Provider::NewItemDynamicParameters(Path = '{0}', ItemTypeName = '{1}')",
             path, itemTypeName));
 
+		newValue = nullptr;
 
         if (itemTypeName == nullptr || itemTypeName->Trim() == "") {
             throw gcnew PSH5XException("Item type must not be empty. Use -ItemType to specify!");

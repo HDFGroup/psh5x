@@ -26,8 +26,6 @@ namespace PSH5X
 	{
 		hid_t mtype = -1;
 
-		array<hsize_t>^ adims = nullptr;
-
 		try
 		{
 			mtype = H5Tget_native_type(ftype, H5T_DIR_ASCEND);
@@ -72,7 +70,7 @@ namespace PSH5X
 				throw gcnew PSH5XException("Zero size opaque type found!");
 			}
 
-			array<unsigned char>^ rdata = gcnew array<unsigned char>(npoints*safe_cast<int>(osize));
+			array<unsigned char>^ rdata = gcnew array<unsigned char>(safe_cast<int>(npoints*osize));
 			pin_ptr<unsigned char> rdata_ptr = &rdata[0];
 
 			if (H5Dread(dset, mtype, mspace, fspace, H5P_DEFAULT, rdata_ptr) < 0) {
@@ -159,4 +157,12 @@ namespace PSH5X
 
 		return result;
 	}
+
+	void OpaqueDatasetReader::Seek(long long offset, System::IO::SeekOrigin origin)
+	{
+		offset = 0;
+		origin = System::IO::SeekOrigin::End;
+		throw gcnew PSH5XException("OpaqueDatasetReader::Seek() not implemented!");
+	}
+
 }

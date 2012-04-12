@@ -28,8 +28,6 @@ namespace PSH5X
 	{
 		hid_t mtype = -1, sel = -1;
 
-		array<hsize_t>^ adims = nullptr;
-
 		IntPtr name = IntPtr::Zero;
 
 		try
@@ -84,7 +82,7 @@ namespace PSH5X
 				throw gcnew PSH5XException("Zero size refer type found!");
 			}
 
-			array<unsigned char>^ rdata = gcnew array<unsigned char>(npoints*refsize);
+			array<unsigned char>^ rdata = gcnew array<unsigned char>(safe_cast<int>(npoints*refsize));
 			pin_ptr<unsigned char> rdata_ptr = &rdata[0];
 
 			if (H5Dread(dset, mtype, mspace, fspace, H5P_DEFAULT, rdata_ptr) < 0) {
@@ -104,7 +102,6 @@ namespace PSH5X
 			}
 
 			name = Marshal::AllocHGlobal(256);
-			ssize_t ret_val;
 
 			if (rank > 1)
 			{
@@ -243,4 +240,12 @@ namespace PSH5X
 			return result;
 		}
 	}
+
+	void ReferenceDatasetReader::Seek(long long offset, System::IO::SeekOrigin origin)
+	{
+		offset = 0;
+		origin = System::IO::SeekOrigin::End;
+		throw gcnew PSH5XException("ReferenceDatasetReader::Seek() not implemented!");
+	}
+
 }
