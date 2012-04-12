@@ -18,6 +18,8 @@ Function New-H5ScalarDataset
      3) The HDF5 path name of a linked HDF5 datatype (string)
    .PARAMETER Compact 
      Create an HDF5 dataset with compact layout.
+    .PARAMETER FillValue 
+      Create an HDF5 dataset with this fill value.
    .PARAMETER Force
      Force the automatic creation of intermediate HDF5 groups.
    .EXAMPLE
@@ -49,6 +51,11 @@ Function New-H5ScalarDataset
         [switch]
         $Compact,
         [Parameter(Mandatory=$false,
+                   HelpMessage='FillValue?')]
+        [ValidateNotNull()]
+        [object]
+        $FillValue,
+        [Parameter(Mandatory=$false,
                    HelpMessage='Force the creation of intermediates?')]
         [switch]
         $Force
@@ -58,6 +65,9 @@ Function New-H5ScalarDataset
     
     if ($Compact) {
         $cmd += ' -Compact'
+    }
+    if ($FillValue) {
+        $cmd += ' -Value $FillValue'
     }
     if ($Force) {
         $cmd += ' -Force'

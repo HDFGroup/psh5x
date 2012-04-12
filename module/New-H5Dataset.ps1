@@ -7,34 +7,36 @@ Function New-H5Dataset
     .DESCRIPTION
       The New-H5Dataset function creates a new HDF5 simple dataset.
       Use the -Force switch to automatically create missing intermediate
-      groups. Unless the current location is on the targeted H5Drive,
-      the path(s) must be drive-qualified.
-   .PARAMETER Path
-     The path of the new HDF5 Dataset.
-   .PARAMETER Type
-     The element type of the HDF5 Dataset. The type can be specified as
-     1) A pre-defined HDF5 datatype
-     2) An HDF5 datatype definition (JSON)
-     3) The HDF5 path name of a linked HDF5 datatype
-   .PARAMETER Null
-     Create an HDF5 dataset with a null dataspace (void).
-   .PARAMETER Scalar
-     Create an HDF5 dataset with a scalar dataspace (singleton).
-   .PARAMETER Dimensions
-     Create an HDF5 dataset with a simple dataspace of this extent.
-   .PARAMETER MaxDimensions
-     Create an HDF5 dataset with a simple extendible dataspace.
-   .PARAMETER Chunked 
-     Create an HDF5 dataset with chunked layout and this chunk size.
-   .PARAMETER Gzip 
-     Create an HDF5 dataset (with chunked layout) with gzip compression enabled.
-   .PARAMETER Compact 
-     Create an HDF5 dataset with compact layout.
-   .PARAMETER Force
-     Force the automatic creation of intermediate HDF5 groups.
-   .EXAMPLE
-   .LINK
-     New-Item
+      groups.
+    .PARAMETER Path
+      The path of the new HDF5 Dataset.
+    .PARAMETER Type
+      The element type of the HDF5 Dataset. The type can be specified as
+      1) A pre-defined HDF5 datatype
+      2) An HDF5 datatype definition (JSON)
+      3) The HDF5 path name of a linked HDF5 datatype
+    .PARAMETER Null
+      Create an HDF5 dataset with a null dataspace (void).
+    .PARAMETER Scalar
+      Create an HDF5 dataset with a scalar dataspace (singleton).
+    .PARAMETER Dimensions
+      Create an HDF5 dataset with a simple dataspace of this extent.
+    .PARAMETER MaxDimensions
+      Create an HDF5 dataset with a simple extendible dataspace.
+    .PARAMETER Chunked 
+      Create an HDF5 dataset with chunked layout and this chunk size.
+    .PARAMETER Gzip 
+      Create an HDF5 dataset (with chunked layout) with gzip compression
+      enabled.
+    .PARAMETER Compact 
+      Create an HDF5 dataset with compact layout.
+    .PARAMETER FillValue 
+      Create an HDF5 dataset with this fill value.
+    .PARAMETER Force
+      Force the automatic creation of intermediate HDF5 groups.
+    .EXAMPLE
+    .LINK
+      New-Item
  #>
     [CmdletBinding(SupportsShouldProcess=$true,
                    DefaultParametersetName='Simple')]
@@ -102,6 +104,11 @@ Function New-H5Dataset
         [switch]
         $Compact,
         [Parameter(Mandatory=$false,
+                   HelpMessage='FillValue?')]
+        [ValidateNotNull()]
+        [object]
+        $FillValue,
+        [Parameter(Mandatory=$false,
                    HelpMessage='Force the creation of intermediates?')]
         [switch]
         $Force
@@ -164,18 +171,18 @@ Function New-H5Dataset
             }
         }
     }
-
     
     $cmd = 'New-Item -Path $Path -ItemType Dataset -ElementType $type'
         
     if ($Force) {
         $cmd += ' -Force'
     }
-        
+    if ($FillValue) {
+        $cmd += ' -Value $FillValue'
+    }
     if ($Compact) {
         $cmd += ' -Compact'
     }
-         
     if ($Nulll) {
         $cmd += ' -Null'
     }

@@ -175,6 +175,10 @@ namespace PSH5X
 
 		static hid_t GetH5MemoryType(System::Type^ t, hid_t ftype);
 
+		static bool TryGetFillValue(hid_t dtype, System::Object^ value, array<unsigned char>^% fill);
+
+		static bool TryGetFillValue(hid_t dtype, array<unsigned char>^ fill, System::Object^% value);
+
 #pragma endregion
 
 #pragma region HDF5 Dataspace

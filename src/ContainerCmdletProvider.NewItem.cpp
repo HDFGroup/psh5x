@@ -239,6 +239,8 @@ namespace PSH5X
 					}
 				}
 
+				bool hasFillValue = (newValue != nullptr);
+
 				dcplist = H5Pcreate(H5P_DATASET_CREATE);
 				if (dcplist < 0) {
 					throw gcnew HDF5Exception("H5Pcreate failed!");
@@ -399,10 +401,25 @@ namespace PSH5X
 #pragma endregion
 				}
 
+				if (hasFillValue && (isSimple || isScalar))
+				{
+					array<unsigned char>^ fill = nullptr;
+					
+					if (ProviderUtils::TryGetFillValue(dtype, newValue, fill))
+					{
+						pin_ptr<unsigned char> fill_ptr = &fill[0];
+						if (H5Pset_fill_value(dcplist, dtype, fill_ptr) < 0) {
+							throw gcnew HDF5Exception("H5Pset_fill_value failed!");
+						}
+					}
+					else {
+						WriteWarning("Could not parse the fill value!");
+					}
+				}
+
 				if (this->ShouldProcess(h5path,
 					String::Format("HDF5 dataset '{0}' does not exist, create it", linkName)))
 				{
-
 					dset = H5Dcreate2(drive->FileHandle, name, dtype, fspace, lcplist, dcplist, H5P_DEFAULT);
 					if (dset < 0) {
 						throw gcnew HDF5Exception("H5Dcreate2 failed!");

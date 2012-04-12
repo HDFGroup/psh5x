@@ -3211,5 +3211,278 @@ namespace PSH5X
 
 		return result;
 	}
-    
+
+	bool ProviderUtils::TryGetFillValue(hid_t dtype, Object^ value, array<unsigned char>^% fill)
+	{
+		bool result = false;
+		fill = nullptr;
+
+		hid_t ntype = -1;
+
+		IntPtr iptr = IntPtr::Zero;
+
+		try
+		{
+			Object^ obj = ProviderUtils::GetDotNetObject(value);
+
+			if ((ntype = H5Tget_native_type(dtype, H5T_DIR_ASCEND)) < 0) {
+				throw gcnew HDF5Exception("H5Tget_native_type failed!");
+			}
+
+			size_t size = H5Tget_size(ntype);
+
+			switch (H5Tget_class(ntype))
+			{
+			case H5T_INTEGER:
+				{
+#pragma region integer
+
+					switch (H5Tget_sign(ntype))
+					{
+					case H5T_SGN_NONE:
+						{
+							switch (size)
+							{
+							case 1:
+								{
+									unsigned char B;
+									if (ProviderUtils::TryGetValue(value, B))
+									{
+										fill = BitConverter::GetBytes(B);
+										result = true;
+									}
+								}
+								break;
+							case 2:
+								{
+									unsigned short S;
+									if (ProviderUtils::TryGetValue(value, S))
+									{
+										fill = BitConverter::GetBytes(S);
+										result = true;
+									}
+								}
+								break;
+							case 4:
+								{
+									unsigned int I;
+									if (ProviderUtils::TryGetValue(value, I))
+									{
+										fill = BitConverter::GetBytes(I);
+										result = true;
+									}
+								}
+								break;
+							case 8:
+								{
+									unsigned long long L;
+									if (ProviderUtils::TryGetValue(value, L))
+									{
+										fill = BitConverter::GetBytes(L);
+										result = true;
+									}
+								}
+								break;
+
+							default:
+								break;
+							}
+						}
+						break;
+
+					case H5T_SGN_2:
+						{
+							switch (size)
+							{
+							case 1:
+								{
+									char b;
+									if (ProviderUtils::TryGetValue(value, b))
+									{
+										fill = BitConverter::GetBytes(b);
+										result = true;
+									}
+								}
+								break;
+							case 2:
+								{
+									short s;
+									if (ProviderUtils::TryGetValue(value, s))
+									{
+										fill = BitConverter::GetBytes(s);
+										result = true;
+									}
+								}
+								break;
+							case 4:
+								{
+									int i;
+									if (ProviderUtils::TryGetValue(value, i))
+									{
+										fill = BitConverter::GetBytes(i);
+										result = true;
+									}
+								}
+								break;
+							case 8:
+								{
+									long long l;
+									if (ProviderUtils::TryGetValue(value, l))
+									{
+										fill = BitConverter::GetBytes(l);
+										result = true;
+									}
+								}
+								break;
+
+							default:
+								break;
+							}
+						}
+						break;
+
+					default:
+						break;
+					}
+#pragma endregion
+				}
+				break;
+
+			case H5T_BITFIELD:
+				{
+#pragma region bitfield
+
+					switch (size)
+					{
+					case 1:
+						{
+							unsigned char B;
+							if (ProviderUtils::TryGetValue(value, B))
+							{
+								fill = BitConverter::GetBytes(B);
+								result = true;
+							}
+						}
+						break;
+					case 2:
+						{
+							unsigned short S;
+							if (ProviderUtils::TryGetValue(value, S))
+							{
+								fill = BitConverter::GetBytes(S);
+								result = true;
+							}
+						}
+						break;
+					case 4:
+						{
+							unsigned int I;
+							if (ProviderUtils::TryGetValue(value, I))
+							{
+								fill = BitConverter::GetBytes(I);
+								result = true;
+							}
+						}
+						break;
+					case 8:
+						{
+							unsigned long long L;
+							if (ProviderUtils::TryGetValue(value, L))
+							{
+								fill = BitConverter::GetBytes(L);
+								result = true;
+							}
+						}
+						break;
+
+					default:
+						break;
+					}
+#pragma endregion
+				}
+				break;
+
+			case H5T_FLOAT:
+				{
+#pragma region float
+					if (size == 4)
+					{
+						float f;
+						if (ProviderUtils::TryGetValue(obj, f))
+						{
+							fill = BitConverter::GetBytes(f);
+							result = true;
+						}
+					}
+					else if (size == 8)
+					{
+						double d;
+						if (ProviderUtils::TryGetValue(obj, d))
+						{
+							fill = BitConverter::GetBytes(d);
+							result = true;
+						}
+					}
+#pragma endregion
+				}
+				break;
+
+			case H5T_STRING:
+				{
+#pragma region string
+					String^ s;
+					if (ProviderUtils::TryGetValue(obj, s))
+					{
+						// length check for fixed-length strings
+						if (H5Tis_variable_str(ntype) == 0)
+						{
+							if (H5Tget_strpad(ntype) == H5T_STR_NULLTERM)
+							{
+								if (s->Length > safe_cast<int>(size-1)) {
+									throw gcnew PSH5XException("The string fill value is too long for this type!");
+								}
+							}
+							else {
+								if (s->Length > safe_cast<int>(size)) {
+									throw gcnew PSH5XException("The string fill value is too long for this type!");
+								}
+							}
+						}
+
+						iptr = Marshal::StringToHGlobalAnsi(s);
+						fill = gcnew array<unsigned char>(s->Length);
+						Marshal::Copy(iptr, fill, 0, s->Length);
+						result = true;
+					}
+#pragma endregion
+				}
+				break;
+
+			default:
+				break;
+			}
+		}
+		finally
+		{
+			if (iptr != IntPtr::Zero) {
+				Marshal::FreeHGlobal(iptr);
+			}
+			if (ntype >= 0) {
+				H5Tclose(ntype);
+			}
+		}
+		
+		return result;
+	}
+
+	bool ProviderUtils::TryGetFillValue(hid_t dtype, array<unsigned char>^ fill, Object^% value)
+	{
+		bool result = false;
+		fill = nullptr;
+
+
+
+
+		return result;
+	}
 }
