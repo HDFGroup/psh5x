@@ -86,7 +86,7 @@ Function New-H5Attribute
                    Position=4,
                    HelpMessage='Non-scalar attribute value')]
         [ValidateNotNull()]
-        [object[]]
+        [object]
         $Value
     )
 

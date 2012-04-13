@@ -163,7 +163,7 @@ $t = '{"Class": "Vlen", "Base": "H5T_STD_I32LE"}'
 
 New-Item dset3 -ItemType Dataset -ElementType $t -Dimensions 4 
 
-$value = @(@(0), @(10,11), @(20,21,22), @(30,31,32,33))
+$value = (,0), (10,11), (20,21,22), (30,31,32,33)
 
 Set-Content dset3 $value
 $a = Get-Content dset3 -ReadCount 0

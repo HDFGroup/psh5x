@@ -115,7 +115,7 @@ $t = '{"Class": "Vlen", "Base": "H5T_STD_I32LE"}'
 
 $dset = New-H5Dataset dset3 $t 4
 
-$value = @(@(0), @(10,11), @(20,21,22), @(30,31,32,33))
+$value = (,0), (10,11), (20,21,22), (30,31,32,33)
 
 Set-Content dset3 $value
 
