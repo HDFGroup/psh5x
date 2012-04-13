@@ -140,10 +140,15 @@ namespace PSH5X
 						throw gcnew HDF5Exception("H5Sselect_hyperslab failed!");
 					}
 
+					hssize_t npoints = H5Sget_select_npoints(fspace);
+					if (npoints != sel_count && sel_count != 1) {
+						throw gcnew HDF5Exception("Selection count mismatch found!");
+					}
+
 					// select the entire content provided
 
 					hsize_t mdims[1];
-					mdims[0] = safe_cast<hsize_t>(sel_count);
+					mdims[0] = safe_cast<hsize_t>(npoints);
 
 					mspace = H5Screate_simple(1, mdims, NULL);
 					if (mspace < 0) {

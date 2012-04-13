@@ -226,6 +226,7 @@ namespace PSH5X
 
 				unsigned int flags, filter_config;
 				size_t cd_nelmts = 0;
+				array<unsigned>^ cd_values = nullptr;
 				char name[256];
 
 				switch (H5Pget_filter2(plist, idx, &flags, &cd_nelmts, NULL, 255, name, &filter_config ))
@@ -248,6 +249,14 @@ namespace PSH5X
 						else {
 							filter["DecodingEnabled"] = "False";
 						}
+
+						if (cd_nelmts > 0)
+						{
+							cd_values = gcnew array<unsigned>(safe_cast<int>(cd_nelmts));
+							pin_ptr<unsigned> ptr = &cd_values[0];
+							H5Pget_filter2(plist, idx, &flags, &cd_nelmts, ptr, 255, name, &filter_config);
+						    filter["FilterData"] = cd_values;
+						}
 					}
 					break;
 
@@ -268,6 +277,14 @@ namespace PSH5X
 						}
 						else {
 							filter["DecodingEnabled"] = "False";
+						}
+
+						if (cd_nelmts > 0)
+						{
+							cd_values = gcnew array<unsigned>(safe_cast<int>(cd_nelmts));
+							pin_ptr<unsigned> ptr = &cd_values[0];
+							H5Pget_filter2(plist, idx, &flags, &cd_nelmts, ptr, 255, name, &filter_config);
+						    filter["FilterData"] = cd_values;
 						}
 					}
 					break;
@@ -290,6 +307,14 @@ namespace PSH5X
 						else {
 							filter["DecodingEnabled"] = "False";
 						}
+
+						if (cd_nelmts > 0)
+						{
+							cd_values = gcnew array<unsigned>(safe_cast<int>(cd_nelmts));
+							pin_ptr<unsigned> ptr = &cd_values[0];
+							H5Pget_filter2(plist, idx, &flags, &cd_nelmts, ptr, 255, name, &filter_config);
+						    filter["FilterData"] = cd_values;
+						}
 					}
 					break;
 
@@ -310,6 +335,14 @@ namespace PSH5X
 						}
 						else {
 							filter["DecodingEnabled"] = "False";
+						}
+
+						if (cd_nelmts > 0)
+						{
+							cd_values = gcnew array<unsigned>(safe_cast<int>(cd_nelmts));
+							pin_ptr<unsigned> ptr = &cd_values[0];
+							H5Pget_filter2(plist, idx, &flags, &cd_nelmts, ptr, 255, name, &filter_config);
+						    filter["FilterData"] = cd_values;
 						}
 					}
 					break;
@@ -333,6 +366,14 @@ namespace PSH5X
 						else {
 							filter["DecodingEnabled"] = "False";
 						}
+
+						if (cd_nelmts > 0)
+						{
+							cd_values = gcnew array<unsigned>(safe_cast<int>(cd_nelmts));
+							pin_ptr<unsigned> ptr = &cd_values[0];
+							H5Pget_filter2(plist, idx, &flags, &cd_nelmts, ptr, 255, name, &filter_config);
+						    filter["FilterData"] = cd_values;
+						}
 					}
 					break;
 
@@ -353,6 +394,14 @@ namespace PSH5X
 						}
 						else {
 							filter["DecodingEnabled"] = "False";
+						}
+
+						if (cd_nelmts > 0)
+						{
+							cd_values = gcnew array<unsigned>(safe_cast<int>(cd_nelmts));
+							pin_ptr<unsigned> ptr = &cd_values[0];
+							H5Pget_filter2(plist, idx, &flags, &cd_nelmts, ptr, 255, name, &filter_config);
+						    filter["FilterData"] = cd_values;
 						}
 					}
 					break;

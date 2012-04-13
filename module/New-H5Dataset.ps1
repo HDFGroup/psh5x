@@ -161,13 +161,16 @@ Function New-H5Dataset
             return
         }
 
-        for ($i = 0; $i -lt $Dimensions.Length; $i++)
+        if ($MaxDimensions)
         {
-            if (($MaxDimensions[$i] -gt 0) -and
-                !($MaxDimensions[$i] -ge $Chunked[$i]))
+            for ($i = 0; $i -lt $Dimensions.Length; $i++)
             {
-                Write-Error "`nFor limited maximum dimensions the chunk dimension must not exceed the maximum dimension."
-                return
+                if (($MaxDimensions[$i] -gt 0) -and
+                    !($MaxDimensions[$i] -ge $Chunked[$i]))
+                {
+                    Write-Error "`nFor limited maximum dimensions the chunk dimension must not exceed the maximum dimension."
+                    return
+                }
             }
         }
     }
@@ -193,17 +196,16 @@ Function New-H5Dataset
     {
        $cmd += ' -Dimensions $Dimensions'
             
-        if ($MaxDimensions)
-        {
+        if ($MaxDimensions) {
             $cmd += ' -MaxDimensions $MaxDimensions'
+        }
             
-            if ($Chunked)
-            {
-                $cmd += ' -Chunked $Chunked'
-                
-                if ($Gzip) {
-                    $cmd += ' -Gzip $Gzip'
-                }
+        if ($Chunked)
+        {
+            $cmd += ' -Chunked $Chunked'
+             
+            if ($Gzip) {
+                $cmd += ' -Gzip $Gzip'
             }
         }
     }

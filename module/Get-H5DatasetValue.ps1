@@ -66,11 +66,11 @@ Function Get-H5DatasetValue
 
     if (!($Start -or $Stride -or $Count -or $Block))
     {
-        Get-Content $Path -ReadCount 0
+        Get-Content -Path $Path -ReadCount 0
     }
     else
     {
-        $cmd = 'Get-Content $Path -ReadCount 0'
+        $cmd = 'Get-Content -Path $Path -ReadCount 0'
         if ($Start) {
             $cmd += ' -Start $Start'
         }
@@ -83,7 +83,7 @@ Function Get-H5DatasetValue
         if ($Block) {
             $cmd += ' -Block $Block'
         }
-
+        
         Invoke-Expression $cmd
     }
 }
