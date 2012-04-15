@@ -192,7 +192,12 @@ namespace PSH5X
 						case H5T_STRING:
 							{
 								if (member_is_vlen_str[m]) {
-									writer->Write(Marshal::StringToHGlobalAnsi((String^) value).ToInt64());
+									if (IntPtr::Size == 8) {
+										writer->Write(Marshal::StringToHGlobalAnsi((String^) value).ToInt64());
+									}
+									else {
+										writer->Write(Marshal::StringToHGlobalAnsi((String^) value).ToInt32());
+									}
 								}
 								else{
 									array<unsigned char>^ bytes = Encoding::ASCII->GetBytes(
