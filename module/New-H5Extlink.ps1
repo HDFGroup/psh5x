@@ -1,21 +1,21 @@
 
-Function New-H5Softlink
+Function New-H5Extlink
 {
 <#
     .SYNOPSIS
-      Creates a new HDF5 soft link
+      Creates a new HDF5 external link
     .DESCRIPTION
-      The New-H5Softlink function creates a new HDF5 soft link.
+      The New-H5Externallink function creates a new HDF5 external link.
     .PARAMETER Source 
       The path name of the source
     .PARAMETER Destination 
-      An HDF5 path name to the HDF5 destination object
+      A pair of an HDF5 file name and an HDF5 path name
     .EXAMPLE
-      New-H5Softlink -Source h5:/group2 -Destination /group1
+      New-H5Extlink -Source h5:/ext1 -Destination my.h5,/group1
     .LINK
       New-Item
     .LINK
-      http://www.hdfgroup.org/HDF5/doc/RM/RM_H5L.html#Link-CreateSoft
+      http://www.hdfgroup.org/HDF5/doc/RM/RM_H5L.html#Link-CreateExternal
  #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param
@@ -32,13 +32,13 @@ Function New-H5Softlink
                    Position=1,
                    HelpMessage='An HDF5 path name to the destination HDF5 object')]
         [ValidateNotNull()]
-        [string]
+        [ValidateCount(2,2)]
+        [string[]]
         $Destination
     )
 
-   
-    if ($PSCmdlet.ShouldProcess($Source, "New HDF5 Softlink -> '$Destination'"))
+    if ($PSCmdlet.ShouldProcess($Source, "New HDF5 Externallink -> '$Destination'"))
     {
-        New-Item -Path $Source -ItemType SoftLink -Value $Destination
+        New-Item -Path $Source -ItemType ExtLink -Value $Destination
     }
 }

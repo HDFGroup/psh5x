@@ -13,6 +13,7 @@ Export-ModuleMember -Cmdlet *
 . $ScriptDir\New-H5Attribute.ps1
 . $ScriptDir\New-H5Dataset.ps1
 . $ScriptDir\New-H5Drive.ps1
+. $ScriptDir\New-H5Extlink.ps1
 . $ScriptDir\New-H5File.ps1
 . $ScriptDir\New-H5Group.ps1
 . $ScriptDir\New-H5Hardlink.ps1

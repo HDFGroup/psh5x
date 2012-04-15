@@ -69,6 +69,11 @@ Function New-H5Drive
         Write-Error "`nFile '$File' is not an HDF5 file."
         return
     }
+    else {
+        if (!$Force) {
+            $File = Resolve-Path $File
+        }
+    }
     
     $count = 0
     Get-PSDrive | ?{$_.Name -eq $Name} | %{$count++}

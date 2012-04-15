@@ -24,12 +24,14 @@ Function New-H5Hardlink
                    ValueFromPipelineByPropertyName=$true,
                    Position=0,
                    HelpMessage='The source path name.')]
+        [ValidateNotNull()]
         [string[]]
         $Source,
         [Parameter(Mandatory=$true,
                    ValueFromPipelineByPropertyName=$true,
                    Position=1,
                    HelpMessage='An HDF5 path name to the destination HDF5 object')]
+        [ValidateNotNull()]
         [string]
         $Destination
     )
