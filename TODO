@@ -13,11 +13,17 @@ KNOWN ISSUES
 NEW FEATURES
 ------------
 
+- Add memory type argument to Get-Content (for primitive types)
+
+- Add a members argument to [Get,Set]-Content for compound types
+
+- Let users de-reference region references
+
 - Support DatasetInfo(Lite) argument in Set/Get-Content and New-H5Array?
 
 - Implement point selections in reader/writer
 
-- Implement Invoke-Item and Clear-Item
+- Implement Invoke-Item (e.g., image) and Clear-Item (reset to fill value)
 
 FUNDAMENTALS
 ------------
