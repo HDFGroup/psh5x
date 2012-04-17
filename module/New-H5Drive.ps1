@@ -73,6 +73,11 @@ Function New-H5Drive
         if (!$Force) {
             $File = Resolve-Path $File
         }
+        else {
+            if (-not [System.IO.Path]::IsPathRooted($File)) {
+                $File = (Join-Path (Get-Location) $File)
+            }
+        }
     }
     
     $count = 0
