@@ -45,17 +45,17 @@ New-H5Attribute . processing_level "processing_level" string$("processing_level"
                     
 New-H5Attribute . standard_name_vocabulary "standard_name_vocabulary" string$("standard_name_vocabulary".Length)
                     
-New-H5Group /LI_Lineage
+mkdir /LI_Lineage
 cd /LI_Lineage
-New-H5Group /LI_Lineage/LE_Source
+mkdir /LI_Lineage/LE_Source
 cd /LI_Lineage/LE_Source
-New-H5Group /LI_Lineage/LE_Source/1
+mkdir /LI_Lineage/LE_Source/1
 cd /LI_Lineage/LE_Source/1
-New-H5Group /LI_Lineage/LE_Source/2
+mkdir /LI_Lineage/LE_Source/2
 cd /LI_Lineage/LE_Source/2
-New-H5Group /acquisitionInformation_1
+mkdir /acquisitionInformation_1
 cd /acquisitionInformation_1
-New-H5Group /acquisitionInformation_1/instrument_1
+mkdir /acquisitionInformation_1/instrument_1
 cd /acquisitionInformation_1/instrument_1
 New-H5Attribute . description "Brief instrument description" string$("Brief instrument description".Length)
                     
@@ -67,13 +67,13 @@ New-H5Attribute . type "GCMD Instrument Keyword" string$("GCMD Instrument Keywor
                     
 New-H5Attribute . uuid "UUID" string$("UUID".Length)
                     
-New-H5Group /acquisitionInformation_1/instrument_1/citation_1
+mkdir /acquisitionInformation_1/instrument_1/citation_1
 cd /acquisitionInformation_1/instrument_1/citation_1
 New-H5Attribute . title "InstrumentShortName > InstrumentLongName" string$("InstrumentShortName > InstrumentLongName".Length)
                     
 New-H5Attribute . uuid "UUID" string$("UUID".Length)
                     
-New-H5Group /acquisitionInformation_1/instrument_1/citation_1/citedResponsibleParty_1
+mkdir /acquisitionInformation_1/instrument_1/citation_1/citedResponsibleParty_1
 cd /acquisitionInformation_1/instrument_1/citation_1/citedResponsibleParty_1
 New-H5Attribute . organisationName "NASA/JPL/SMAP > Soil Moisture Active Passive, Jet Propulsion Laboratory, NASA" string$("NASA/JPL/SMAP > Soil Moisture Active Passive, Jet Propulsion Laboratory, NASA".Length)
                     
@@ -81,7 +81,7 @@ New-H5Attribute . role "author" string$("author".Length)
                     
 New-H5Attribute . uuid "UUID" string$("UUID".Length)
                     
-New-H5Group /acquisitionInformation_1/instrument_1/citation_1/citedResponsibleParty_1/onlineResource_1
+mkdir /acquisitionInformation_1/instrument_1/citation_1/citedResponsibleParty_1/onlineResource_1
 cd /acquisitionInformation_1/instrument_1/citation_1/citedResponsibleParty_1/onlineResource_1
 New-H5Attribute . function "information" string$("information".Length)
                     
@@ -89,13 +89,13 @@ New-H5Attribute . linkage "http://smap.jpl.nasa.gov/" string$("http://smap.jpl.n
                     
 New-H5Attribute . uuid "UUID" string$("UUID".Length)
                     
-New-H5Group /acquisitionInformation_1/instrument_1/citation_1/date_1
+mkdir /acquisitionInformation_1/instrument_1/citation_1/date_1
 cd /acquisitionInformation_1/instrument_1/citation_1/date_1
 New-H5Attribute . date "2012-03-06" string$("2012-03-06".Length)
                     
 New-H5Attribute . dateType "publication" string$("publication".Length)
                     
-New-H5Group /acquisitionInformation_1/platform_1
+mkdir /acquisitionInformation_1/platform_1
 cd /acquisitionInformation_1/platform_1
 New-H5Attribute . description "PlatformType" string$("PlatformType".Length)
                     
@@ -103,13 +103,13 @@ New-H5Attribute . identifier "PlatformShortName > PlatformLongName" string$("Pla
                     
 New-H5Attribute . uuid "UUID" string$("UUID".Length)
                     
-New-H5Group /acquisitionInformation_1/platform_1/citation_1
+mkdir /acquisitionInformation_1/platform_1/citation_1
 cd /acquisitionInformation_1/platform_1/citation_1
 New-H5Attribute . title "PlatformShortName > PlatformLongName" string$("PlatformShortName > PlatformLongName".Length)
                     
 New-H5Attribute . uuid "UUID" string$("UUID".Length)
                     
-New-H5Group /acquisitionInformation_1/platform_1/citation_1/citedResponsibleParty_1
+mkdir /acquisitionInformation_1/platform_1/citation_1/citedResponsibleParty_1
 cd /acquisitionInformation_1/platform_1/citation_1/citedResponsibleParty_1
 New-H5Attribute . organisationName "NASA/JPL/SMAP > Soil Moisture Active Passive, Jet Propulsion Laboratory, NASA" string$("NASA/JPL/SMAP > Soil Moisture Active Passive, Jet Propulsion Laboratory, NASA".Length)
                     
@@ -117,7 +117,7 @@ New-H5Attribute . role "author" string$("author".Length)
                     
 New-H5Attribute . uuid "UUID" string$("UUID".Length)
                     
-New-H5Group /acquisitionInformation_1/platform_1/citation_1/citedResponsibleParty_1/onlineResource_1
+mkdir /acquisitionInformation_1/platform_1/citation_1/citedResponsibleParty_1/onlineResource_1
 cd /acquisitionInformation_1/platform_1/citation_1/citedResponsibleParty_1/onlineResource_1
 New-H5Attribute . function "information" string$("information".Length)
                     
@@ -125,13 +125,13 @@ New-H5Attribute . linkage "http://smap.jpl.nasa.gov/" string$("http://smap.jpl.n
                     
 New-H5Attribute . uuid "UUID" string$("UUID".Length)
                     
-New-H5Group /acquisitionInformation_1/platform_1/citation_1/date_1
+mkdir /acquisitionInformation_1/platform_1/citation_1/date_1
 cd /acquisitionInformation_1/platform_1/citation_1/date_1
 New-H5Attribute . date "2012-03-06" string$("2012-03-06".Length)
                     
 New-H5Attribute . dateType "publication" string$("publication".Length)
                     
-New-H5Group /contact_1
+mkdir /contact_1
 cd /contact_1
 New-H5Attribute . organisationName "NASA/JPL/SMAP > Soil Moisture Active Passive, Jet Propulsion Laboratory, NASA" string$("NASA/JPL/SMAP > Soil Moisture Active Passive, Jet Propulsion Laboratory, NASA".Length)
                     
@@ -139,7 +139,7 @@ New-H5Attribute . role "pointOfContact" string$("pointOfContact".Length)
                     
 New-H5Attribute . uuid "UUID" string$("UUID".Length)
                     
-New-H5Group /contact_1/onlineResource_1
+mkdir /contact_1/onlineResource_1
 cd /contact_1/onlineResource_1
 New-H5Attribute . function "information" string$("information".Length)
                     
@@ -147,7 +147,7 @@ New-H5Attribute . linkage "http://smap.jpl.nasa.gov/" string$("http://smap.jpl.n
                     
 New-H5Attribute . uuid "UUID" string$("UUID".Length)
                     
-New-H5Group /contact_2
+mkdir /contact_2
 cd /contact_2
 New-H5Attribute . organisationName "NASA/JPL/SMAP > Soil Moisture Active Passive, Jet Propulsion Laboratory, NASA" string$("NASA/JPL/SMAP > Soil Moisture Active Passive, Jet Propulsion Laboratory, NASA".Length)
                     
@@ -155,7 +155,7 @@ New-H5Attribute . role "pointOfContact" string$("pointOfContact".Length)
                     
 New-H5Attribute . uuid "UUID" string$("UUID".Length)
                     
-New-H5Group /contact_2/onlineResource_1
+mkdir /contact_2/onlineResource_1
 cd /contact_2/onlineResource_1
 New-H5Attribute . function "information" string$("information".Length)
                     
@@ -163,13 +163,13 @@ New-H5Attribute . linkage "http://smap.jpl.nasa.gov/" string$("http://smap.jpl.n
                     
 New-H5Attribute . uuid "UUID" string$("UUID".Length)
                     
-New-H5Group /dataQualityInfo_1
+mkdir /dataQualityInfo_1
 cd /dataQualityInfo_1
 New-H5Attribute . scope "dataset" string$("dataset".Length)
                     
-New-H5Group /dataQualityInfo_1/lineage
+mkdir /dataQualityInfo_1/lineage
 cd /dataQualityInfo_1/lineage
-New-H5Group /dataQualityInfo_1/lineage/processStep_1
+mkdir /dataQualityInfo_1/lineage/processStep_1
 cd /dataQualityInfo_1/lineage/processStep_1
 New-H5Attribute . dateTime "ProductionDateTime" string$("ProductionDateTime".Length)
                     
@@ -179,15 +179,15 @@ New-H5Attribute . source "UUID,UUID,UUID" string$("UUID,UUID,UUID".Length)
                     
 New-H5Attribute . uuid "UUID" string$("UUID".Length)
                     
-New-H5Group /dataQualityInfo_1/lineage/processStep_1/processingInformation_1
+mkdir /dataQualityInfo_1/lineage/processStep_1/processingInformation_1
 cd /dataQualityInfo_1/lineage/processStep_1/processingInformation_1
 New-H5Attribute . identifier "SPSIdentifier" string$("SPSIdentifier".Length)
                     
-New-H5Group /dataQualityInfo_1/lineage/processStep_1/processingInformation_1/algorithm_1
+mkdir /dataQualityInfo_1/lineage/processStep_1/processingInformation_1/algorithm_1
 cd /dataQualityInfo_1/lineage/processStep_1/processingInformation_1/algorithm_1
 New-H5Attribute . description "AlgorithmDescriptor" string$("AlgorithmDescriptor".Length)
                     
-New-H5Group /dataQualityInfo_1/lineage/processStep_1/processingInformation_1/algorithm_1/citation_1
+mkdir /dataQualityInfo_1/lineage/processStep_1/processingInformation_1/algorithm_1/citation_1
 cd /dataQualityInfo_1/lineage/processStep_1/processingInformation_1/algorithm_1/citation_1
 New-H5Attribute . edition "AlgorithmPackageVersionID" string$("AlgorithmPackageVersionID".Length)
                     
@@ -197,11 +197,11 @@ New-H5Attribute . title "AlgorithmTitle" string$("AlgorithmTitle".Length)
                     
 New-H5Attribute . uuid "UUID" string$("UUID".Length)
                     
-New-H5Group /dataQualityInfo_1/lineage/processStep_1/processingInformation_1/algorithm_1/citation_1/date_1
+mkdir /dataQualityInfo_1/lineage/processStep_1/processingInformation_1/algorithm_1/citation_1/date_1
 cd /dataQualityInfo_1/lineage/processStep_1/processingInformation_1/algorithm_1/citation_1/date_1
 New-H5Attribute . dateType "publication" string$("publication".Length)
                     
-New-H5Group /dataQualityInfo_1/lineage/processStep_1/processor_1
+mkdir /dataQualityInfo_1/lineage/processStep_1/processor_1
 cd /dataQualityInfo_1/lineage/processStep_1/processor_1
 New-H5Attribute . organisationName "ProductionLocationCode" string$("ProductionLocationCode".Length)
                     
@@ -209,7 +209,7 @@ New-H5Attribute . role "processor" string$("processor".Length)
                     
 New-H5Attribute . uuid "UUID" string$("UUID".Length)
                     
-New-H5Group /dataQualityInfo_1/lineage/source_1
+mkdir /dataQualityInfo_1/lineage/source_1
 cd /dataQualityInfo_1/lineage/source_1
 New-H5Attribute . description "Radar Level 1A Product Description" string$("Radar Level 1A Product Description".Length)
                     
@@ -217,7 +217,7 @@ New-H5Attribute . sourceStep "UUID,UUID,UUID" string$("UUID,UUID,UUID".Length)
                     
 New-H5Attribute . uuid "UUID" string$("UUID".Length)
                     
-New-H5Group /dataQualityInfo_1/lineage/source_1/sourceCitation_1
+mkdir /dataQualityInfo_1/lineage/source_1/sourceCitation_1
 cd /dataQualityInfo_1/lineage/source_1/sourceCitation_1
 New-H5Attribute . edition "Radar Level 1A Product Edition" string$("Radar Level 1A Product Edition".Length)
                     
@@ -225,17 +225,17 @@ New-H5Attribute . title "http://smap.jpl.nasa.gov/RadarLevel1AProduct.h5" string
                     
 New-H5Attribute . uuid "UUID" string$("UUID".Length)
                     
-New-H5Group /dataQualityInfo_1/lineage/source_1/sourceCitation_1/date_1
+mkdir /dataQualityInfo_1/lineage/source_1/sourceCitation_1/date_1
 cd /dataQualityInfo_1/lineage/source_1/sourceCitation_1/date_1
 New-H5Attribute . dateType "creation" string$("creation".Length)
                     
-New-H5Group /dataQualityInfo_1/lineage/source_2
+mkdir /dataQualityInfo_1/lineage/source_2
 cd /dataQualityInfo_1/lineage/source_2
 New-H5Attribute . sourceStep "UUID,UUID,UUID" string$("UUID,UUID,UUID".Length)
                     
 New-H5Attribute . uuid "UUID" string$("UUID".Length)
                     
-New-H5Group /dataQualityInfo_1/lineage/source_2/sourceCitation_1
+mkdir /dataQualityInfo_1/lineage/source_2/sourceCitation_1
 cd /dataQualityInfo_1/lineage/source_2/sourceCitation_1
 New-H5Attribute . edition "SMAP Epehemeris Data Product Edition" string$("SMAP Epehemeris Data Product Edition".Length)
                     
@@ -243,17 +243,17 @@ New-H5Attribute . title "http://smap.jpl.nasa.gov/SMAPEpehemerisDataProduct.h5" 
                     
 New-H5Attribute . uuid "UUID" string$("UUID".Length)
                     
-New-H5Group /dataQualityInfo_1/lineage/source_2/sourceCitation_1/date_1
+mkdir /dataQualityInfo_1/lineage/source_2/sourceCitation_1/date_1
 cd /dataQualityInfo_1/lineage/source_2/sourceCitation_1/date_1
 New-H5Attribute . dateType "creation" string$("creation".Length)
                     
-New-H5Group /dataQualityInfo_1/lineage/source_3
+mkdir /dataQualityInfo_1/lineage/source_3
 cd /dataQualityInfo_1/lineage/source_3
 New-H5Attribute . sourceStep "UUID,UUID,UUID" string$("UUID,UUID,UUID".Length)
                     
 New-H5Attribute . uuid "UUID" string$("UUID".Length)
                     
-New-H5Group /dataQualityInfo_1/lineage/source_3/sourceCitation_1
+mkdir /dataQualityInfo_1/lineage/source_3/sourceCitation_1
 cd /dataQualityInfo_1/lineage/source_3/sourceCitation_1
 New-H5Attribute . edition "SMAP Attitude Data Product Edition" string$("SMAP Attitude Data Product Edition".Length)
                     
@@ -261,17 +261,17 @@ New-H5Attribute . title "http://smap.jpl.nasa.gov/SMAPAttitudeDataProduct.h5" st
                     
 New-H5Attribute . uuid "UUID" string$("UUID".Length)
                     
-New-H5Group /dataQualityInfo_1/lineage/source_3/sourceCitation_1/date_1
+mkdir /dataQualityInfo_1/lineage/source_3/sourceCitation_1/date_1
 cd /dataQualityInfo_1/lineage/source_3/sourceCitation_1/date_1
 New-H5Attribute . dateType "creation" string$("creation".Length)
                     
-New-H5Group /dataQualityInfo_1/lineage/source_4
+mkdir /dataQualityInfo_1/lineage/source_4
 cd /dataQualityInfo_1/lineage/source_4
 New-H5Attribute . sourceStep "UUID,UUID,UUID" string$("UUID,UUID,UUID".Length)
                     
 New-H5Attribute . uuid "UUID" string$("UUID".Length)
                     
-New-H5Group /dataQualityInfo_1/lineage/source_4/sourceCitation_1
+mkdir /dataQualityInfo_1/lineage/source_4/sourceCitation_1
 cd /dataQualityInfo_1/lineage/source_4/sourceCitation_1
 New-H5Attribute . edition "Input Antenna Pointing Data Product Edition" string$("Input Antenna Pointing Data Product Edition".Length)
                     
@@ -279,11 +279,11 @@ New-H5Attribute . title "http://smap.jpl.nasa.gov/InputAntennaPointingDataProduc
                     
 New-H5Attribute . uuid "UUID" string$("UUID".Length)
                     
-New-H5Group /dataQualityInfo_1/lineage/source_4/sourceCitation_1/date_1
+mkdir /dataQualityInfo_1/lineage/source_4/sourceCitation_1/date_1
 cd /dataQualityInfo_1/lineage/source_4/sourceCitation_1/date_1
 New-H5Attribute . dateType "creation" string$("creation".Length)
                     
-New-H5Group /dataQualityInfo_1/lineage/source_5
+mkdir /dataQualityInfo_1/lineage/source_5
 cd /dataQualityInfo_1/lineage/source_5
 New-H5Attribute . description "Digital Elevation Model Product Description" string$("Digital Elevation Model Product Description".Length)
                     
@@ -291,7 +291,7 @@ New-H5Attribute . sourceStep "UUID,UUID,UUID" string$("UUID,UUID,UUID".Length)
                     
 New-H5Attribute . uuid "UUID" string$("UUID".Length)
                     
-New-H5Group /dataQualityInfo_1/lineage/source_5/sourceCitation_1
+mkdir /dataQualityInfo_1/lineage/source_5/sourceCitation_1
 cd /dataQualityInfo_1/lineage/source_5/sourceCitation_1
 New-H5Attribute . edition "Digital Elevation Model Data Product Edition" string$("Digital Elevation Model Data Product Edition".Length)
                     
@@ -299,17 +299,17 @@ New-H5Attribute . title "http://smap.jpl.nasa.gov/DigitalElevationModelDataProdu
                     
 New-H5Attribute . uuid "UUID" string$("UUID".Length)
                     
-New-H5Group /dataQualityInfo_1/lineage/source_5/sourceCitation_1/date_1
+mkdir /dataQualityInfo_1/lineage/source_5/sourceCitation_1/date_1
 cd /dataQualityInfo_1/lineage/source_5/sourceCitation_1/date_1
 New-H5Attribute . dateType "creation" string$("creation".Length)
                     
-New-H5Group /dataQualityInfo_1/lineage/source_6
+mkdir /dataQualityInfo_1/lineage/source_6
 cd /dataQualityInfo_1/lineage/source_6
 New-H5Attribute . sourceStep "UUID,UUID,UUID" string$("UUID,UUID,UUID".Length)
                     
 New-H5Attribute . uuid "UUID" string$("UUID".Length)
                     
-New-H5Group /dataQualityInfo_1/lineage/source_6/sourceCitation_1
+mkdir /dataQualityInfo_1/lineage/source_6/sourceCitation_1
 cd /dataQualityInfo_1/lineage/source_6/sourceCitation_1
 New-H5Attribute . edition "Input Product Configuration File Edition" string$("Input Product Configuration File Edition".Length)
                     
@@ -317,17 +317,17 @@ New-H5Attribute . title "http://smap.jpl.nasa.gov/InputProductConfigurationFile.
                     
 New-H5Attribute . uuid "UUID" string$("UUID".Length)
                     
-New-H5Group /dataQualityInfo_1/lineage/source_6/sourceCitation_1/date_1
+mkdir /dataQualityInfo_1/lineage/source_6/sourceCitation_1/date_1
 cd /dataQualityInfo_1/lineage/source_6/sourceCitation_1/date_1
 New-H5Attribute . dateType "creation" string$("creation".Length)
                     
-New-H5Group /dataQualityInfo_1/lineage/source_7
+mkdir /dataQualityInfo_1/lineage/source_7
 cd /dataQualityInfo_1/lineage/source_7
 New-H5Attribute . sourceStep "UUID,UUID,UUID" string$("UUID,UUID,UUID".Length)
                     
 New-H5Attribute . uuid "UUID" string$("UUID".Length)
                     
-New-H5Group /dataQualityInfo_1/lineage/source_7/sourceCitation_1
+mkdir /dataQualityInfo_1/lineage/source_7/sourceCitation_1
 cd /dataQualityInfo_1/lineage/source_7/sourceCitation_1
 New-H5Attribute . edition "Output Product Configuration File Edition" string$("Output Product Configuration File Edition".Length)
                     
@@ -335,11 +335,11 @@ New-H5Attribute . title "http://smap.jpl.nasa.gov/OutputProductConfigurationFile
                     
 New-H5Attribute . uuid "UUID" string$("UUID".Length)
                     
-New-H5Group /dataQualityInfo_1/lineage/source_7/sourceCitation_1/date_1
+mkdir /dataQualityInfo_1/lineage/source_7/sourceCitation_1/date_1
 cd /dataQualityInfo_1/lineage/source_7/sourceCitation_1/date_1
 New-H5Attribute . dateType "creation" string$("creation".Length)
                     
-New-H5Group /dataQualityInfo_1/lineage/source_8
+mkdir /dataQualityInfo_1/lineage/source_8
 cd /dataQualityInfo_1/lineage/source_8
 New-H5Attribute . description "Metadata Configuration File Description" string$("Metadata Configuration File Description".Length)
                     
@@ -347,7 +347,7 @@ New-H5Attribute . sourceStep "UUID,UUID,UUID" string$("UUID,UUID,UUID".Length)
                     
 New-H5Attribute . uuid "UUID" string$("UUID".Length)
                     
-New-H5Group /dataQualityInfo_1/lineage/source_8/sourceCitation_1
+mkdir /dataQualityInfo_1/lineage/source_8/sourceCitation_1
 cd /dataQualityInfo_1/lineage/source_8/sourceCitation_1
 New-H5Attribute . edition "Metadata Configuration File Edition" string$("Metadata Configuration File Edition".Length)
                     
@@ -355,17 +355,17 @@ New-H5Attribute . title "http://smap.jpl.nasa.gov/MetadataConfigurationFile.h5" 
                     
 New-H5Attribute . uuid "UUID" string$("UUID".Length)
                     
-New-H5Group /dataQualityInfo_1/lineage/source_8/sourceCitation_1/date_1
+mkdir /dataQualityInfo_1/lineage/source_8/sourceCitation_1/date_1
 cd /dataQualityInfo_1/lineage/source_8/sourceCitation_1/date_1
 New-H5Attribute . dateType "creation" string$("creation".Length)
                     
-New-H5Group /dataQualityInfo_2
+mkdir /dataQualityInfo_2
 cd /dataQualityInfo_2
 New-H5Attribute . scope "dataset" string$("dataset".Length)
                     
-New-H5Group /dataQualityInfo_2/lineage
+mkdir /dataQualityInfo_2/lineage
 cd /dataQualityInfo_2/lineage
-New-H5Group /dataQualityInfo_2/lineage/processStep_1
+mkdir /dataQualityInfo_2/lineage/processStep_1
 cd /dataQualityInfo_2/lineage/processStep_1
 New-H5Attribute . dateTime "ProductionDateTime" string$("ProductionDateTime".Length)
                     
@@ -375,7 +375,7 @@ New-H5Attribute . source "UUID,UUID,UUID" string$("UUID,UUID,UUID".Length)
                     
 New-H5Attribute . uuid "UUID" string$("UUID".Length)
                     
-New-H5Group /dataQualityInfo_2/lineage/processStep_1/processor_1
+mkdir /dataQualityInfo_2/lineage/processStep_1/processor_1
 cd /dataQualityInfo_2/lineage/processStep_1/processor_1
 New-H5Attribute . organisationName "NASA/JPL/SMAP > Soil Moisture Active Passive, Jet Propulsion Laboratory, NASA" string$("NASA/JPL/SMAP > Soil Moisture Active Passive, Jet Propulsion Laboratory, NASA".Length)
                     
@@ -383,7 +383,7 @@ New-H5Attribute . role "processor" string$("processor".Length)
                     
 New-H5Attribute . uuid "UUID" string$("UUID".Length)
                     
-New-H5Group /dataQualityInfo_2/lineage/processStep_1/processor_1/onlineResource_1
+mkdir /dataQualityInfo_2/lineage/processStep_1/processor_1/onlineResource_1
 cd /dataQualityInfo_2/lineage/processStep_1/processor_1/onlineResource_1
 New-H5Attribute . function "information" string$("information".Length)
                     
@@ -391,7 +391,7 @@ New-H5Attribute . linkage "http://smap.jpl.nasa.gov/" string$("http://smap.jpl.n
                     
 New-H5Attribute . uuid "UUID" string$("UUID".Length)
                     
-New-H5Group /dataQualityInfo_2/lineage/source_1
+mkdir /dataQualityInfo_2/lineage/source_1
 cd /dataQualityInfo_2/lineage/source_1
 New-H5Attribute . description "Radar Level 1A Product Description" string$("Radar Level 1A Product Description".Length)
                     
@@ -399,7 +399,7 @@ New-H5Attribute . sourceStep "UUID,UUID,UUID" string$("UUID,UUID,UUID".Length)
                     
 New-H5Attribute . uuid "UUID" string$("UUID".Length)
                     
-New-H5Group /dataQualityInfo_2/lineage/source_1/sourceCitation_1
+mkdir /dataQualityInfo_2/lineage/source_1/sourceCitation_1
 cd /dataQualityInfo_2/lineage/source_1/sourceCitation_1
 New-H5Attribute . edition "Radar Level 1A Product Version" string$("Radar Level 1A Product Version".Length)
                     
@@ -407,7 +407,7 @@ New-H5Attribute . title "Radar Level 1A Product Name" string$("Radar Level 1A Pr
                     
 New-H5Attribute . uuid "UUID" string$("UUID".Length)
                     
-New-H5Group /dataQualityInfo_2/lineage/source_2
+mkdir /dataQualityInfo_2/lineage/source_2
 cd /dataQualityInfo_2/lineage/source_2
 New-H5Attribute . description "SMAP Epehemeris Data Product Description" string$("SMAP Epehemeris Data Product Description".Length)
                     
@@ -415,7 +415,7 @@ New-H5Attribute . sourceStep "UUID,UUID,UUID" string$("UUID,UUID,UUID".Length)
                     
 New-H5Attribute . uuid "UUID" string$("UUID".Length)
                     
-New-H5Group /dataQualityInfo_2/lineage/source_2/sourceCitation_1
+mkdir /dataQualityInfo_2/lineage/source_2/sourceCitation_1
 cd /dataQualityInfo_2/lineage/source_2/sourceCitation_1
 New-H5Attribute . edition "SMAP Epehemeris Data Product Version" string$("SMAP Epehemeris Data Product Version".Length)
                     
@@ -423,7 +423,7 @@ New-H5Attribute . title "SMAP Epehemeris Data Product Name" string$("SMAP Epehem
                     
 New-H5Attribute . uuid "UUID" string$("UUID".Length)
                     
-New-H5Group /dataQualityInfo_2/lineage/source_3
+mkdir /dataQualityInfo_2/lineage/source_3
 cd /dataQualityInfo_2/lineage/source_3
 New-H5Attribute . description "SMAP Attitude Data Product Description" string$("SMAP Attitude Data Product Description".Length)
                     
@@ -431,7 +431,7 @@ New-H5Attribute . sourceStep "UUID,UUID,UUID" string$("UUID,UUID,UUID".Length)
                     
 New-H5Attribute . uuid "UUID" string$("UUID".Length)
                     
-New-H5Group /dataQualityInfo_2/lineage/source_3/sourceCitation_1
+mkdir /dataQualityInfo_2/lineage/source_3/sourceCitation_1
 cd /dataQualityInfo_2/lineage/source_3/sourceCitation_1
 New-H5Attribute . edition "SMAP Attitude Data Product Version" string$("SMAP Attitude Data Product Version".Length)
                     
@@ -439,7 +439,7 @@ New-H5Attribute . title "SMAP Attitude Data Product Name" string$("SMAP Attitude
                     
 New-H5Attribute . uuid "UUID" string$("UUID".Length)
                     
-New-H5Group /dataQualityInfo_2/lineage/source_4
+mkdir /dataQualityInfo_2/lineage/source_4
 cd /dataQualityInfo_2/lineage/source_4
 New-H5Attribute . description "Input Antenna Pointing Data Product Description" string$("Input Antenna Pointing Data Product Description".Length)
                     
@@ -447,7 +447,7 @@ New-H5Attribute . sourceStep "UUID,UUID,UUID" string$("UUID,UUID,UUID".Length)
                     
 New-H5Attribute . uuid "UUID" string$("UUID".Length)
                     
-New-H5Group /dataQualityInfo_2/lineage/source_4/sourceCitation_1
+mkdir /dataQualityInfo_2/lineage/source_4/sourceCitation_1
 cd /dataQualityInfo_2/lineage/source_4/sourceCitation_1
 New-H5Attribute . edition "Input Antenna Pointing Data Product Version" string$("Input Antenna Pointing Data Product Version".Length)
                     
@@ -455,7 +455,7 @@ New-H5Attribute . title "Input Antenna Pointing Data Product Name" string$("Inpu
                     
 New-H5Attribute . uuid "UUID" string$("UUID".Length)
                     
-New-H5Group /dataQualityInfo_2/lineage/source_5
+mkdir /dataQualityInfo_2/lineage/source_5
 cd /dataQualityInfo_2/lineage/source_5
 New-H5Attribute . description "Digital Elevation Model Product Description" string$("Digital Elevation Model Product Description".Length)
                     
@@ -463,7 +463,7 @@ New-H5Attribute . sourceStep "UUID,UUID,UUID" string$("UUID,UUID,UUID".Length)
                     
 New-H5Attribute . uuid "UUID" string$("UUID".Length)
                     
-New-H5Group /dataQualityInfo_2/lineage/source_5/sourceCitation_1
+mkdir /dataQualityInfo_2/lineage/source_5/sourceCitation_1
 cd /dataQualityInfo_2/lineage/source_5/sourceCitation_1
 New-H5Attribute . edition "Digital Elevation Model Product Version" string$("Digital Elevation Model Product Version".Length)
                     
@@ -471,7 +471,7 @@ New-H5Attribute . title "Digital Elevation Model Product Name" string$("Digital 
                     
 New-H5Attribute . uuid "UUID" string$("UUID".Length)
                     
-New-H5Group /dataQualityInfo_2/lineage/source_6
+mkdir /dataQualityInfo_2/lineage/source_6
 cd /dataQualityInfo_2/lineage/source_6
 New-H5Attribute . description "Input Product Configuration File Description" string$("Input Product Configuration File Description".Length)
                     
@@ -479,7 +479,7 @@ New-H5Attribute . sourceStep "UUID,UUID,UUID" string$("UUID,UUID,UUID".Length)
                     
 New-H5Attribute . uuid "UUID" string$("UUID".Length)
                     
-New-H5Group /dataQualityInfo_2/lineage/source_6/sourceCitation_1
+mkdir /dataQualityInfo_2/lineage/source_6/sourceCitation_1
 cd /dataQualityInfo_2/lineage/source_6/sourceCitation_1
 New-H5Attribute . edition "Input Product Configuration File Version" string$("Input Product Configuration File Version".Length)
                     
@@ -487,7 +487,7 @@ New-H5Attribute . title "Input Product Configuration File Name" string$("Input P
                     
 New-H5Attribute . uuid "UUID" string$("UUID".Length)
                     
-New-H5Group /dataQualityInfo_2/lineage/source_7
+mkdir /dataQualityInfo_2/lineage/source_7
 cd /dataQualityInfo_2/lineage/source_7
 New-H5Attribute . description "Output Product Configuration File Description" string$("Output Product Configuration File Description".Length)
                     
@@ -495,7 +495,7 @@ New-H5Attribute . sourceStep "UUID,UUID,UUID" string$("UUID,UUID,UUID".Length)
                     
 New-H5Attribute . uuid "UUID" string$("UUID".Length)
                     
-New-H5Group /dataQualityInfo_2/lineage/source_7/sourceCitation_1
+mkdir /dataQualityInfo_2/lineage/source_7/sourceCitation_1
 cd /dataQualityInfo_2/lineage/source_7/sourceCitation_1
 New-H5Attribute . edition "Output Product Configuration File Version" string$("Output Product Configuration File Version".Length)
                     
@@ -503,7 +503,7 @@ New-H5Attribute . title "Output Product Configuration File Name" string$("Output
                     
 New-H5Attribute . uuid "UUID" string$("UUID".Length)
                     
-New-H5Group /dataQualityInfo_2/lineage/source_8
+mkdir /dataQualityInfo_2/lineage/source_8
 cd /dataQualityInfo_2/lineage/source_8
 New-H5Attribute . description "Metadata Configuration File Description" string$("Metadata Configuration File Description".Length)
                     
@@ -511,7 +511,7 @@ New-H5Attribute . sourceStep "UUID,UUID,UUID" string$("UUID,UUID,UUID".Length)
                     
 New-H5Attribute . uuid "UUID" string$("UUID".Length)
                     
-New-H5Group /dataQualityInfo_2/lineage/source_8/sourceCitation_1
+mkdir /dataQualityInfo_2/lineage/source_8/sourceCitation_1
 cd /dataQualityInfo_2/lineage/source_8/sourceCitation_1
 New-H5Attribute . edition "Metadata Configuration File Version" string$("Metadata Configuration File Version".Length)
                     
@@ -519,11 +519,11 @@ New-H5Attribute . title "Metadata Configuration File Name" string$("Metadata Con
                     
 New-H5Attribute . uuid "UUID" string$("UUID".Length)
                     
-New-H5Group /identificationInfo_1
+mkdir /identificationInfo_1
 cd /identificationInfo_1
 New-H5Attribute . summary "CollectionDescription]" string$("CollectionDescription]".Length)
                     
-New-H5Group /identificationInfo_1/citation_1
+mkdir /identificationInfo_1/citation_1
 cd /identificationInfo_1/citation_1
 New-H5Attribute . identifier "/gmi:MI_Metadata/gmd:identificationInfo[1]/gmd:MD_DataIdentification[1]/gmd:citation[1]/gmd:CI_Citation[1]/gmd:identifier[1]/gmd:MD_Identifier[1]/gmd:code[1]/gco:CharacterString[1]" string$("/gmi:MI_Metadata/gmd:identificationInfo[1]/gmd:MD_DataIdentification[1]/gmd:citation[1]/gmd:CI_Citation[1]/gmd:identifier[1]/gmd:MD_Identifier[1]/gmd:code[1]/gco:CharacterString[1]".Length)
                     
@@ -531,7 +531,7 @@ New-H5Attribute . title "GranuleName" string$("GranuleName".Length)
                     
 New-H5Attribute . uuid "UUID" string$("UUID".Length)
                     
-New-H5Group /identificationInfo_1/citation_1/citedResponsibleParty_1
+mkdir /identificationInfo_1/citation_1/citedResponsibleParty_1
 cd /identificationInfo_1/citation_1/citedResponsibleParty_1
 New-H5Attribute . organisationName "NASA/JPL/SMAP > Soil Moisture Active Passive, Jet Propulsion Laboratory, NASA" string$("NASA/JPL/SMAP > Soil Moisture Active Passive, Jet Propulsion Laboratory, NASA".Length)
                     
@@ -539,7 +539,7 @@ New-H5Attribute . role "originator" string$("originator".Length)
                     
 New-H5Attribute . uuid "UUID" string$("UUID".Length)
                     
-New-H5Group /identificationInfo_1/citation_1/citedResponsibleParty_1/onlineResource_1
+mkdir /identificationInfo_1/citation_1/citedResponsibleParty_1/onlineResource_1
 cd /identificationInfo_1/citation_1/citedResponsibleParty_1/onlineResource_1
 New-H5Attribute . function "information" string$("information".Length)
                     
@@ -547,12 +547,12 @@ New-H5Attribute . linkage "http://smap.jpl.nasa.gov/" string$("http://smap.jpl.n
                     
 New-H5Attribute . uuid "UUID" string$("UUID".Length)
                     
-New-H5Group /identificationInfo_1/citation_1/date_1
+mkdir /identificationInfo_1/citation_1/date_1
 cd /identificationInfo_1/citation_1/date_1
 New-H5Attribute . date ' '  string1
 New-H5Attribute . dateType "creation" string$("creation".Length)
                     
-New-H5Group /identificationInfo_1/extent_1
+mkdir /identificationInfo_1/extent_1
 cd /identificationInfo_1/extent_1
 New-H5Attribute . beginPosition "RangeBeginningDateTRangeBeginningTime" string$("RangeBeginningDateTRangeBeginningTime".Length)
                     
@@ -570,7 +570,7 @@ New-H5Attribute . uuid "UUID" string$("UUID".Length)
                     
 New-H5Attribute . westBoundLongitude "WestBoundingCoordinate" string$("WestBoundingCoordinate".Length)
                     
-New-H5Group /identificationInfo_1/pointOfContact_1
+mkdir /identificationInfo_1/pointOfContact_1
 cd /identificationInfo_1/pointOfContact_1
 New-H5Attribute . organisationName "NASA/JPL/SMAP > Soil Moisture Active Passive, Jet Propulsion Laboratory, NASA" string$("NASA/JPL/SMAP > Soil Moisture Active Passive, Jet Propulsion Laboratory, NASA".Length)
                     
@@ -578,7 +578,7 @@ New-H5Attribute . role "pointOfContact" string$("pointOfContact".Length)
                     
 New-H5Attribute . uuid "UUID" string$("UUID".Length)
                     
-New-H5Group /identificationInfo_1/pointOfContact_1/onlineResource_1
+mkdir /identificationInfo_1/pointOfContact_1/onlineResource_1
 cd /identificationInfo_1/pointOfContact_1/onlineResource_1
 New-H5Attribute . function "information" string$("information".Length)
                     
@@ -586,13 +586,13 @@ New-H5Attribute . linkage "http://smap.jpl.nasa.gov/" string$("http://smap.jpl.n
                     
 New-H5Attribute . uuid "UUID" string$("UUID".Length)
                     
-New-H5Group /identificationInfo_2
+mkdir /identificationInfo_2
 cd /identificationInfo_2
 New-H5Attribute . purpose "Scientific Research and Understanding" string$("Scientific Research and Understanding".Length)
                     
 New-H5Attribute . summary "CollectionDescription" string$("CollectionDescription".Length)
                     
-New-H5Group /identificationInfo_2/citation_1
+mkdir /identificationInfo_2/citation_1
 cd /identificationInfo_2/citation_1
 New-H5Attribute . edition "VersionID" string$("VersionID".Length)
                     
@@ -602,7 +602,7 @@ New-H5Attribute . title "ShortName > LongName" string$("ShortName > LongName".Le
                     
 New-H5Attribute . uuid "UUID" string$("UUID".Length)
                     
-New-H5Group /identificationInfo_2/citation_1/citedResponsibleParty_1
+mkdir /identificationInfo_2/citation_1/citedResponsibleParty_1
 cd /identificationInfo_2/citation_1/citedResponsibleParty_1
 New-H5Attribute . organisationName "NASA/JPL/SMAP > Soil Moisture Active Passive, Jet Propulsion Laboratory, NASA" string$("NASA/JPL/SMAP > Soil Moisture Active Passive, Jet Propulsion Laboratory, NASA".Length)
                     
@@ -610,7 +610,7 @@ New-H5Attribute . role "originator" string$("originator".Length)
                     
 New-H5Attribute . uuid "UUID" string$("UUID".Length)
                     
-New-H5Group /identificationInfo_2/citation_1/citedResponsibleParty_1/onlineResource_1
+mkdir /identificationInfo_2/citation_1/citedResponsibleParty_1/onlineResource_1
 cd /identificationInfo_2/citation_1/citedResponsibleParty_1/onlineResource_1
 New-H5Attribute . function "information" string$("information".Length)
                     
@@ -618,12 +618,12 @@ New-H5Attribute . linkage "http://smap.jpl.nasa.gov/" string$("http://smap.jpl.n
                     
 New-H5Attribute . uuid "UUID" string$("UUID".Length)
                     
-New-H5Group /identificationInfo_2/citation_1/date_1
+mkdir /identificationInfo_2/citation_1/date_1
 cd /identificationInfo_2/citation_1/date_1
 New-H5Attribute . date ' '  string1
 New-H5Attribute . dateType "publication" string$("publication".Length)
                     
-New-H5Group /identificationInfo_2/descriptiveKeywords_1
+mkdir /identificationInfo_2/descriptiveKeywords_1
 cd /identificationInfo_2/descriptiveKeywords_1
 New-H5Attribute . keyword_1 "keyword_1" string$("keyword_1".Length)
                     
@@ -633,127 +633,127 @@ New-H5Attribute . keyword_3 "keyword_3" string$("keyword_3".Length)
                     
 New-H5Attribute . type "theme" string$("theme".Length)
                     
-New-H5Group /identificationInfo_2/descriptiveKeywords_1/thesaurusName_1
+mkdir /identificationInfo_2/descriptiveKeywords_1/thesaurusName_1
 cd /identificationInfo_2/descriptiveKeywords_1/thesaurusName_1
 New-H5Attribute . title "title" string$("title".Length)
                     
 New-H5Attribute . uuid "UUID" string$("UUID".Length)
                     
-New-H5Group /identificationInfo_2/descriptiveKeywords_1/thesaurusName_1/date_1
+mkdir /identificationInfo_2/descriptiveKeywords_1/thesaurusName_1/date_1
 cd /identificationInfo_2/descriptiveKeywords_1/thesaurusName_1/date_1
 New-H5Attribute . date "date" string$("date".Length)
                     
 New-H5Attribute . dateType "revision" string$("revision".Length)
                     
-New-H5Group /identificationInfo_2/descriptiveKeywords_2
+mkdir /identificationInfo_2/descriptiveKeywords_2
 cd /identificationInfo_2/descriptiveKeywords_2
 New-H5Attribute . keyword "SMAP > Soil Moisture Active Passive" string$("SMAP > Soil Moisture Active Passive".Length)
                     
 New-H5Attribute . type "project" string$("project".Length)
                     
-New-H5Group /identificationInfo_2/descriptiveKeywords_2/thesaurusName_1
+mkdir /identificationInfo_2/descriptiveKeywords_2/thesaurusName_1
 cd /identificationInfo_2/descriptiveKeywords_2/thesaurusName_1
 New-H5Attribute . title "GCMD Project Keywords" string$("GCMD Project Keywords".Length)
                     
 New-H5Attribute . uuid "UUID" string$("UUID".Length)
                     
-New-H5Group /identificationInfo_2/descriptiveKeywords_2/thesaurusName_1/date_1
+mkdir /identificationInfo_2/descriptiveKeywords_2/thesaurusName_1/date_1
 cd /identificationInfo_2/descriptiveKeywords_2/thesaurusName_1/date_1
 New-H5Attribute . date "date" string$("date".Length)
                     
 New-H5Attribute . dateType "revision" string$("revision".Length)
                     
-New-H5Group /identificationInfo_2/descriptiveKeywords_3
+mkdir /identificationInfo_2/descriptiveKeywords_3
 cd /identificationInfo_2/descriptiveKeywords_3
 New-H5Attribute . keyword "keyword_1" string$("keyword_1".Length)
                     
 New-H5Attribute . type "dataCenter" string$("dataCenter".Length)
                     
-New-H5Group /identificationInfo_2/descriptiveKeywords_3/thesaurusName_1
+mkdir /identificationInfo_2/descriptiveKeywords_3/thesaurusName_1
 cd /identificationInfo_2/descriptiveKeywords_3/thesaurusName_1
 New-H5Attribute . title "title" string$("title".Length)
                     
 New-H5Attribute . uuid "UUID" string$("UUID".Length)
                     
-New-H5Group /identificationInfo_2/descriptiveKeywords_3/thesaurusName_1/date_1
+mkdir /identificationInfo_2/descriptiveKeywords_3/thesaurusName_1/date_1
 cd /identificationInfo_2/descriptiveKeywords_3/thesaurusName_1/date_1
 New-H5Attribute . date "date" string$("date".Length)
                     
 New-H5Attribute . dateType "revision" string$("revision".Length)
                     
-New-H5Group /identificationInfo_2/descriptiveKeywords_4
+mkdir /identificationInfo_2/descriptiveKeywords_4
 cd /identificationInfo_2/descriptiveKeywords_4
 New-H5Attribute . keyword "keyword_1" string$("keyword_1".Length)
                     
 New-H5Attribute . type "place" string$("place".Length)
                     
-New-H5Group /identificationInfo_2/descriptiveKeywords_4/thesaurusName_1
+mkdir /identificationInfo_2/descriptiveKeywords_4/thesaurusName_1
 cd /identificationInfo_2/descriptiveKeywords_4/thesaurusName_1
 New-H5Attribute . title "title" string$("title".Length)
                     
 New-H5Attribute . uuid "UUID" string$("UUID".Length)
                     
-New-H5Group /identificationInfo_2/descriptiveKeywords_4/thesaurusName_1/date_1
+mkdir /identificationInfo_2/descriptiveKeywords_4/thesaurusName_1/date_1
 cd /identificationInfo_2/descriptiveKeywords_4/thesaurusName_1/date_1
 New-H5Attribute . date "date" string$("date".Length)
                     
 New-H5Attribute . dateType "revision" string$("revision".Length)
                     
-New-H5Group /identificationInfo_2/descriptiveKeywords_5
+mkdir /identificationInfo_2/descriptiveKeywords_5
 cd /identificationInfo_2/descriptiveKeywords_5
 New-H5Attribute . keyword "keyword_1" string$("keyword_1".Length)
                     
 New-H5Attribute . type "instrument" string$("instrument".Length)
                     
-New-H5Group /identificationInfo_2/descriptiveKeywords_5/thesaurusName_1
+mkdir /identificationInfo_2/descriptiveKeywords_5/thesaurusName_1
 cd /identificationInfo_2/descriptiveKeywords_5/thesaurusName_1
 New-H5Attribute . title "title" string$("title".Length)
                     
 New-H5Attribute . uuid "UUID" string$("UUID".Length)
                     
-New-H5Group /identificationInfo_2/descriptiveKeywords_5/thesaurusName_1/date_1
+mkdir /identificationInfo_2/descriptiveKeywords_5/thesaurusName_1/date_1
 cd /identificationInfo_2/descriptiveKeywords_5/thesaurusName_1/date_1
 New-H5Attribute . date "date" string$("date".Length)
                     
 New-H5Attribute . dateType "revision" string$("revision".Length)
                     
-New-H5Group /identificationInfo_2/descriptiveKeywords_6
+mkdir /identificationInfo_2/descriptiveKeywords_6
 cd /identificationInfo_2/descriptiveKeywords_6
 New-H5Attribute . keyword "keyword_1" string$("keyword_1".Length)
                     
 New-H5Attribute . type "platform" string$("platform".Length)
                     
-New-H5Group /identificationInfo_2/descriptiveKeywords_6/thesaurusName_1
+mkdir /identificationInfo_2/descriptiveKeywords_6/thesaurusName_1
 cd /identificationInfo_2/descriptiveKeywords_6/thesaurusName_1
 New-H5Attribute . title "title" string$("title".Length)
                     
 New-H5Attribute . uuid "UUID" string$("UUID".Length)
                     
-New-H5Group /identificationInfo_2/descriptiveKeywords_6/thesaurusName_1/date_1
+mkdir /identificationInfo_2/descriptiveKeywords_6/thesaurusName_1/date_1
 cd /identificationInfo_2/descriptiveKeywords_6/thesaurusName_1/date_1
 New-H5Attribute . date "date" string$("date".Length)
                     
 New-H5Attribute . dateType "revision" string$("revision".Length)
                     
-New-H5Group /identificationInfo_2/descriptiveKeywords_7
+mkdir /identificationInfo_2/descriptiveKeywords_7
 cd /identificationInfo_2/descriptiveKeywords_7
 New-H5Attribute . keyword "keyword_1" string$("keyword_1".Length)
                     
 New-H5Attribute . type "dataResolution" string$("dataResolution".Length)
                     
-New-H5Group /identificationInfo_2/descriptiveKeywords_7/thesaurusName_1
+mkdir /identificationInfo_2/descriptiveKeywords_7/thesaurusName_1
 cd /identificationInfo_2/descriptiveKeywords_7/thesaurusName_1
 New-H5Attribute . title "title" string$("title".Length)
                     
 New-H5Attribute . uuid "UUID" string$("UUID".Length)
                     
-New-H5Group /identificationInfo_2/descriptiveKeywords_7/thesaurusName_1/date_1
+mkdir /identificationInfo_2/descriptiveKeywords_7/thesaurusName_1/date_1
 cd /identificationInfo_2/descriptiveKeywords_7/thesaurusName_1/date_1
 New-H5Attribute . date "date" string$("date".Length)
                     
 New-H5Attribute . dateType "revision" string$("revision".Length)
                     
-New-H5Group /identificationInfo_2/extent_1
+mkdir /identificationInfo_2/extent_1
 cd /identificationInfo_2/extent_1
 New-H5Attribute . beginPosition "seriesBeginningDate" string$("seriesBeginningDate".Length)
                     
@@ -770,7 +770,7 @@ New-H5Attribute . uuid "UUID" string$("UUID".Length)
                     
 New-H5Attribute . westBoundLongitude "WestBoundingCoordinate" string$("WestBoundingCoordinate".Length)
                     
-New-H5Group /identificationInfo_2/pointOfContact_1
+mkdir /identificationInfo_2/pointOfContact_1
 cd /identificationInfo_2/pointOfContact_1
 New-H5Attribute . organisationName "NASA > National Aeronautics and Space Administration" string$("NASA > National Aeronautics and Space Administration".Length)
                     
@@ -778,7 +778,7 @@ New-H5Attribute . role "pointOfContact" string$("pointOfContact".Length)
                     
 New-H5Attribute . uuid "UUID" string$("UUID".Length)
                     
-New-H5Group /identificationInfo_2/pointOfContact_1/onlineResource_1
+mkdir /identificationInfo_2/pointOfContact_1/onlineResource_1
 cd /identificationInfo_2/pointOfContact_1/onlineResource_1
 New-H5Attribute . function "pointOfContact" string$("pointOfContact".Length)
                     
@@ -786,7 +786,7 @@ New-H5Attribute . linkage "http://smap.jpl.nasa.gov/" string$("http://smap.jpl.n
                     
 New-H5Attribute . uuid "UUID" string$("UUID".Length)
                     
-New-H5Group /orbitalInformation
+mkdir /orbitalInformation
 cd /orbitalInformation
 New-H5Attribute . argumentOfPerigee "555.555" string$("555.555".Length)
                     
@@ -798,7 +798,7 @@ New-H5Attribute . period "444.444" string$("444.444".Length)
                     
 New-H5Attribute . semiMajorAxis "333.333" string$("333.333".Length)
                     
-New-H5Group /processingInformation
+mkdir /processingInformation
 cd /processingInformation
 New-H5Attribute . RFIThreshold ' '  string1
 New-H5Attribute . permanentWaterBodyThreshold "47.5" string$("47.5".Length)
