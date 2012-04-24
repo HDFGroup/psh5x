@@ -7,6 +7,10 @@ New-Alias Get-H5Member Get-ChildItem
 
 New-Alias Get-H5Item Get-Item
 
+New-Alias h5mount New-H5Drive
+
+New-Alias h5unmount Remove-H5Drive
+
 New-Alias Move-H5Attribute Move-ItemProperty
 
 New-Alias Move-H5Item Move-Item
