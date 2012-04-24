@@ -60,11 +60,11 @@
         <h2>Downloads (coming soon)</h2>
         <ul>
             <li>PSH5X Alpha .NET 4 (x86) built against <a
-                    href="http://www.hdfgroup.org/ftp/HDF5/current/bin/windows/HDF5188-win32-shared.zip"
-                    > HDF5 1.8.8</a></li>
+                    href="http://www.hdfgroup.org/ftp/HDF5/current/bin/windows/HDF5189-win32-shared.zip"
+                    > HDF5 1.8.9</a></li>
             <li>PSH5X Alpha .NET 4 (x86_64) built against <a
-                    href="http://www.hdfgroup.org/ftp/HDF5/current/bin/windows/HDF5188-win64-shared.zip"
-                    >HDF5 1.8.8</a></li>
+                    href="http://www.hdfgroup.org/ftp/HDF5/current/bin/windows/HDF5189-win64-shared.zip"
+                    >HDF5 1.8.9</a></li>
             <li>PSH5X Source</li>
             <li>PSH5X Examples</li>
         </ul>
@@ -86,6 +86,25 @@
                     >blog entry</a> and this <a
                     href="http://stackoverflow.com/questions/2094694/how-can-i-run-powershell-with-the-net-4-runtime"
                     >forum post</a>. </li>
+            <li>At this point, you may try running <tt>Import-Module HDF5</tt>. There's a chance
+                that instead of a cheerful &quot;Welcome to HDF5!&quot; greeting you'll see an error
+                message telling you that <tt>... cannot be loaded because the execution of scripts
+                    is disabled on this system.</tt> By default, PowerShell can't run any scripts.
+                If and what kind of scripts you can execute is governed by a so-called execution
+                policy. Your system administrator may have set that or it still has the default
+                value of <tt>Restricted</tt>, which is a euphemism for 'no scripts'. The
+                    <tt>Set-ExecutionPolicy</tt> cmdlet lets you adjust what kind of scripts are
+                allowed to run. Running <tt>Set-ExecutionPolicy</tt> without a <tt>-Scope</tt>
+                argument will change the registry and requires administrative privileges. Your
+                options are: <ul>
+                    <li>You have administrative rights on the machine: Run PowerShell as
+                        administrator and adjust the execution policy as follows
+                            <tt>Set-ExecutionPolicy RemoteSigned</tt></li>
+                    <li>You don't have administrative rights on the machine: Adjust the execution
+                        policy for just this session as follows <tt>Set-ExecutionPolicy -Scope Process
+                        RemoteSigned</tt></li>
+                </ul>
+            </li>
         </ol>
         <p>If you did everything right, when importing the HDF5 module, you should see something
             like this:</p>
