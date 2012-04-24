@@ -1388,6 +1388,9 @@ namespace PSH5X
         m_item_types["EXT"] = "EXTLINK";
 
 
+		m_item_types["DIRECTORY"] = "GROUP";
+		m_item_types["DIR"] = "GROUP";
+
         m_item_types["GROUP"] = "GROUP";
         m_item_types["GRP"] = "GROUP";
         m_item_types["GR"] = "GROUP";

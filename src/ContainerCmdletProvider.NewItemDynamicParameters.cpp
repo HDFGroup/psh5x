@@ -162,7 +162,7 @@ namespace PSH5X
 
             dict->Add("Definition", paramTypeDef);
         }
-        else if (itemTypeName->ToUpper() == "GROUP")
+        else if (itemTypeName->ToUpper() == "DIRECTORY" || itemTypeName->ToUpper() == "GROUP")
         {
 #pragma region Group
 
