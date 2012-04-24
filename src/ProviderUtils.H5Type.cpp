@@ -1857,7 +1857,7 @@ namespace PSH5X
 		}
 		else if (t->StartsWith("STRING"))
         {
-#pragma region fixed-length FORTRAN or variable-length ASCII string
+#pragma region fixed-length null-padded or variable-length ASCII string
 
 			if (t == "STRING")
             {
@@ -1879,8 +1879,7 @@ namespace PSH5X
 							throw gcnew HDF5Exception("H5Tcreate failed!");
 						}
 						isString = true;
-						// FORTRAN!!!
-						if (H5Tset_strpad(result, H5T_STR_SPACEPAD) < 0) {
+						if (H5Tset_strpad(result, H5T_STR_NULLPAD) < 0) {
 							throw gcnew HDF5Exception("H5Tset_strpad failed!"); 
 						}
 					}

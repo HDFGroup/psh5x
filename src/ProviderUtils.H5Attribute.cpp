@@ -371,9 +371,8 @@ namespace PSH5X
 
 								vrdata = new char* [npoints];
 
-								mtype = H5Tcopy(H5T_C_S1);
-								if (H5Tset_size(mtype, H5T_VARIABLE) < 0) {
-									throw gcnew HDF5Exception("H5Tset_size failed!");
+								if ((mtype = H5Tcreate(H5T_STRING, H5T_VARIABLE)) < 0) {
+									throw gcnew HDF5Exception("H5Tcreate failed!");
 								}
 
 								if (H5Aread(aid, mtype, vrdata) < 0) {
@@ -408,9 +407,8 @@ namespace PSH5X
 								{
 									rdata[i] = rdata[0] + i * (size+1);
 								}
-								mtype = H5Tcopy(H5T_C_S1);
-								if (H5Tset_size(mtype, size+1) < 0) {
-									throw gcnew HDF5Exception("H5Tset_size failed!");
+								if ((mtype = H5Tcreate(H5T_STRING, size+1)) < 0) {
+									throw gcnew HDF5Exception("H5Tcreate failed!");
 								}
 								if (H5Aread(aid, mtype, rdata[0]) < 0) {
 									throw gcnew HDF5Exception("H5Aread failed!");
@@ -733,9 +731,8 @@ namespace PSH5X
 						{
 							vwdata[0] = (char*) Marshal::StringToHGlobalAnsi(astring).ToPointer();
 
-							mtype = H5Tcopy(H5T_C_S1);
-							if (H5Tset_size(mtype, H5T_VARIABLE) < 0) {
-								throw gcnew HDF5Exception("H5Tset_size failed!");
+							if ((mtype = H5Tcreate(H5T_STRING, H5T_VARIABLE)) < 0) {
+								throw gcnew HDF5Exception("H5Tcreate failed!");
 							}
 
 							if (H5Awrite(aid, mtype, vwdata) < 0) {
@@ -748,17 +745,21 @@ namespace PSH5X
 					}
 					else if (is_vlen == 0)
 					{
+						H5T_str_t spad = H5Tget_strpad(ftype);
+
 						if (ProviderUtils::TryGetValue(value, astring))
 						{
-							if (astring->Length > size-1) {
+							if ((spad == H5T_STR_NULLTERM && astring->Length > size-1) ||
+									astring->Length > size) {
 								throw gcnew PSH5XException("String too long!");
 							}
 
 							wdata = (char*) Marshal::StringToHGlobalAnsi(astring).ToPointer();
-							mtype = H5Tcopy(H5T_C_S1);
-							if (H5Tset_size(mtype, size) < 0) {
-								throw gcnew HDF5Exception("H5Tset_size failed!!!");
+
+							if ((mtype = H5Tcreate(H5T_STRING, size)) < 0) {
+								throw gcnew HDF5Exception("H5Tcreate failed!");
 							}
+
 							if (H5Awrite(aid, mtype, wdata) < 0) {
 								throw gcnew HDF5Exception("H5Awrite failed!");
 							}
@@ -1068,6 +1069,8 @@ namespace PSH5X
 					}
 					else if (is_vlen == 0)
 					{
+						H5T_str_t spad = H5Tget_strpad(ftype);
+
 						wdata = new char* [npoints];
 						wdata[0] = new char [npoints*(size+1)];
 						for (i = 1; i < npoints; ++i)
@@ -1081,7 +1084,8 @@ namespace PSH5X
 						{
 							for (i = 0; i < npoints; ++i)
 							{
-								if (astring[i]->Length > size) {
+								if ((spad == H5T_STR_NULLTERM && astring[i]->Length > size-1) ||
+									astring[i]->Length > size) {
 									throw gcnew PSH5XException("String too long!");
 								}
 							}

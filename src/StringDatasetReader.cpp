@@ -111,7 +111,7 @@ namespace PSH5X
 			{
 				size_t size = H5Tget_size(ftype);
 
-				if (H5Tget_strpad(ftype) == H5T_STR_SPACEPAD) { // FORTRAN
+				if (H5Tget_strpad(ftype) == H5T_STR_SPACEPAD || H5Tget_strpad(ftype) == H5T_STR_NULLPAD ) {
 					++size;
 				}
 

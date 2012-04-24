@@ -29,7 +29,7 @@ foreach ($f in $flavors)
     foreach ($i in 0..2) {
         foreach ($j in 0..1) {
             if ($value[$i, $j] -ne $a[$i, $j]) {
-                "$($value[$i, $j]) != $($a[$i, $j])"
+                Write-Error "$($value[$i, $j]) != $($a[$i, $j])"
             }
         }
     }

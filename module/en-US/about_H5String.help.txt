@@ -53,7 +53,7 @@ ABBREVIATIONS
         "Class"    : "String" ,
         "Encoding" : "ASCII" ,
         "Size"     : N ,
-        "StrPad"   : "Spacepad" 
+        "StrPad"   : "Nullpad" 
     }
 
     'ucstringN', where N is a positive integer, is equivalent to:
