@@ -116,27 +116,43 @@ namespace PSH5X
             {
 #pragma region HDF5 group
 
+				bool trackAttrOrder = false;
+				bool indexAttrOrder = false;
+				bool trackLinkOrder = false;
+				bool indexLinkOrder = false;
+
 				gcplist = H5Pcreate(H5P_GROUP_CREATE);
 				unsigned int flags = 0;
 				
 				RuntimeDefinedParameterDictionary^ dynamicParameters =
                     (RuntimeDefinedParameterDictionary^) DynamicParameters;
 
-				bool trackAttrOrder = (dynamicParameters["TrackAttributeOrder"]->IsSet);
-				bool indexAttrOrder = (dynamicParameters["IndexAttributeOrder"]->IsSet);
-				if (trackAttrOrder) { flags |= H5P_CRT_ORDER_TRACKED; }
-				if (indexAttrOrder) { flags |= H5P_CRT_ORDER_TRACKED|H5P_CRT_ORDER_INDEXED; }
-				if(H5Pset_attr_creation_order(gcplist, flags) < 0) {
-					throw gcnew HDF5Exception("H5Pset_attr_creation_order failed!!!");
-				}
+				if (dynamicParameters != nullptr)
+				{
+					if (dynamicParameters->ContainsKey("TrackAttributeOrder")) {
+						trackAttrOrder = dynamicParameters["TrackAttributeOrder"]->IsSet;
+					}
+					if (dynamicParameters->ContainsKey("IndexAttributeOrder")) {
+						indexAttrOrder = dynamicParameters["IndexAttributeOrder"]->IsSet;
+					}
+					if (trackAttrOrder) { flags |= H5P_CRT_ORDER_TRACKED; }
+					if (indexAttrOrder) { flags |= H5P_CRT_ORDER_TRACKED|H5P_CRT_ORDER_INDEXED; }
+					if(H5Pset_attr_creation_order(gcplist, flags) < 0) {
+						throw gcnew HDF5Exception("H5Pset_attr_creation_order failed!!!");
+					}
 
-				bool trackLinkOrder = (dynamicParameters["TrackLinkOrder"]->IsSet);
-				bool indexLinkOrder = (dynamicParameters["IndexLinkOrder"]->IsSet);
-				flags = 0;
-				if (trackLinkOrder) { flags |= H5P_CRT_ORDER_TRACKED; }
-				if (indexLinkOrder) { flags |= H5P_CRT_ORDER_TRACKED|H5P_CRT_ORDER_INDEXED; }
-				if(H5Pset_link_creation_order(gcplist, flags) < 0) {
-					throw gcnew HDF5Exception("H5Pset_link_creation_order failed!!!");
+					if (dynamicParameters->ContainsKey("TrackLinkOrder")) {
+						trackLinkOrder = dynamicParameters["TrackLinkOrder"]->IsSet;
+					}
+					if (dynamicParameters->ContainsKey("IndexLinkOrder")) {
+						indexLinkOrder = dynamicParameters["IndexLinkOrder"]->IsSet;
+					}
+					flags = 0;
+					if (trackLinkOrder) { flags |= H5P_CRT_ORDER_TRACKED; }
+					if (indexLinkOrder) { flags |= H5P_CRT_ORDER_TRACKED|H5P_CRT_ORDER_INDEXED; }
+					if(H5Pset_link_creation_order(gcplist, flags) < 0) {
+						throw gcnew HDF5Exception("H5Pset_link_creation_order failed!!!");
+					}
 				}
 
                 if (this->ShouldProcess(h5path,

@@ -73,7 +73,7 @@ namespace PSH5X
     {
         WriteVerbose(String::Format("HDF5Provider::ItemExists(Path = '{0}')",path));
 
-        DriveInfo^ drive = nullptr;
+		DriveInfo^ drive = nullptr;
         String^ h5path = nullptr;
 
         if (!ProviderUtils::TryGetDriveEtH5Path(path, ProviderInfo, drive, h5path)) {
@@ -83,8 +83,7 @@ namespace PSH5X
 		bool resolvableCheck = false;
 		RuntimeDefinedParameterDictionary^ dynamicParameters =
 			(RuntimeDefinedParameterDictionary^) DynamicParameters;
-		if (dynamicParameters != nullptr && dynamicParameters->ContainsKey("Resolvable"))
-		{
+		if (dynamicParameters != nullptr && dynamicParameters->ContainsKey("Resolvable")) {
 			resolvableCheck = dynamicParameters["Resolvable"]->IsSet;
 		}
 

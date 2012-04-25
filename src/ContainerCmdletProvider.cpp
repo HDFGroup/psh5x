@@ -316,7 +316,7 @@ namespace PSH5X
 
             if (ProviderUtils::IsH5Group(drive->FileHandle, h5path))
             {
-                gpath = (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
+				gpath = (char*)(Marshal::StringToHGlobalAnsi(h5path)).ToPointer();
 
                 gid = H5Gopen2(drive->FileHandle, gpath, H5P_DEFAULT);
                 if (gid < 0) {
@@ -327,7 +327,13 @@ namespace PSH5X
 
                 for each (String^ linkName in linkNames)
                 {
-                    String^ childPath = path + "\\" + linkName->Replace('/','\\');
+                    String^ childPath = nullptr;
+					if (!path->EndsWith("\\")) {
+						childPath = path + "\\" + linkName->Replace('/','\\');
+					}
+					else {
+						childPath = path + linkName->Replace('/','\\');
+					}
 
                     link_name = (char*)(Marshal::StringToHGlobalAnsi(linkName)).ToPointer();
 
@@ -357,6 +363,9 @@ namespace PSH5X
                     else {
                         throw gcnew HDF5Exception("H5Lget_info failed!");
                     }
+
+					Marshal::FreeHGlobal(IntPtr(link_name));
+					link_name = NULL;
                 }
             }
         }

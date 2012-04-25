@@ -15,20 +15,33 @@ using namespace System::Management::Automation;
 using namespace System::Management::Automation::Provider;
 using namespace System::Runtime::InteropServices;
 
+/*
+   
+   There appears to be bug in the default implementation of the
+   Get* methods. The problem can be reproduced with the Filesystem
+   provider. Tab completion stops working and traversal into
+   directories with brackets in their name fails.
+   HACK: For now we strip backticks from any path and do not
+   allow them in HDF5 path names. That way we can at least
+   find our way with -LiteralPath. Tab completion is still broken though.
+
+ */
+
 namespace PSH5X
 {
     String^ Provider::GetChildName(String^ path)
     {
         WriteVerbose(String::Format("HDF5Provider::GetChildName(Path = '{0}')", path));
-        return __super::GetChildName(path);
+		String^ result = __super::GetChildName(path)->Replace("`","");
+		return result;
     }
 
     String^ Provider::GetParentPath(System::String^ path, System::String^ root)
     {
         WriteVerbose(String::Format("HDF5Provider::GetParentPath(Path = '{0}', Root = '{1}')",
             path, root));
-        
-        return __super::GetParentPath(path,root);
+		String^ result = __super::GetParentPath(path,root)->Replace("`",""); 
+        return result;
     }
 
     bool Provider::IsItemContainer(System::String^ path)
@@ -50,6 +63,7 @@ namespace PSH5X
     {
         WriteVerbose(String::Format("HDF5Provider::MakePath(Parent = '{0}', Child = '{1}')",
             parent, child));
-        return __super::MakePath(parent, child);
+		String^ result = __super::MakePath(parent, child)->Replace("`",""); 
+		return result;
     }
 }

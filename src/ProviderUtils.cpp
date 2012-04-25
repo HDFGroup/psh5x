@@ -29,10 +29,9 @@ namespace PSH5X
     {
         DriveInfo^ result = nullptr;
 
-        // three formats possible?
+        // two formats possible
         // provider::drive:\path
         // drive:\path
-        // //drive/path
         array<String^>^ paths = path->Split(ProviderUtils::DriveSeparator, 2);
 
         if (paths->Length > 0)
@@ -42,6 +41,7 @@ namespace PSH5X
             {
                 if (drive->Name == drivepath) {
                     result = (DriveInfo^) drive;
+					break;
                 }
             }
         }
@@ -49,20 +49,17 @@ namespace PSH5X
         return result;
     }
 
-    // TODO: This is not quite right. A well-formed HDF5 path may contain back slashes,
+    // FEATURE: This is not 100% right. A well-formed HDF5 path may contain back slashes,
     // which currently get wiped out (replaced by forward slashes)
     // remove duplicate slashes as part of the normalization process
 
     String^ ProviderUtils::NormalizePath(String^ path)
     {
-        if (path->Contains("/") && path->Contains("\\")) {
-            throw gcnew ArgumentException("A path name must not simultaneously contain forward- and back-slashes.");
-        }
-
         String^ result = path;
 
-        if (!String::IsNullOrEmpty(path))
+        if (!String::IsNullOrEmpty(path)) {
             result = path->Replace("\\", ProviderUtils::HDF5_PATH_SEP);
+		}
 
         // Eliminate consecutive and trailing slashes
 
@@ -85,12 +82,21 @@ namespace PSH5X
     String^ ProviderUtils::PathNoDrive(String^ path)
     {
         array<String^>^ paths = path->Split(ProviderUtils::DriveSeparator, 2);
-        String^ pathNoDrive = paths[0];
-        if (paths->Length == 2)
-            pathNoDrive = paths[1];
+        String^ pathNoDrive = nullptr;
+		
+		if (paths->Length > 0) {
+			pathNoDrive = paths[0];
+		}
+		else {
+			throw gcnew PSH5XException("Empty path found!");
+		}
 
-        if (pathNoDrive->Trim() == "")
-            pathNoDrive = ProviderUtils::HDF5_PATH_SEP;
+        if (paths->Length == 2) {
+            pathNoDrive = paths[1];
+		}
+
+		if (!pathNoDrive->StartsWith(ProviderUtils::HDF5_PATH_SEP))
+            pathNoDrive = ProviderUtils::HDF5_PATH_SEP + pathNoDrive;
 
         return pathNoDrive;
     }
