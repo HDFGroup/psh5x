@@ -28,6 +28,9 @@ Function New-H5Dataset
     .PARAMETER Gzip 
       Create an HDF5 dataset (with chunked layout) with gzip compression
       enabled.
+    .PARAMETER Checksum 
+      Create an HDF5 dataset (with chunked layout) with Fletcher32 checksum
+      filter.
     .PARAMETER Compact 
       Create an HDF5 dataset with compact layout.
     .PARAMETER FillValue 
@@ -100,6 +103,12 @@ Function New-H5Dataset
         [int]
         $Gzip,
         [Parameter(Mandatory=$false,
+                   ParameterSetName='Simple',
+                   Position=6,
+                   HelpMessage='Fletcher32 checksum filter?')]
+        [switch]
+        $Checksum,
+        [Parameter(Mandatory=$false,
                    HelpMessage='Compact layout?')]
         [switch]
         $Compact,
@@ -119,9 +128,9 @@ Function New-H5Dataset
         Write-Error "`nThe -Chunked and -Compact options are not compatible."
         return
     }
-    if (!$Chunked -and $Gzip)
+    if (!$Chunked -and ($Gzip -or $Checksum))
     {
-        Write-Error "`nThe -Gzip option requires chunked layout. (-Chunked...)."
+        Write-Error "`nThe -Gzip or -Checksum options require chunked layout. (-Chunked...)."
         return
     }
     if ($MaxDimensions)
@@ -206,6 +215,9 @@ Function New-H5Dataset
              
             if ($Gzip) {
                 $cmd += ' -Gzip $Gzip'
+            }
+            if ($Checksum) {
+                $cmd += ' -Checksum'
             }
         }
     }

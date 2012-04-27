@@ -144,6 +144,19 @@ namespace PSH5X
 
             dict->Add("Null", paramNull);
 
+			// Scalar
+
+            ParameterAttribute^ attr9 = gcnew ParameterAttribute();
+            attr9->Mandatory = false;
+            attr9->ValueFromPipeline = false;
+
+            RuntimeDefinedParameter^ paramChecksum = gcnew RuntimeDefinedParameter();
+            paramChecksum->Name = "Checksum";
+            paramChecksum->ParameterType = SwitchParameter::typeid;
+            paramChecksum->Attributes->Add(attr9);
+
+            dict->Add("Checksum", paramChecksum);
+
 #pragma endregion
 
         }

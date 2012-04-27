@@ -235,6 +235,7 @@ namespace PSH5X
                 bool isChunked = (dynamicParameters["Chunked"]->Value != nullptr);
                 bool isCompact = (dynamicParameters["Compact"]->IsSet);
                 bool applyGzip = (dynamicParameters["Gzip"]->Value != nullptr);
+				bool applyChecksum = (dynamicParameters["Checksum"]->IsSet);
 				
 				if (!(isNull || isScalar || isSimple)) {
 					throw gcnew PSH5XException("Exactly one of -Null, -Scalar, or -Dimensions must be specified!");
@@ -243,14 +244,14 @@ namespace PSH5X
 				{
 					if (isNull)
 					{
-						if (isScalar || isSimple || hasMaxDims || isChunked || applyGzip) {
-							throw gcnew PSH5XException("The following options are incompatible with the -Null option: -Scalar, -Dimensions, -MaxDimensions, -Chunked, -Gzip.");
+						if (isScalar || isSimple || hasMaxDims || isChunked || applyGzip || applyChecksum) {
+							throw gcnew PSH5XException("The following options are incompatible with the -Null option: -Scalar, -Dimensions, -MaxDimensions, -Chunked, -Gzip, -Checksum.");
 						}
 					}
 					else if (isScalar)
 					{
-						if (isSimple || hasMaxDims || isChunked || applyGzip) {
-							throw gcnew PSH5XException("The following options are incompatible with the -Null option: -Simple, -Dimensions, -MaxDimensions, -Chunked, -Gzip.");
+						if (isSimple || hasMaxDims || isChunked || applyGzip || applyChecksum) {
+							throw gcnew PSH5XException("The following options are incompatible with the -Null option: -Simple, -Dimensions, -MaxDimensions, -Chunked, -Gzip, -Checksum.");
 						}
 					}
 				}
@@ -276,15 +277,15 @@ namespace PSH5X
 						throw gcnew PSH5XException("Invalid rank: the dataset rank must be between 1 and 32!");
 					}
 
-					if (hasMaxDims || isChunked || applyGzip) {
+					if (hasMaxDims || isChunked || applyGzip || applyChecksum) {
 						layout = "Chunked";
 						if (!isChunked) {
-							throw gcnew PSH5XException("The -MaxDimensions and -Gzip options valid only in conjunction " +
+							throw gcnew PSH5XException("The -MaxDimensions, -Gzip, and -Checksum options valid only in conjunction " +
 								"with the -Chunked option. Please specify!");
 						}
 						if (isCompact) {
 							throw gcnew PSH5XException("The -Compact switch is incompatible with the " +
-								"-MaxDimensions, -Chunked, and -Gzip options.");
+								"-MaxDimensions, -Chunked, -Gzip, and -Checksum options.");
 						}
 					}
 
@@ -364,6 +365,13 @@ namespace PSH5X
 
 						if (H5Pset_deflate(dcplist, level) < 0) {
 							throw gcnew HDF5Exception("H5Pset_deflate failed!");
+						}
+					}
+
+					if (applyChecksum)
+					{
+						if (H5Pset_fletcher32(dcplist) < 0) {
+							throw gcnew HDF5Exception("H5Pset_fletcher32 failed!");
 						}
 					}
 #pragma endregion
