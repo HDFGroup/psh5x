@@ -28,7 +28,7 @@ namespace PSH5X
 
         unsigned flags = H5F_ACC_RDONLY;
 
-		hid_t fapl_id = -1;
+		hid_t fapl_id = H5P_DEFAULT;
 
 		try
 		{
@@ -55,7 +55,7 @@ namespace PSH5X
 					throw gcnew PSH5XException(msg);
 				}
 
-				m_handle = H5Fopen(name, flags, H5P_DEFAULT);
+				m_handle = H5Fopen(name, flags, fapl_id);
 				if (m_handle < 0) {
 					String^ msg = String::Format(
 						"H5Fopen failed with status {0} for name {1}", m_handle, path);
@@ -82,7 +82,7 @@ namespace PSH5X
 				m_path = info->FullName;
 				m_readonly = false;
 
-				m_handle = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
+				m_handle = H5Fopen(filename, H5F_ACC_RDWR, fapl_id);
 				if (m_handle < 0) {
 					String^ msg = String::Format(
 						"H5Fopen failed with status {0} for name {1}", m_handle, info->FullName);
@@ -103,7 +103,7 @@ namespace PSH5X
 				Marshal::FreeHGlobal(IntPtr(filename));
 			}
 
-			if (fapl_id >= 0) {
+			if (fapl_id != H5P_DEFAULT) {
 				H5Pclose(fapl_id);
 			}
 		}

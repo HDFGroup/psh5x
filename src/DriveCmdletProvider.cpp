@@ -6,7 +6,6 @@
 
 extern "C" {
 #include "H5Fpublic.h"
-#include "H5FDcore.h"
 #include "H5Ppublic.h"
 }
 
@@ -24,7 +23,7 @@ namespace PSH5X
 
         char* file_name = NULL;
 
-        hid_t file_id = -1, fapl_id = -1;
+        hid_t file_id = -1;
 
         Collection<System::Management::Automation::PSDriveInfo^>^ coll =
             gcnew Collection<System::Management::Automation::PSDriveInfo^>();
@@ -36,13 +35,6 @@ namespace PSH5X
             String^ tmpFile = System::IO::Path::GetTempFileName();
 
             file_name = (char*)(Marshal::StringToHGlobalAnsi(tmpFile)).ToPointer();
-
-			if ((fapl_id = H5Pcreate(H5P_FILE_ACCESS)) < 0) {
-			    throw gcnew HDF5Exception("H5Pcreate failed!");
-			}
-			if (H5Pset_fapl_core(fapl_id, 8192, 1) < 0) {
-				throw gcnew HDF5Exception("H5Pset_fapl_core failed!");
-			}
 
             file_id = H5Fcreate(file_name, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
             if (file_id < 0) {
@@ -63,6 +55,7 @@ namespace PSH5X
 
             if (info != nullptr)
             {
+				// use the core VFD for h5tmp
                 DriveInfo^ drive = gcnew DriveInfo(tmpFile, false, info, false, true);
                 if (drive != nullptr)
                 {
@@ -84,9 +77,6 @@ namespace PSH5X
             if (file_name != NULL) {
                 Marshal::FreeHGlobal(IntPtr(file_name));
             }
-			if (fapl_id >= 0) {
-				H5Pclose(fapl_id);
-			}
         }
 
         return coll;
