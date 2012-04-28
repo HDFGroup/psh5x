@@ -6,6 +6,13 @@
 extern "C" {
 #include "H5ACpublic.h"
 #include "H5FDcore.h"
+#include "H5FDdirect.h"
+#include "H5FDfamily.h"
+#include "H5FDlog.h"
+#include "H5FDmulti.h"
+#include "H5FDsec2.h"
+#include "H5FDstdio.h"
+#include "H5FDwindows.h"
 #include "H5Ppublic.h"
 }
 
@@ -41,7 +48,8 @@ namespace PSH5X
 				if ((fapl_id = H5Pcreate(H5P_FILE_ACCESS)) < 0) {
 					throw gcnew HDF5Exception("H5Pcreate failed!");
 				}
-				if (H5Pset_fapl_core(fapl_id, 8192, 1) < 0) {
+				// 64 MB increments
+				if (H5Pset_fapl_core(fapl_id, 6*1024*1024, 1) < 0) {
 					throw gcnew HDF5Exception("H5Pset_fapl_core failed!");
 				}
 			}
@@ -200,6 +208,59 @@ namespace PSH5X
 
         return ht;
     }
+
+	String^ DriveInfo::Driver::get()
+    {
+		String^ result = nullptr;
+
+		hid_t plist = -1;
+     
+		try
+		{
+			plist = H5Fget_access_plist(m_handle);
+			if (plist < 0) {
+				throw gcnew HDF5Exception("H5Fget_access_plist failed!!!");
+			}
+
+			hid_t driver_id = H5Pget_driver(plist);
+
+			if (driver_id == H5FD_SEC2) {
+				result = "H5FD_SEC2";
+			}
+			else if (driver_id == H5FD_DIRECT) {
+				result = "H5FD_DIRECT";
+			}
+			else if (driver_id == H5FD_LOG) {
+				result = "H5FD_LOG";
+			}
+			else if (driver_id == H5FD_WINDOWS) {
+				result = "H5FD_WINDOWS";
+			}
+			else if (driver_id == H5FD_STDIO) {
+				result = "H5FD_STDIO";
+			}
+			else if (driver_id == H5FD_CORE) {
+				result = "H5FD_CORE";
+			}
+			else if (driver_id == H5FD_FAMILY) {
+				result = "H5FD_FAMILY";
+			}
+			else if (driver_id == H5FD_MULTI) {
+				result = "H5FD_MULTI";
+			}
+			else {
+				result = "UNKNOWN";
+			}
+		}
+		finally
+		{
+			if (plist >= 0) {
+				H5Pclose(plist);
+			}
+		}
+
+		return result;
+	}
 
     hid_t DriveInfo::FileHandle::get()
     {
