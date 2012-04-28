@@ -21,6 +21,8 @@ Function New-H5Drive
       The scope in which the drive is to be created. See about_Scopes.
     .PARAMETER Force
       If the HDF5 does not exist, force the creation of a new HDF5 file.
+    .PARAMETER Core
+      Use the HDF5 core VFD.
     .EXAMPLE
       New-H5Drive -Name h5 -File C:\tmp\foo.h5
     .EXAMPLE
@@ -29,6 +31,7 @@ Function New-H5Drive
     .LINK
       New-PSDrive
       about_Scopes
+      http://www.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-SetFaplCore
  #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param
@@ -61,7 +64,11 @@ Function New-H5Drive
         [Parameter(Mandatory=$false,
                    HelpMessage='Force the creation of a new file?')]
         [switch]
-        $Force
+        $Force,
+        [Parameter(Mandatory=$false,
+                   HelpMessage='Use the HDF5 core VFD?')]
+        [switch]
+        $Core
     )
 
     if (!($Force -or (Test-H5File (Resolve-Path $File))))
@@ -105,6 +112,10 @@ Function New-H5Drive
         
     if ($Force) {
         $cmd += ' -Force'
+    }
+
+    if ($Core) {
+        $cmd += ' -Core'
     }
         
     if ($PSCmdlet.ShouldProcess($File, "New HDF5 Drive '$Name'"))

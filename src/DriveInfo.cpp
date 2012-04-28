@@ -5,6 +5,7 @@
 
 extern "C" {
 #include "H5ACpublic.h"
+#include "H5FDcore.h"
 #include "H5Ppublic.h"
 }
 
@@ -27,10 +28,22 @@ namespace PSH5X
 
         unsigned flags = H5F_ACC_RDONLY;
 
+		hid_t fapl_id = -1;
+
 		try
 		{
 			if (!m_readonly) {
 				flags = H5F_ACC_RDWR;
+			}
+
+			if (core)
+			{
+				if ((fapl_id = H5Pcreate(H5P_FILE_ACCESS)) < 0) {
+					throw gcnew HDF5Exception("H5Pcreate failed!");
+				}
+				if (H5Pset_fapl_core(fapl_id, 8192, 1) < 0) {
+					throw gcnew HDF5Exception("H5Pset_fapl_core failed!");
+				}
 			}
 
 			if (File::Exists(m_path))
@@ -88,6 +101,10 @@ namespace PSH5X
 
 			if (filename != NULL) {
 				Marshal::FreeHGlobal(IntPtr(filename));
+			}
+
+			if (fapl_id >= 0) {
+				H5Pclose(fapl_id);
 			}
 		}
     }

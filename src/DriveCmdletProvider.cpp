@@ -40,7 +40,7 @@ namespace PSH5X
 			if ((fapl_id = H5Pcreate(H5P_FILE_ACCESS)) < 0) {
 			    throw gcnew HDF5Exception("H5Pcreate failed!");
 			}
-			if (H5Pset_fapl_core(fapl_id, 4096, 1) < 0) {
+			if (H5Pset_fapl_core(fapl_id, 8192, 1) < 0) {
 				throw gcnew HDF5Exception("H5Pset_fapl_core failed!");
 			}
 
@@ -84,7 +84,6 @@ namespace PSH5X
             if (file_name != NULL) {
                 Marshal::FreeHGlobal(IntPtr(file_name));
             }
-
 			if (fapl_id >= 0) {
 				H5Pclose(fapl_id);
 			}

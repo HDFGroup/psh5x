@@ -8,7 +8,7 @@ if (Test-Path $path)
     Remove-Item $path
 }
 
-New-H5Drive $name $path -RW -Force -Scope $scope 
+New-H5Drive $name $path -RW -Force -Scope $scope -Core
 
 cd "$($name):"
 
