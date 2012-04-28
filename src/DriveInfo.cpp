@@ -17,7 +17,7 @@ using namespace System::Runtime::InteropServices;
 namespace PSH5X
 {
 
-    DriveInfo::DriveInfo(String^ path, bool readonly, PSDriveInfo^ drive, bool force)
+    DriveInfo::DriveInfo(String^ path, bool readonly, PSDriveInfo^ drive, bool force, bool core)
         : PSDriveInfo(drive)
     {
         m_path = path;

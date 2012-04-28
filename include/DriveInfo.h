@@ -11,7 +11,7 @@ namespace PSH5X
     public:
 
         DriveInfo(System::String^ path, bool readonly,
-            System::Management::Automation::PSDriveInfo^ drive, bool force);
+            System::Management::Automation::PSDriveInfo^ drive, bool force, bool core);
 
         property System::Collections::Hashtable^ CreationProperties
         {

@@ -31,10 +31,12 @@ namespace PSH5X
             String^ path = dynamicParameters["Path"]->Value->ToString();
 
             bool readonly = true;
-            if (dynamicParameters["Mode"]->Value != nullptr)
+            if (dynamicParameters->ContainsKey("Mode") && dynamicParameters["Mode"]->Value != nullptr) {
                 readonly = (dynamicParameters["Mode"]->Value->ToString()->ToUpper() != "RW");
+			}
 
-            return gcnew DriveInfo(path, readonly, drive, dynamicParameters["Force"]->IsSet);
+            return gcnew DriveInfo(path, readonly, drive,
+				dynamicParameters["Force"]->IsSet, dynamicParameters["Core"]->IsSet);
         }
         else
         {
@@ -71,6 +73,15 @@ namespace PSH5X
         paramForce->ParameterType = SwitchParameter::typeid;
         paramForce->Attributes->Add(atts2);
         dynamicParameters->Add("Force", paramForce);
+        
+		ParameterAttribute^ atts3 = gcnew ParameterAttribute();
+        atts3->Mandatory = false;
+        atts3->ValueFromPipeline = false;
+        RuntimeDefinedParameter^ paramCore = gcnew RuntimeDefinedParameter();
+        paramCore->Name = "Core";
+        paramCore->ParameterType = SwitchParameter::typeid;
+        paramCore->Attributes->Add(atts3);
+        dynamicParameters->Add("Core", paramCore);
         
         return dynamicParameters;
     }
