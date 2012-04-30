@@ -48,8 +48,8 @@ namespace PSH5X
 				if ((fapl_id = H5Pcreate(H5P_FILE_ACCESS)) < 0) {
 					throw gcnew HDF5Exception("H5Pcreate failed!");
 				}
-				// 64 MB increments
-				if (H5Pset_fapl_core(fapl_id, 6*1024*1024, 1) < 0) {
+				// 8 MB increments
+				if (H5Pset_fapl_core(fapl_id, 8*1024*1024, 1) < 0) {
 					throw gcnew HDF5Exception("H5Pset_fapl_core failed!");
 				}
 			}

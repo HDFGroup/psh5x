@@ -101,6 +101,10 @@ namespace PSH5X
 						throw gcnew PSH5XException(String::Format("Empty string found at position {0}!", npoints));
 					}
 
+					if (!ProviderUtils::IsResolvableH5Path(m_h5file, path)) {
+						throw gcnew PSH5XException(String::Format("HDF5 Object at path '{0}' not found!", path));
+					}
+
 					IntPtr path_str = Marshal::StringToHGlobalAnsi(path);
 
 					pin_ptr<unsigned char> ptr = &((array<unsigned char>^)m_array)[i*rsize];
@@ -129,6 +133,10 @@ namespace PSH5X
 					}
 					else {
 						throw gcnew PSH5XException(String::Format("Empty KeyValuePair found at position {0}!", npoints));
+					}
+
+					if (!ProviderUtils::IsResolvableH5Path(m_h5file, rref.Key)) {
+						throw gcnew PSH5XException(String::Format("HDF5 Object at path '{0}' not found!", rref.Key));
 					}
 
 					IntPtr path_str = Marshal::StringToHGlobalAnsi(rref.Key);

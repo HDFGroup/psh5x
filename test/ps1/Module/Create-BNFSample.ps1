@@ -12,9 +12,9 @@ New-H5Drive $name $path -RW -Force -Scope $scope
 
 cd "$($name):"
 
-$dummy = New-H5Attribute . attr1 'string attribute' string17
+New-H5Attribute . attr1 'string attribute' string17
 
-$dset = New-H5Dataset dset1 H5T_STD_I32BE 10,10
+New-H5Dataset dset1 H5T_STD_I32BE 10,10
 
 $value = New-Object 'int[,]' 10,10
 
@@ -48,7 +48,7 @@ public class cmpd_a_b_c
 }
 "@
 
-$dset = New-H5Dataset dset2 $t 5
+New-H5Dataset dset2 $t 5
 
 $value = New-Object 'cmpd_a_b_c[]' 5
 
@@ -63,7 +63,7 @@ foreach ($i in 1..5)
 
 Set-H5DatasetValue dset2 $value
 
-$dummy = New-H5Group group1
+New-H5Group group1
 
 $t = @"
 {
@@ -85,7 +85,7 @@ public class cmpd_a_b
 }
 "@
 
-$dummy = New-H5LinkedDatatype type1 $t
+New-H5LinkedDatatype type1 $t
 
 cd group1
 
@@ -119,9 +119,9 @@ $value = (,0), (10,11), (20,21,22), (30,31,32,33)
 
 Set-Content dset3 $value
 
-$dummy = New-H5Hardlink group2 /group1
+New-H5Hardlink group2 /group1
 
-$dummy = New-H5Softlink slink1 somevalue
+New-H5Softlink slink1 somevalue
 
 c:
 

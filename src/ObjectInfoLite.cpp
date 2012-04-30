@@ -39,8 +39,8 @@ namespace PSH5X
 
             m_atime = info.atime;
             m_mtime = info.mtime;
-            m_ctime = info.ctime;
-            m_btime = info.btime;
+			m_ctime = info.ctime;
+			m_btime = info.btime;
             m_num_attrs = info.num_attrs;
             m_attribute_names = ProviderUtils::GetObjectAttributeNames(obj);
         }

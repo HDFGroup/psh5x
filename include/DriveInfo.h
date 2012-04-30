@@ -18,6 +18,11 @@ namespace PSH5X
             System::Collections::Hashtable^ get();
         }
 
+		property System::String^ Driver
+        {
+            System::String^ get();
+        }
+
         property hid_t FileHandle
         {
             hid_t get();

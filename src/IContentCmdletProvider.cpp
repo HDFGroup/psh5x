@@ -221,58 +221,51 @@ namespace PSH5X
 				
 				switch (cls)
 				{
-				case H5T_INTEGER:
-				case H5T_ENUM:
 				case H5T_BITFIELD:
-#pragma region HDF5 integer, enum, bitfield
-
-					t = ProviderUtils::H5Type2DotNet(ftype);
-					if (t == SByte::typeid) {
-						result = gcnew DatasetReaderT<SByte>(dset, ftype, fspace, mspace);
-					}
-					else if (t == Int16::typeid) {
-						result = gcnew DatasetReaderT<Int16>(dset, ftype, fspace, mspace);
-					}
-					else if (t == Int32::typeid) {
-						result = gcnew DatasetReaderT<Int32>(dset, ftype, fspace, mspace);
-					}
-					else if (t == Int64::typeid) {
-						result = gcnew DatasetReaderT<Int64>(dset, ftype, fspace, mspace);
-					}
-					else if (t == Byte::typeid) {
-						result = gcnew DatasetReaderT<Byte>(dset, ftype, fspace, mspace);
-					}
-					else if (t == UInt16::typeid) {
-						result = gcnew DatasetReaderT<UInt16>(dset, ftype, fspace, mspace);
-					}
-					else if (t ==  UInt32::typeid) {
-						result = gcnew DatasetReaderT<UInt32>(dset, ftype, fspace, mspace);
-					}
-					else if (t ==  UInt64::typeid) {
-						result = gcnew DatasetReaderT<UInt64>(dset, ftype, fspace, mspace);
-					}
-					else {
-						throw gcnew PSH5XException("Unsupported integer, enum, or bitfield type!");
-					}
-
-#pragma endregion
-					break;
-
+				case H5T_ENUM:
 				case H5T_FLOAT:
-#pragma region HDF5 float
+				case H5T_INTEGER:
+					{
+#pragma region HDF5 bitfield, enum, float, integer 
 
-					t = ProviderUtils::H5Type2DotNet(ftype);
-					if (t == Single::typeid) {
-						result = gcnew DatasetReaderT<Single>(dset, ftype, fspace, mspace);
-					}
-					else if (t == Double::typeid) {
-						result = gcnew DatasetReaderT<Double>(dset, ftype, fspace, mspace);
-					}
-					else {
-						throw gcnew PSH5XException("Unsupported float type!");
-					}
+						t = ProviderUtils::H5Type2DotNet(ftype);
+
+						if (t == Single::typeid) {
+							result = gcnew DatasetReaderT<Single>(dset, ftype, fspace, mspace);
+						}
+						else if (t == Double::typeid) {
+							result = gcnew DatasetReaderT<Double>(dset, ftype, fspace, mspace);
+						}
+						else if (t == SByte::typeid) {
+							result = gcnew DatasetReaderT<SByte>(dset, ftype, fspace, mspace);
+						}
+						else if (t == Int16::typeid) {
+							result = gcnew DatasetReaderT<Int16>(dset, ftype, fspace, mspace);
+						}
+						else if (t == Int32::typeid) {
+							result = gcnew DatasetReaderT<Int32>(dset, ftype, fspace, mspace);
+						}
+						else if (t == Int64::typeid) {
+							result = gcnew DatasetReaderT<Int64>(dset, ftype, fspace, mspace);
+						}
+						else if (t == Byte::typeid) {
+							result = gcnew DatasetReaderT<Byte>(dset, ftype, fspace, mspace);
+						}
+						else if (t == UInt16::typeid) {
+							result = gcnew DatasetReaderT<UInt16>(dset, ftype, fspace, mspace);
+						}
+						else if (t ==  UInt32::typeid) {
+							result = gcnew DatasetReaderT<UInt32>(dset, ftype, fspace, mspace);
+						}
+						else if (t ==  UInt64::typeid) {
+							result = gcnew DatasetReaderT<UInt64>(dset, ftype, fspace, mspace);
+						}
+						else {
+							throw gcnew PSH5XException("Unsupported float, integer, enum, or bitfield type!");
+						}
 
 #pragma endregion
+					}
 					break;
 
 				case H5T_STRING:
