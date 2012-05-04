@@ -2495,13 +2495,10 @@ namespace PSH5X
 
                 member_offset[i] = safe_cast<int>(offset);
 
-                name = H5Tget_member_name(type_id, safe_cast<unsigned>(i));
-                if (name == NULL) {
+                if ((name = H5Tget_member_name(type_id, safe_cast<unsigned>(i))) == NULL) {
                     throw gcnew HDF5Exception("H5Tget_member_name failed!");
                 }
-
-                mtype = H5Tget_member_type(type_id, safe_cast<unsigned>(i));
-                if (mtype < 0) {
+                if ((mtype = H5Tget_member_type(type_id, safe_cast<unsigned>(i))) < 0) {
                     throw gcnew HDF5Exception("H5Tget_member_type failed!");
                 }
 
@@ -2510,9 +2507,14 @@ namespace PSH5X
 				if (cls == H5T_ARRAY)
 				{
 					StringBuilder^ sb = gcnew StringBuilder();
+
 					member_is_array[i] = true;
 					int rank = H5Tget_array_ndims(mtype);
+					if (rank <= 0) {
+						throw gcnew HDF5Exception("Invalid rank in H5Tget_array_ndims!");
+					}
 					array<hsize_t>^ adims = gcnew array<hsize_t>(rank);
+					
 					pin_ptr<hsize_t> adims_ptr = &adims[0];
 					rank = H5Tget_array_dims2(mtype, adims_ptr);
 					sb->Append("[");
@@ -2533,13 +2535,11 @@ namespace PSH5X
                 }
 				else if (cls == H5T_ENUM)
 				{
-					stype = H5Tget_super(mtype);
-					if (stype < 0) {
+					if ((stype = H5Tget_super(mtype)) < 0) {
 						throw gcnew HDF5Exception("H5Tget_super failed!");
 					}
 
                     ntype = H5Tget_native_type(stype, H5T_DIR_ASCEND);
-
 					if (H5Tclose(stype) < 0) {
 						throw gcnew HDF5Exception("H5Tclose failed!");
 					}
@@ -2560,8 +2560,7 @@ namespace PSH5X
 					}
 					else
 					{
-						stype = H5Tget_super(mtype);
-						if (stype < 0) {
+						if ((stype = H5Tget_super(mtype)) < 0) {
 							throw gcnew HDF5Exception("H5Tget_super failed!");
 						}
 
@@ -2607,36 +2606,11 @@ namespace PSH5X
                 mtype = -1;
             }
 
-			/*
-			// patch member offsets for objects (arrays and strings)
-
-			int mod = (IntPtr::Size == 4) ? 4 : 8;
-
-			for (int i = 0; i < member_count; ++i)
-            {
-				int shift = 0;
-
-				if (member_is_array[i] || member_tcode[i] == 's')
-				{
-					member_offset[i] += shift;
-					int res = member_offset[i]%mod;
-
-					if (res != 0)
-					{
-						shift += res;
-						member_offset[i] += res;
-					}
-				}
-			}
-			*/
-
             sbconstr->Append(") {");
 
             String^ class_name = sbname->ToString();
 
             StringBuilder^ sbcode = gcnew StringBuilder();
-            //sbcode->Append("using System.Runtime.InteropServices; ");
-            //sbcode->Append("[StructLayout(LayoutKind.Explicit,Size= " + size + ",CharSet=CharSet.Ansi)] ");
             sbcode->Append("public class " + class_name + " { ");
 
             StringBuilder^ sb_def_constr = gcnew StringBuilder();
@@ -2644,7 +2618,6 @@ namespace PSH5X
 
             for (int i = 0; i < member_count; ++i)
             {
-                //sbcode->Append("[FieldOffset(" + member_offset[i] + ")]");
 				if (!member_is_array[i]) {
 					sbcode->Append(" public " + member_type[i] + " " + member_name[i] + ";");
 				}
@@ -2669,7 +2642,9 @@ namespace PSH5X
 
             String^ code = sbcode->ToString() + "}";
 
-            //Console::WriteLine(code);
+			if (Environment::GetEnvironmentVariable("PSH5XDbgCodeGen") != nullptr) {
+				Console::WriteLine(code);
+			}
 
             CompilerParameters^ params = gcnew CompilerParameters();
             params->GenerateInMemory = true;

@@ -59,14 +59,14 @@ $value += $a
 
 Set-H5DatasetValue DS1 $value
 
-$ref = Get-H5DatasetValue DS1 -Start 1
+$ref = (Get-H5DatasetValue DS1 -Start 1)[0]
 
 # no support for region references in Get-H5DatasetValue yet...
 
-$start = $ref[0].Value[0,0],$ref[0].Value[0,1]
-$block = ($ref[0].Value[1,0]-$ref[0].Value[0,0]+1),($ref[0].Value[1,1]-$ref[0].Value[0,1]+1)
+$start = $ref.Value[0,0],$ref.Value[0,1]
+$block = ($ref.Value[1,0]-$ref.Value[0,0]+1),($ref.Value[1,1]-$ref.Value[0,1]+1)
 
-$value = Get-H5DatasetValue "$($ref[0].Key)" -Start $start -Block $block
+$value = Get-H5DatasetValue "$($ref.Key)" -Start $start -Block $block
 
 c:
 

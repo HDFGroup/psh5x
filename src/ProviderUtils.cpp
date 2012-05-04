@@ -950,476 +950,486 @@ namespace PSH5X
 
     static ProviderUtils::ProviderUtils()
     {
-        m_hdf5_path_sep = "/";
+		try
+		{
+			m_hdf5_path_sep = "/";
 
-        m_hdf5_drive_sep = ":";
+			m_hdf5_drive_sep = ":";
 
-        m_hdf5_provider_sep = "::";
+			m_hdf5_provider_sep = "::";
 
-        m_drive_sep = gcnew array<wchar_t> {':'};
+			m_drive_sep = gcnew array<wchar_t> {':'};
 
-        m_type_classes = gcnew array<String^>{
-            "ARRAY", "BITFIELD", "COMPOUND", "ENUM", "FLOAT",
-            "INTEGER", "OPAQUE", "REFERENCE", "STRING", "VLEN" };
-
+			m_type_classes = gcnew array<String^>{
+				"ARRAY", "BITFIELD", "COMPOUND", "ENUM", "FLOAT",
+					"INTEGER", "OPAQUE", "REFERENCE", "STRING", "VLEN" };
 
 #pragma region HDF5 predefined types
 
-        /* http://www.hdfgroup.org/HDF5/doc/RM/PredefDTypes.html */
+				/* http://www.hdfgroup.org/HDF5/doc/RM/PredefDTypes.html */
 
 
-		JavaScriptSerializer^ serializer = gcnew JavaScriptSerializer();
+				JavaScriptSerializer^ serializer = gcnew JavaScriptSerializer();
 
-        m_predefined_types = gcnew Hashtable();
+				m_predefined_types = gcnew Hashtable();
 
-        // IEEE floating point datatypes
+				// IEEE floating point datatypes
 
-        hid_t type = H5Tcopy(H5T_IEEE_F32BE);
-        m_predefined_types["H5T_IEEE_F32BE"] = serializer->Serialize(ParseH5Type(type));
-        H5Tclose(type);
-        type = H5Tcopy(H5T_IEEE_F32LE);
-        m_predefined_types["H5T_IEEE_F32LE"] = serializer->Serialize(ParseH5Type(type));
-        H5Tclose(type);
-        type = H5Tcopy(H5T_IEEE_F64BE);
-        m_predefined_types["H5T_IEEE_F64BE"] = serializer->Serialize(ParseH5Type(type));
-        H5Tclose(type);
-        type = H5Tcopy(H5T_IEEE_F64LE);
-        m_predefined_types["H5T_IEEE_F64LE"] = serializer->Serialize(ParseH5Type(type));
-        H5Tclose(type);
+				hid_t type = H5Tcopy(H5T_IEEE_F32BE);
+				m_predefined_types["H5T_IEEE_F32BE"] = serializer->Serialize(ParseH5Type(type));
+				H5Tclose(type);
+				type = H5Tcopy(H5T_IEEE_F32LE);
+				m_predefined_types["H5T_IEEE_F32LE"] = serializer->Serialize(ParseH5Type(type));
+				H5Tclose(type);
+				type = H5Tcopy(H5T_IEEE_F64BE);
+				m_predefined_types["H5T_IEEE_F64BE"] = serializer->Serialize(ParseH5Type(type));
+				H5Tclose(type);
+				type = H5Tcopy(H5T_IEEE_F64LE);
+				m_predefined_types["H5T_IEEE_F64LE"] = serializer->Serialize(ParseH5Type(type));
+				H5Tclose(type);
 
-        // Standard datatypes
+				// Standard datatypes
 
-        type = H5Tcopy(H5T_STD_I8BE);
-        m_predefined_types["H5T_STD_I8BE"] = serializer->Serialize(ParseH5Type(type));
-        H5Tclose(type);
-        type = H5Tcopy(H5T_STD_I8LE);
-        m_predefined_types["H5T_STD_I8LE"] = serializer->Serialize(ParseH5Type(type));
-        H5Tclose(type);
-        type = H5Tcopy(H5T_STD_I16BE);
-        m_predefined_types["H5T_STD_I16BE"] = serializer->Serialize(ParseH5Type(type));
-        H5Tclose(type);
-        type = H5Tcopy(H5T_STD_I16LE);
-        m_predefined_types["H5T_STD_I16LE"] = serializer->Serialize(ParseH5Type(type));
-        H5Tclose(type);
-        type = H5Tcopy(H5T_STD_I32BE);
-        m_predefined_types["H5T_STD_I32BE"] = serializer->Serialize(ParseH5Type(type));
-        H5Tclose(type);
-        type = H5Tcopy(H5T_STD_I32LE);
-        m_predefined_types["H5T_STD_I32LE"] = serializer->Serialize(ParseH5Type(type));
-        H5Tclose(type);
-        type = H5Tcopy(H5T_STD_I64BE);
-        m_predefined_types["H5T_STD_I64BE"] = serializer->Serialize(ParseH5Type(type));
-        H5Tclose(type);
-        type = H5Tcopy(H5T_STD_I32LE);
-        m_predefined_types["H5T_STD_I64LE"] = serializer->Serialize(ParseH5Type(type));
-        H5Tclose(type);
+				type = H5Tcopy(H5T_STD_I8BE);
+				m_predefined_types["H5T_STD_I8BE"] = serializer->Serialize(ParseH5Type(type));
+				H5Tclose(type);
+				type = H5Tcopy(H5T_STD_I8LE);
+				m_predefined_types["H5T_STD_I8LE"] = serializer->Serialize(ParseH5Type(type));
+				H5Tclose(type);
+				type = H5Tcopy(H5T_STD_I16BE);
+				m_predefined_types["H5T_STD_I16BE"] = serializer->Serialize(ParseH5Type(type));
+				H5Tclose(type);
+				type = H5Tcopy(H5T_STD_I16LE);
+				m_predefined_types["H5T_STD_I16LE"] = serializer->Serialize(ParseH5Type(type));
+				H5Tclose(type);
+				type = H5Tcopy(H5T_STD_I32BE);
+				m_predefined_types["H5T_STD_I32BE"] = serializer->Serialize(ParseH5Type(type));
+				H5Tclose(type);
+				type = H5Tcopy(H5T_STD_I32LE);
+				m_predefined_types["H5T_STD_I32LE"] = serializer->Serialize(ParseH5Type(type));
+				H5Tclose(type);
+				type = H5Tcopy(H5T_STD_I64BE);
+				m_predefined_types["H5T_STD_I64BE"] = serializer->Serialize(ParseH5Type(type));
+				H5Tclose(type);
+				type = H5Tcopy(H5T_STD_I32LE);
+				m_predefined_types["H5T_STD_I64LE"] = serializer->Serialize(ParseH5Type(type));
+				H5Tclose(type);
 
-        type = H5Tcopy(H5T_STD_U8BE);
-        m_predefined_types["H5T_STD_U8BE"] = serializer->Serialize(ParseH5Type(type));
-        H5Tclose(type);
-        type = H5Tcopy(H5T_STD_U8LE);
-        m_predefined_types["H5T_STD_U8LE"] = serializer->Serialize(ParseH5Type(type));
-        H5Tclose(type);
-        type = H5Tcopy(H5T_STD_U16BE);
-        m_predefined_types["H5T_STD_U16BE"] = serializer->Serialize(ParseH5Type(type));
-        H5Tclose(type);
-        type = H5Tcopy(H5T_STD_U16LE);
-        m_predefined_types["H5T_STD_U16LE"] = serializer->Serialize(ParseH5Type(type));
-        H5Tclose(type);
-        type = H5Tcopy(H5T_STD_U32BE);
-        m_predefined_types["H5T_STD_U32BE"] = serializer->Serialize(ParseH5Type(type));
-        H5Tclose(type);
-        type = H5Tcopy(H5T_STD_U32LE);
-        m_predefined_types["H5T_STD_U32LE"] = serializer->Serialize(ParseH5Type(type));
-        H5Tclose(type);
-        type = H5Tcopy(H5T_STD_U64BE);
-        m_predefined_types["H5T_STD_U64BE"] = serializer->Serialize(ParseH5Type(type));
-        H5Tclose(type);
-        type = H5Tcopy(H5T_STD_U32LE);
-        m_predefined_types["H5T_STD_U64LE"] = serializer->Serialize(ParseH5Type(type));
-        H5Tclose(type);
+				type = H5Tcopy(H5T_STD_U8BE);
+				m_predefined_types["H5T_STD_U8BE"] = serializer->Serialize(ParseH5Type(type));
+				H5Tclose(type);
+				type = H5Tcopy(H5T_STD_U8LE);
+				m_predefined_types["H5T_STD_U8LE"] = serializer->Serialize(ParseH5Type(type));
+				H5Tclose(type);
+				type = H5Tcopy(H5T_STD_U16BE);
+				m_predefined_types["H5T_STD_U16BE"] = serializer->Serialize(ParseH5Type(type));
+				H5Tclose(type);
+				type = H5Tcopy(H5T_STD_U16LE);
+				m_predefined_types["H5T_STD_U16LE"] = serializer->Serialize(ParseH5Type(type));
+				H5Tclose(type);
+				type = H5Tcopy(H5T_STD_U32BE);
+				m_predefined_types["H5T_STD_U32BE"] = serializer->Serialize(ParseH5Type(type));
+				H5Tclose(type);
+				type = H5Tcopy(H5T_STD_U32LE);
+				m_predefined_types["H5T_STD_U32LE"] = serializer->Serialize(ParseH5Type(type));
+				H5Tclose(type);
+				type = H5Tcopy(H5T_STD_U64BE);
+				m_predefined_types["H5T_STD_U64BE"] = serializer->Serialize(ParseH5Type(type));
+				H5Tclose(type);
+				type = H5Tcopy(H5T_STD_U32LE);
+				m_predefined_types["H5T_STD_U64LE"] = serializer->Serialize(ParseH5Type(type));
+				H5Tclose(type);
 
-        type = H5Tcopy(H5T_STD_B8BE);
-        m_predefined_types["H5T_STD_B8BE"] = serializer->Serialize(ParseH5Type(type));
-        H5Tclose(type);
-        type = H5Tcopy(H5T_STD_B8LE);
-        m_predefined_types["H5T_STD_B8LE"] = serializer->Serialize(ParseH5Type(type));
-        H5Tclose(type);
-        type = H5Tcopy(H5T_STD_B16BE);
-        m_predefined_types["H5T_STD_B16BE"] = serializer->Serialize(ParseH5Type(type));
-        H5Tclose(type);
-        type = H5Tcopy(H5T_STD_B16LE);
-        m_predefined_types["H5T_STD_B16LE"] = serializer->Serialize(ParseH5Type(type));
-        H5Tclose(type);
-        type = H5Tcopy(H5T_STD_B32BE);
-        m_predefined_types["H5T_STD_B32BE"] = serializer->Serialize(ParseH5Type(type));
-        H5Tclose(type);
-        type = H5Tcopy(H5T_STD_B32LE);
-        m_predefined_types["H5T_STD_B32LE"] = serializer->Serialize(ParseH5Type(type));
-        H5Tclose(type);
-        type = H5Tcopy(H5T_STD_B64BE);
-        m_predefined_types["H5T_STD_B64BE"] = serializer->Serialize(ParseH5Type(type));
-        H5Tclose(type);
-        type = H5Tcopy(H5T_STD_B64LE);
-        m_predefined_types["H5T_STD_B64LE"] = serializer->Serialize(ParseH5Type(type));
-        H5Tclose(type);
+				type = H5Tcopy(H5T_STD_B8BE);
+				m_predefined_types["H5T_STD_B8BE"] = serializer->Serialize(ParseH5Type(type));
+				H5Tclose(type);
+				type = H5Tcopy(H5T_STD_B8LE);
+				m_predefined_types["H5T_STD_B8LE"] = serializer->Serialize(ParseH5Type(type));
+				H5Tclose(type);
+				type = H5Tcopy(H5T_STD_B16BE);
+				m_predefined_types["H5T_STD_B16BE"] = serializer->Serialize(ParseH5Type(type));
+				H5Tclose(type);
+				type = H5Tcopy(H5T_STD_B16LE);
+				m_predefined_types["H5T_STD_B16LE"] = serializer->Serialize(ParseH5Type(type));
+				H5Tclose(type);
+				type = H5Tcopy(H5T_STD_B32BE);
+				m_predefined_types["H5T_STD_B32BE"] = serializer->Serialize(ParseH5Type(type));
+				H5Tclose(type);
+				type = H5Tcopy(H5T_STD_B32LE);
+				m_predefined_types["H5T_STD_B32LE"] = serializer->Serialize(ParseH5Type(type));
+				H5Tclose(type);
+				type = H5Tcopy(H5T_STD_B64BE);
+				m_predefined_types["H5T_STD_B64BE"] = serializer->Serialize(ParseH5Type(type));
+				H5Tclose(type);
+				type = H5Tcopy(H5T_STD_B64LE);
+				m_predefined_types["H5T_STD_B64LE"] = serializer->Serialize(ParseH5Type(type));
+				H5Tclose(type);
 
-        type = H5Tcopy(H5T_STD_REF_OBJ);
-        m_predefined_types["H5T_STD_REF_OBJ"] = serializer->Serialize(ParseH5Type(type));
-        H5Tclose(type);
-        type = H5Tcopy(H5T_STD_REF_DSETREG);
-        m_predefined_types["H5T_STD_REF_DSETREG"] = serializer->Serialize(ParseH5Type(type));
-        H5Tclose(type);
+				type = H5Tcopy(H5T_STD_REF_OBJ);
+				m_predefined_types["H5T_STD_REF_OBJ"] = serializer->Serialize(ParseH5Type(type));
+				H5Tclose(type);
+				type = H5Tcopy(H5T_STD_REF_DSETREG);
+				m_predefined_types["H5T_STD_REF_DSETREG"] = serializer->Serialize(ParseH5Type(type));
+				H5Tclose(type);
 
-        // C-specific datatype
+				// C-specific datatype
 
-        type = H5Tcopy(H5T_C_S1);
-        m_predefined_types["H5T_C_S1"] = serializer->Serialize(ParseH5Type(type));
-        H5Tclose(type);
+				type = H5Tcopy(H5T_C_S1);
+				m_predefined_types["H5T_C_S1"] = serializer->Serialize(ParseH5Type(type));
+				H5Tclose(type);
 
-		// FORTRAN-specific datatype
+				// FORTRAN-specific datatype
 
-        type = H5Tcopy(H5T_FORTRAN_S1);
-        m_predefined_types["H5T_FORTRAN_S1"] = serializer->Serialize(ParseH5Type(type));
-        H5Tclose(type);
+				type = H5Tcopy(H5T_FORTRAN_S1);
+				m_predefined_types["H5T_FORTRAN_S1"] = serializer->Serialize(ParseH5Type(type));
+				H5Tclose(type);
 
-        // Predefined native datatypes
+				// Predefined native datatypes
 
-        type = H5Tcopy(H5T_NATIVE_CHAR);
-        m_predefined_types["H5T_NATIVE_CHAR"] = serializer->Serialize(ParseH5Type(type));
-        H5Tclose(type);
-        type = H5Tcopy(H5T_NATIVE_SHORT);
-        m_predefined_types["H5T_NATIVE_SHORT"] = serializer->Serialize(ParseH5Type(type));
-        H5Tclose(type);
-        type = H5Tcopy(H5T_NATIVE_INT);
-        m_predefined_types["H5T_NATIVE_INT"] = serializer->Serialize(ParseH5Type(type));
-        H5Tclose(type);
-        type = H5Tcopy(H5T_NATIVE_LONG);
-        m_predefined_types["H5T_NATIVE_LONG"] = serializer->Serialize(ParseH5Type(type));
-        H5Tclose(type);
-        type = H5Tcopy(H5T_NATIVE_LLONG);
-        m_predefined_types["H5T_NATIVE_LLONG"] = serializer->Serialize(ParseH5Type(type));
-        H5Tclose(type);
-        type = H5Tcopy(H5T_NATIVE_UCHAR);
-        m_predefined_types["H5T_NATIVE_UCHAR"] = serializer->Serialize(ParseH5Type(type));
-        H5Tclose(type);
-        type = H5Tcopy(H5T_NATIVE_USHORT);
-        m_predefined_types["H5T_NATIVE_USHORT"] = serializer->Serialize(ParseH5Type(type));
-        H5Tclose(type);
-        type = H5Tcopy(H5T_NATIVE_UINT);
-        m_predefined_types["H5T_NATIVE_UINT"] = serializer->Serialize(ParseH5Type(type));
-        H5Tclose(type);
-        type = H5Tcopy(H5T_NATIVE_ULONG);
-        m_predefined_types["H5T_NATIVE_ULONG"] = serializer->Serialize(ParseH5Type(type));
-        H5Tclose(type);
-        type = H5Tcopy(H5T_NATIVE_ULLONG);
-        m_predefined_types["H5T_NATIVE_ULLONG"] = serializer->Serialize(ParseH5Type(type));
-        H5Tclose(type);
-        type = H5Tcopy(H5T_NATIVE_FLOAT);
-        m_predefined_types["H5T_NATIVE_FLOAT"] = serializer->Serialize(ParseH5Type(type));
-        H5Tclose(type);
-        type = H5Tcopy(H5T_NATIVE_DOUBLE);
-        m_predefined_types["H5T_NATIVE_DOUBLE"] = serializer->Serialize(ParseH5Type(type));
-        H5Tclose(type);
-        type = H5Tcopy(H5T_NATIVE_LDOUBLE);
-        m_predefined_types["H5T_NATIVE_LDOUBLE"] = serializer->Serialize(ParseH5Type(type));
-        H5Tclose(type);
-        type = H5Tcopy(H5T_NATIVE_B8);
-        m_predefined_types["H5T_NATIVE_B8"] = serializer->Serialize(ParseH5Type(type));
-        H5Tclose(type);
-        type = H5Tcopy(H5T_NATIVE_B16);
-        m_predefined_types["H5T_NATIVE_B16"] = serializer->Serialize(ParseH5Type(type));
-        H5Tclose(type);
-        type = H5Tcopy(H5T_NATIVE_B32);
-        m_predefined_types["H5T_NATIVE_B32"] = serializer->Serialize(ParseH5Type(type));
-        H5Tclose(type);
-        type = H5Tcopy(H5T_NATIVE_B64);
-        m_predefined_types["H5T_NATIVE_B64"] = serializer->Serialize(ParseH5Type(type));
-        H5Tclose(type);
+				type = H5Tcopy(H5T_NATIVE_CHAR);
+				m_predefined_types["H5T_NATIVE_CHAR"] = serializer->Serialize(ParseH5Type(type));
+				H5Tclose(type);
+				type = H5Tcopy(H5T_NATIVE_SHORT);
+				m_predefined_types["H5T_NATIVE_SHORT"] = serializer->Serialize(ParseH5Type(type));
+				H5Tclose(type);
+				type = H5Tcopy(H5T_NATIVE_INT);
+				m_predefined_types["H5T_NATIVE_INT"] = serializer->Serialize(ParseH5Type(type));
+				H5Tclose(type);
+				type = H5Tcopy(H5T_NATIVE_LONG);
+				m_predefined_types["H5T_NATIVE_LONG"] = serializer->Serialize(ParseH5Type(type));
+				H5Tclose(type);
+				type = H5Tcopy(H5T_NATIVE_LLONG);
+				m_predefined_types["H5T_NATIVE_LLONG"] = serializer->Serialize(ParseH5Type(type));
+				H5Tclose(type);
+				type = H5Tcopy(H5T_NATIVE_UCHAR);
+				m_predefined_types["H5T_NATIVE_UCHAR"] = serializer->Serialize(ParseH5Type(type));
+				H5Tclose(type);
+				type = H5Tcopy(H5T_NATIVE_USHORT);
+				m_predefined_types["H5T_NATIVE_USHORT"] = serializer->Serialize(ParseH5Type(type));
+				H5Tclose(type);
+				type = H5Tcopy(H5T_NATIVE_UINT);
+				m_predefined_types["H5T_NATIVE_UINT"] = serializer->Serialize(ParseH5Type(type));
+				H5Tclose(type);
+				type = H5Tcopy(H5T_NATIVE_ULONG);
+				m_predefined_types["H5T_NATIVE_ULONG"] = serializer->Serialize(ParseH5Type(type));
+				H5Tclose(type);
+				type = H5Tcopy(H5T_NATIVE_ULLONG);
+				m_predefined_types["H5T_NATIVE_ULLONG"] = serializer->Serialize(ParseH5Type(type));
+				H5Tclose(type);
+				type = H5Tcopy(H5T_NATIVE_FLOAT);
+				m_predefined_types["H5T_NATIVE_FLOAT"] = serializer->Serialize(ParseH5Type(type));
+				H5Tclose(type);
+				type = H5Tcopy(H5T_NATIVE_DOUBLE);
+				m_predefined_types["H5T_NATIVE_DOUBLE"] = serializer->Serialize(ParseH5Type(type));
+				H5Tclose(type);
+				type = H5Tcopy(H5T_NATIVE_LDOUBLE);
+				m_predefined_types["H5T_NATIVE_LDOUBLE"] = serializer->Serialize(ParseH5Type(type));
+				H5Tclose(type);
+				type = H5Tcopy(H5T_NATIVE_B8);
+				m_predefined_types["H5T_NATIVE_B8"] = serializer->Serialize(ParseH5Type(type));
+				H5Tclose(type);
+				type = H5Tcopy(H5T_NATIVE_B16);
+				m_predefined_types["H5T_NATIVE_B16"] = serializer->Serialize(ParseH5Type(type));
+				H5Tclose(type);
+				type = H5Tcopy(H5T_NATIVE_B32);
+				m_predefined_types["H5T_NATIVE_B32"] = serializer->Serialize(ParseH5Type(type));
+				H5Tclose(type);
+				type = H5Tcopy(H5T_NATIVE_B64);
+				m_predefined_types["H5T_NATIVE_B64"] = serializer->Serialize(ParseH5Type(type));
+				H5Tclose(type);
 
-        m_bitfield_types = gcnew Hashtable();
+				m_bitfield_types = gcnew Hashtable();
 
-        array<String^>^ a = gcnew array<String^>{
-            "H5T_STD_B8BE", "H5T_STD_B8LE", "H5T_STD_B16BE",
-            "H5T_STD_B16LE", "H5T_STD_B32BE", "H5T_STD_B32LE",
-            "H5T_STD_B64BE", "H5T_STD_B64LE", "H5T_NATIVE_B8",
-            "H5T_NATIVE_B16", "H5T_NATIVE_B32", "H5T_NATIVE_B64"
-        };
+				array<String^>^ a = gcnew array<String^>{
+					"H5T_STD_B8BE", "H5T_STD_B8LE", "H5T_STD_B16BE",
+						"H5T_STD_B16LE", "H5T_STD_B32BE", "H5T_STD_B32LE",
+						"H5T_STD_B64BE", "H5T_STD_B64LE", "H5T_NATIVE_B8",
+						"H5T_NATIVE_B16", "H5T_NATIVE_B32", "H5T_NATIVE_B64"
+				};
 
-        for each (String^ s in a) {
-            m_bitfield_types[s] = m_predefined_types[s];
-        }
+				for each (String^ s in a) {
+					m_bitfield_types[s] = m_predefined_types[s];
+				}
 
-        
-        m_float_types = gcnew Hashtable();
 
-        a = gcnew array<String^>{
-            "H5T_IEEE_F32BE", "H5T_IEEE_F32LE", "H5T_IEEE_F64BE",
-            "H5T_IEEE_F64LE", "H5T_NATIVE_FLOAT", "H5T_NATIVE_DOUBLE",
-            "H5T_NATIVE_LDOUBLE"
-        };
+				m_float_types = gcnew Hashtable();
 
-        for each (String^ s in a) {
-            m_float_types[s] = m_predefined_types[s];
-        }
+				a = gcnew array<String^>{
+					"H5T_IEEE_F32BE", "H5T_IEEE_F32LE", "H5T_IEEE_F64BE",
+						"H5T_IEEE_F64LE", "H5T_NATIVE_FLOAT", "H5T_NATIVE_DOUBLE",
+						"H5T_NATIVE_LDOUBLE"
+				};
 
-        m_integer_types = gcnew Hashtable();
+				for each (String^ s in a) {
+					m_float_types[s] = m_predefined_types[s];
+				}
 
-        a = gcnew array<String^>{
-            "H5T_STD_I8BE", "H5T_STD_I8LE", "H5T_STD_I16BE",
-            "H5T_STD_I16LE", "H5T_STD_I32BE", "H5T_STD_I32LE",
-            "H5T_STD_I64BE", "H5T_STD_I64LE", "H5T_STD_U8BE",
-            "H5T_STD_U8LE", "H5T_STD_U16BE", "H5T_STD_U16LE",
-            "H5T_STD_U32BE", "H5T_STD_U32LE", "H5T_STD_U64BE",
-            "H5T_STD_U64LE", "H5T_NATIVE_CHAR",
-            "H5T_NATIVE_UCHAR", "H5T_NATIVE_SHORT", "H5T_NATIVE_USHORT",
-            "H5T_NATIVE_INT", "H5T_NATIVE_UINT", "H5T_NATIVE_LONG",
-            "H5T_NATIVE_ULONG", "H5T_NATIVE_LLONG", "H5T_NATIVE_ULLONG"
-        };
+				m_integer_types = gcnew Hashtable();
 
-        for each (String^ s in a) {
-            m_integer_types[s] = m_predefined_types[s];
-        }
+				a = gcnew array<String^>{
+					"H5T_STD_I8BE", "H5T_STD_I8LE", "H5T_STD_I16BE",
+						"H5T_STD_I16LE", "H5T_STD_I32BE", "H5T_STD_I32LE",
+						"H5T_STD_I64BE", "H5T_STD_I64LE", "H5T_STD_U8BE",
+						"H5T_STD_U8LE", "H5T_STD_U16BE", "H5T_STD_U16LE",
+						"H5T_STD_U32BE", "H5T_STD_U32LE", "H5T_STD_U64BE",
+						"H5T_STD_U64LE", "H5T_NATIVE_CHAR",
+						"H5T_NATIVE_UCHAR", "H5T_NATIVE_SHORT", "H5T_NATIVE_USHORT",
+						"H5T_NATIVE_INT", "H5T_NATIVE_UINT", "H5T_NATIVE_LONG",
+						"H5T_NATIVE_ULONG", "H5T_NATIVE_LLONG", "H5T_NATIVE_ULLONG"
+				};
 
-        m_native_types = gcnew Hashtable();
+				for each (String^ s in a) {
+					m_integer_types[s] = m_predefined_types[s];
+				}
 
-        a = gcnew array<String^>{
-            "H5T_NATIVE_CHAR", "H5T_NATIVE_SHORT", "H5T_NATIVE_INT",
-            "H5T_NATIVE_LONG", "H5T_NATIVE_LLONG", "H5T_NATIVE_UCHAR",
-            "H5T_NATIVE_USHORT", "H5T_NATIVE_UINT", "H5T_NATIVE_ULONG",
-            "H5T_NATIVE_ULLONG", "H5T_NATIVE_FLOAT", "H5T_NATIVE_DOUBLE",
-            "H5T_NATIVE_LDOUBLE", "H5T_NATIVE_B8", "H5T_NATIVE_B16",
-            "H5T_NATIVE_B32", "H5T_NATIVE_B64" };
+				m_native_types = gcnew Hashtable();
 
-        for each (String^ s in a) {
-            m_native_types[s] = m_predefined_types[s];
-        }
+				a = gcnew array<String^>{
+					"H5T_NATIVE_CHAR", "H5T_NATIVE_SHORT", "H5T_NATIVE_INT",
+						"H5T_NATIVE_LONG", "H5T_NATIVE_LLONG", "H5T_NATIVE_UCHAR",
+						"H5T_NATIVE_USHORT", "H5T_NATIVE_UINT", "H5T_NATIVE_ULONG",
+						"H5T_NATIVE_ULLONG", "H5T_NATIVE_FLOAT", "H5T_NATIVE_DOUBLE",
+						"H5T_NATIVE_LDOUBLE", "H5T_NATIVE_B8", "H5T_NATIVE_B16",
+						"H5T_NATIVE_B32", "H5T_NATIVE_B64" };
 
-        m_reference_types = gcnew Hashtable();
+					for each (String^ s in a) {
+						m_native_types[s] = m_predefined_types[s];
+					}
 
-        a = gcnew array<String^>{
-            "H5T_STD_REF_OBJ", "H5T_STD_REF_DSETREG"
-        };
+					m_reference_types = gcnew Hashtable();
 
-        for each (String^ s in a) {
-            m_reference_types[s] = m_predefined_types[s];
-        }
+					a = gcnew array<String^>{
+						"H5T_STD_REF_OBJ", "H5T_STD_REF_DSETREG"
+					};
 
-        m_standard_types = gcnew Hashtable();
+					for each (String^ s in a) {
+						m_reference_types[s] = m_predefined_types[s];
+					}
 
-        a = gcnew array<String^>{
-            "H5T_STD_I8BE", "H5T_STD_I8LE", "H5T_STD_I16BE",
-            "H5T_STD_I16LE", "H5T_STD_I32BE", "H5T_STD_I32LE",
-            "H5T_STD_I64BE", "H5T_STD_I64LE", "H5T_STD_U8BE",
-            "H5T_STD_U8LE", "H5T_STD_U16BE", "H5T_STD_U16LE",
-            "H5T_STD_U32BE", "H5T_STD_U32LE", "H5T_STD_U64BE",
-            "H5T_STD_U64LE", "H5T_STD_B8BE", "H5T_STD_B8LE",
-            "H5T_STD_B16BE", "H5T_STD_B16LE", "H5T_STD_B32BE",
-            "H5T_STD_B32LE", "H5T_STD_B64BE", "H5T_STD_B64LE",
-            "H5T_STD_REF_OBJ", "H5T_STD_REF_DSETREG"
-        };
+					m_standard_types = gcnew Hashtable();
 
-        for each (String^ s in a) {
-            m_standard_types[s] = m_predefined_types[s];
-        }
+					a = gcnew array<String^>{
+						"H5T_STD_I8BE", "H5T_STD_I8LE", "H5T_STD_I16BE",
+							"H5T_STD_I16LE", "H5T_STD_I32BE", "H5T_STD_I32LE",
+							"H5T_STD_I64BE", "H5T_STD_I64LE", "H5T_STD_U8BE",
+							"H5T_STD_U8LE", "H5T_STD_U16BE", "H5T_STD_U16LE",
+							"H5T_STD_U32BE", "H5T_STD_U32LE", "H5T_STD_U64BE",
+							"H5T_STD_U64LE", "H5T_STD_B8BE", "H5T_STD_B8LE",
+							"H5T_STD_B16BE", "H5T_STD_B16LE", "H5T_STD_B32BE",
+							"H5T_STD_B32LE", "H5T_STD_B64BE", "H5T_STD_B64LE",
+							"H5T_STD_REF_OBJ", "H5T_STD_REF_DSETREG"
+					};
+
+					for each (String^ s in a) {
+						m_standard_types[s] = m_predefined_types[s];
+					}
 
 #pragma endregion
 
 #pragma region HDF5 known types
 
-        m_known_types = gcnew Hashtable();
+					m_known_types = gcnew Hashtable();
 
-		m_known_types["CHAR"] = H5T_NATIVE_CHAR;
-        m_known_types["H5T_NATIVE_CHAR"] = H5T_NATIVE_CHAR;
+					m_known_types["CHAR"] = H5T_NATIVE_CHAR;
+					m_known_types["H5T_NATIVE_CHAR"] = H5T_NATIVE_CHAR;
 
 #pragma region integer
 
-		m_known_types["I8BE"] = H5T_STD_I8BE;
-        m_known_types["I8LE"] = H5T_STD_I8LE;
-		m_known_types["H5T_NATIVE_SCHAR"] = H5T_NATIVE_SCHAR;
-		m_known_types["H5T_STD_I8BE"] = H5T_STD_I8BE;
-        m_known_types["H5T_STD_I8LE"] = H5T_STD_I8LE;
-		m_known_types["SCHAR"] = H5T_NATIVE_SCHAR;
-        
-		m_known_types["H5T_STD_U8BE"] = H5T_STD_U8BE;
-        m_known_types["H5T_STD_U8LE"] = H5T_STD_U8LE;
-        m_known_types["H5T_NATIVE_UCHAR"] = H5T_NATIVE_UCHAR;
-		m_known_types["U8"] = H5T_NATIVE_UCHAR;		
-		m_known_types["U8BE"] = H5T_STD_U8BE;
-        m_known_types["U8LE"] = H5T_STD_U8LE;
-        m_known_types["UCHAR"] = H5T_NATIVE_UCHAR;
-       
-		m_known_types["I16"] = H5T_NATIVE_SHORT;
-		m_known_types["I16BE"] = H5T_STD_I16BE;
-		m_known_types["I16LE"] = H5T_STD_I16LE;
-        m_known_types["H5T_NATIVE_SHORT"] = H5T_NATIVE_SHORT;
-		m_known_types["H5T_STD_I16BE"] = H5T_STD_I16BE;
-		m_known_types["H5T_STD_I16LE"] = H5T_STD_I16LE;
-        m_known_types["SHORT"] = H5T_NATIVE_SHORT;
+					m_known_types["I8BE"] = H5T_STD_I8BE;
+					m_known_types["I8LE"] = H5T_STD_I8LE;
+					m_known_types["H5T_NATIVE_SCHAR"] = H5T_NATIVE_SCHAR;
+					m_known_types["H5T_STD_I8BE"] = H5T_STD_I8BE;
+					m_known_types["H5T_STD_I8LE"] = H5T_STD_I8LE;
+					m_known_types["SCHAR"] = H5T_NATIVE_SCHAR;
 
-        m_known_types["H5T_STD_U16BE"] = H5T_STD_U16BE;
-		m_known_types["H5T_STD_U16LE"] = H5T_STD_U16LE;
-        m_known_types["H5T_NATIVE_USHORT"] = H5T_NATIVE_USHORT;
-		m_known_types["U16"] = H5T_NATIVE_USHORT;        
-		m_known_types["U16BE"] = H5T_STD_U16BE;
-		m_known_types["U16LE"] = H5T_STD_U16LE;
-		m_known_types["USHORT"] = H5T_NATIVE_USHORT;
+					m_known_types["H5T_STD_U8BE"] = H5T_STD_U8BE;
+					m_known_types["H5T_STD_U8LE"] = H5T_STD_U8LE;
+					m_known_types["H5T_NATIVE_UCHAR"] = H5T_NATIVE_UCHAR;
+					m_known_types["U8"] = H5T_NATIVE_UCHAR;		
+					m_known_types["U8BE"] = H5T_STD_U8BE;
+					m_known_types["U8LE"] = H5T_STD_U8LE;
+					m_known_types["UCHAR"] = H5T_NATIVE_UCHAR;
 
-		m_known_types["I32"] = H5T_NATIVE_INT;
-		m_known_types["I32BE"] = H5T_STD_I32BE;
-        m_known_types["I32LE"] = H5T_STD_I32LE;
-        m_known_types["INT"] = H5T_NATIVE_INT;
-        m_known_types["H5T_NATIVE_INT"] = H5T_NATIVE_INT;
-		m_known_types["H5T_STD_I32BE"] = H5T_STD_I32BE;
-		m_known_types["H5T_STD_I32LE"] = H5T_STD_I32LE;
-        
-		m_known_types["H5T_NATIVE_LONG"] = H5T_NATIVE_LONG;
-        m_known_types["LONG"] = H5T_NATIVE_LONG;
-        
-		m_known_types["H5T_STD_U32BE"] = H5T_STD_U32BE;        
-        m_known_types["H5T_STD_U32LE"] = H5T_STD_U32LE;
-		m_known_types["H5T_NATIVE_UINT"] = H5T_NATIVE_UINT;
-		m_known_types["U32"] = H5T_NATIVE_UINT;
-		m_known_types["U32BE"] = H5T_STD_U32BE;
-        m_known_types["U32LE"] = H5T_STD_U32LE;
-		m_known_types["UINT"] = H5T_NATIVE_UINT;
-        
-		m_known_types["H5T_NATIVE_ULONG"] = H5T_NATIVE_ULONG;
-		m_known_types["ULONG"] = H5T_NATIVE_ULONG;
+					m_known_types["I16"] = H5T_NATIVE_SHORT;
+					m_known_types["I16BE"] = H5T_STD_I16BE;
+					m_known_types["I16LE"] = H5T_STD_I16LE;
+					m_known_types["H5T_NATIVE_SHORT"] = H5T_NATIVE_SHORT;
+					m_known_types["H5T_STD_I16BE"] = H5T_STD_I16BE;
+					m_known_types["H5T_STD_I16LE"] = H5T_STD_I16LE;
+					m_known_types["SHORT"] = H5T_NATIVE_SHORT;
 
-		m_known_types["H5T_STD_I64BE"] = H5T_STD_I64BE;
-        m_known_types["H5T_STD_I64LE"] = H5T_STD_I64LE;
-		m_known_types["I64BE"] = H5T_STD_I64BE;
-		m_known_types["I64LE"] = H5T_STD_I64LE;
-        
-		m_known_types["I64"] = H5T_NATIVE_LLONG;
-		m_known_types["H5T_NATIVE_LLONG"] = H5T_NATIVE_LLONG;
-		m_known_types["LLONG"] = H5T_NATIVE_LLONG;
-        
-		m_known_types["H5T_STD_U64BE"] = H5T_STD_U64BE;
-        m_known_types["H5T_STD_U64LE"] = H5T_STD_U64LE;
-        m_known_types["U64BE"] = H5T_STD_U64BE;
-        m_known_types["U64LE"] = H5T_STD_U64LE;
-		
-		m_known_types["H5T_NATIVE_ULLONG"] = H5T_NATIVE_ULLONG;
-        m_known_types["U64"] = H5T_NATIVE_ULLONG;
-		m_known_types["ULLONG"] = H5T_NATIVE_ULLONG;
-        
+					m_known_types["H5T_STD_U16BE"] = H5T_STD_U16BE;
+					m_known_types["H5T_STD_U16LE"] = H5T_STD_U16LE;
+					m_known_types["H5T_NATIVE_USHORT"] = H5T_NATIVE_USHORT;
+					m_known_types["U16"] = H5T_NATIVE_USHORT;        
+					m_known_types["U16BE"] = H5T_STD_U16BE;
+					m_known_types["U16LE"] = H5T_STD_U16LE;
+					m_known_types["USHORT"] = H5T_NATIVE_USHORT;
+
+					m_known_types["I32"] = H5T_NATIVE_INT;
+					m_known_types["I32BE"] = H5T_STD_I32BE;
+					m_known_types["I32LE"] = H5T_STD_I32LE;
+					m_known_types["INT"] = H5T_NATIVE_INT;
+					m_known_types["H5T_NATIVE_INT"] = H5T_NATIVE_INT;
+					m_known_types["H5T_STD_I32BE"] = H5T_STD_I32BE;
+					m_known_types["H5T_STD_I32LE"] = H5T_STD_I32LE;
+
+					m_known_types["H5T_NATIVE_LONG"] = H5T_NATIVE_LONG;
+					m_known_types["LONG"] = H5T_NATIVE_LONG;
+
+					m_known_types["H5T_STD_U32BE"] = H5T_STD_U32BE;        
+					m_known_types["H5T_STD_U32LE"] = H5T_STD_U32LE;
+					m_known_types["H5T_NATIVE_UINT"] = H5T_NATIVE_UINT;
+					m_known_types["U32"] = H5T_NATIVE_UINT;
+					m_known_types["U32BE"] = H5T_STD_U32BE;
+					m_known_types["U32LE"] = H5T_STD_U32LE;
+					m_known_types["UINT"] = H5T_NATIVE_UINT;
+
+					m_known_types["H5T_NATIVE_ULONG"] = H5T_NATIVE_ULONG;
+					m_known_types["ULONG"] = H5T_NATIVE_ULONG;
+
+					m_known_types["H5T_STD_I64BE"] = H5T_STD_I64BE;
+					m_known_types["H5T_STD_I64LE"] = H5T_STD_I64LE;
+					m_known_types["I64BE"] = H5T_STD_I64BE;
+					m_known_types["I64LE"] = H5T_STD_I64LE;
+
+					m_known_types["I64"] = H5T_NATIVE_LLONG;
+					m_known_types["H5T_NATIVE_LLONG"] = H5T_NATIVE_LLONG;
+					m_known_types["LLONG"] = H5T_NATIVE_LLONG;
+
+					m_known_types["H5T_STD_U64BE"] = H5T_STD_U64BE;
+					m_known_types["H5T_STD_U64LE"] = H5T_STD_U64LE;
+					m_known_types["U64BE"] = H5T_STD_U64BE;
+					m_known_types["U64LE"] = H5T_STD_U64LE;
+
+					m_known_types["H5T_NATIVE_ULLONG"] = H5T_NATIVE_ULLONG;
+					m_known_types["U64"] = H5T_NATIVE_ULLONG;
+					m_known_types["ULLONG"] = H5T_NATIVE_ULLONG;
+
 #pragma endregion
 
 #pragma region bitfield
 
-        m_known_types["B8"] = H5T_NATIVE_B8;
-        m_known_types["B8BE"] = H5T_STD_B8BE;
-		m_known_types["B8LE"] = H5T_STD_B8LE;
-		m_known_types["H5T_NATIVE_B8"] = H5T_NATIVE_B8;
-		m_known_types["H5T_STD_B8BE"] = H5T_STD_B8BE;
-        m_known_types["H5T_STD_B8LE"] = H5T_STD_B8LE;
+					m_known_types["B8"] = H5T_NATIVE_B8;
+					m_known_types["B8BE"] = H5T_STD_B8BE;
+					m_known_types["B8LE"] = H5T_STD_B8LE;
+					m_known_types["H5T_NATIVE_B8"] = H5T_NATIVE_B8;
+					m_known_types["H5T_STD_B8BE"] = H5T_STD_B8BE;
+					m_known_types["H5T_STD_B8LE"] = H5T_STD_B8LE;
 
-        m_known_types["B16"] = H5T_NATIVE_B16;
-	    m_known_types["B16BE"] = H5T_STD_B16BE;
-		m_known_types["B16LE"] = H5T_STD_B16LE;
-        m_known_types["H5T_NATIVE_B16"] = H5T_NATIVE_B16;
-		m_known_types["H5T_STD_B16BE"] = H5T_STD_B16BE;
-        m_known_types["H5T_STD_B16LE"] = H5T_STD_B16LE;
-		
-		m_known_types["B32"] = H5T_NATIVE_B32;
-		m_known_types["B32BE"] = H5T_STD_B32BE;
-		m_known_types["B32LE"] = H5T_STD_B32LE;
-		m_known_types["H5T_NATIVE_B32"] = H5T_NATIVE_B32;
-		m_known_types["H5T_STD_B32BE"] = H5T_STD_B32BE;
-		m_known_types["H5T_STD_B32LE"] = H5T_STD_B32LE;
+					m_known_types["B16"] = H5T_NATIVE_B16;
+					m_known_types["B16BE"] = H5T_STD_B16BE;
+					m_known_types["B16LE"] = H5T_STD_B16LE;
+					m_known_types["H5T_NATIVE_B16"] = H5T_NATIVE_B16;
+					m_known_types["H5T_STD_B16BE"] = H5T_STD_B16BE;
+					m_known_types["H5T_STD_B16LE"] = H5T_STD_B16LE;
 
-		m_known_types["B64"] = H5T_NATIVE_B64;
-		m_known_types["B64BE"] = H5T_STD_B64BE;
-		m_known_types["B64LE"] = H5T_STD_B64LE;
-		m_known_types["H5T_NATIVE_B64"] = H5T_NATIVE_B64;
-		m_known_types["H5T_STD_B64BE"] = H5T_STD_B64BE;
-		m_known_types["H5T_STD_B64LE"] = H5T_STD_B64LE;
+					m_known_types["B32"] = H5T_NATIVE_B32;
+					m_known_types["B32BE"] = H5T_STD_B32BE;
+					m_known_types["B32LE"] = H5T_STD_B32LE;
+					m_known_types["H5T_NATIVE_B32"] = H5T_NATIVE_B32;
+					m_known_types["H5T_STD_B32BE"] = H5T_STD_B32BE;
+					m_known_types["H5T_STD_B32LE"] = H5T_STD_B32LE;
+
+					m_known_types["B64"] = H5T_NATIVE_B64;
+					m_known_types["B64BE"] = H5T_STD_B64BE;
+					m_known_types["B64LE"] = H5T_STD_B64LE;
+					m_known_types["H5T_NATIVE_B64"] = H5T_NATIVE_B64;
+					m_known_types["H5T_STD_B64BE"] = H5T_STD_B64BE;
+					m_known_types["H5T_STD_B64LE"] = H5T_STD_B64LE;
 
 #pragma endregion
-    
+
 #pragma region float
 
-		m_known_types["F32"] = H5T_NATIVE_FLOAT;
-        m_known_types["F32BE"] = H5T_IEEE_F32BE;
-        m_known_types["F32LE"] = H5T_IEEE_F32LE;
-		m_known_types["FLOAT"] = H5T_NATIVE_FLOAT;
-        m_known_types["H5T_IEEE_F32BE"] = H5T_IEEE_F32BE;
-        m_known_types["H5T_IEEE_F32LE"] = H5T_IEEE_F32LE;
-	    m_known_types["H5T_NATIVE_FLOAT"] = H5T_NATIVE_FLOAT;
-    	m_known_types["SINGLE"] = H5T_NATIVE_FLOAT;
-        
-		m_known_types["DOUBLE"] = H5T_NATIVE_DOUBLE;
-		m_known_types["F64"] = H5T_NATIVE_DOUBLE;
-        m_known_types["F64BE"] = H5T_IEEE_F64BE;
-        m_known_types["F64LE"] = H5T_IEEE_F64LE;
-        m_known_types["H5T_IEEE_F64BE"] = H5T_IEEE_F64BE;
-		m_known_types["H5T_IEEE_F64LE"] = H5T_IEEE_F64LE;
-		m_known_types["H5T_NATIVE_DOUBLE"] = H5T_NATIVE_DOUBLE;
-        
-	    m_known_types["H5T_NATIVE_LDOUBLE"] = H5T_NATIVE_LDOUBLE;
-		m_known_types["LDOUBLE"] = H5T_NATIVE_LDOUBLE;
-        
+					m_known_types["F32"] = H5T_NATIVE_FLOAT;
+					m_known_types["F32BE"] = H5T_IEEE_F32BE;
+					m_known_types["F32LE"] = H5T_IEEE_F32LE;
+					m_known_types["FLOAT"] = H5T_NATIVE_FLOAT;
+					m_known_types["H5T_IEEE_F32BE"] = H5T_IEEE_F32BE;
+					m_known_types["H5T_IEEE_F32LE"] = H5T_IEEE_F32LE;
+					m_known_types["H5T_NATIVE_FLOAT"] = H5T_NATIVE_FLOAT;
+					m_known_types["SINGLE"] = H5T_NATIVE_FLOAT;
+
+					m_known_types["DOUBLE"] = H5T_NATIVE_DOUBLE;
+					m_known_types["F64"] = H5T_NATIVE_DOUBLE;
+					m_known_types["F64BE"] = H5T_IEEE_F64BE;
+					m_known_types["F64LE"] = H5T_IEEE_F64LE;
+					m_known_types["H5T_IEEE_F64BE"] = H5T_IEEE_F64BE;
+					m_known_types["H5T_IEEE_F64LE"] = H5T_IEEE_F64LE;
+					m_known_types["H5T_NATIVE_DOUBLE"] = H5T_NATIVE_DOUBLE;
+
+					m_known_types["H5T_NATIVE_LDOUBLE"] = H5T_NATIVE_LDOUBLE;
+					m_known_types["LDOUBLE"] = H5T_NATIVE_LDOUBLE;
+
 #pragma endregion
 
-		m_known_types["H5T_STD_REF_OBJ"] = H5T_STD_REF_OBJ;
-        m_known_types["OBJREF"] = H5T_STD_REF_OBJ;
-        m_known_types["REF_OBJ"] = H5T_STD_REF_OBJ;
-        
-		m_known_types["H5T_STD_REF_DSETREG"] = H5T_STD_REF_DSETREG;
-        m_known_types["REF_DSETREG"] = H5T_STD_REF_DSETREG;
-		m_known_types["REGREF"] = H5T_STD_REF_DSETREG;
+#pragma region references
+
+					m_known_types["H5T_STD_REF_OBJ"] = H5T_STD_REF_OBJ;
+					m_known_types["OBJREF"] = H5T_STD_REF_OBJ;
+					m_known_types["REF_OBJ"] = H5T_STD_REF_OBJ;
+
+					m_known_types["H5T_STD_REF_DSETREG"] = H5T_STD_REF_DSETREG;
+					m_known_types["REF_DSETREG"] = H5T_STD_REF_DSETREG;
+					m_known_types["REGREF"] = H5T_STD_REF_DSETREG;
+
+#pragma endregion
 
 #pragma endregion
 
 #pragma region HDF5 item types
 
-        m_item_types = gcnew Hashtable();
+					m_item_types = gcnew Hashtable();
 
-        m_item_types["DATASET"] = "DATASET";
-        m_item_types["DSET"] = "DATASET";
-        m_item_types["SET"] = "DATASET";
-        m_item_types["D"] = "DATASET";
+					m_item_types["DATASET"] = "DATASET";
+					m_item_types["DSET"] = "DATASET";
+					m_item_types["SET"] = "DATASET";
+					m_item_types["D"] = "DATASET";
 
-        m_item_types["DATATYPE"] = "DATATYPE";
-        m_item_types["DTYPE"] = "DATATYPE";
-        m_item_types["TYPE"] = "DATATYPE";
-        m_item_types["T"] = "DATATYPE";
+					m_item_types["DATATYPE"] = "DATATYPE";
+					m_item_types["DTYPE"] = "DATATYPE";
+					m_item_types["TYPE"] = "DATATYPE";
+					m_item_types["T"] = "DATATYPE";
 
-        m_item_types["EXTLINK"] = "EXTLINK";
-        m_item_types["EXTERNALLINK"] = "EXTLINK";
-        m_item_types["EXTERNAL"] = "EXTLINK";
-        m_item_types["ELINK"] = "EXTLINK";
-        m_item_types["EXT"] = "EXTLINK";
+					m_item_types["EXTLINK"] = "EXTLINK";
+					m_item_types["EXTERNALLINK"] = "EXTLINK";
+					m_item_types["EXTERNAL"] = "EXTLINK";
+					m_item_types["ELINK"] = "EXTLINK";
+					m_item_types["EXT"] = "EXTLINK";
 
 
-		m_item_types["DIRECTORY"] = "GROUP";
-		m_item_types["DIR"] = "GROUP";
+					m_item_types["DIRECTORY"] = "GROUP";
+					m_item_types["DIR"] = "GROUP";
 
-        m_item_types["GROUP"] = "GROUP";
-        m_item_types["GRP"] = "GROUP";
-        m_item_types["GR"] = "GROUP";
-        m_item_types["G"] = "GROUP";
+					m_item_types["GROUP"] = "GROUP";
+					m_item_types["GRP"] = "GROUP";
+					m_item_types["GR"] = "GROUP";
+					m_item_types["G"] = "GROUP";
 
-        m_item_types["HARDLINK"] = "HARDLINK";
-        m_item_types["HLINK"] = "HARDLINK";
-        m_item_types["HARD"] = "HARDLINK";
+					m_item_types["HARDLINK"] = "HARDLINK";
+					m_item_types["HLINK"] = "HARDLINK";
+					m_item_types["HARD"] = "HARDLINK";
 
-        m_item_types["IMAGE"] = "IMAGE";
-        m_item_types["IMG"] = "IMAGE";
-        m_item_types["IM"] = "IMAGE";
+					m_item_types["IMAGE"] = "IMAGE";
+					m_item_types["IMG"] = "IMAGE";
+					m_item_types["IM"] = "IMAGE";
 
-        m_item_types["PACKETTABLE"] = "PACKETTABLE";
-        m_item_types["PTABLE"] = "PACKETTABLE";
-        m_item_types["PACKET"] = "PACKETTABLE";
-        m_item_types["PACK"] = "PACKETTABLE";
-        m_item_types["PT"] = "PACKETTABLE";
+					m_item_types["PACKETTABLE"] = "PACKETTABLE";
+					m_item_types["PTABLE"] = "PACKETTABLE";
+					m_item_types["PACKET"] = "PACKETTABLE";
+					m_item_types["PACK"] = "PACKETTABLE";
+					m_item_types["PT"] = "PACKETTABLE";
 
-        m_item_types["SOFTLINK"] = "SOFTLINK";
-        m_item_types["SLINK"] = "SOFTLINK";
-        m_item_types["SOFT"] = "SOFTLINK";
+					m_item_types["SOFTLINK"] = "SOFTLINK";
+					m_item_types["SLINK"] = "SOFTLINK";
+					m_item_types["SOFT"] = "SOFTLINK";
 
 #pragma endregion
+
+		}
+		catch (Exception^ ex) {
+			Console::WriteLine("CAUGHT EXCEPTION IN .CCTOR: " + ex->ToString());
+		}
     }
 }
