@@ -139,6 +139,10 @@ namespace PSH5X
 					"Item '{0}' already has a property named '{1}'", path, propertyName));
 			}
 
+			if (!ProviderUtils::AttributeSizeOK(oid, ftype)) {
+				throw gcnew PSH5XException("Attribute too large! (Max. 64K in compact storage)");
+			}
+
 			if (shape->ToUpper() == "NULL")
 			{
 				fspace = H5Screate(H5S_NULL);

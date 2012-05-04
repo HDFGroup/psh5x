@@ -25,7 +25,7 @@ using namespace System::Runtime::InteropServices;
 namespace PSH5X
 {
 
-    DriveInfo::DriveInfo(String^ path, bool readonly, PSDriveInfo^ drive, bool force, bool core)
+    DriveInfo::DriveInfo(String^ path, bool readonly, PSDriveInfo^ drive, bool force, bool core, bool latest)
         : PSDriveInfo(drive)
     {
         m_path = path;
@@ -43,14 +43,23 @@ namespace PSH5X
 				flags = H5F_ACC_RDWR;
 			}
 
-			if (core)
+			if (core || latest)
 			{
 				if ((fapl_id = H5Pcreate(H5P_FILE_ACCESS)) < 0) {
 					throw gcnew HDF5Exception("H5Pcreate failed!");
 				}
-				// 64 MB increments
-				if (H5Pset_fapl_core(fapl_id, 64*1024*1024, 1) < 0) {
-					throw gcnew HDF5Exception("H5Pset_fapl_core failed!");
+
+				if (core) {
+					// 64 MB increments
+					if (H5Pset_fapl_core(fapl_id, 64*1024*1024, 1) < 0) {
+						throw gcnew HDF5Exception("H5Pset_fapl_core failed!");
+					}
+				}
+
+				if (latest) {
+					if (H5Pset_libver_bounds(fapl_id, H5F_LIBVER_LATEST, H5F_LIBVER_LATEST) < 0) {
+						throw gcnew HDF5Exception("H5Pset_libver_bounds failed!");
+					}
 				}
 			}
 
@@ -75,7 +84,7 @@ namespace PSH5X
 				FileInfo^ info = gcnew FileInfo(path);
 				filename = (char*)(Marshal::StringToHGlobalAnsi(info->FullName)).ToPointer();
 
-				hid_t file = H5Fcreate(filename, H5F_ACC_EXCL, H5P_DEFAULT, H5P_DEFAULT);
+				hid_t file = H5Fcreate(filename, H5F_ACC_EXCL, H5P_DEFAULT, fapl_id);
 				if (file >= 0) {
 					if (H5Fclose(file) < 0) {
 						throw gcnew HDF5Exception("H5Fclose failed!!!");

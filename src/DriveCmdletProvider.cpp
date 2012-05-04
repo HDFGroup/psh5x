@@ -23,7 +23,7 @@ namespace PSH5X
 
         char* file_name = NULL;
 
-        hid_t file_id = -1;
+        hid_t file_id = -1, fapl_id = -1;
 
         Collection<System::Management::Automation::PSDriveInfo^>^ coll =
             gcnew Collection<System::Management::Automation::PSDriveInfo^>();
@@ -36,7 +36,14 @@ namespace PSH5X
 
             file_name = (char*)(Marshal::StringToHGlobalAnsi(tmpFile)).ToPointer();
 
-            file_id = H5Fcreate(file_name, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
+			if ((fapl_id = H5Pcreate(H5P_FILE_ACCESS)) < 0) {
+				throw gcnew HDF5Exception("H5Pcreate failed!");
+			}
+			if (H5Pset_libver_bounds(fapl_id, H5F_LIBVER_LATEST, H5F_LIBVER_LATEST) < 0) {
+				throw gcnew HDF5Exception("H5Pset_libver_bounds failed!");
+			}
+
+            file_id = H5Fcreate(file_name, H5F_ACC_TRUNC, H5P_DEFAULT, fapl_id);
             if (file_id < 0) {
                 String^ msg = String::Format(
                     "H5Fcreate failed with status {0} for file '{1}'", file_id, tmpFile);
@@ -57,7 +64,7 @@ namespace PSH5X
             {
 				bool useCoreVFD = (Environment::GetEnvironmentVariable("PSH5XTmpCoreVFD") != nullptr);
 
-                DriveInfo^ drive = gcnew DriveInfo(tmpFile, false, info, false, useCoreVFD);
+                DriveInfo^ drive = gcnew DriveInfo(tmpFile, false, info, false, useCoreVFD, true);
                 if (drive != nullptr)
                 {
                     coll->Add(drive);
@@ -75,6 +82,10 @@ namespace PSH5X
         }
         finally
         {
+			if (fapl_id >= 0) {
+				H5Pclose(fapl_id);
+			}
+
             if (file_name != NULL) {
                 Marshal::FreeHGlobal(IntPtr(file_name));
             }

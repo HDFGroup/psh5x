@@ -27,9 +27,6 @@ namespace PSH5X
 
         hid_t fspace = -1, ftype = -1, ntype = -1, mtype = -1;
 
-        hsize_t* dims = NULL;
-        hsize_t* maxdims = NULL;
-
         htri_t is_vlen = -1;
 
         char** rdata = NULL;
@@ -87,22 +84,13 @@ namespace PSH5X
                         npoints = H5Sget_simple_extent_npoints(fspace);
                         ht->Add("ElementCount", npoints);
 
-                        dims = new hsize_t [rank];
-                        maxdims = new hsize_t [rank];
-                        rank = H5Sget_simple_extent_dims(fspace, dims, maxdims);
+                        rank = H5Sget_simple_extent_ndims(fspace);
                         if (rank >= 0)
                         {
-                            array<hsize_t>^ adims    = gcnew array<hsize_t>(rank);
-                            array<hsize_t>^ maxadims = gcnew array<hsize_t>(rank);
-                            for (int i = 0; i < rank; ++i)
-                            {
-                                adims[i]    = dims[i];
-                                maxadims[i] = maxdims[i];
-                            }
+							array<hsize_t>^ adims = gcnew array<hsize_t>(rank);
+							pin_ptr<hsize_t> adims_ptr = &adims[0];
+							rank = H5Sget_simple_extent_dims(fspace, adims_ptr, NULL);
                             ht->Add("Dimensions", adims);
-
-                            // attributes are not extendible
-                            //ht->Add("MaxDimensions", maxadims);
                         }
                         else {
                             throw gcnew PSH5XException("Rank of simple dataspace must be positive!!!");
@@ -112,8 +100,7 @@ namespace PSH5X
                         throw gcnew PSH5XException("Rank of simple dataspace must be positive!!!");
                     }
                 }
-                else if (stype == H5S_SCALAR)
-                {
+                else if (stype == H5S_SCALAR) {
                     npoints = 1;
                 }
 
@@ -125,8 +112,7 @@ namespace PSH5X
 
                 if (npoints >= 1)
                 {
-                    ftype = H5Aget_type(aid);
-                    if (ftype < 0) {
+                    if ((ftype = H5Aget_type(aid)) < 0) {
                         throw gcnew HDF5Exception("H5Aget_type failed!");
                     }
 
@@ -141,7 +127,11 @@ namespace PSH5X
 						{
 #pragma region HDF5 INTEGER
 							ht->Add("ElementTypeClass", "Integer");
-							ntype = H5Tget_native_type(ftype, H5T_DIR_ASCEND);
+							
+							if ((ntype = H5Tget_native_type(ftype, H5T_DIR_ASCEND)) < 0) {
+								throw gcnew HDF5Exception("H5Tget_native_type failed!");
+							}
+							
 							sign = H5Tget_sign(ntype);
 							if (sign == H5T_SGN_2)
 							{
@@ -486,12 +476,6 @@ namespace PSH5X
             if (ftype >= 0) {
                 H5Tclose(ftype);
             }
-            if (dims != NULL) {
-                delete [] dims;
-            }
-            if (maxdims != NULL) {
-                delete [] maxdims;
-            };
             if (fspace >= 0) {
                 H5Sclose(fspace);
             }
@@ -515,8 +499,7 @@ namespace PSH5X
 
 #pragma region sanity check
 
-			fspace = H5Aget_space(aid);
-			if (fspace < 0) {
+			if ((fspace = H5Aget_space(aid)) < 0) {
 				throw gcnew HDF5Exception("H5Aget_space failed!");
 			}
 
@@ -524,9 +507,8 @@ namespace PSH5X
 			if (stype != H5S_SCALAR) {
 				throw gcnew PSH5XException("Scalar HDF5 attributes only!");
 			}
-			
-			ftype = H5Aget_type(aid);
-            if (ftype < 0) {
+
+            if ((ftype = H5Aget_type(aid)) < 0) {
                 throw gcnew HDF5Exception("H5Aget_type failed!");
             }
 
@@ -540,7 +522,9 @@ namespace PSH5X
 #pragma endregion
     
 			size_t size = H5Tget_size(ftype);
-			ntype = H5Tget_native_type(ftype, H5T_DIR_ASCEND);
+			if ((ntype = H5Tget_native_type(ftype, H5T_DIR_ASCEND)) < 0) {
+				throw gcnew HDF5Exception("H5Tget_native_type failed!");
+			}
 
             H5T_sign_t sign = H5T_SGN_NONE;
 
@@ -685,7 +669,6 @@ namespace PSH5X
 					if (size == 4)
 					{
 						float afloat;
-
 						if (ProviderUtils::TryGetValue(value, afloat))
 						{
 							if (H5Awrite(aid, ntype, &afloat) < 0) {
@@ -699,7 +682,6 @@ namespace PSH5X
 					else if (size == 8)
 					{
 						double adouble;
-
 						if (ProviderUtils::TryGetValue(value, adouble))
 						{
 							if (H5Awrite(aid, ntype, &adouble) < 0) {
@@ -734,6 +716,9 @@ namespace PSH5X
 							if ((mtype = H5Tcreate(H5T_STRING, H5T_VARIABLE)) < 0) {
 								throw gcnew HDF5Exception("H5Tcreate failed!");
 							}
+							if (H5Tset_cset(mtype, H5Tget_cset(ftype)) < 0) {
+								throw gcnew HDF5Exception("H5Tset_cset failed!");
+							}
 
 							if (H5Awrite(aid, mtype, vwdata) < 0) {
 								throw gcnew HDF5Exception("H5Awrite failed!");
@@ -758,6 +743,9 @@ namespace PSH5X
 
 							if ((mtype = H5Tcreate(H5T_STRING, size)) < 0) {
 								throw gcnew HDF5Exception("H5Tcreate failed!");
+							}
+							if (H5Tset_cset(mtype, H5Tget_cset(ftype)) < 0) {
+								throw gcnew HDF5Exception("H5Tset_cset failed!");
 							}
 
 							if (H5Awrite(aid, mtype, wdata) < 0) {
@@ -820,8 +808,7 @@ namespace PSH5X
 
         try
         {
-            fspace = H5Aget_space(aid);
-            if (fspace < 0) {
+            if ((fspace = H5Aget_space(aid)) < 0) {
                 throw gcnew HDF5Exception("H5Aget_space failed!");
             }
 
@@ -841,8 +828,7 @@ namespace PSH5X
                 throw gcnew PSH5XException("Unknown dataspace type!");
             }
 
-            ftype = H5Aget_type(aid);
-            if (ftype < 0) {
+            if ((ftype = H5Aget_type(aid)) < 0) {
                 throw gcnew HDF5Exception("H5Aget_type failed!");
             }
 
@@ -851,7 +837,9 @@ namespace PSH5X
                     throw gcnew PSH5XException("Attribute type unsupported (currently)!");
             }
 
-			ntype = H5Tget_native_type(ftype, H5T_DIR_ASCEND);
+			if ((ntype = H5Tget_native_type(ftype, H5T_DIR_ASCEND)) < 0) {
+				throw gcnew HDF5Exception("H5Tget_native_type failed!");
+			}
 			size_t size = H5Tget_size(ntype);
 
             H5T_sign_t sign = H5T_SGN_NONE;
@@ -1058,6 +1046,9 @@ namespace PSH5X
 							if (H5Tset_size(mtype, H5T_VARIABLE) < 0) {
 								throw gcnew HDF5Exception("H5Tset_size failed!");
 							}
+							if (H5Tset_cset(mtype, H5Tget_cset(ftype)) < 0) {
+								throw gcnew HDF5Exception("H5Tset_cset failed!");
+							}
 
 							if (H5Awrite(aid, mtype, vwdata) < 0) {
 								throw gcnew HDF5Exception("H5Awrite failed!");
@@ -1073,8 +1064,7 @@ namespace PSH5X
 
 						wdata = new char* [npoints];
 						wdata[0] = new char [npoints*(size+1)];
-						for (i = 1; i < npoints; ++i)
-						{
+						for (i = 1; i < npoints; ++i) {
 							wdata[i] = wdata[0] + i*(size+1);
 						}
 
@@ -1100,6 +1090,9 @@ namespace PSH5X
 							mtype = H5Tcopy(H5T_C_S1);
 							if (H5Tset_size(mtype, size+1) < 0) {
 								throw gcnew HDF5Exception("H5Tset_size failed!!!");
+							}
+							if (H5Tset_cset(mtype, H5Tget_cset(ftype)) < 0) {
+								throw gcnew HDF5Exception("H5Tset_cset failed!");
 							}
 
 							if (H5Awrite(aid, mtype, wdata[0]) < 0) {
@@ -1151,4 +1144,33 @@ namespace PSH5X
 
         return;
     }
+
+	bool ProviderUtils::AttributeSizeOK(hid_t obj_id, hid_t type_id)
+	{
+		bool result = false;
+
+		try
+		{
+			H5O_info_t info;
+			if (H5Oget_info(obj_id, &info) < 0) {
+				throw gcnew HDF5Exception("H5Oget_info failed!");
+			}
+
+			// HACK: how do I determine if we are in compact or dense storage?
+
+			if (info.meta_size.attr.index_size > 0 && info.meta_size.attr.heap_size > 0) {
+				result = true;
+			}
+			else {
+				if (H5Tget_size(type_id) <= 64000) {
+					result = true;
+				}
+			}
+		}
+		finally
+		{
+		}
+
+		return result;
+	}
 }

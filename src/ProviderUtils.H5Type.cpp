@@ -2012,7 +2012,6 @@ namespace PSH5X
 				if (ProviderUtils::TryGetValue(t->Substring(6, t->IndexOf('[')-6), size))
 				{
 					tag = type->Trim()->Substring(t->IndexOf('[')+1, t->LastIndexOf(']')-t->IndexOf('[')-1);
-					Console::WriteLine(tag);
 					if (tag->Length > H5T_OPAQUE_TAG_MAX) {
 						throw gcnew PSH5XException(
 							String::Format("The tag length must not exceed {0}!", H5T_OPAQUE_TAG_MAX));
@@ -2041,8 +2040,6 @@ namespace PSH5X
 					throw gcnew PSH5XException("Unable to determine size of opaque type! Syntax error?");
 				}
 			}
-
-			Console::WriteLine(size);
 		}
 
         if (result < 0) {
@@ -2464,8 +2461,6 @@ namespace PSH5X
         if (H5Tget_class(type_id) != H5T_COMPOUND) {
             throw gcnew PSH5XException("This is not a compound type");
         }
-
-        //size_t size = H5Tget_size(type_id);
 
         int member_count = H5Tget_nmembers(type_id);
         if (member_count < 0) {

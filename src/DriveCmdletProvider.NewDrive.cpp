@@ -36,7 +36,9 @@ namespace PSH5X
 			}
 
             return gcnew DriveInfo(path, readonly, drive,
-				dynamicParameters["Force"]->IsSet, dynamicParameters["Core"]->IsSet);
+				dynamicParameters["Force"]->IsSet,
+				dynamicParameters["Core"]->IsSet,
+				dynamicParameters["Latest"]->IsSet);
         }
         else
         {
@@ -82,6 +84,15 @@ namespace PSH5X
         paramCore->ParameterType = SwitchParameter::typeid;
         paramCore->Attributes->Add(atts3);
         dynamicParameters->Add("Core", paramCore);
+
+		ParameterAttribute^ atts4 = gcnew ParameterAttribute();
+        atts4->Mandatory = false;
+        atts4->ValueFromPipeline = false;
+        RuntimeDefinedParameter^ paramLatest = gcnew RuntimeDefinedParameter();
+        paramLatest->Name = "Latest";
+        paramLatest->ParameterType = SwitchParameter::typeid;
+        paramLatest->Attributes->Add(atts4);
+        dynamicParameters->Add("Latest", paramLatest);
         
         return dynamicParameters;
     }

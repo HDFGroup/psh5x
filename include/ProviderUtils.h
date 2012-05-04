@@ -201,6 +201,8 @@ namespace PSH5X
 
         static void SetH5AttributeValue(hid_t attr_id, System::Object^ value);
 
+		static bool AttributeSizeOK(hid_t obj_id, hid_t type_id);
+
 #pragma endregion
 
 #pragma region General Utilities
