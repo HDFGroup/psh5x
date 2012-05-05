@@ -5,18 +5,19 @@
         <link rel="stylesheet" type="text/css" href="./style.css" />
     </head>
     <body>
-        <a href="./index.html"><img src="img/psh5x_logo_100x75.gif" alt="PSH5X logo" align="bottom" /></a>
+        <a href="./index.html"><img src="img/psh5x_logo_100x75.gif" alt="PSH5X logo" align="bottom"
+             /></a>
         <h2>Introduction</h2>
         <h3>1.01 Where do I get help?</h3>
         <p>In PowerShell, the <tt>Get-Help</tt> cmdlet is your one-stop shop for help about cmdlets
             and topics. All PSH5X cmdlets come with some form of help. For example, to get help on
-                <tt>New-H5Drive</tt> type <tt>help New-H5Drive</tt> or <tt>New-H5Drive -?</tt>. You can get a
-        list of HDF5 related topics by typing <tt>help about_H5*</tt> .</p>
+                <tt>New-H5Drive</tt> type <tt>help New-H5Drive</tt> or <tt>New-H5Drive -?</tt>. You
+            can get a list of HDF5 related topics by typing <tt>help about_H5*</tt> .</p>
         <h3>1.02 What's the difference between between scripting languages and shell languages?</h3>
-        <p>I keep returning to this question about every 3 months
-            and an answer still eludes me. The following comment by <a
-                href="http://manning.com/payette2/">Bruce Payette</a> has been a steady source of
-            consolation (Windows PowerShell in Action, 2nd Edition, Manning 2011, page 7):</p>
+        <p>I keep returning to this question about every 3 months and an answer still eludes me. The
+            following comment by <a href="http://manning.com/payette2/">Bruce Payette</a> has been a
+            steady source of consolation (Windows PowerShell in Action, 2nd Edition, Manning 2011,
+            page 7):</p>
         <q>In the end, there's no hard-and-fast distinction between a shell language and a scripting
             language. Some of the features that make a good scripting language result in a poor
             shell user experience. Conversely, some of the features that make for a good interactive
@@ -91,5 +92,52 @@ PS:13 >[HDF5DotNet.H5]::Version
                    -------                      -----                     -----
                          8                          8                         1
         </pre>
+        <h2>Common HDF5 Tasks</h2>
+        <h3>3.01 How do I save an XML file in HDF5?</h3>
+        <p>There are several different ways of accomplishing that. Most are a variation on the
+            following theme: Let's store the <tt>types.ps1xml</tt> file in a scalar string attribute
+            of the HDF5 root group. We can store it as a variable-length or fixed-length string. By
+            default, attributes are stored in compact form where their size must not exceed 64K. By
+            comparision, a scalar dataset is not subject to that restriction.</p>
+        <pre class="code">
+$x = [string] (Get-Content "$($PSHOME)\types.ps1xml")
+
+# variable-length, UTF-8 encoded string
+
+New-H5Attribute h5tmp:\ vlen_str $x ustring
+
+# in dense storage (default) the attribute size must not exceed 64K
+
+$y = $x.Substring(0,64000)
+
+New-H5Attribute h5tmp:\ fixed_str $y "ustring$($y.Length)"
+
+New-H5Dataset h5tmp:\fixed_str "ustring$($x.Length)" -Scalar
+
+Set-H5datasetValue h5tmp:\fixed_str $x            
+        </pre>
+        <p> Attributes can be larger than 64K if an object's attribute storage is dense. This
+            property must be set at file/object creation time. </p>
+        <h3>3.02 How do I save a binary file in HDF5?</h3>
+        <p>There are several different ways of accomplishing that. Most are a variation on the
+            following theme: Let's store the <a
+                href="http://en.wikipedia.org/wiki/Notepad_(software)">Notepad</a> executable,
+                <tt>notepad.exe</tt> in a scalar (singleton) HDF5 dataset of an HDF5 opaque type. </p>
+        <pre class="code">
+# get the file bytes
+[byte[]] $x = Get-Content -Encoding byte -Path "$($env:windir)\System32\notepad.exe" -ReadCount 0
+
+# create a scalar HDF5 dataset of an opaque type of the right size (193536 in Windows 7 64-bit)
+New-H5Dataset h5tmp:\notepad.exe "opaque$($x.Count)['notepad.exe']" -Scalar
+
+# pump the bytes in
+Set-H5DatasetValue h5tmp:\notepad.exe (,$x)
+        </pre>
+        <p>The <tt>(,$x)</tt> on the last line is not a typo. <tt>Set-H5DatasetValue</tt> compares
+            the size of the dataset with the value supplied. Since we are dealing with a scalar
+            dataset, <tt>Set-H5DatasetValue</tt> expects a single value. Supplying <tt>$x</tt> as
+            the value would create a size mismatch error, since it's an array of length greater than
+            one. We must us the comma operator to turn it into a single element array whose only
+            element is an array itself.</p>
     </body>
 </html>
