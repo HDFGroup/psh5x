@@ -23,6 +23,9 @@ Function New-H5Drive
       If the HDF5 does not exist, force the creation of a new HDF5 file.
     .PARAMETER Core
       Use the HDF5 core VFD.
+    .PARAMETER Latest
+      Use the latest HDF5 object header format.
+    .EXAMPLE
     .EXAMPLE
       New-H5Drive -Name h5 -File C:\tmp\foo.h5
     .EXAMPLE
@@ -68,7 +71,11 @@ Function New-H5Drive
         [Parameter(Mandatory=$false,
                    HelpMessage='Use the HDF5 core VFD?')]
         [switch]
-        $Core
+        $Core,
+        [Parameter(Mandatory=$false,
+                   HelpMessage='Use the latest HDF5 object header format?')]
+        [switch]
+        $Latest
     )
 
     if (!($Force -or (Test-H5File (Resolve-Path $File))))
@@ -116,6 +123,10 @@ Function New-H5Drive
 
     if ($Core) {
         $cmd += ' -Core'
+    }
+
+    if ($Latest) {
+        $cmd += ' -Latest'
     }
         
     if ($PSCmdlet.ShouldProcess($File, "New HDF5 Drive '$Name'"))
