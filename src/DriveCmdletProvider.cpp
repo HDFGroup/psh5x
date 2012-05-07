@@ -64,7 +64,7 @@ namespace PSH5X
             {
 				bool useCoreVFD = (Environment::GetEnvironmentVariable("PSH5XTmpCoreVFD") != nullptr);
 
-                DriveInfo^ drive = gcnew DriveInfo(tmpFile, false, info, false, useCoreVFD, true);
+                DriveInfo^ drive = gcnew DriveInfo(tmpFile, false, info, false, useCoreVFD, H5F_LIBVER_LATEST);
                 if (drive != nullptr)
                 {
                     coll->Add(drive);

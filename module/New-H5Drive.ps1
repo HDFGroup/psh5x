@@ -23,6 +23,8 @@ Function New-H5Drive
       If the HDF5 does not exist, force the creation of a new HDF5 file.
     .PARAMETER Core
       Use the HDF5 core VFD.
+    .PARAMETER V18
+      Use the HDF5 1.8 release series object header format.
     .PARAMETER Latest
       Use the latest HDF5 object header format.
     .EXAMPLE
@@ -35,6 +37,7 @@ Function New-H5Drive
       New-PSDrive
       about_Scopes
       http://www.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-SetFaplCore
+      http://www.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-SetLibverBounds
  #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param
@@ -72,6 +75,10 @@ Function New-H5Drive
                    HelpMessage='Use the HDF5 core VFD?')]
         [switch]
         $Core,
+        [Parameter(Mandatory=$false,
+                   HelpMessage='Use the HDF5 1.8 release series object header format?')]
+        [switch]
+        $V18,
         [Parameter(Mandatory=$false,
                    HelpMessage='Use the latest HDF5 object header format?')]
         [switch]
@@ -125,13 +132,22 @@ Function New-H5Drive
         $cmd += ' -Core'
     }
 
+    if ($V18 -and $Latest)
+    {
+        Write-Error "`nThe -V18 and -Latest options are incompatible!"
+        return
+    }
+
+    if ($V18) {
+        $cmd += ' -V18'
+    }
+
     if ($Latest) {
         $cmd += ' -Latest'
     }
         
     if ($PSCmdlet.ShouldProcess($File, "New HDF5 Drive '$Name'"))
     {
-       
         Invoke-Expression $cmd
     }
 }

@@ -25,7 +25,7 @@ using namespace System::Runtime::InteropServices;
 namespace PSH5X
 {
 
-    DriveInfo::DriveInfo(String^ path, bool readonly, PSDriveInfo^ drive, bool force, bool core, bool latest)
+    DriveInfo::DriveInfo(String^ path, bool readonly, PSDriveInfo^ drive, bool force, bool core, H5F_libver_t ver)
         : PSDriveInfo(drive)
     {
         m_path = path;
@@ -43,23 +43,16 @@ namespace PSH5X
 				flags = H5F_ACC_RDWR;
 			}
 
-			if (core || latest)
-			{
-				if ((fapl_id = H5Pcreate(H5P_FILE_ACCESS)) < 0) {
-					throw gcnew HDF5Exception("H5Pcreate failed!");
-				}
-
-				if (core) {
-					// 64 MB increments
-					if (H5Pset_fapl_core(fapl_id, 64*1024*1024, 1) < 0) {
-						throw gcnew HDF5Exception("H5Pset_fapl_core failed!");
-					}
-				}
-
-				if (latest) {
-					if (H5Pset_libver_bounds(fapl_id, H5F_LIBVER_LATEST, H5F_LIBVER_LATEST) < 0) {
-						throw gcnew HDF5Exception("H5Pset_libver_bounds failed!");
-					}
+			if ((fapl_id = H5Pcreate(H5P_FILE_ACCESS)) < 0) {
+				throw gcnew HDF5Exception("H5Pcreate failed!");
+			}
+			if (H5Pset_libver_bounds(fapl_id, ver, H5F_LIBVER_LATEST) < 0) {
+				throw gcnew HDF5Exception("H5Pset_libver_bounds failed!");
+			}
+			if (core) {
+				// 64 MB increments
+				if (H5Pset_fapl_core(fapl_id, 64*1024*1024, 1) < 0) {
+					throw gcnew HDF5Exception("H5Pset_fapl_core failed!");
 				}
 			}
 

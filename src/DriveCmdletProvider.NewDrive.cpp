@@ -35,10 +35,22 @@ namespace PSH5X
                 readonly = (dynamicParameters["Mode"]->Value->ToString()->ToUpper() != "RW");
 			}
 
+			H5F_libver_t ver = H5F_LIBVER_EARLIEST;
+
+			if (dynamicParameters["Latest"]->IsSet && dynamicParameters["V18"]->IsSet) {
+				throw gcnew PSH5XException("The -Latest and the -V18 options are incompatible. Use one of them!");
+			}
+			if (dynamicParameters["V18"]->IsSet) {
+				ver = H5F_LIBVER_18;
+			}
+			if (dynamicParameters["Latest"]->IsSet) {
+				ver = H5F_LIBVER_LATEST;
+			}
+			
             return gcnew DriveInfo(path, readonly, drive,
 				dynamicParameters["Force"]->IsSet,
 				dynamicParameters["Core"]->IsSet,
-				dynamicParameters["Latest"]->IsSet);
+				ver);
         }
         else
         {
@@ -93,6 +105,15 @@ namespace PSH5X
         paramLatest->ParameterType = SwitchParameter::typeid;
         paramLatest->Attributes->Add(atts4);
         dynamicParameters->Add("Latest", paramLatest);
+        
+		ParameterAttribute^ atts5 = gcnew ParameterAttribute();
+        atts5->Mandatory = false;
+        atts5->ValueFromPipeline = false;
+        RuntimeDefinedParameter^ paramV18 = gcnew RuntimeDefinedParameter();
+        paramV18->Name = "V18";
+        paramV18->ParameterType = SwitchParameter::typeid;
+        paramV18->Attributes->Add(atts5);
+        dynamicParameters->Add("V18", paramV18);
         
         return dynamicParameters;
     }

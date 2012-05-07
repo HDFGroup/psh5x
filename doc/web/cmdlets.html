@@ -6,10 +6,10 @@
     </head>
     <body>
         <a href="./index.html"><img src="img/psh5x_logo_100x75.gif" alt="PSH5X logo" align="bottom"
-        /></a>
+             /></a>
         <p> The purpose of the table below is to provide an overview of the cmdlets available in
-            PSH5X. Detailed help comes with each cmdlet via the PowerShell help system. Note
-            that some cmdlets are just aliases for core provider cmdlets.</p>
+            PSH5X. Detailed help comes with each cmdlet via the PowerShell help system. Note that
+            some cmdlets are just aliases for core provider cmdlets.</p>
         <table>
             <tr>
                 <th>Cmdlet</th>
@@ -27,18 +27,20 @@
                 <td>Copies HDF5 attributes of objects on the same or different HDF5 drives.</td>
             </tr>
             <tr>
-                <td><tt>Copy-H5Object</tt></td>
-                <td>Copies HDF5 objects (dataset, group, linked datatype) on the same or between
-                    different HDF5 drives.</td>
+                <td><tt>Copy-H5Item</tt></td>
+                <td>Copies HDF5 items (HDF5 objects or symbolic links) on the same or between different
+                    HDF5 drives.</td>
             </tr>
             <tr>
-                <td><tt>Copy-H5SymbolicLink</tt></td>
-                <td>Copies HDF5 symbolic links (soft link and external link) on the same or between
-                    different HDF5 drives.</td>
+                <td colspan="2" class="leftcoltitle"><tt>Format-...</tt></td>
             </tr>
             <tr>
                 <td><tt>Format-H5Dataset</tt></td>
                 <td>Changes the extent (dimension sizes) of extendible HDF5 datasets.</td>
+            </tr>
+            <tr>
+                <td><tt>Format-H5File</tt></td>
+                <td>Creates a new HDF5 file.</td>
             </tr>
             <tr>
                 <td colspan="2" class="leftcoltitle"><tt>Get-...</tt></td>
@@ -57,12 +59,12 @@
                 <td>Gets a representation of an HDF5 drive (H5Drive).</td>
             </tr>
             <tr>
-                <td><tt>Get-H5Member</tt></td>
-                <td>Gets a list representing the links in an HDF5 group (group members).</td>
-            </tr>
-            <tr>
                 <td><tt>Get-H5Item</tt></td>
                 <td>Gets a representation of an HDF5 item (HDF5 object or symbolic link).</td>
+            </tr>
+            <tr>
+                <td><tt>Get-H5Member</tt></td>
+                <td>Gets a list representing the links in an HDF5 group (group members).</td>
             </tr>
             <tr>
                 <td colspan="2" class="leftcoltitle"><tt>Move-...</tt></td>
@@ -110,8 +112,8 @@
             <tr>
                 <td><tt>New-H5Image</tt></td>
                 <td>Creates a new HDF5 image from an image file. (See <a
-                    href="http://www.hdfgroup.org/HDF5/doc/ADGuide/ImageSpec.html">HDF5 Image
-                    and Palette Specification</a> and <a
+                        href="http://www.hdfgroup.org/HDF5/doc/ADGuide/ImageSpec.html">HDF5 Image
+                        and Palette Specification</a> and <a
                         href="http://www.hdfgroup.org/HDF5/doc/RM/Tools.html#Tools-GIF2H5"
                         >gif2h5</a>.)</td>
             </tr>
@@ -143,6 +145,10 @@
                 <td>Removes an HDF5 attribute from an HDF5 object.</td>
             </tr>
             <tr>
+                <td><tt>Remove-H5Drive</tt></td>
+                <td>Removes an HDF5 drive and closes the underlying HDF5 file.</td>
+            </tr>
+            <tr>
                 <td><tt>Remove-H5Item</tt></td>
                 <td>Removes and HDF5 item (HDF5 object or symbolic link).</td>
             </tr>
@@ -161,6 +167,11 @@
                 <td colspan="2" class="leftcoltitle"><tt>Set-...</tt></td>
             </tr>
             <tr>
+                <td><tt>Show-H5Types</tt></td>
+                <td>Shows HDF5 predefined datatypes and their JSON type definitions.</td>
+            </tr>
+            
+            <tr>
                 <td><tt>Set-H5Attribute</tt></td>
                 <td>Sets the value of an HDF5 attribute.</td>
             </tr>
@@ -174,6 +185,10 @@
             <tr>
                 <td><tt>Test-H5Attribute</tt></td>
                 <td>Tests whether an HDF5 object has an HDF5 attribute of a given name.</td>
+            </tr>
+            <tr>
+                <td><tt>Test-H5File</tt></td>
+                <td>Tests whether a file is an HDF5 file.</td>
             </tr>
             <tr>
                 <td><tt>Test-H5Path</tt></td>

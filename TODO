@@ -8,21 +8,24 @@ KNOWN ISSUES
 ------------
 
 - Clean up the attribute code (I[Dynamic]Property)
+-- Support read/write of bitfield, reference, enum, and array attributes
+-- Support memory type conversion
 
 NEW FEATURES
 ------------
 
-- Add memory type argument to Get-Content (for primitive types)
+- Support -Encoding (memory type) argument in Get-Content (for primitive types)
+
+- Support -RegionReference (KeyValPair) argument in Get-Content
 
 - Add a members argument to [Get,Set]-Content for compound types
 
-- Let users de-reference region references
-
 - Support DatasetInfo(Lite) argument in Set/Get-Content and New-H5Array?
+
+- Implement Invoke-Item (e.g., image) and Clear-Item (reset to fill value)
 
 - Implement point selections in reader/writer
 
-- Implement Invoke-Item (e.g., image) and Clear-Item (reset to fill value)
 
 FUNDAMENTALS
 ------------
