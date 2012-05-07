@@ -82,10 +82,10 @@ Function New-H5Group
         $cmd += ' -TrackLinkOrder'
     }
     if ($IndexLinkOrder) {
-        $param += ' -IndexLinkOrder'
+        $cmd += ' -IndexLinkOrder'
     }
     if ($Force) {
-        $param += ' -Force'
+        $cmd += ' -Force'
     }
     
     if ($PSCmdlet.ShouldProcess($Path, 'New HDF5 Group'))

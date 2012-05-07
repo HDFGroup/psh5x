@@ -95,7 +95,7 @@ Function New-H5Image
     }
     
     if ($FromFile) {
-        $cmd += ' -Value $FromFile'
+        $cmd += ' -Value (Resolve-Path $FromFile).Path'
     }
     else {
         $cmd += ' -Bits $Bits -WxH @($Width,$Height) -InterlaceMode $Interlace'
