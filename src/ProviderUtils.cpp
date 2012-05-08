@@ -1,5 +1,13 @@
 
+#include "DatasetInfo.h"
+#include "DatasetInfoLite.h"
+#include "DatatypeInfo.h"
+#include "GroupInfo.h"
+#include "GroupInfoLite.h"
 #include "HDF5Exception.h"
+#include "LinkInfo.h"
+#include "ObjectInfo.h"
+#include "Provider.h"
 #include "ProviderUtils.h"
 #include "PSH5XException.h"
 
@@ -676,6 +684,79 @@ namespace PSH5X
 		}
 		else {
 			result = obj;
+		}
+
+		return result;
+	}
+
+	Object^ ProviderUtils::GetObjectRep(hid_t oid, Hashtable^ dropItem, bool detailed, bool% isContainer)
+	{
+		Object^ result = nullptr;
+
+		H5O_info_t oinfo;
+		if (H5Oget_info(oid, &oinfo) >= 0)
+		{
+			switch (oinfo.type)
+			{
+			case H5O_TYPE_GROUP:
+				{
+					if ((bool) dropItem["G"]) {
+						break;
+					}
+
+					if (!detailed)
+					{
+						result = gcnew GroupInfoLite(oid);
+						isContainer = true;
+					}
+					else 
+					{
+					    result = gcnew GroupInfo(oid);
+						isContainer = true;
+					}
+				}
+				break;
+
+			case H5O_TYPE_DATASET:
+				{
+					if ((bool) dropItem["D"]) {
+						break;
+					}
+
+					if (!detailed)
+					{
+						result = gcnew DatasetInfoLite(oid);
+						isContainer = false;
+					}
+					else
+					{
+					    result = gcnew DatasetInfoLite(oid);
+						isContainer = false;
+					}
+				}
+				break;
+
+			case H5O_TYPE_NAMED_DATATYPE:
+				{
+					if ((bool) dropItem["T"]) {
+						break;
+					}
+
+					result = gcnew DatatypeInfo(oid);
+					isContainer = false;
+				}
+				break;
+
+			default:
+				{
+					result = gcnew ObjectInfo(oid);
+					isContainer = false;
+				}
+				break;
+			}
+		}
+		else {
+			throw gcnew HDF5Exception("H5Oget_info failed!");
 		}
 
 		return result;

@@ -133,6 +133,13 @@ namespace PSH5X
 
         static array<System::String^>^ GetGroupLinkNames(hid_t group_id, bool recurse);
 
+		static System::Object^ GetObjectRep(
+			hid_t oid,
+			System::Collections::Hashtable^ dropItem,
+			bool detailed,
+			bool% isContainer
+			);
+
 #pragma region HDF5 Dataset
 
         static DatasetInfoLite^ GetDatasetInfoLite(hid_t obj_id);

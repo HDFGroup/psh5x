@@ -8,13 +8,11 @@ KNOWN ISSUES
 ------------
 
 - Clean up the attribute code (I[Dynamic]Property)
--- Support read/write of bitfield, reference, enum, and array attributes
+-- Support read/write of bitfield, enum, reference, array, and compound attributes
 -- Support memory type conversion
 
 NEW FEATURES
 ------------
-
-- Implement -Force in Get-ChildItem
 
 - Support -Encoding (memory type) argument in Get-Content (for primitive types)
 

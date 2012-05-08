@@ -37,7 +37,7 @@ namespace PSH5X
 
 #pragma region item type filter
 
-        Hashtable dropItem = gcnew Hashtable();
+        Hashtable^ dropItem = gcnew Hashtable();
         dropItem["D"] = false;
         dropItem["EL"] = false;
         dropItem["G"] = false;
@@ -136,8 +136,9 @@ namespace PSH5X
                 for each (String^ linkName in linkNames)
                 {
                     String^ childPath = path;
-                    if (path != (drive->Name + ":\\"))
+                    if (path != (drive->Name + ":\\")) {
                         childPath += "\\";
+					}
                     childPath += linkName->Replace('/','\\');
 
                     link_name = (char*)(Marshal::StringToHGlobalAnsi(linkName)).ToPointer();
@@ -148,75 +149,21 @@ namespace PSH5X
                         {
                         case H5L_TYPE_HARD:
 							{
-#pragma region HDF5 hard link
 								oid = H5Oopen(gid, link_name, H5P_DEFAULT);
 								if (oid < 0) {
 									throw gcnew HDF5Exception("H5Oopen failed!");
 								}
 
-								H5O_info_t oinfo;
-								if (H5Oget_info(oid, &oinfo) >= 0)
-								{
-									switch (oinfo.type)
-									{
-									case H5O_TYPE_GROUP:
-										{
-											if ((bool) dropItem["G"]) {
-												break;
-											}
-
-											if (!detailed) {
-												WriteItemObject(gcnew GroupInfoLite(oid), childPath,
-													true);
-											}
-											else {
-												WriteItemObject(gcnew GroupInfo(oid), childPath, true);
-											}
-										}
-										break;
-
-									case H5O_TYPE_DATASET:
-										{
-											if ((bool) dropItem["D"]) {
-												break;
-											}
-
-											if (!detailed) {
-												WriteItemObject(gcnew DatasetInfoLite(oid), childPath,
-													false);
-											}
-											else {
-												WriteItemObject(gcnew DatasetInfo(oid), childPath,
-													false);
-											}
-										}
-										break;
-
-									case H5O_TYPE_NAMED_DATATYPE:
-										{
-											if ((bool) dropItem["T"]) {
-												break;
-											}
-
-											WriteItemObject(gcnew DatatypeInfo(oid), childPath, false);
-										}
-										break;
-
-									default:
-
-										WriteItemObject(gcnew ObjectInfo(oid), childPath, false);
-										break;
-									}
-								}
-								else {
-									throw gcnew HDF5Exception("H5Oget_info failed!");
+								bool isContainer = false;
+								Object^ rep = ProviderUtils::GetObjectRep(oid, dropItem, detailed, isContainer);
+								if (rep != nullptr) {
+									WriteItemObject(rep, childPath, isContainer);
 								}
 
 								if (H5Oclose(oid) < 0) {
 									throw gcnew HDF5Exception("H5Oclose failed!");
 								}
-								oid = -1;
-#pragma endregion
+								oid = -1;								
 							}
                             break;
 
@@ -226,8 +173,35 @@ namespace PSH5X
 									break;
 								}
 
-								WriteItemObject(gcnew LinkInfo(gid, linkName),
-									childPath, false);
+								if (!Force) {
+									WriteItemObject(gcnew LinkInfo(gid, linkName),
+										childPath, false);
+								}
+								else
+								{
+									if (ProviderUtils::IsResolvableH5Path(gid, linkName))
+									{
+										oid = H5Oopen(gid, link_name, H5P_DEFAULT);
+										if (oid < 0) {
+											throw gcnew HDF5Exception("H5Oopen failed!");
+										}
+
+										bool isContainer = false;
+										Object^ rep = ProviderUtils::GetObjectRep(oid, dropItem, detailed, isContainer);
+										if (rep != nullptr) {
+											WriteItemObject(rep, childPath, isContainer);
+										}
+
+										if (H5Oclose(oid) < 0) {
+											throw gcnew HDF5Exception("H5Oclose failed!");
+										}
+										oid = -1;
+									}
+									else {
+										WriteItemObject(gcnew LinkInfo(gid, linkName),
+											childPath, false);
+									}
+								}
 							}
                             break;
 
@@ -237,8 +211,35 @@ namespace PSH5X
 									break;
 								}
 
-								WriteItemObject(gcnew LinkInfo(gid, linkName),
-									childPath, false);
+								if (!Force) {
+									WriteItemObject(gcnew LinkInfo(gid, linkName),
+										childPath, false);
+								}
+								else
+								{
+									if (ProviderUtils::IsResolvableH5Path(gid, linkName))
+									{
+										oid = H5Oopen(gid, link_name, H5P_DEFAULT);
+										if (oid < 0) {
+											throw gcnew HDF5Exception("H5Oopen failed!");
+										}
+
+										bool isContainer = false;
+										Object^ rep = ProviderUtils::GetObjectRep(oid, dropItem, detailed, isContainer);
+										if (rep != nullptr) {
+											WriteItemObject(rep, childPath, isContainer);
+										}
+
+										if (H5Oclose(oid) < 0) {
+											throw gcnew HDF5Exception("H5Oclose failed!");
+										}
+										oid = -1;
+									}
+									else {
+										WriteItemObject(gcnew LinkInfo(gid, linkName),
+											childPath, false);
+									}
+								}
 							}
                             break;
 
