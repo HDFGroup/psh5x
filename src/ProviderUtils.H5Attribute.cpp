@@ -25,7 +25,7 @@ namespace PSH5X
     {
         Hashtable^ ht = gcnew Hashtable();
 
-        hid_t fspace = -1, ftype = -1, ntype = -1, mtype = -1;
+        hid_t fspace = -1, ftype = -1, btype = -1, ntype = -1, mtype = -1;
 
         htri_t is_vlen = -1;
 
@@ -121,95 +121,116 @@ namespace PSH5X
                     ht["ElementType"] = serializer->Serialize(ProviderUtils::ParseH5Type(ftype));
                     size_t size = H5Tget_size(ftype);
 
-                    switch (H5Tget_class(ftype))
+					H5T_class_t cls = H5Tget_class(ftype);
+
+                    switch (cls)
                     {
+				    case H5T_BITFIELD:
+					case H5T_ENUM:
                     case H5T_INTEGER:
 						{
-#pragma region HDF5 INTEGER
-							ht->Add("ElementTypeClass", "Integer");
-							
-							if ((ntype = H5Tget_native_type(ftype, H5T_DIR_ASCEND)) < 0) {
-								throw gcnew HDF5Exception("H5Tget_native_type failed!");
+#pragma region HDF5 INTEGER & ENUM & BITFIELD
+
+							if (cls == H5T_BITFIELD) {
+								ht->Add("ElementTypeClass", "Bitfield");	
 							}
-							
-							sign = H5Tget_sign(ntype);
+							else if (cls == H5T_ENUM)
+							{
+								ht->Add("ElementTypeClass", "Enum");
+								if ((btype = H5Tget_super(ftype)) < 0) {
+									throw gcnew HDF5Exception("H5Tget_super failed!");
+								}
+								sign = H5Tget_sign(btype);
+							}
+							else if (cls == H5T_INTEGER) {
+								ht->Add("ElementTypeClass", "Integer");
+								sign = H5Tget_sign(ftype);
+							}
+
+							if (cls != H5T_BITFIELD) {
+								if ((mtype = H5Tget_native_type(ftype, H5T_DIR_ASCEND)) < 0) {
+									throw gcnew HDF5Exception("H5Tget_native_type failed!");
+								}
+							}
+							else {
+								if ((mtype = H5Tget_native_type(ftype, H5T_DIR_DESCEND)) < 0) {
+									throw gcnew HDF5Exception("H5Tget_native_type failed!");
+								}
+							}
+
 							if (sign == H5T_SGN_2)
 							{
 #pragma region signed
 								if (size == 1)
 								{
-									array<char>^ achar = gcnew array<char>(safe_cast<int>(npoints));
-									pin_ptr<char> achar_ptr = &achar[0];
-									mtype = H5Tcopy(H5T_NATIVE_CHAR);
-									if (H5Aread(aid, mtype, achar_ptr) < 0) {
+									array<char>^ a = gcnew array<char>(safe_cast<int>(npoints));
+									pin_ptr<char> a_ptr = &a[0];
+									if (H5Aread(aid, mtype, a_ptr) < 0) {
 										throw gcnew HDF5Exception("H5Aread failed!");
 									}
 									else
 									{
 										if (npoints > 1) {
-											ht->Add("Value", achar);
+											ht->Add("Value", a);
 										}
 										else {
-											ht->Add("Value", achar[0]);
+											ht->Add("Value", a[0]);
 										}
 									}
 								}
 								else if (size == 2)
 								{
-									array<short>^ ashort = gcnew array<short>(safe_cast<int>(npoints));
-									pin_ptr<short> ashort_ptr = &ashort[0];
-									mtype = H5Tcopy(H5T_NATIVE_SHORT);
-									if (H5Aread(aid, mtype, ashort_ptr) < 0) {
+									array<short>^ a = gcnew array<short>(safe_cast<int>(npoints));
+									pin_ptr<short> a_ptr = &a[0];
+									if (H5Aread(aid, mtype, a_ptr) < 0) {
 										throw gcnew HDF5Exception("H5Aread failed!");
 									}
 									else
 									{
 										if (npoints > 1) {
-											ht->Add("Value", ashort);
+											ht->Add("Value", a);
 										}
 										else {
-											ht->Add("Value", ashort[0]);
+											ht->Add("Value", a[0]);
 										}
 									}
 								}
 								else if (size == 4)
 								{
-									array<int>^ aint = gcnew array<int>(safe_cast<int>(npoints));
-									pin_ptr<int> aint_ptr = &aint[0];
-									mtype = H5Tcopy(H5T_NATIVE_INT);
-									if (H5Aread(aid, mtype, aint_ptr) < 0) {
+									array<int>^ a = gcnew array<int>(safe_cast<int>(npoints));
+									pin_ptr<int> a_ptr = &a[0];
+									if (H5Aread(aid, mtype, a_ptr) < 0) {
 										throw gcnew Exception("H5Aread failed!");
 									}
 									else
 									{
 										if (npoints > 1) {
-											ht->Add("Value", aint);
+											ht->Add("Value", a);
 										}
 										else {
-											ht->Add("Value", aint[0]);
+											ht->Add("Value", a[0]);
 										}
 									}
 								}
 								else if (size == 8)
 								{
-									array<long long>^ allong = gcnew array<long long>(safe_cast<int>(npoints));
-									pin_ptr<long long> allong_ptr = &allong[0];
-									mtype = H5Tcopy(H5T_NATIVE_LLONG);
-									if (H5Aread(aid, mtype, allong_ptr) < 0) {
+									array<long long>^ a = gcnew array<long long>(safe_cast<int>(npoints));
+									pin_ptr<long long> a_ptr = &a[0];
+									if (H5Aread(aid, mtype, a_ptr) < 0) {
 										throw gcnew Exception("H5Aread failed!");
 									}
 									else
 									{
 										if (npoints > 1) {
-											ht->Add("Value", allong);
+											ht->Add("Value", a);
 										}
 										else {
-											ht->Add("Value", allong[0]);
+											ht->Add("Value", a[0]);
 										}
 									}
 								}
 								else {
-									throw gcnew PSH5XException("Unsupprted INTEGER type!");
+									throw gcnew PSH5XException("Unsupprted INTEGER or ENUM type!");
 								}
 #pragma endregion
 							}
@@ -218,73 +239,69 @@ namespace PSH5X
 #pragma region unsigned
 								if (size == 1)
 								{
-									array<unsigned char>^ auchar = gcnew array<unsigned char>(safe_cast<int>(npoints));
-									pin_ptr<unsigned char> auchar_ptr = &auchar[0];
-									mtype = H5Tcopy(H5T_NATIVE_UCHAR);
-									if (H5Aread(aid, mtype, auchar_ptr) < 0) {
+									array<unsigned char>^ a = gcnew array<unsigned char>(safe_cast<int>(npoints));
+									pin_ptr<unsigned char> a_ptr = &a[0];
+									if (H5Aread(aid, mtype, a_ptr) < 0) {
 										throw gcnew HDF5Exception("H5Aread failed!");
 									}
 									else
 									{
 										if (npoints > 1) {
-											ht->Add("Value", auchar);
+											ht->Add("Value", a);
 										}
 										else {
-											ht->Add("Value", auchar[0]);
+											ht->Add("Value", a[0]);
 										}
 									}
 								}
 								else if (size == 2)
 								{
-									array<unsigned short>^ aushort = gcnew array<unsigned short>(safe_cast<int>(npoints));
-									pin_ptr<unsigned short> aushort_ptr = &aushort[0];
-									mtype = H5Tcopy(H5T_NATIVE_USHORT);
-									if (H5Aread(aid, mtype, aushort_ptr) < 0) {
+									array<unsigned short>^ a = gcnew array<unsigned short>(safe_cast<int>(npoints));
+									pin_ptr<unsigned short> a_ptr = &a[0];
+									if (H5Aread(aid, mtype, a_ptr) < 0) {
 										throw gcnew HDF5Exception("H5Aread failed!");
 									}
 									else
 									{
 										if (npoints > 1) {
-											ht->Add("Value", aushort);
+											ht->Add("Value", a);
 										}
 										else {
-											ht->Add("Value", aushort[0]);
+											ht->Add("Value", a[0]);
 										}
 									}
 								}
 								else if (size == 4)
 								{
-									array<unsigned int>^ auint = gcnew array<unsigned int>(safe_cast<int>(npoints));
-									pin_ptr<unsigned int> auint_ptr = &auint[0];
-									mtype = H5Tcopy(H5T_NATIVE_UINT);
-									if (H5Aread(aid, mtype, auint_ptr) < 0) {
+									array<unsigned int>^ a = gcnew array<unsigned int>(safe_cast<int>(npoints));
+									pin_ptr<unsigned int> a_ptr = &a[0];
+									if (H5Aread(aid, mtype, a_ptr) < 0) {
 										throw gcnew HDF5Exception("H5Aread failed!");
 									}
 									else
 									{
 										if (npoints > 1) {
-											ht->Add("Value", auint);
+											ht->Add("Value", a);
 										}
 										else {
-											ht->Add("Value", auint[0]);
+											ht->Add("Value", a[0]);
 										}
 									}
 								}
 								else if (size == 8)
 								{
-									array<unsigned long long>^ aullong = gcnew array<unsigned long long>(safe_cast<int>(npoints));
-									pin_ptr<unsigned long long> aullong_ptr = &aullong[0];
-									mtype = H5Tcopy(H5T_NATIVE_ULLONG);
-									if (H5Aread(aid, mtype, aullong_ptr) < 0) {
+									array<unsigned long long>^ a = gcnew array<unsigned long long>(safe_cast<int>(npoints));
+									pin_ptr<unsigned long long> a_ptr = &a[0];
+									if (H5Aread(aid, mtype, a_ptr) < 0) {
 										throw gcnew HDF5Exception("H5Aread failed!");
 									}
 									else
 									{
 										if (npoints > 1) {
-											ht->Add("Value", aullong);
+											ht->Add("Value", a);
 										}
 										else {
-											ht->Add("Value", aullong[0]);
+											ht->Add("Value", a[0]);
 										}
 									}
 								}
@@ -426,28 +443,22 @@ namespace PSH5X
 						}
                         break;
 
-                    case H5T_BITFIELD:
-                        ht->Add("ElementTypeClass", "Bitfield");
-                        break;
-                    case H5T_REFERENCE:
-                        ht->Add("ElementTypeClass", "Reference");
-                        break;
-                    case H5T_OPAQUE:
+					case H5T_OPAQUE:
                         ht->Add("ElementTypeClass", "Opaque");
                         break;
-                    case H5T_COMPOUND:
-                        ht->Add("ElementTypeClass", "Compound");
-                        break;
-                    case H5T_ENUM:
-                        ht->Add("ElementTypeClass", "Enum");
-                        break;
-                    case H5T_VLEN:
-                        ht->Add("ElementTypeClass", "Vlen");
+					case H5T_REFERENCE:
+                        ht->Add("ElementTypeClass", "Reference");
                         break;
                     case H5T_ARRAY:
                         ht->Add("ElementTypeClass", "Array");
                         break;
-                    default:
+                    case H5T_VLEN:
+                        ht->Add("ElementTypeClass", "Vlen");
+                        break;
+					case H5T_COMPOUND:
+                        ht->Add("ElementTypeClass", "Compound");
+                        break;
+					default:
                         ht->Add("ElementTypeClass", "UNKNOWN");;
                         break;
                     }
@@ -469,6 +480,9 @@ namespace PSH5X
             }
             if (mtype >= 0) {
                 H5Tclose(mtype);
+            }
+			if (btype >= 0) {
+                H5Tclose(btype);
             }
             if (ntype >= 0) {
                 H5Tclose(ntype);
