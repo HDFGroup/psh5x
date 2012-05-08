@@ -14,13 +14,13 @@ KNOWN ISSUES
 NEW FEATURES
 ------------
 
+- Implement -Force in Get-ChildItem
+
 - Support -Encoding (memory type) argument in Get-Content (for primitive types)
 
 - Support -RegionReference (KeyValPair) argument in Get-Content
 
-- Add a members argument to [Get,Set]-Content for compound types
-
-- Support DatasetInfo(Lite) argument in Set/Get-Content and New-H5Array?
+- Add a -Members argument to [Get,Set]-Content for compound types
 
 - Implement Invoke-Item (e.g., image) and Clear-Item (reset to fill value)
 
