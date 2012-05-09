@@ -1,5 +1,6 @@
 
 #include "AttributeInfo.h"
+#include "H5ArrayT.h"
 #include "HDF5Exception.h"
 #include "ProviderUtils.h"
 #include "PSH5XException.h"
@@ -49,12 +50,13 @@ namespace PSH5X
 
 #pragma region H5Aget_space
 
-                fspace = H5Aget_space(aid);
-                if (fspace < 0) {
+                if ((fspace = H5Aget_space(aid)) < 0) {
                     throw gcnew HDF5Exception("H5Aget_space failed!!!");
                 }
 
                 H5S_class_t stype = H5Sget_simple_extent_type(fspace);
+				array<hsize_t>^ dims = gcnew array<hsize_t>(1);
+				dims[0] = 1;
 
                 switch (stype)
                 {
@@ -72,35 +74,31 @@ namespace PSH5X
                     break;
                 }
 
+				int rank = -1;
                 hssize_t npoints = -1;
 
                 if (stype == H5S_SIMPLE)
-                {
-                    int rank = H5Sget_simple_extent_ndims(fspace);
-                    if (rank > 0)
-                    {
-                        ht->Add("Rank", rank);
+				{
+					if ((rank = H5Sget_simple_extent_ndims(fspace)) <= 0) {
+						throw gcnew PSH5XException("Rank of simple dataspace must be positive!");
+					}
+					ht->Add("Rank", rank);
 
-                        npoints = H5Sget_simple_extent_npoints(fspace);
-                        ht->Add("ElementCount", npoints);
+					npoints = H5Sget_simple_extent_npoints(fspace);
+					ht->Add("ElementCount", npoints);
 
-                        rank = H5Sget_simple_extent_ndims(fspace);
-                        if (rank >= 0)
-                        {
-							array<hsize_t>^ adims = gcnew array<hsize_t>(rank);
-							pin_ptr<hsize_t> adims_ptr = &adims[0];
-							rank = H5Sget_simple_extent_dims(fspace, adims_ptr, NULL);
-                            ht->Add("Dimensions", adims);
-                        }
-                        else {
-                            throw gcnew PSH5XException("Rank of simple dataspace must be positive!!!");
-                        }
-                    }
-                    else {
-                        throw gcnew PSH5XException("Rank of simple dataspace must be positive!!!");
-                    }
-                }
+					if ((rank = H5Sget_simple_extent_ndims(fspace)) <= 0) {
+						throw gcnew HDF5Exception("H5Sget_simple_extent_ndims failed!");
+					}
+
+					dims = gcnew array<hsize_t>(rank);
+					pin_ptr<hsize_t> dims_ptr = &dims[0];
+					rank = H5Sget_simple_extent_dims(fspace, dims_ptr, NULL);
+					ht->Add("Dimensions", dims);
+
+				}
                 else if (stype == H5S_SCALAR) {
+					rank = 0;
                     npoints = 1;
                 }
 
@@ -163,74 +161,74 @@ namespace PSH5X
 #pragma region signed
 								if (size == 1)
 								{
-									array<char>^ a = gcnew array<char>(safe_cast<int>(npoints));
-									pin_ptr<char> a_ptr = &a[0];
-									if (H5Aread(aid, mtype, a_ptr) < 0) {
+									H5Array<char>^ h5a = gcnew H5Array<char>(dims);
+									pin_ptr<char> ptr = h5a->GetHandle();
+									if (H5Aread(aid, mtype, ptr) < 0) {
 										throw gcnew HDF5Exception("H5Aread failed!");
 									}
 									else
 									{
-										if (npoints > 1) {
-											ht->Add("Value", a);
+										if (rank >= 1) {
+											ht->Add("Value", h5a->GetArray());
 										}
 										else {
-											ht->Add("Value", a[0]);
+											ht->Add("Value", ptr[0]);
 										}
 									}
 								}
 								else if (size == 2)
 								{
-									array<short>^ a = gcnew array<short>(safe_cast<int>(npoints));
-									pin_ptr<short> a_ptr = &a[0];
-									if (H5Aread(aid, mtype, a_ptr) < 0) {
+									H5Array<short>^ h5a = gcnew H5Array<short>(dims);
+									pin_ptr<short> ptr = h5a->GetHandle();
+									if (H5Aread(aid, mtype, ptr) < 0) {
 										throw gcnew HDF5Exception("H5Aread failed!");
 									}
 									else
 									{
-										if (npoints > 1) {
-											ht->Add("Value", a);
+										if (rank >= 1) {
+											ht->Add("Value", h5a->GetArray());
 										}
 										else {
-											ht->Add("Value", a[0]);
+											ht->Add("Value", ptr[0]);
 										}
 									}
 								}
 								else if (size == 4)
 								{
-									array<int>^ a = gcnew array<int>(safe_cast<int>(npoints));
-									pin_ptr<int> a_ptr = &a[0];
-									if (H5Aread(aid, mtype, a_ptr) < 0) {
-										throw gcnew Exception("H5Aread failed!");
+									H5Array<int>^ h5a = gcnew H5Array<int>(dims);
+									pin_ptr<int> ptr = h5a->GetHandle();
+									if (H5Aread(aid, mtype, ptr) < 0) {
+										throw gcnew HDF5Exception("H5Aread failed!");
 									}
 									else
 									{
-										if (npoints > 1) {
-											ht->Add("Value", a);
+										if (rank >= 1) {
+											ht->Add("Value", h5a->GetArray());
 										}
 										else {
-											ht->Add("Value", a[0]);
+											ht->Add("Value", ptr[0]);
 										}
 									}
 								}
 								else if (size == 8)
 								{
-									array<long long>^ a = gcnew array<long long>(safe_cast<int>(npoints));
-									pin_ptr<long long> a_ptr = &a[0];
-									if (H5Aread(aid, mtype, a_ptr) < 0) {
-										throw gcnew Exception("H5Aread failed!");
+									H5Array<long long>^ h5a = gcnew H5Array<long long>(dims);
+									pin_ptr<long long> ptr = h5a->GetHandle();
+									if (H5Aread(aid, mtype, ptr) < 0) {
+										throw gcnew HDF5Exception("H5Aread failed!");
 									}
 									else
 									{
-										if (npoints > 1) {
-											ht->Add("Value", a);
+										if (rank >= 1) {
+											ht->Add("Value", h5a->GetArray());
 										}
 										else {
-											ht->Add("Value", a[0]);
+											ht->Add("Value", ptr[0]);
 										}
 									}
 								}
 								else {
-									throw gcnew PSH5XException("Unsupprted INTEGER or ENUM type!");
+									throw gcnew PSH5XException("Unsupprted INTEGER, ENUM, or BITFIELD type!");
 								}
 #pragma endregion
 							}
@@ -239,69 +237,69 @@ namespace PSH5X
 #pragma region unsigned
 								if (size == 1)
 								{
-									array<unsigned char>^ a = gcnew array<unsigned char>(safe_cast<int>(npoints));
-									pin_ptr<unsigned char> a_ptr = &a[0];
-									if (H5Aread(aid, mtype, a_ptr) < 0) {
+									H5Array<unsigned char>^ h5a = gcnew H5Array<unsigned char>(dims);
+									pin_ptr<unsigned char> ptr = h5a->GetHandle();
+									if (H5Aread(aid, mtype, ptr) < 0) {
 										throw gcnew HDF5Exception("H5Aread failed!");
 									}
 									else
 									{
-										if (npoints > 1) {
-											ht->Add("Value", a);
+										if (rank >= 1) {
+											ht->Add("Value", h5a->GetArray());
 										}
 										else {
-											ht->Add("Value", a[0]);
+											ht->Add("Value", ptr[0]);
 										}
 									}
 								}
 								else if (size == 2)
 								{
-									array<unsigned short>^ a = gcnew array<unsigned short>(safe_cast<int>(npoints));
-									pin_ptr<unsigned short> a_ptr = &a[0];
-									if (H5Aread(aid, mtype, a_ptr) < 0) {
+									H5Array<unsigned short>^ h5a = gcnew H5Array<unsigned short>(dims);
+									pin_ptr<unsigned short> ptr = h5a->GetHandle();
+									if (H5Aread(aid, mtype, ptr) < 0) {
 										throw gcnew HDF5Exception("H5Aread failed!");
 									}
 									else
 									{
-										if (npoints > 1) {
-											ht->Add("Value", a);
+										if (rank >= 1) {
+											ht->Add("Value", h5a->GetArray());
 										}
 										else {
-											ht->Add("Value", a[0]);
+											ht->Add("Value", ptr[0]);
 										}
 									}
 								}
 								else if (size == 4)
 								{
-									array<unsigned int>^ a = gcnew array<unsigned int>(safe_cast<int>(npoints));
-									pin_ptr<unsigned int> a_ptr = &a[0];
-									if (H5Aread(aid, mtype, a_ptr) < 0) {
+									H5Array<unsigned int>^ h5a = gcnew H5Array<unsigned int>(dims);
+									pin_ptr<unsigned int> ptr = h5a->GetHandle();
+									if (H5Aread(aid, mtype, ptr) < 0) {
 										throw gcnew HDF5Exception("H5Aread failed!");
 									}
 									else
 									{
-										if (npoints > 1) {
-											ht->Add("Value", a);
+										if (rank >= 1) {
+											ht->Add("Value", h5a->GetArray());
 										}
 										else {
-											ht->Add("Value", a[0]);
+											ht->Add("Value", ptr[0]);
 										}
 									}
 								}
 								else if (size == 8)
 								{
-									array<unsigned long long>^ a = gcnew array<unsigned long long>(safe_cast<int>(npoints));
-									pin_ptr<unsigned long long> a_ptr = &a[0];
-									if (H5Aread(aid, mtype, a_ptr) < 0) {
+									H5Array<unsigned long long>^ h5a = gcnew H5Array<unsigned long long>(dims);
+									pin_ptr<unsigned long long> ptr = h5a->GetHandle();
+									if (H5Aread(aid, mtype, ptr) < 0) {
 										throw gcnew HDF5Exception("H5Aread failed!");
 									}
 									else
 									{
-										if (npoints > 1) {
-											ht->Add("Value", a);
+										if (rank >= 1) {
+											ht->Add("Value", h5a->GetArray());
 										}
 										else {
-											ht->Add("Value", a[0]);
+											ht->Add("Value", ptr[0]);
 										}
 									}
 								}
@@ -322,39 +320,41 @@ namespace PSH5X
 #pragma region HDF5 FLOAT
 							ht->Add("ElementTypeClass", "Float");
 
+							if ((mtype = H5Tget_native_type(ftype, H5T_DIR_ASCEND)) < 0) {
+								throw gcnew HDF5Exception("H5Tget_native_type failed!");
+							}
+
 							if (size == 4)
 							{
-								array<float>^ afloat = gcnew array<float>(safe_cast<int>(npoints));
-								pin_ptr<float> afloat_ptr = &afloat[0];
-								mtype = H5Tcopy(H5T_NATIVE_FLOAT);
-								if (H5Aread(aid, mtype, afloat_ptr) < 0) {
+								H5Array<float>^ h5a = gcnew H5Array<float>(dims);
+								pin_ptr<float> ptr = h5a->GetHandle();
+								if (H5Aread(aid, mtype, ptr) < 0) {
 									throw gcnew HDF5Exception("H5Aread failed!");
 								}
 								else
 								{
-									if (npoints > 1) {
-										ht->Add("Value", afloat);
+									if (rank >= 1) {
+										ht->Add("Value", h5a->GetArray());
 									}
 									else {
-										ht->Add("Value", afloat[0]);
+										ht->Add("Value", ptr[0]);
 									}
 								}
 							}
 							else if (size == 8)
 							{
-								array<double>^ adouble = gcnew array<double>(safe_cast<int>(npoints));
-								pin_ptr<double> adouble_ptr = &adouble[0];
-								mtype = H5Tcopy(H5T_NATIVE_DOUBLE);
-								if (H5Aread(aid, mtype, adouble_ptr) < 0) {
+								H5Array<double>^ h5a = gcnew H5Array<double>(dims);
+								pin_ptr<double> ptr = h5a->GetHandle();
+								if (H5Aread(aid, mtype, ptr) < 0) {
 									throw gcnew HDF5Exception("H5Aread failed!");
 								}
 								else
 								{
-									if (npoints > 1) {
-										ht->Add("Value", adouble);
+									if (rank >= 1) {
+										ht->Add("Value", h5a->GetArray());
 									}
 									else {
-										ht->Add("Value", adouble[0]);
+										ht->Add("Value", ptr[0]);
 									}
 								}
 							}
@@ -392,11 +392,12 @@ namespace PSH5X
 									}
 									else
 									{
-										array<String^>^ astring = gcnew array<String^>(safe_cast<int>(npoints));
+										H5Array<String^>^ h5a = gcnew H5Array<String^>(dims);
+								        pin_ptr<String^> ptr = h5a->GetHandle();
 										for (i = 0; i < npoints; ++i) {
-											astring[i] = gcnew String(vrdata[i]);
+											ptr[i] = gcnew String(vrdata[i]);
 										}
-										ht->Add("Value", astring);
+										ht->Add("Value", h5a->GetArray());
 									}
 
 									if (H5Dvlen_reclaim(mtype, fspace, H5P_DEFAULT, vrdata) < 0) {
@@ -410,8 +411,7 @@ namespace PSH5X
 
 								rdata = new char* [npoints];
 								rdata[0] = new char [npoints*(size+1)];
-								for (i = 1; i < npoints; ++i)
-								{
+								for (i = 1; i < npoints; ++i) {
 									rdata[i] = rdata[0] + i * (size+1);
 								}
 								if ((mtype = H5Tcreate(H5T_STRING, size+1)) < 0) {
@@ -427,12 +427,12 @@ namespace PSH5X
 									}
 									else
 									{
-										array<String^>^ astring = gcnew array<String^>(safe_cast<int>(npoints));
-										for (i = 0; i < npoints; ++i)
-										{
-											astring[i] = gcnew String(rdata[i]);
+										H5Array<String^>^ h5a = gcnew H5Array<String^>(dims);
+								        pin_ptr<String^> ptr = h5a->GetHandle();
+										for (i = 0; i < npoints; ++i) {
+											ptr[i] = gcnew String(rdata[i]);
 										}
-										ht->Add("Value", astring);
+										ht->Add("Value", h5a->GetArray());
 									}
 								}
 							}
