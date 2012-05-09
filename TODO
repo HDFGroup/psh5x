@@ -28,5 +28,7 @@ NEW FEATURES
 FUNDAMENTALS
 ------------
 
+- Refactor the dataset and attribute code so that they use a common code base for R/W
+
 - Find a cleaner way to generate code in ProviderUtils::GetCompundDotNetType
   F# type provider?
