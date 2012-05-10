@@ -16,6 +16,7 @@ extern "C" {
 #include "H5Gpublic.h"
 #include "H5Ipublic.h"
 #include "H5Lpublic.h"
+#include "H5LTpublic.h"
 }
 
 #include <string>
@@ -103,8 +104,13 @@ namespace PSH5X
             pathNoDrive = paths[1];
 		}
 
-		if (!pathNoDrive->StartsWith(ProviderUtils::HDF5_PATH_SEP))
+		if (!pathNoDrive->StartsWith(ProviderUtils::HDF5_PATH_SEP)) {
             pathNoDrive = ProviderUtils::HDF5_PATH_SEP + pathNoDrive;
+		}
+
+		if (pathNoDrive == ProviderUtils::HDF5_PATH_SEP) {
+			pathNoDrive = ".";
+		}
 
         return pathNoDrive;
     }
@@ -177,6 +183,32 @@ namespace PSH5X
 
     bool ProviderUtils::IsValidH5Path(hid_t loc, String^ h5path)
     {
+		/*
+
+		??? This should work. Maybe a bug in H5LTpath_valid ???
+
+		bool result = false;
+
+		char *path_str = NULL;
+
+		try
+		{
+			path_str = (char*) Marshal::StringToHGlobalAnsi(h5path).ToPointer();
+
+			if (H5LTpath_valid(loc, path_str, 0) > 0) {
+				result = true;
+			}
+		}
+		finally
+		{
+			if (path_str != NULL) {
+				Marshal::FreeHGlobal(IntPtr(path_str));
+			}
+		}
+
+		return result;
+		*/
+
 		bool result = false;
 
 		char *path_str = NULL, *name_str = NULL;
@@ -283,71 +315,20 @@ namespace PSH5X
 	{
 		bool result = false;
 
-		hid_t obj = -1;
-
-		char *obj_path_str = NULL, *name_str = NULL;
+		char *path_str = NULL;
 
 		try
 		{
-			if (IsValidH5Path(loc, h5path))
-			{
-				array<String^>^ linkNames = GetLinkNames(h5path);
+			path_str = (char*) Marshal::StringToHGlobalAnsi(h5path).ToPointer();
 
-				if (linkNames->Length > 1)
-				{
-					String^ name = linkNames[linkNames->Length-1];
-					StringBuilder^ sb = gcnew StringBuilder();
-					for (int i = 0; i < linkNames->Length-1; ++i)
-					{
-						if (i > 0) {
-							sb->Append("/");
-						}
-						sb->Append(linkNames[i]);
-					}
-					String^ objPath = sb->ToString();
-
-					obj_path_str = (char*) Marshal::StringToHGlobalAnsi(objPath).ToPointer();
-					obj = H5Oopen(loc, obj_path_str, H5P_DEFAULT);
-					H5I_type_t type = H5Iget_type(obj);
-					if (type == H5I_FILE || type == H5I_GROUP)
-					{
-						name_str = (char*) Marshal::StringToHGlobalAnsi(name).ToPointer();
-						if (H5Oexists_by_name(obj, name_str, H5P_DEFAULT) > 0) {
-							result = true;
-						}
-					}
-				}
-				else
-				{
-					H5I_type_t type = H5Iget_type(loc);
-					if (type == H5I_FILE || type == H5I_GROUP)
-					{
-						if (linkNames->Length == 1)
-						{
-							name_str = (char*) Marshal::StringToHGlobalAnsi(linkNames[0]).ToPointer();
-							if (H5Lexists(loc, name_str, H5P_DEFAULT) > 0) {
-								if (H5Oexists_by_name(loc, name_str, H5P_DEFAULT) > 0) {
-									result = true;
-								}
-							}
-						}
-						else {
-							result = (type == H5I_FILE);
-						}
-					}
-				}
+			if (H5LTpath_valid(loc, path_str, 1) > 0) {
+				result = true;
 			}
 		}
 		finally
 		{
-			if (obj != -1) {
-				H5Oclose(obj);
-			}
-			if (obj_path_str != NULL) {
-				Marshal::FreeHGlobal(IntPtr(obj_path_str));
-			}
-			if (name_str != NULL) {
-				Marshal::FreeHGlobal(IntPtr(name_str));
+			if (path_str != NULL) {
+				Marshal::FreeHGlobal(IntPtr(path_str));
 			}
 		}
 
@@ -372,6 +353,10 @@ namespace PSH5X
 		{
 			for (int i = 0; i < linkNames->Length; ++i)
 			{
+				if (!ProviderUtils::IsH5Group(loc, currentPath)) {
+					break;
+				}
+
 				path_str = (char*)(Marshal::StringToHGlobalAnsi(currentPath)).ToPointer();
 				
 				group = H5Gopen2(loc, path_str, H5P_DEFAULT);
@@ -1026,7 +1011,7 @@ namespace PSH5X
 
 	array<String^>^ ProviderUtils::GetLinkNames(String^ h5path)
 	{
-		return h5path->Split((gcnew array<wchar_t>{'/'}), StringSplitOptions::RemoveEmptyEntries);
+		return h5path->TrimStart('.')->Split((gcnew array<wchar_t>{'/'}), StringSplitOptions::RemoveEmptyEntries);
 	}
 
     static ProviderUtils::ProviderUtils()
