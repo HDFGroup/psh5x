@@ -177,7 +177,12 @@ namespace PSH5X
 
 #pragma region create a buffer and read the dataset as a byte array
 
-			array<unsigned char>^ buf = gcnew array<unsigned char>(safe_cast<int>(npoints*size));
+			int req_size = safe_cast<int>(npoints*size);
+			if (req_size <= 0) {
+				throw gcnew PSH5XException("The requested array is too large!");
+			}
+
+			array<unsigned char>^ buf = gcnew array<unsigned char>(req_size);
 			pin_ptr<unsigned char> buf_ptr = &buf[0];
 
 			if (H5Dread(dset, mtype, mspace, fspace, H5P_DEFAULT, buf_ptr) < 0) {

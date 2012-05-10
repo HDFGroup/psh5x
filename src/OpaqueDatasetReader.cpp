@@ -70,7 +70,12 @@ namespace PSH5X
 				throw gcnew PSH5XException("Zero size opaque type found!");
 			}
 
-			array<unsigned char>^ rdata = gcnew array<unsigned char>(safe_cast<int>(npoints*osize));
+			int req_size = safe_cast<int>(npoints*osize);
+			if (req_size <= 0) {
+				throw gcnew PSH5XException("The requested array is too large!");
+			}
+
+			array<unsigned char>^ rdata = gcnew array<unsigned char>(safe_cast<int>(req_size));
 			pin_ptr<unsigned char> rdata_ptr = &rdata[0];
 
 			if (H5Dread(dset, mtype, mspace, fspace, H5P_DEFAULT, rdata_ptr) < 0) {
