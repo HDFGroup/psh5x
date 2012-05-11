@@ -152,7 +152,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config" />
     <None Include="COPYING" />
     <None Include="README" />
     <None Include="TODO" />
