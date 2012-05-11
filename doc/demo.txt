@@ -4,18 +4,16 @@ Import-Module HDF5
 New-H5Drive aura E:\HDF5\h5\HIRDLS-Aura_L2_v02-04-09-c03_2008d001.he5
 # Show drives on this machine
 Get-PSDrive
-# Change current location
-cd aura:
-# What's happening?
-dir
+# Change current location and list members
+cd aura: ; dir
 # Get more detail on 'HDFEOS Information' 
-Get-H5Object 'HDFEOS INFORMATION' -Detailed | Format-List
+Get-H5Item 'HDFEOS INFORMATION' -Detailed | Format-List
 # These are NOT strings!!!
-Get-H5Object 'HDFEOS INFORMATION' -Detailed | Get-Member
+Get-H5Item 'HDFEOS INFORMATION' -Detailed | Get-Member
 # Get attribute names
-(Get-H5Object 'HDFEOS INFORMATION').AttributeNames
-# Get the HDFEOSVersion attribute 
-Get-H5Attribute 'HDFEOS INFORMATION' HDFEOSVersion
+(Get-H5Item '/HDFEOS/SWATHS/HIRDLS/Data Fields/Temperature').AttributeNames
+# Get the _FillValue attribute 
+Get-H5Attribute '/HDFEOS/SWATHS/HIRDLS/Data Fields/Temperature' _FillValue 
 # Let's see what else is out there! 
 dir aura:/ -Recurse | sort PSParentPath
 # Pretty busy. Let's try something visual! 
@@ -25,13 +23,11 @@ dir . -r | where {$_.PSChildName -like '*H2O*'} | select PSPath
 # How many HDF5 objects are there?
 dir . -r | measure | select Count
 # How many HDF5 groups are there?
-Get-H5Member . -r | ?{$_.ItemType -eq 'Group'} | measure | select Count
-# How many HDF5 groups are there? (using filter)
-Get-H5Member . -r -Filter g | measure | select Count
+dir . -r | ?{$_.ItemType -eq 'Group'} | measure | select Count
 # Where are they?
-Get-H5Member . -r -Filter g | select PSPath
+dir . -r -Filter g | select PSPath
 # Yes, you can 'cd' into an HDF5 PSDrive (using '/' or '\')
-cd '/HDFEOS/SWATHS/HIRDLS/Geolocation Fields' ; Get-H5Member .
+cd '/HDFEOS/SWATHS\HIRDLS/Geolocation Fields' ; dir .
 # And the usual aliases just work... (tab-completion works also)
 cd .. ; dir
 # How many HDF5 groups and datasets are there in this file?
@@ -42,8 +38,6 @@ dir aura:\ -Recurse -Filter d | %{ $dsetBytes += $_.StorageSizeBytes }; "In data
 $value = Get-H5DatasetValue 'aura:/HDFEOS INFORMATION/coremetadata.0'; $value[0].Substring(0,256)
 # Get the value of a simple dataset on a hyperslab
 $value = Get-H5DatasetValue 'aura:\HDFEOS\SWATHS\HIRDLS\Data Fields\Temperature' -Start 0,9 -Block 5553,86
-# What's its shape?
-"Rank: $($value.Rank) [$($value.GetLength(0)) x $($value.GetLength(1))]"
 # What's at position [4711,22]?
 $value[4711, 22]
 # I want this in Excel!
@@ -60,6 +54,8 @@ $range.Value2 = $value
 $excel.Application.DisplayAlerts = $False; $excel.Quit(); Get-Process Excel | Stop-Process; [System.Runtime.Interopservices.Marshal]::ReleaseComObject($excel)
 # Our current location is still on the aura drive
 pwd
+# Copy stuff from 'aura' to the sandbox drive (h5tmp)
+Copy-H5Item 'aura:\HDFEOS\SWATHS\HIRDLS\Data Fields\*' h5tmp:\; dir h5tmp:\
 # We have to change location before we can remove the drive
 c:
 # Remove the aura drive

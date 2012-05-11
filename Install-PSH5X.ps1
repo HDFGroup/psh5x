@@ -27,6 +27,7 @@ else {
 
 if ($dest -ne $Null) {
     copy $here\module\* $dest -Force
+    copy $here\COPYING $dest -Force
 }
 
 $check = (Get-Module -ListAvailable | ?{$_.Name -eq 'HDF5'})

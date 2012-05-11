@@ -14,24 +14,41 @@ if (Test-Path $packdir) {
     del $packdir -Recurse -Force
 }
 
-mkdir $packdir,$packdir\module,$packdir\module\en-US,$packdir\Win32,$packdir\Win64
+mkdir $packdir,$packdir\examples,$packdir\module,$packdir\module\en-US,$packdir\Win32,$packdir\Win64
 
-copy $config $packdir
+# module files
 
 copy $module\*.ps1 $packdir\module
 copy $module\*.psm1 $packdir\module
 copy $module\*.psd1 $packdir\module
 copy $module\*.ps1xml $packdir\module
-
 copy $module\en-US\*.txt $packdir\module\en-US
+
+# PSH5X binaries
 
 copy $here\Win32\Release\PSH5X.dll $packdir\Win32
 copy $here\Win64\Release\PSH5X.dll $packdir\Win64
 
+# HDF5 binaries
+
 copy "${Env:ProgramFiles(x86)}\HDF Group\HDF5" $packdir\Win32 -Recurse
 copy "$Env:ProgramFiles\HDF Group\HDF5" $packdir\Win64 -Recurse
 
+# Misc
+
+copy $config $packdir
 copy $here\Install-PSH5X.ps1 $packdir
+copy $here\COPYING $packdir
+#copy $here\README $packdir
+copy $here\psh5x_logo.gif $packdir
+copy $here\doc\INSTALL $packdir
+copy $here\doc\RELEASE.txt $packdir
+
+copy $here\doc\demo.txt $packdir\examples
+copy $here\doc\Start-Demo.ps1 $packdir\examples
+copy $here\doc\sample.ps1 $packdir\examples
+copy $here\doc\hdf_logo.jpg $packdir\examples
+copy $here\doc\PSH5X.png $packdir\examples
 
 $args = ('a', "$tempdir\PSH5X.zip", $packdir)
 
