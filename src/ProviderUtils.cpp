@@ -236,7 +236,7 @@ namespace PSH5X
 			array<String^>^ linkNames = GetLinkNames(h5path);
 
 			if (linkNames->Length == 0 || (linkNames->Length == 1 && linkNames[0] == ".")) {
-				return true;
+				result = true;
 			}
 
 			String^ currentPath = ".";

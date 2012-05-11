@@ -25,6 +25,10 @@ using namespace System::Runtime::InteropServices;
    allow them in HDF5 path names. That way we can at least
    find our way with -LiteralPath. Tab completion is still broken though.
 
+   Dan Harman says:
+
+   This is a known issue that we're tracking for the next release of PowerShell (not PowerShell v3).
+
  */
 
 namespace PSH5X
@@ -32,6 +36,7 @@ namespace PSH5X
     String^ Provider::GetChildName(String^ path)
     {
         WriteVerbose(String::Format("HDF5Provider::GetChildName(Path = '{0}')", path));
+		// HACK!!!
 		String^ result = __super::GetChildName(path)->Replace("`","");
 		return result;
     }
@@ -40,6 +45,7 @@ namespace PSH5X
     {
         WriteVerbose(String::Format("HDF5Provider::GetParentPath(Path = '{0}', Root = '{1}')",
             path, root));
+		// HACK!!!
 		String^ result = __super::GetParentPath(path,root)->Replace("`",""); 
         return result;
     }
@@ -54,8 +60,6 @@ namespace PSH5X
             throw gcnew PSH5XException("Ill-formed HDF5 path name and/or unable to obtain drive name!");
         }
 
-        if (ProviderUtils::IsH5RootPathName(h5path)) { return true; }
-
         return ProviderUtils::IsH5Group(drive->FileHandle, h5path);
     }
 
@@ -63,6 +67,7 @@ namespace PSH5X
     {
         WriteVerbose(String::Format("HDF5Provider::MakePath(Parent = '{0}', Child = '{1}')",
             parent, child));
+		// HACK!!!
 		String^ result = __super::MakePath(parent, child)->Replace("`",""); 
 		return result;
     }
