@@ -1,3 +1,5 @@
+# Verify the module installation
+Get-Module -ListAvailable
 # Load the HDF5 PowerShell extension
 Import-Module HDF5
 # Map a new drive backed by an HDF5 file
@@ -26,14 +28,14 @@ dir . -r | measure | select Count
 dir . -r | ?{$_.ItemType -eq 'Group'} | measure | select Count
 # Where are they?
 dir . -r -Filter g | select PSPath
-# Yes, you can 'cd' into an HDF5 PSDrive (using '/' or '\')
-cd '/HDFEOS/SWATHS\HIRDLS/Geolocation Fields' ; dir .
-# And the usual aliases just work... (tab-completion works also)
-cd .. ; dir
 # How many HDF5 groups and datasets are there in this file?
 dir aura:/ -Recurse -Filter dg | %{ switch($_.ItemType) { 'Group' {$groups++} 'Dataset' {$datasets++} } }; "Groups: $groups - Datsets: $datasets"
 # How much data is stored in HDF5 datasets vs. the total file size?
 dir aura:\ -Recurse -Filter d | %{ $dsetBytes += $_.StorageSizeBytes }; "In datasets: $dsetBytes - File: $((Get-H5Drive aura).FileSizeBytes)"
+# Yes, you can 'cd' into an HDF5 PSDrive (using '/' or '\')
+cd '/HDFEOS/SWATHS\HIRDLS/Geolocation Fields' ; dir .
+# And the usual aliases just work... (tab-completion works also)
+cd .. ; dir
 # Get the value of a scalar dataset
 $value = Get-H5DatasetValue 'aura:/HDFEOS INFORMATION/coremetadata.0'; $value[0].Substring(0,256)
 # Get the value of a simple dataset on a hyperslab
