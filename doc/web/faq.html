@@ -70,28 +70,35 @@ Get-Process Excel | Stop-Process
             <li><a href="http://www.powershellpraxis.de/Excel-COM.982.0.html">PowerShell Excel (COM)
                     (in German)</a></li>
         </ul>
-        <h3>2.02 Can I use HDF5DotNet objects in PowerShell?</h3>
-        <p>Yes, use the <tt>Add-Type</tt> cmdlet to load the HDF5DotNet assembly. You can then
-            create HDF5DotNet .NET objects with the <tt>New-Object</tt> cmdlet.</p>
+        <h3>2.02 Can I use ILNumerics in PowerShell?</h3>
+        <p><b>Short answer:</b> Yes.</p>
+        <p><b>Long answer:</b>
+            <a href="http://ilnumerics.net/">ILNumerics</a> is a high performance math library for
+            applications. Use the <tt>Add-Type</tt> cmdlet to load the ILNumerics assembly. You can
+            then create ILNumerics .NET objects by casting or with the <tt>New-Object</tt>
+            cmdlet.</p>
+        <p>Use a package, such as <a href="http://pstx.codeplex.com/">PowerShell Type
+                Accelerators</a> to make to code a littler easier to read and type.</p>
         <pre class="code">
-PS:11 >Add-Type -Path 'C:\Program Files\HDF Group\HDF5\1.8.8\bin\HDF5DotNet.dll'
+Add-Type -Path E:\ILNumerics\ILNumerics_2.11.4464.29952\bin64\ILNumerics64.dll
 
-PS:12 >[System.AppDomain]::CurrentDomain.GetAssemblies()
+Import-Module TypeAccelerator
 
-GAC    Version        Location
----    -------        --------
-...
-True   v4.0.30319     C:\Windows\Microsoft.Net\assembly\GAC_MSIL\System.Core\v4.0_4.0.0.0__b77a5c5...
-False  v4.0.30319     C:\Users\gheber\Documents\WindowsPowerShell\Modules\HDF5\PSH5X.dll
-True   v4.0.30319     C:\Windows\Microsoft.Net\assembly\GAC_MSIL\Microsoft.VisualC\v4.0_10.0.0.0__...
-False  v4.0.30319     C:\Program Files\HDF Group\HDF5\1.8.8\bin\HDF5DotNet.dll
+Add-TypeAccelerator ilm   ILNumerics.ILMath
 
-PS:13 >[HDF5DotNet.H5]::Version
+Add-TypeAccelerator ilf32 ILNumerics.ILArray[single]
 
-                   Release                      Minor                     Major
-                   -------                      -----                     -----
-                         8                          8                         1
+# convert the value of an HDF5 dataset into an ILNumerics.ILArray&lt;Single&gt;
+
+$il = [ilf32] (Get-H5DatasetValue 'aura:\HDFEOS\SWATHS\HIRDLS\Data Fields\Temperature')
+
+# get the last column
+
+$il[':;end']
         </pre>
+        <p> The same is pretty much true for any .NET library. If such a library depends on HDF5,
+            e.g., <a href="http://www.hdf5.net/">HDF5DotNet</a>, make sure that it was built against
+            the same version of the HDF5 library as PSH5X. </p>
         <h2>Common HDF5 Tasks</h2>
         <h3>3.01 How do I save an XML file in HDF5?</h3>
         <p>There are several different ways of accomplishing that. Most are a variation on the
