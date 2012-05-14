@@ -83,13 +83,8 @@ namespace PSH5X
 						if (this->ShouldProcess(h5path,
 							String::Format("Setting HDF5 attribute '{0}'", attributeName)))
 						{
-							if (stype == H5S_SIMPLE) {
-								ProviderUtils::SetH5AttributeValue(attr, obj);
-							}
-							else if (stype == H5S_SCALAR) {
-								ProviderUtils::SetScalarH5AttributeValue(attr, obj);
-							}
-
+							ProviderUtils::SetH5AttributeValue(attr, obj);
+							
 							if (H5Fflush(oid, H5F_SCOPE_LOCAL) < 0) {
 								throw gcnew HDF5Exception("H5Fflush failed!");
 							}

@@ -22,7 +22,7 @@ $flavors = @('string','string4','cstring5','fstring4','ucstring5','ufstring4')
 
 foreach ($f in $flavors)
 {
-    $dset = New-H5Dataset $f $f 3,2
+    New-H5Dataset $f $f 3,2
     Set-H5DatasetValue $f $value
 
     $a = Get-H5DatasetValue $f
@@ -30,6 +30,43 @@ foreach ($f in $flavors)
         foreach ($j in 0..1) {
             if ($value[$i, $j] -ne $a[$i, $j]) {
                 Write-Error "$($value[$i, $j]) != $($a[$i, $j])"
+            }
+        }
+    }
+}
+
+# null attributes
+
+foreach ($f in $flavors)
+{
+    New-H5Attribute . "$f Null" -Nulll -Type $f
+}
+
+# scalar attributes
+
+foreach ($f in $flavors)
+{
+    foreach ($i in 0..2) {
+        foreach ($j in 0..1) {
+            New-H5Attribute . "$f $i $j" -Scalar $value[$i, $j] $f
+            $check = (Get-H5Attribute  . "$f $i $j").Value
+            if ($value[$i, $j] -ne $check) {
+                Write-Error "$($value[$i, $j]) != $($check)"
+            }
+        }
+    }
+}
+
+# simple attributes
+
+foreach ($f in $flavors)
+{
+    New-H5Attribute . $f -Simple 3,2 -Type $f -Value $value
+    $check = (Get-H5Attribute  . $f).Value
+    foreach ($i in 0..2) {
+        foreach ($j in 0..1) {
+            if ($value[$i, $j] -ne $check[$i, $j]) {
+                Write-Error "$($value[$i, $j]) != $($check[$i, $j])"
             }
         }
     }

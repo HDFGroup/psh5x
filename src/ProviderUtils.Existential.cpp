@@ -178,7 +178,7 @@ namespace PSH5X
 
     bool ProviderUtils::IsH5SymLink(hid_t file, String^ h5path)
     {
-        if (ProviderUtils::IsH5RootPathName(h5path)) { return false; }
+        if (h5path == ".") { return false; }
 
         bool result = false;
 		char* name = NULL;
@@ -207,7 +207,7 @@ namespace PSH5X
 
     bool ProviderUtils::IsH5SoftLink(hid_t file, String^ h5path)
     {
-        if (ProviderUtils::IsH5RootPathName(h5path)) { return false; }
+        if (h5path == ".") { return false; }
 
         bool result = false;
 		char* name = NULL;
@@ -236,7 +236,7 @@ namespace PSH5X
 
     bool ProviderUtils::IsH5ExternalLink(hid_t file, String^ h5path)
     {
-        if (ProviderUtils::IsH5RootPathName(h5path)) { return false; }
+        if (h5path == ".") { return false; }
 
         bool result = false;
 		char* name = NULL;

@@ -35,7 +35,7 @@ namespace PSH5X
 
         hid_t obj_id = -1, group_id = -1;
 
-        char *root_name = NULL, *group_path = NULL, *link_name = NULL, *path_name = NULL;
+        char *group_path = NULL, *link_name = NULL, *path_name = NULL;
 
         try
         {
@@ -52,14 +52,13 @@ namespace PSH5X
                 detailed = dynamicParameters["Detailed"]->IsSet;
             }
 
-            if (ProviderUtils::IsH5RootPathName(h5path)) // root group
+            if (h5path == ".")
             {
 #pragma region root group
 
-                String^ rootName = "/";
-                root_name =  (char*)(Marshal::StringToHGlobalAnsi(rootName)).ToPointer();
+                path_name =  (char*)(Marshal::StringToHGlobalAnsi(".")).ToPointer();
 
-                obj_id = H5Oopen(drive->FileHandle, root_name, H5P_DEFAULT);
+                obj_id = H5Oopen(drive->FileHandle, path_name, H5P_DEFAULT);
                 if (obj_id < 0) {
                     throw gcnew HDF5Exception("H5Oopen failed!!!");
                 }
@@ -240,9 +239,6 @@ namespace PSH5X
             }
             if (group_path != NULL) {
                 Marshal::FreeHGlobal(IntPtr(group_path));
-            }
-            if (root_name != NULL) {
-                Marshal::FreeHGlobal(IntPtr(root_name));
             }
         }
 

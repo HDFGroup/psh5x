@@ -87,8 +87,6 @@ namespace PSH5X
             System::Management::Automation::ProviderInfo^ provider, DriveInfo^% drive,
             System::String^% h5path);
 
-        static bool IsH5RootPathName(System::String^ h5path);
-
         static bool IsWellFormedH5Path(System::String^ h5path);
         
         // path is in use, but may end in a dangling link
@@ -204,9 +202,7 @@ namespace PSH5X
 
         static System::Collections::Hashtable^ H5Attribute(hid_t attr_id, System::String^ attributeName);
 
-		static void SetScalarH5AttributeValue(hid_t attr_id, System::Object^ value);
-
-        static void SetH5AttributeValue(hid_t attr_id, System::Object^ value);
+		static void SetH5AttributeValue(hid_t attr_id, System::Object^ value);
 
 		static bool AttributeSizeOK(hid_t obj_id, hid_t type_id);
 
@@ -262,7 +258,19 @@ namespace PSH5X
             {
                 Array^ tmp = safe_cast<Array^>(bobj);
                 arr = gcnew array<T>(tmp->Length);
-                Array::Copy(tmp, arr, tmp->Length);
+
+				if (tmp->Rank == 1) {
+					Array::Copy(tmp, arr, tmp->Length);
+				}
+				else // take the slow way home
+				{
+					IEnumerator^ iter = tmp->GetEnumerator();
+					int count = 0;
+					while ((iter->MoveNext()) && (iter->Current != nullptr)) {
+						arr[count++] = safe_cast<T>(iter->Current);
+					}
+				}
+
                 result = true;
             }
             catch (...) {}

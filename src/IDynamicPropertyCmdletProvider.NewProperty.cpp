@@ -197,14 +197,8 @@ namespace PSH5X
 					throw gcnew HDF5Exception("H5Acreate2 failed!");
 				}
 
-				if (setValue)
-				{
-					if (shape->ToUpper() == "SIMPLE") {
-						ProviderUtils::SetH5AttributeValue(aid, attrValue);
-					}
-					else if (shape->ToUpper() == "SCALAR") {
-						ProviderUtils::SetScalarH5AttributeValue(aid, attrValue);
-					}
+				if (setValue) {
+					ProviderUtils::SetH5AttributeValue(aid, attrValue);
 				}
 
 				if (H5Fflush(aid, H5F_SCOPE_LOCAL) < 0) {

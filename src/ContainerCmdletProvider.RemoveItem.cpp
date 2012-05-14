@@ -82,9 +82,9 @@ namespace PSH5X
                 throw gcnew PSH5XException("The drive is read-only and cannot be modified!");
             }
 
-            if (ProviderUtils::IsH5RootPathName(h5path)) // root group, TODO: refine with address check!
+            if (h5path == ".") // root group
             {
-                throw gcnew PSH5XException(String::Format("Cannot remove root group '{0}'", h5path));
+                throw gcnew PSH5XException(String::Format("Cannot remove root group '{0}'", path));
             }
             else
 			{

@@ -129,11 +129,6 @@ namespace PSH5X
         return true;
     }
 
-    bool ProviderUtils::IsH5RootPathName(String^ h5path)
-    {
-        return (h5path->Trim() == "/");
-    }
-
     bool ProviderUtils::IsWellFormedH5Path(System::String^ h5path)
     {
         String^ tpath = h5path->Trim();
@@ -547,7 +542,7 @@ namespace PSH5X
     {
         if (ProviderUtils::IsWellFormedH5Path(h5path))
         {
-            if (ProviderUtils::IsH5RootPathName(h5path))
+            if (h5path == ".")
                 return nullptr;
             else
                 return h5path->Substring(h5path->LastIndexOf('/')+1);
@@ -947,17 +942,16 @@ namespace PSH5X
 
         try
         {
-            array<Object^>^ tmp = safe_cast<array<Object^>^>(obj);
-            arr = gcnew array<String^>(tmp->Length);
-            for (int i = 0; i < tmp->Length; ++i)
-            {
-				if (tmp[i] != nullptr) {
-					arr[i] = tmp[i]->ToString();
-				}
-				else {
-					arr[i] = "";
-				}
-            }
+			Object^ bobj = GetDotNetObject(obj);
+
+			Array^ tmp = safe_cast<Array^>(bobj);
+			arr = gcnew array<String^>(tmp->Length);
+
+			System::Collections::IEnumerator^ iter = tmp->GetEnumerator();
+			int count = 0;
+			while ((iter->MoveNext()) && (iter->Current != nullptr)) {
+				arr[count++] = safe_cast<String^>(iter->Current);
+			}
 
             result = true;
         }
