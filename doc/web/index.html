@@ -68,17 +68,26 @@
         <h2>Installation</h2>
         <ol>
             <li>Make sure you have the latest and greatest version of <a
-                    href="http://www.hdfgroup.org/HDF5/release/obtain5.html#obtain">HDF5</a>. You
-                can use your own binaries (of the required HDF5 version) as long as you built the
-                dynamically linked libraries (DLLs) and they are located in a directory listed in
-                your <tt>Path</tt> environment variable.</li>
-            <li>Unpack the zip archive and copy the HDF5 folder into a directory in
-                    <tt>$ENV:PSModulePath</tt>. For example, on Windows 7 you'd most likely copy it
-                into <tt>C:\Users\{your username}\Documents\WindowsPowerShell\Modules</tt>. </li>
+                    href="http://www.hdfgroup.org/HDF5/release/obtain5.html#obtain">HDF5</a>. HDF5
+                binaries are included in the zip archive in the <tt>Win32</tt> and <tt>Win64</tt>
+                subfolder. You can use your own binaries as long as they are of the required HDF5
+                version (currently, HDF5 1.8.9), you've built the dynamically linked libraries
+                (DLLs), and they are located in a directory listed in your <tt>Path</tt> environment
+                variable.</li>
+            <li>Unpack the zip archive. Create a directory called <tt>HDF5</tt> folder in a
+                directory in your PowerShell module path <tt>$ENV:PSModulePath</tt>. For example, on
+                Windows 7 you'd most likely create it in <tt>C:\Users\{your
+                    username}\Documents\WindowsPowerShell\Modules</tt>. Copy the contents of the
+                    <tt>module</tt> folder and the <tt>PSH5X.dll</tt> for your OS (<tt>Win32</tt> or
+                    <tt>Win64</tt>) from the zip archive into the <tt>HDF5</tt> folder you just
+                created. Alternatively, run the <tt>Install-PSH5X.ps1</tt> script that performs
+                these steps for you.</li>
             <li>If you are running PowerShell version 2.0, make sure that it runs with .NET 4.0 (and
-                not the default .NET 2.0). You can either modify the registry or add a configuration
-                file to the directory which contains <tt>powershell.exe</tt>. Instructions can be
-                found in this <a
+                not the default .NET 2.0). The easiest way to accomplish this is to copy the files
+                    <tt>powershell.exe.config</tt> and (optionally)
+                    <tt>powershell_ise.exe.config</tt> from the zip archive to <tt>$PSHOME</tt>,
+                typically <tt>C:\Windows\System32\WindowsPowerShell\v1.0</tt>. A braoder discussion
+                can be found in this <a
                     href="http://tfl09.blogspot.com/2010/08/using-newer-versions-of-net-with.html"
                     >blog entry</a> and this <a
                     href="http://stackoverflow.com/questions/2094694/how-can-i-run-powershell-with-the-net-4-runtime"

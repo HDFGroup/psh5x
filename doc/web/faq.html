@@ -25,6 +25,92 @@
             good scripting language and a good interactive shell, balancing the tradeoffs between
             user experience and scripting authoring was one of the major language design
             challenges.</q>
+        <h3>1.03 What datatypes are supported?</h3>
+        <p>The ultimate goal is to support all datatypes. When we say 'support', we mean that data
+            of that type can be represented in memory and on disk, and be read an written. The
+            flexible JSON notation for HDF5 datatypes (see <tt>help about_H5Datatypes</tt>) lets one
+            create HDF5 datasets, linked datatypes, and attributes of any HDF5 datatype. However,
+            not all of them can be currently read or written. The process to get to a more complete
+            support will be very much demand-driven. </p>
+        <p>The table below gives an overview of what's supported in the current version.</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>HDF5 Type Class</th>
+                    <th>HDF5 Dataset</th>
+                    <th>HDF5 Attribute</th>
+                    <th>Notes</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><tt>H5T_INTEGER</tt></td>
+                    <td>yes</td>
+                    <td>yes</td>
+                    <td> 1, 2, 4 or 8 byte, BE or LE, signed/unsigned</td>
+                </tr>
+                <tr>
+                    <td><tt>H5T_FLOAT</tt></td>
+                    <td>yes</td>
+                    <td>yes</td>
+                    <td> 4 or 8 byte, IEEE </td>
+                </tr>
+                <tr>
+                    <td><tt>H5T_STRING</tt></td>
+                    <td>yes</td>
+                    <td>yes</td>
+                    <td>Fixed- and variable-length, ASCII and UTF-8</td>
+                </tr>
+                <tr>
+                    <td><tt>H5T_ENUM</tt></td>
+                    <td>yes</td>
+                    <td>yes</td>
+                    <td> Must be derived from 1, 2, 4 or 8 byte, BE or LE, signed/unsigned integers.
+                    </td>
+                </tr>
+                <tr>
+                    <td><tt>H5T_BITFIELD</tt></td>
+                    <td>yes</td>
+                    <td>yes</td>
+                    <td> 1, 2, 4 or 8 byte </td>
+                </tr>
+                <tr>
+                    <td><tt>H5T_OPAQUE</tt></td>
+                    <td>yes</td>
+                    <td>no</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td><tt>H5T_REFERENCE</tt></td>
+                    <td>yes</td>
+                    <td>no</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td><tt>H5T_COMPOUND</tt></td>
+                    <td>yes</td>
+                    <td>no</td>
+                    <td>Currently, members of class <tt>H5T_COMPOUND</tt> and <tt>H5T_VLEN</tt> are
+                        not supported. Members of class <tt>H5T_ARRAY</tt> are supported, if they
+                        are derived from a primitive type (e.g., integers, floats, strings
+                        etc.)</td>
+                </tr>
+                <tr>
+                    <td><tt>H5T_ARRAY</tt></td>
+                    <td>yes</td>
+                    <td>no</td>
+                    <td>Currently, only array types derived from a primitive type (e.g., integers,
+                        floats, strings etc.) are supported.</td>
+                </tr>
+                <tr>
+                    <td><tt>H5T_VLEN</tt></td>
+                    <td>yes</td>
+                    <td>no</td>
+                    <td>Currently, only variable-length sequence types derived from a primitive type
+                        (e.g., integers, floats, strings etc.) are supported.</td>
+                </tr>
+            </tbody>
+        </table>
         <h2>The Windows Platform</h2>
         <h3 name="hdf52excel">2.01 How do I get data from HDF5 into Excel?</h3>
         <p>Assume that we have a 5553 (rows) by 86 (colums) twodimensional dataset of floating point
