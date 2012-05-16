@@ -64,7 +64,7 @@ namespace PSH5X
 						throw gcnew HDF5Exception("H5Aopen failed!");
 					}
 
-					WritePropertyObject(ProviderUtils::H5Attribute(aid, attributeName), path);
+					WritePropertyObject(ProviderUtils::H5Attribute(aid, attributeName, drive->FileHandle), path);
 
 					if (H5Aclose(aid) < 0) {
 						throw gcnew HDF5Exception("H5Aclose failed!");

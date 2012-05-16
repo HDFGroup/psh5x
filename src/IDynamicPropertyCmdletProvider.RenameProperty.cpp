@@ -86,7 +86,7 @@ namespace PSH5X
 						throw gcnew HDF5Exception("H5Aopen failed!");
 					}
 
-					Hashtable^ ht = ProviderUtils::H5Attribute(aid, destinationProperty);
+					Hashtable^ ht = ProviderUtils::H5Attribute(aid, destinationProperty, drive->FileHandle);
 					WritePropertyObject(ht, path);
 				}
 				else {

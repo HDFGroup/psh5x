@@ -83,13 +83,13 @@ namespace PSH5X
 						if (this->ShouldProcess(h5path,
 							String::Format("Setting HDF5 attribute '{0}'", attributeName)))
 						{
-							ProviderUtils::SetH5AttributeValue(attr, obj);
+							ProviderUtils::SetH5AttributeValue(attr, obj, drive->FileHandle);
 							
 							if (H5Fflush(oid, H5F_SCOPE_LOCAL) < 0) {
 								throw gcnew HDF5Exception("H5Fflush failed!");
 							}
 
-							WritePropertyObject(ProviderUtils::H5Attribute(attr, attributeName), path);
+							WritePropertyObject(ProviderUtils::H5Attribute(attr, attributeName, drive->FileHandle), path);
 						}
 					}
 					else {

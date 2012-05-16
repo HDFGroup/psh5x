@@ -138,7 +138,7 @@ namespace PSH5X
 					throw gcnew HDF5Exception("H5Adelete_by_name failed!!!");
 				}
 
-				WritePropertyObject(ProviderUtils::H5Attribute(dst_attr, destinationProperty), destinationPath);
+				WritePropertyObject(ProviderUtils::H5Attribute(dst_attr, destinationProperty, destinationDrive->FileHandle), destinationPath);
 			}
 		}
 		finally

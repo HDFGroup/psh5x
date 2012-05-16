@@ -200,9 +200,9 @@ namespace PSH5X
 
 #pragma region HDF5 Attribute
 
-        static System::Collections::Hashtable^ H5Attribute(hid_t attr_id, System::String^ attributeName);
+        static System::Collections::Hashtable^ H5Attribute(hid_t attr_id, System::String^ attributeName, hid_t file);
 
-		static void SetH5AttributeValue(hid_t attr_id, System::Object^ value);
+		static void SetH5AttributeValue(hid_t attr_id, System::Object^ value, hid_t file);
 
 		static bool AttributeSizeOK(hid_t obj_id, hid_t type_id);
 

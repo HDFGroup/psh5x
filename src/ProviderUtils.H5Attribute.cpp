@@ -8,6 +8,7 @@
 extern "C" {
 #include "H5Apublic.h"
 #include "H5Dpublic.h"
+#include "H5Rpublic.h"
 #include "H5Spublic.h"
 #include "H5Tpublic.h"
 }
@@ -22,7 +23,7 @@ using namespace System::Web::Script::Serialization;
 
 namespace PSH5X
 {
-    Hashtable^ ProviderUtils::H5Attribute(hid_t aid, String^ attributeName)
+    Hashtable^ ProviderUtils::H5Attribute(hid_t aid, String^ attributeName, hid_t file)
     {
         Hashtable^ ht = gcnew Hashtable();
 
@@ -464,8 +465,55 @@ namespace PSH5X
                         ht->Add("ElementTypeClass", "Opaque");
                         break;
 					case H5T_REFERENCE:
-                        ht->Add("ElementTypeClass", "Reference");
+						{
+#pragma region HDF5 REFERENCE
+							ht->Add("ElementTypeClass", "Reference");
+
+							if ((mtype = H5Tget_native_type(ftype, H5T_DIR_ASCEND)) < 0) {
+								throw gcnew HDF5Exception("H5Tget_native_type failed!");
+							}
+
+							if (H5Tequal(ftype, H5T_STD_REF_OBJ) <= 0) {
+								throw gcnew PSH5XException("Unsupported reference type found!");
+							}
+
+							int refsize = safe_cast<int>(H5Tget_size(ftype));
+							if (refsize == 0) {
+								throw gcnew PSH5XException("Zero size refer type found!");
+							}
+
+							int req_size = safe_cast<int>(npoints*refsize);
+							if (req_size <= 0) {
+								throw gcnew PSH5XException("The requested array is too large!");
+							}
+
+							array<unsigned char>^ a = gcnew array<unsigned char>(safe_cast<int>(req_size));
+							pin_ptr<unsigned char> ptr = &a[0];
+
+							if (H5Aread(aid, mtype, ptr) < 0) {
+								throw gcnew HDF5Exception("H5Aread failed!");
+							}
+							else
+							{
+								if (npoints == 1) {
+									ht->Add("Value", ProviderUtils::GetObjectReference(file, ptr));
+								}
+								else
+								{
+									H5Array<String^>^ h5a = gcnew H5Array<String^>(dims);
+									pin_ptr<String^> h5a_ptr = h5a->GetHandle();
+									for (i = 0; i < npoints; ++i)
+									{
+										pin_ptr<unsigned char> here = ptr+i*refsize;
+										h5a_ptr[i] = ProviderUtils::GetObjectReference(file, here);
+									}
+									ht->Add("Value", h5a->GetArray());
+								}
+							}
+#pragma endregion
+						}
                         break;
+
                     case H5T_ARRAY:
                         ht->Add("ElementTypeClass", "Array");
                         break;
@@ -515,7 +563,7 @@ namespace PSH5X
         return ht;
     }
 
-	void ProviderUtils::SetH5AttributeValue(hid_t aid, Object^ value)
+	void ProviderUtils::SetH5AttributeValue(hid_t aid, Object^ value, hid_t file)
 	{
 		hid_t fspace = -1, ftype = -1, btype = -1, ntype = -1, mtype = -1;
 
@@ -555,8 +603,7 @@ namespace PSH5X
             }
 
             H5T_class_t cls = H5Tget_class(ftype);
-            if (cls == H5T_COMPOUND || cls == H5T_VLEN || cls == H5T_ARRAY ||
-				cls == H5T_REFERENCE || cls == H5T_OPAQUE) {
+            if (cls == H5T_COMPOUND || cls == H5T_VLEN || cls == H5T_ARRAY || cls == H5T_OPAQUE) {
                     throw gcnew PSH5XException("Attribute type unsupported (currently)!");
             }
 
@@ -962,6 +1009,78 @@ namespace PSH5X
 					else {
 						throw gcnew PSH5XException("Unknown STRING type found!!!");
 					}
+
+#pragma endregion
+				}
+				break;
+
+			case H5T_REFERENCE:
+				{
+#pragma region HDF5 REFERENCE
+
+					size_t rsize = H5Tget_size(ftype);
+					ntype = H5Tget_native_type(ftype, H5T_DIR_ASCEND);
+
+					array<unsigned char>^ a = gcnew array<unsigned char>(npoints*safe_cast<int>(rsize));
+			        pin_ptr<unsigned char> ptr = &a[0];
+
+					if (H5Tequal(ftype, H5T_STD_REF_OBJ) > 0)
+					{
+#pragma region object reference
+
+						if (stype == H5S_SIMPLE)
+						{
+							array<String^>^ a = gcnew array<String^>(safe_cast<int>(npoints));
+
+							if (ProviderUtils::TryGetValue(value, a)) {
+								for (i = 0; i < npoints; ++i)
+								{
+									if (a[i]->Trim() != "/" && !ProviderUtils::IsResolvableH5Path(file, a[i])) {
+										throw gcnew PSH5XException(String::Format("HDF5 Object at path '{0}' not found!", a[i]));
+									}
+
+									IntPtr path_str = Marshal::StringToHGlobalAnsi(a[i]);
+									pin_ptr<unsigned char> here = ptr+i*rsize;
+									if (H5Rcreate(here, file, (char*) path_str.ToPointer(), H5R_OBJECT, -1) < 0) {
+										throw gcnew HDF5Exception("H5Rcreate failed!");
+									}
+									Marshal::FreeHGlobal(path_str);
+								}
+							}
+							else {
+								throw gcnew PSH5XException("Value type mismatch!");
+							}
+						}
+						else //scalar
+						{
+							String^ path = nullptr;
+							if (ProviderUtils::TryGetValue(value, path))
+							{
+								if (path->Trim() != "/" && !ProviderUtils::IsResolvableH5Path(file, path)) {
+									throw gcnew PSH5XException(String::Format("HDF5 Object at path '{0}' not found!", path));
+								}
+
+								IntPtr path_str = Marshal::StringToHGlobalAnsi(path);
+								if (H5Rcreate(ptr, file, (char*) path_str.ToPointer(), H5R_OBJECT, -1) < 0) {
+									throw gcnew HDF5Exception("H5Rcreate failed!");
+								}
+								Marshal::FreeHGlobal(path_str);
+							}
+							else {
+								throw gcnew PSH5XException("Value type mismatch!");
+							}
+						}
+
+						if (H5Awrite(aid, ntype, ptr) < 0) {
+							throw gcnew Exception("H5Awrite failed!");
+						}
+#pragma endregion
+					}
+					else {
+						throw gcnew PSH5XException("Unknown reference type found!");
+					}
+
+					
 
 #pragma endregion
 				}

@@ -127,7 +127,7 @@ namespace PSH5X
 					}
 				}
 
-				WritePropertyObject(ProviderUtils::H5Attribute(dst_attr, destinationProperty), destinationPath);
+				WritePropertyObject(ProviderUtils::H5Attribute(dst_attr, destinationProperty, destinationDrive->FileHandle), destinationPath);
 			}
 		}
 		finally

@@ -198,7 +198,7 @@ namespace PSH5X
 				}
 
 				if (setValue) {
-					ProviderUtils::SetH5AttributeValue(aid, attrValue);
+					ProviderUtils::SetH5AttributeValue(aid, attrValue, drive->FileHandle);
 				}
 
 				if (H5Fflush(aid, H5F_SCOPE_LOCAL) < 0) {
