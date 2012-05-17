@@ -111,6 +111,82 @@
                 </tr>
             </tbody>
         </table>
+        <h3>1.04 How do HDF5 compound datatypes "work" in PSH5X?</h3>
+        <p>There are two parts to this question.</p>
+        <h4>Reading data elements of an HDF5 compound datatype</h4>
+        <p>The workflow for reading data elements from an HDF5 dataset is this:</p>
+        <ol>
+            <li>Parse the HDF5 datatype (in the file)</li>
+            <li>Create a C# class whose instances (.NET objects) can be used to represent the data
+                elements in memory</li>
+            <li>Compile the code and load the .NET assembly into the running session</li>
+            <li>Create a .NET array of the right size and shape</li>
+            <li>Read the HDF5 dataset and intialize the array with the values read from disk</li>
+            <li>Return the .NET array to the user</li>
+        </ol>
+        <p> There are several important details to this process. First, the code generation
+            currently does not support deeply nested compound types. This is a matter of finding a
+            good balance between demand (i.e., compound types that people really use) and having a
+            maintainable code generator. Second, not all compound member names can be used as names
+            of members in a .NET class. There are decorators such as <tt>PSNoteProperty</tt>, but we
+            haven't finalized our approach. In the meantime, we use the type codes from the Python
+                <tt>array</tt> module (e.g., <tt>H</tt> for a 16-bit unsigned integer) with a suffix
+            indicating the rank of the member in the HDF5 compound. Let's look at an example. The
+            compound type with this JSON definition:</p>
+        <pre class="code">
+{
+    "Class": "Compound",
+    "Size": 16,
+    "Members":
+    {
+        "a": [0, "H5T_STD_I32BE"],
+        "b": [4, "H5T_IEEE_F32BE"],
+        "c": [8, "H5T_IEEE_F64BE"]
+    }
+}     
+        </pre>
+        <p>will be represented as follows:</p>
+        <pre class="code">
+using System;
+public class ifd
+{
+    public System.Int32  i0;
+    public System.Single f1;
+    public System.Double d2;
+    public ifd() { }
+    public ifd(System.Int32 param0, System.Single param1, System.Double param2)
+    { i0 = param0; f1 = param1; d2 = param2; }
+}           
+        </pre>
+        <p> It'd be nice if there was an array package like <tt>NumPy</tt> for .NET. There appears
+            to be a working 32-bit version, but not a 64-bit version. If you have any suggestions,
+            please let us know! </p>
+        <p>The <tt>Get-H5DatasetValue</tt> cmdlet currently does not support reading a subset of
+            members of a compound type and it does not support type conversion (i.e., a
+            single-prescision floating point number is read as just that; it doesn't convert it into
+            a double). Both of these features will be supported in the release version of PSH5X.</p>
+        <h4>Writing data elements of an HDF5 compound datatype</h4>
+        <p>The workflow for writing data elements from an HDF5 dataset is this:</p>
+        <ol>
+            <li>Parse the HDF5 datatype in the file</li>
+            <li>Reflect on the .NET type of the array elements in memory and determine if the member
+                types can be converted to the matching member types on disk</li>
+            <li>If successful, write the array to the HDF5 dataset</li>
+        </ol>
+        <p>Writing is simpler than reading, since no dynamic code generation is required. The
+                <tt>Add-Type</tt> cmdlet gives the user ultimate control over the in-memory
+            representation (and constructors) of the data elements. (See the <a
+                href="./tutorial.html">tutorial</a> for examples.)</p>
+        <p>The <tt>Set-H5DatasetValue</tt> cmdlet currently does not support writing just a subset
+            of compound members. This will be supported in the release version of PSH5X.</p>
+        <p>To create an array of in-memory representations of an HDF5 datatype you have at least two
+            options.</p>
+        <ol>
+            <li>Use <tt>Add-Type</tt> to add a .NET type followd by a <tt>New-Object</tt> to
+                construct the array</li>
+            <li>Use the <tt>New-H5Array</tt> cmdlet. Its first argument is the JSON type string and
+                the array shape (dimensions) is its second argument.</li>
+        </ol>
         <h2>The Windows Platform</h2>
         <h3 name="hdf52excel">2.01 How do I get data from HDF5 into Excel?</h3>
         <p>Assume that we have a 5553 (rows) by 86 (colums) twodimensional dataset of floating point
