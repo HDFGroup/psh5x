@@ -2474,6 +2474,7 @@ namespace PSH5X
         array<__wchar_t>^ member_tcode = gcnew array<__wchar_t>(member_count);
 		array<bool>^ member_is_array = gcnew array<bool>(member_count);
 		array<String^>^ array_member_dims = gcnew array<String^>(member_count);
+		array<String^>^ array_member_xdims = gcnew array<String^>(member_count);
 
         StringBuilder^ sbname = gcnew StringBuilder();
         StringBuilder^ sbconstr = gcnew StringBuilder("(");
@@ -2501,7 +2502,25 @@ namespace PSH5X
 
 				if (cls == H5T_ARRAY)
 				{
+					if ((stype = H5Tget_super(mtype)) < 0) {
+						throw gcnew HDF5Exception("H5Tget_super failed!");
+					}
+
+                    ntype = H5Tget_native_type(stype, H5T_DIR_ASCEND);
+					if (H5Tclose(stype) < 0) {
+						throw gcnew HDF5Exception("H5Tclose failed!");
+					}
+					stype = -1;
+
+					Type^ nstype = ProviderUtils::H5Type2DotNet(ntype);
+					__wchar_t scode = ProviderUtils::TypeCode(nstype, H5Tget_class(ntype));
+					if (H5Tclose(ntype) < 0) {
+						throw gcnew HDF5Exception("H5Tclose failed!");
+					}
+					ntype = -1;
+
 					StringBuilder^ sb = gcnew StringBuilder();
+					StringBuilder^ sbx = gcnew StringBuilder();
 
 					member_is_array[i] = true;
 					int rank = H5Tget_array_ndims(mtype);
@@ -2516,13 +2535,16 @@ namespace PSH5X
 					for (int r = 0; r < rank; ++r) {
 						if (r > 0) {
 							sb->Append("," + safe_cast<int>(adims[r]).ToString());
+							sbx->Append("x" + safe_cast<int>(adims[r]).ToString());
 						}
 						else {
 							sb->Append(safe_cast<int>(adims[r]).ToString());
+							sbx->Append(safe_cast<int>(adims[r]).ToString());
 						}
 					}
 					sb->Append("]");
 					array_member_dims[i] = sb->ToString();
+					array_member_xdims[i] = scode + sbx->ToString();
 				}
 
                 if (cls == H5T_BITFIELD) {
@@ -2577,7 +2599,12 @@ namespace PSH5X
                 {
                     member_type[i]  = t->ToString();
                     member_tcode[i] = ProviderUtils::TypeCode(t, cls);
-                    sbname->Append(member_tcode[i]);
+					if (member_is_array[i]) {
+						sbname->Append(member_tcode[i] + array_member_xdims[i]);
+					}
+					else {
+						sbname->Append(member_tcode[i]);
+					}
                     member_name[i]  = member_tcode[i] + Convert::ToString(i);
                 }
                 else {

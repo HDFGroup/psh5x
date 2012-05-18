@@ -67,13 +67,6 @@
         </ul>
         <h2>Installation</h2>
         <ol>
-            <li>Make sure you have the latest and greatest version of <a
-                    href="http://www.hdfgroup.org/HDF5/release/obtain5.html#obtain">HDF5</a>. HDF5
-                binaries are included in the zip archive in the <tt>Win32</tt> and <tt>Win64</tt>
-                subfolder. You can use your own binaries as long as they are of the required HDF5
-                version (currently, HDF5 1.8.9), you've built the dynamically linked libraries
-                (DLLs), and they are located in a directory listed in your <tt>Path</tt> environment
-                variable.</li>
             <li>Unpack the zip archive. Create a directory called <tt>HDF5</tt> folder in a
                 directory in your PowerShell module path <tt>$ENV:PSModulePath</tt>. For example, on
                 Windows 7 you'd most likely create it in <tt>C:\Users\{your
@@ -81,7 +74,10 @@
                     <tt>module</tt> folder and the <tt>PSH5X.dll</tt> for your OS (<tt>Win32</tt> or
                     <tt>Win64</tt>) from the zip archive into the <tt>HDF5</tt> folder you just
                 created. Alternatively, run the <tt>Install-PSH5X.ps1</tt> script that performs
-                these steps for you.</li>
+                these steps for you. <tt>PSH5X.dll</tt> depends on <tt>msvcp100.dll</tt> and
+                    <tt>msvcr100.dll</tt> which are included in the zip archive. Unless they are
+                already in your <tt>PATH</tt>, please copy them (for your OS) to a location in your
+                    <tt>PATH</tt>.</li>
             <li>If you are running PowerShell version 2.0, make sure that it runs with .NET 4.0 (and
                 not the default .NET 2.0). The easiest way to accomplish this is to copy the files
                     <tt>powershell.exe.config</tt> and (optionally)

@@ -29,10 +29,10 @@ copy $module\en-US\*.txt $packdir\module\en-US
 copy $here\Win32\Release\PSH5X.dll $packdir\Win32
 copy $here\Win64\Release\PSH5X.dll $packdir\Win64
 
-# HDF5 binaries
+# MSVC dlls
 
-copy "${Env:ProgramFiles(x86)}\HDF Group\HDF5" $packdir\Win32 -Recurse
-copy "$Env:ProgramFiles\HDF Group\HDF5" $packdir\Win64 -Recurse
+copy "${Env:ProgramFiles(x86)}\HDF Group\HDF5\1.8.9\static\bin\msvc*.dll" $packdir\Win32
+copy "$Env:ProgramFiles\HDF Group\HDF5\1.8.9\static\bin\msvc*.dll" $packdir\Win64
 
 # Misc
 

@@ -30,28 +30,19 @@ If you have administrative privileges, you might consider adjusting it
 via Set-ExecutionPolicy. The 'Remote-Signed' level is usually sufficient.
 See 'help about_Execution_Policies' for more details on script execution policy.
 
-4. The HDF5 1.8.9 DLLs are in your path  
----------------------------------------
-
-The HDF5 binaries are included in the module archive in the Win[32,64]\HDF5
-subdirectories. The HDF5 module will fail to load if one or more of the DLLs
-cannot be found. The module will also fail to load if a different version of
-the HDF5 binaries is found in the path. PSH5X.dll depends on:
-
-    hdf5dll.dll
-    hdf5_hldll.dll
-    msvcp100.dll
-    szip.dll
-    zlib.dll
-
 ========
 To build:
 ========
 
-To build PSH5X.dll from source you need the HDF5 1.8.9 headers and libraries
-included in the Win[32,64]\HDF5 subdirectories of the module archive.
+To build PSH5X.dll from source you need the HDF5 1.8.9 headers and libraries.
 Load the Visual Studio 2010 solution file PSH5X.sln and select
 Build -> Build Solution (or Ctrl+Shift+B).
+The solution is set up to statically link PSH5X against HDF5 1.8.9.
+Pre-built HDF5 binaries can be found at
+
+http://www.hdfgroup.org/ftp/HDF5/current/bin/windows/HDF5189-win64-vs10-static.zip
+
+.
 
 ============
 To run tests:
