@@ -710,7 +710,7 @@ namespace PSH5X
 					}
 					else
 					{
-					    result = gcnew DatasetInfoLite(oid);
+					    result = gcnew DatasetInfo(oid);
 						isContainer = false;
 					}
 				}
