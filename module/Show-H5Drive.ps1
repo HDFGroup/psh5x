@@ -80,11 +80,11 @@ Function Show-H5Drive
 
 @"
 digraph $Name {
-rankdir = LR;
-$gnodes
-$dnodes
-$tnodes
-$slinks
+    rankdir = LR;
+    $gnodes
+    $dnodes
+    $tnodes
+    $slinks
 "@
     foreach ($k in $symlinks.Keys) {
         "    node [shape = plaintext, label = `"$($k)`"]; $($symlinks[$k]);"
@@ -113,5 +113,6 @@ $slinks
 
     # Can't go without this one!
 
+    '    label = "http://www.hdfgroup.org/projects/PSH5X";'
     '}'
 }
