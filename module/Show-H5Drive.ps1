@@ -1,11 +1,11 @@
 
-Function Dot-H5Drive
+Function Show-H5Drive
 {
 <#
     .SYNOPSIS
       Creates a DOT language representation of an HDF5 drive
     .DESCRIPTION
-      The Dot-H5Drive cmdlet creates a DOT language representation
+      The Show-H5Drive cmdlet creates a DOT language representation
       of an HDF5 drive which can be used to create an image file
       using a tool such as GraphViz.
     .PARAMETER Name
@@ -93,18 +93,21 @@ $slinks
     #print edges
 
     $items = (Get-ChildItem $root -Recurse -Detailed)
-    foreach ($i in $items)
+    if ($items -ne $Null)
     {
-        $src = "G_$((Get-Item $i.PSParentPath -Detailed).Address)"
-        $label = "$($i.PSChildName)"
-
-        if ($i.ItemType -ne 'SoftLink') {
-            $address = (Get-Item $i.PSPath -Detailed).Address
-            $dst = "$($ht[$address])_$address"
-            "    $src -> $dst [ label = `"$label`" ];"
-        }
-        else {
-            "    $src -> $($symlinks[$i.H5PathName]) [ label = `"$label`" ];"
+        foreach ($i in $items)
+        {
+            $src = "G_$((Get-Item $i.PSParentPath -Detailed).Address)"
+            $label = "$($i.PSChildName)"
+    
+            if ($i.ItemType -ne 'SoftLink') {
+                $address = (Get-Item $i.PSPath -Detailed).Address
+                $dst = "$($ht[$address])_$address"
+                "    $src -> $dst [ label = `"$label`" ];"
+            }
+            else {
+                "    $src -> $($symlinks[$i.H5PathName]) [ label = `"$label`" ];"
+            }
         }
     }
 
