@@ -37,11 +37,12 @@
             multi-faceted as HDF5 there can hardly be too many good choices. With PSH5X we're adding
             another powerful tool to the arsenal and hope that, with your help, it will find its
             "niche" in the ecosystem.</p>
-        <p>Questions? Check out <a href="terminology.html">a few remarks on terminology</a>, a list
-            of <a href="./cmdlets.html">PSH5X cmdlets</a>, the <a href="./faq.html">FAQ</a>, the <a
-                href="./tutorial.html">tutorial</a>, <a href="./advanced.html">advanced
-            features</a>, and several <a href="./nolimits.html">limitations and known
-            issues</a>.</p>
+        <p>Questions? Watch the <a href="http://www.hdfgroup.org/ftp/HDF5/projects/psh5x/PSH5X.mov"
+                >PSH5X movie</a> and check out <a href="terminology.html">a few remarks on
+                terminology</a>, a list of <a href="./cmdlets.html">PSH5X cmdlets</a>, the <a
+                href="./faq.html">FAQ</a>, the <a href="./tutorial.html">tutorial</a>, <a
+                href="./advanced.html">advanced features</a>, and several <a href="./nolimits.html"
+                >limitations and known issues</a>.</p>
         <p>
             <a href="https://twitter.com/psh5x" class="twitter-follow-button"
                 data-show-count="false">Follow @psh5x</a>
@@ -54,6 +55,13 @@
             <tr>
                 <td><u>Operating system:</u></td>
                 <td>Windows XP, Vista, 7, 8, Windows Server 2003, 2008, 2008 R2, 8</td>
+            </tr>
+            <tr>
+                <td><u>Runtime:</u></td>
+                <td>Visual C++ 2010 Redistributable Package <a
+                        href="http://www.microsoft.com/en-us/download/details.aspx?id=5555">x86</a>
+                    or <a href="http://www.microsoft.com/en-us/download/details.aspx?id=14632"
+                        >x86_64</a></td>
             </tr>
             <tr>
                 <td><u>.NET Framework:</u></td>
@@ -77,13 +85,13 @@
                 directory in your PowerShell module path <tt>$ENV:PSModulePath</tt>. For example, on
                 Windows 7 you'd most likely create it in <tt>C:\Users\{your
                     username}\Documents\WindowsPowerShell\Modules</tt>. Copy the contents of the
-                    <tt>module</tt> folder and the <tt>PSH5X.dll</tt> for your OS (<tt>Win32</tt> or
-                    <tt>Win64</tt>) from the zip archive into the <tt>HDF5</tt> folder you just
-                created. Alternatively, run the <tt>Install-PSH5X.ps1</tt> script that performs
-                these steps for you. <tt>PSH5X.dll</tt> depends on <tt>msvcp100.dll</tt> and
-                    <tt>msvcr100.dll</tt> which are included in the zip archive. Unless they are
-                already in your <tt>PATH</tt>, please copy them (for your OS) to a location in your
-                    <tt>PATH</tt>.</li>
+                    <tt>module</tt> folder and the <tt>PSH5X.dll</tt> for your architecture
+                    (<tt>Win32</tt> or <tt>Win64</tt>) from the zip archive into the <tt>HDF5</tt>
+                folder you just created. Alternatively, run the <tt>Install-PSH5X.ps1</tt> script
+                that performs these steps for you. <tt>PSH5X.dll</tt> depends on the Visual C++ 2010
+                runtime via <tt>msvcp100.dll</tt> and <tt>msvcr100.dll</tt> which are included in
+                the zip archive. Unless they are already in your <tt>PATH</tt>, please copy them
+                (for your architecture) to a location in your <tt>PATH</tt>.</li>
             <li>If you are running PowerShell version 2.0, make sure that it runs with .NET 4.0 (and
                 not the default .NET 2.0). The easiest way to accomplish this is to copy the files
                     <tt>powershell.exe.config</tt> and (optionally)
