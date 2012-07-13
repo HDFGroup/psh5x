@@ -2,6 +2,10 @@
 BUGS
 ----
 
+- Image creation fails with -Force, because intermediate groups
+  are not automatically created (H5IM functions have no arguments
+  for a link creation property list...)
+
 - Bug in writing Vlen datasets with zero length arrays?
 
 KNOWN ISSUES
