@@ -6,6 +6,8 @@ BUGS
   are not automatically created (H5IM functions have no arguments
   for a link creation property list...)
 
+- If a link name contains a colon, PSH5X cannot find the item
+
 - Bug in writing Vlen datasets with zero length arrays?
 
 KNOWN ISSUES
