@@ -1,0 +1,17 @@
+Import-Module HDF5
+Import-Module ILNumerics
+
+# create a new drive 'h5' backed by an HDF5 file and read the dataset value
+
+New-H5Drive h5 '.\HIRDLS-Aura_L2_v02-04-09-c03_2008d001.he5'
+$data = [ilf32] (Get-H5DatasetValue 'h5:\HDFEOS\SWATHS\HIRDLS\Data Fields\Temperature')
+
+# mark fill values as NaN values
+$fill = (Get-H5Attribute 'h5:\HDFEOS\SWATHS\HIRDLS\Data Fields\Temperature' `
+         '_FillValue').Value
+$data.SetRange([Single]::NaN, [ilmath]::eq($data, $fill))
+
+Remove-h5Drive h5
+
+# plot the data 
+$panel = Surface($data[':;0:2000'])

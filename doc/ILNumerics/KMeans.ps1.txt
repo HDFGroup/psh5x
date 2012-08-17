@@ -1,0 +1,227 @@
+Import-Module ILNumerics
+
+################################################################################
+# <summary>
+# k-means clustering: find clusters in data matrix X
+# </summary>
+# <param name="X">Data matrix, data points are expected as columns</param>
+# <param name="k">Initial number of clusters expected</param>
+# <param name="centerInitRandom">[Optional] false: pick the first k data points
+#    as initial centers, true: pick random datapoints (default)</param>
+# <param name="maxIterations">[Optional] Maximum number of iterations, the
+#    computation will exit after that many iterations, default: 10.000</param>
+# <param name="outCenters">[Input/Output/Optional] If not null on entry,
+#    outCenters will contain the centers of the clusters found,
+#    default: null</param>
+# <returns>Vector of length n with indices of the clusters which were assigned
+#    to each datapoint</returns>
+# <remarks><para>If <paramref name="outCenters"/> is not null on input, the
+#    algorithm returns the computed centers in that parameter. A 
+#    matrix may be given on input, in order to give a hint of the initial
+#    center positions. This may help to find correct cluster centers - even if 
+#    the initial hint is not exact. In order to do so, the matrix given must be
+#    of the correct size (X.D[0] by k) and <paramref name="centerInitRandom"/>
+#    must be set to <c>false</c>.</para></remarks>
+################################################################################
+
+Function example_kmeansclust
+{
+    param([ilf64i] $X, [ilf64i] $k, [int] $maxIterations=1000, `
+          [bool] $centerInitRandom=$True, [ilf64o] $outCenters=$Null)
+
+    ILUsing ([ilscope]::Enter($X, $k)) {
+
+        if($X -eq $Null) {
+            Write-Error 'X must be a data matrix (not null)'
+            exit
+        }
+        if ($X.IsEmpty) {
+            if ($outCenters -ne $Null) {
+                if ($X.S[0] -gt 0) {
+                    $outCenters.a = [ilmath]::empty([ilmath]::size($X.S[0], 0))
+                }
+                else {
+                    $outCenters.a = [ilmath]::empty([ilmath]::size(0, $X.S[1]))
+                }
+            }
+        }
+        if (($k -eq $Null) -or (-not $k.IsScalar) -or (-not $k.IsNumeric)) {
+            Write-Error 'number of clusters k must be a numeric scalar'
+            exit
+        }
+        $iK = [ilmath]::toint32($k).GetValue(0)
+        if ($X.S[1] -lt $iK) {
+            Write-Error "too few datapoints provided for $iK clusters"
+            exit
+        }
+        if ($iK -lt 0) {
+            Write-Error 'number of clusters must be positive'
+            exit
+        }
+        $d = $X.S[0]; $n = $X.S[1]
+        if ($iK -eq 0) {
+            if ($outCenters -ne $Null) {
+                $outCenters.a = [ilmath]::empty( `
+                    (New-Object 'ILNumerics.ILSize' $d, $iK))
+            }
+            return [ilf64r] ,[ilmath]::empty( `
+                (New-Object 'ILNumerics.ILSize' 0, $n))
+        }
+
+        # initialize centers by using random datapoints
+        $centers = [ilf64] [ilmath]::empty()
+
+        if ($centerInitRandom) {
+            $pickIndices = [ilf64] [ilmath]::empty();
+            [ilmath]::sort([ilmath]::rand(1,$n), $pickIndices, 1, $False).Dispose()
+            $centers.a = $X.Subarray((':', $pickIndices["0:$($iK-1)"]))
+        }
+        else {
+            if (($outCenters -ne $Null) -and ($outCenters.S[0] -eq $d) -and `
+                ($outCenters.S[1] -eq $iK)) {
+                $centers.a = $outCenters
+            }
+            else {
+                $centers.a = X[":;0:$($iK-1)"]
+            }
+        }
+
+        $classes = [ilf64] [ilmath]::zeros(1, $n)
+        $oldCenters = [ilf64] $centers.C
+
+        $sw = New-Object 'System.Diagnostics.Stopwatch'
+
+        while ($maxIterations-- -gt 0)
+        {
+            $sw.Restart()
+
+            for ($i = 0; $i -lt $n; ++$i)
+            {
+                # find cluster affiliates
+                ILUsing ([ilscope]::Enter()) {
+
+                    $minDistIdx = [ilf64] [ilmath]::empty()
+                    [ilmath]::min([ilmath]::distL1($centers, $X[":;$i"]), `
+                        $minDistIdx, 1).Dispose()
+                    $classes[$i] = [double]$minDistIdx[0]
+                }
+            }
+
+            Write-Host "kmeans: 1 of $maxIterations MemoryPool.Info: `
+                $([ILNumerics.ILMemoryPool]::Pool.Info($True))"
+
+            for ($i = 0; $i -lt $iK; ++$i)
+            {
+                ILUsing ([ilscope]::Enter()) {
+
+                    $r = [ilmath]::find([ilmath]::eq($classes, [double]$i))
+                    $inClass = [ilf64] $X.Subarray((':', $r))
+
+                    if ($inClass.IsEmpty) {
+                        $centers[":;$i"] = [double]::NaN
+                    }
+                    else {
+                        $centers[":;$i"] = [ilf64] [ilmath]::mean($inClass, 1)
+                    }
+                }
+            }
+
+            $sw.Stop()
+
+            Write-Host "Changed centers: $([ilmath]::any([ilmath]::neq( `
+                $oldCenters, $centers)).NumberNonZero) `
+                elapsed: $($sw.ElapsedMilliseconds)ms"
+
+            if ([ilmath]::allall([ilmath]::eq($oldCenters, $centers))) {
+                break;
+            }
+            $oldCenters.a = $centers.C
+        }
+
+        if ($outCenters -ne $Null) {
+            $outCenters.a = $centers
+        }
+
+        , [ilf64r] $classes
+    }
+}
+
+################################################################################
+# <summary>
+# create test data for testing kmeans
+# </summary>
+# <param name="numSampPerClust">average number of samples in each cluster</param>
+# <param name="centers">initial centers of clusters</param>
+# <returns>test data matrix, centers.S[0] rows, numSampPerClust * centers.S[1]
+# columns</returns>
+################################################################################
+
+Function createClusters
+{
+    param([int] $numSampPerClust, [ilf64i] $centers)
+
+    ILUsing ([ilscope]::Enter($centers)) {
+
+        $rows = $centers.S[0]
+        $cols = $numSampPerClust*$centers.S[1]
+        $A = [ilf64] [ilmath]::multiplyElem([ilmath]::rand($rows, $cols), 0.25)
+        for ($i = 0; $i -lt $centers.S[1]; ++$i)
+        {
+            $r = ":;$($i*$numSampPerClust):$(($i+1)*$numSampPerClust-1)"
+            $A[$r] = [ilmath]::add($A[$r], $centers[":;$i"])
+        }
+        , [ilf64r]$A
+    }
+}
+
+################################################################################
+
+$centers = [ilf64] [ilmath]::counter(1,5)
+
+'Current license information:'
+[ilsettings]::License
+
+# make some test data for kmeans
+
+$centers['1;:'] = $centers
+
+$A = [ilf64] (createClusters 3 $centers)
+
+$classes = [ilf64] (example_kmeansclust $A 5.0 1000 $False $centers)
+
+$correct_classes = [ilf64] [double[]] (0,0,0,1,1,1,2,2,2,3,3,3,4,4,4)
+
+"Classes: $($classes.ToString())"
+"Expected: $($correct_classes.T.ToString())"
+
+if (-not $classes.Equals($correct_classes.T)) {
+    Write-Error 'invalid classes found'
+    exit
+}
+
+# larger data example: this actually creates a 'worst case' scenario regarding
+# the memory management. kmeans on random data frequently creates all length
+# of arrays which is hard to pool. Therefore - on this difficult case - the
+# ILNumerics memory management can only partly succeed in reusing arrays.
+# Typical values for reuse success rates are around 75% (i.e. 1 new array
+# among 4 allocation requests). See the output of
+# ILMemoryPool.Pool.Info(false) below.
+
+'Please wait ... '
+
+$A.a = [ilmath]::rand(500, 2000)
+for ($i = 0; $i -lt 5; ++$i) {
+    $classes.a = (example_kmeansclust $A 350.0)
+    "Step $i of 5 done."
+}
+
+'Done. Memory Pool Statistics:'
+
+# give some memory pool statistics. For more detailed infos, one may 
+# query the windows performance counters: ILNumerics Memory Pool. (which
+# unfortunately is an undocumented feature and disabled per default)
+
+"$([ILNumerics.ILMemoryPool]::Pool.Info($False))"
+
+Write-Host "Press any key to continue ..."
+$x = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")

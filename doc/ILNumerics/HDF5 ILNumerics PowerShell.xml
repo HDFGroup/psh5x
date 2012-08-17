@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://www.oasis-open.org/docbook/xml/5.0/rng/docbook.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<article xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink"
+    xmlns:xi="http://www.w3.org/2001/XInclude" version="5.0">
+    <info>
+        <title>Putting on a Good Show with HDF5, ILNumerics, and PowerShell</title>
+        <author>
+            <personname>
+                <firstname>Gerd</firstname>
+                <surname>Heber</surname>
+            </personname>
+            <affiliation>
+                <orgname>The HDF Group</orgname>
+                <address>
+                <city>Champaign</city>
+                <street>1800 S. Oak St., Suite 203</street>
+                <postcode>61820</postcode>
+                <country>USA</country>
+                    </address>
+            </affiliation>
+            <email>gheber@hdfgroup.org</email>
+        </author>
+        <author>
+            <personname>
+                <firstname>Haymo</firstname>
+                <surname>Kutschbach</surname>
+            </personname>
+            <affiliation>
+                <orgname>ILNumerics</orgname>
+                <address>
+                <city>Berlin</city>
+                <street>Habersaathstr. 6</street>
+                <postcode>10115</postcode>
+                <country>Germany</country>
+                    </address>
+            </affiliation>
+            <email>h.kutschbach@ilnumerics.net</email>
+        </author>
+    </info>
+
+    <blockquote>
+        <attribution>Nietzsche, Zarathustra II, The Stillest Hour, Translation by Walter Kaufmann </attribution>
+        <para><emphasis> It is the stillest words that bring on the storm. Thoughts that come on
+                doves' feet guide the world.</emphasis>
+        </para>
+    </blockquote>
+
+    <sect1>
+        <title>Dramatis Personae</title>
+
+        <para>None of the actors really needs an introduction, but here's something in case you just
+            got back from vacation...</para>
+
+        <bridgehead>HDF5</bridgehead>
+        <bridgehead>ILNumerics</bridgehead>
+        <bridgehead>PowerShell</bridgehead>
+    </sect1>
+
+    <sect1>
+        <title>Pulling it off</title>
+        <para/>
+
+        <sect2>
+            <title>Why ILNumerics is so fast</title>
+            <para/>
+        </sect2>
+
+        <sect2>
+            <title>Mimicking C#'s <literal>using</literal> statement</title>
+            <para/>
+        </sect2>
+
+        <sect2>
+            <title>Making it look pretty</title>
+            <para/>
+        </sect2>
+
+    </sect1>
+
+    <sect1>
+        <title>Finale</title>
+        <informalexample>
+            <?dbfo pgwide="1"?>
+            <programlisting><xi:include parse="text" href="finale.ps1.txt"/></programlisting>
+        </informalexample>
+
+        <figure>
+            <title>Surface</title>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="Surface.png" scale="75" align="center" valign="bottom"/>
+                </imageobject>
+            </mediaobject>
+        </figure>
+
+    </sect1>
+
+    <appendix xml:id="MindMap">
+        <title>K-Means in PowerShell</title>
+        <informalexample>
+            <?dbfo pgwide="1"?>
+            <programlisting linenumbering="numbered"><xi:include parse="text" href="KMeans.ps1.txt"/></programlisting>
+        </informalexample>
+    </appendix>
+
+    <bibliography>
+
+        <biblioentry xml:id="Dahlby2008">
+            <abbrev>Dahlby2008</abbrev>
+            <author>
+                <personname>
+                    <firstname>Keith</firstname>
+                    <surname>Dahlby</surname>
+                </personname>
+            </author>
+            <title><link
+                    xlink:href="http://solutionizing.net/2008/09/21/multi-purpose-powershell-using-function/"
+                    >Multi-Purpose PowerShell Using Function</link></title>
+            <pubdate>September 21, 2008</pubdate>
+        </biblioentry>
+
+        <biblioentry xml:id="HDF5">
+            <abbrev>HDF5</abbrev>
+            <title><link xlink:href="http://www.hdfgroup.org/HDF5/">The Home of HDF5</link></title>
+            <publisher>
+                <publishername>The HDF Group</publishername>
+            </publisher>
+            <pubdate>2012</pubdate>
+        </biblioentry>
+
+        <biblioentry xml:id="HDF-EOS">
+            <abbrev>HDF-EOS</abbrev>
+            <title><link xlink:href="http://hdfeos.org/">HDF-EOS Tools and Information
+                Center</link></title>
+            <publisher>
+                <publishername>NASA/The HDF Group</publishername>
+            </publisher>
+            <pubdate>2012</pubdate>
+        </biblioentry>
+
+        <biblioentry xml:id="HIRDLS">
+            <abbrev>HIRDLS</abbrev>
+            <title><link xlink:href="http://www.eos.ucar.edu/hirdls/">HIgh Resolution Dynamics Limb
+                    Sounder</link></title>
+            <publisher>
+                <publishername>UCAR</publishername>
+            </publisher>
+            <pubdate>2008</pubdate>
+        </biblioentry>
+
+        <biblioentry xml:id="ILNumerics">
+            <abbrev>ILNumerics</abbrev>
+            <title><link xlink:href="http://ilnumerics.net/">Numeric Computing for
+                    Applications</link></title>
+            <publisher>
+                <publishername>Haymo Kutschbach</publishername>
+            </publisher>
+            <pubdate>2012</pubdate>
+        </biblioentry>
+
+        <biblioentry xml:id="Payette2011">
+            <abbrev>Payette2011</abbrev>
+            <author>
+                <personname>
+                    <firstname>Bruce</firstname>
+                    <surname>Payette</surname>
+                </personname>
+            </author>
+            <title><link xlink:href="http://www.manning.com/payette2/">Windows PowerShell in Action,
+                    Second Edition</link></title>
+            <publisher>
+                <publishername>Manning</publishername>
+            </publisher>
+            <pubdate>May 18, 2011</pubdate>
+        </biblioentry>
+
+        <biblioentry xml:id="PSTX">
+            <abbrev>PSTX</abbrev>
+            <title><link xlink:href="http://pstx.codeplex.com/">PowerShell Type
+                Accelerators</link></title>
+            <publisher>
+                <publishername>poshoholic</publishername>
+            </publisher>
+            <pubdate>2012</pubdate>
+        </biblioentry>
+
+        <biblioentry xml:id="PS4DEV">
+            <abbrev>Finke2012</abbrev>
+            <author>
+                <personname>
+                    <firstname>Douglas</firstname>
+                    <surname>Finke</surname>
+                </personname>
+            </author>
+            <title><link xlink:href="http://shop.oreilly.com/product/0636920024491.do">Windows
+                    PowerShell for Developers</link></title>
+            <subtitle>Enhance your productivity and enable rapid application development</subtitle>
+            <publisher>
+                <publishername>O'Reilly</publishername>
+            </publisher>
+            <pubdate>2012</pubdate>
+        </biblioentry>
+
+        <biblioentry xml:id="PSH5X">
+            <abbrev>PSH5X</abbrev>
+            <title><link xlink:href="http://www.hdfgroup.org/projects/PSH5X/">HDF PSH5X
+                    Project</link></title>
+            <subtitle>In Action</subtitle>
+            <publisher>
+                <publishername>The HDF Group</publishername>
+            </publisher>
+            <pubdate>2012</pubdate>
+        </biblioentry>
+
+    </bibliography>
+</article>
