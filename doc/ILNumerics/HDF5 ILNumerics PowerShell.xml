@@ -36,43 +36,251 @@
             </affiliation>
             <email>h.kutschbach@ilnumerics.net</email>
         </author>
+        <abstract>
+            <para> In this article, we describe how a simple combination of three freely available
+                tools &#8212; HDF5, ILNumerics, and PowerShell &#8212; can be used to analyze and
+                visualize data stored in HDF5 files. Our claim is not that there aren't other
+                excellent free choices that achieve the same (or more). Our goal is to highlight a
+                few lesser-known but no less capable actors on the Windows platform. </para>
+            <para> This article should be of interest to ... and of particular interest to ...
+            </para>
+        </abstract>
     </info>
 
+    <!-- 
     <blockquote>
         <attribution>Nietzsche, Zarathustra II, The Stillest Hour, Translation by Walter Kaufmann </attribution>
         <para><emphasis> It is the stillest words that bring on the storm. Thoughts that come on
                 doves' feet guide the world.</emphasis>
         </para>
     </blockquote>
+    -->
+    <blockquote>
+        <attribution>Shakespeare, The Tragedie of Macbeth.</attribution>
+        <para>
+            <emphasis>Thunder and lightning. Enter three Witches.</emphasis>
+        </para>
+        <orderedlist>
+            <listitem>
+                <para> When shall we three meet againe? In Thunder, Lightning, or in Raine? </para>
+            </listitem>
+            <listitem>
+                <para> When the Hurley burley's done, When the Battaile's lost, and wonne. </para>
+            </listitem>
+            <listitem>
+                <para> That will be ere the set of Sunne. </para>
+            </listitem>
+        </orderedlist>
+    </blockquote>
 
     <sect1>
         <title>Dramatis Personae</title>
 
-        <para>None of the actors really needs an introduction, but here's something in case you just
-            got back from vacation...</para>
-
         <bridgehead>HDF5</bridgehead>
+        <para> HDF5 files (<xref linkend="HDF5"/>) are a common way of storing self-describing webs
+            of numerical and non-numerical (text, multimedia) datasets of all sizes. They are
+            popular, for example, in the High-Performance Computing and the Remote Sensing
+            communtities. (<xref linkend="HDF-EOS"/>) It is common to access HDF5 files or stores
+            via some kind of API. The APIs can be as low-level as a C- or FORTRAN-API, or they may
+            come with high-level conveniences such as <literal>h5py</literal> (<xref linkend="h5py"
+            />) or MATLAB. </para>
+
         <bridgehead>ILNumerics</bridgehead>
+        <para>ILNumerics (<xref linkend="ILNumerics"/>) brings powerful numerical computing and
+            visualization capabilities to the .NET framework. It allows for a convenient formulation
+            of even complex algorithms with the help of n-dimensional array classes and a syntax
+            akin to MATLAB or IDL. By paying attention to certain features of managed languages
+            (rather than ignoring them), algorithms implemented with ILNumerics execute at speeds
+            competitive with C and FORTRAN. </para>
+        <para> The library has been around since 2006 and proven its efficiency for numerical
+            algorithms and visualization in all areas where the .NET framework is commonly used:
+            enterprise applications, ASP.NET websites, office applications and more.</para>
+
         <bridgehead>PowerShell</bridgehead>
+        <para> Unbeknownst to many, Windows PowerShell <xref linkend="Payette2011"/> has been around
+            for almost 6 years and, at the time of this writing, the release of version 3 is just
+            around the corner. After years of overlapping, incomplete, and incoherent Windows
+            scripting solutions, PowerShell has emerged as the de facto standard for automation on
+            the Windows platform. Today, no server product (e.g., Exchange, SQL Server, Hyper-V)
+            ships without a PowerShell interface. </para>
+        <para> The great acceptance of PowerShell among administrators may have contributed to the
+            commonly found but ill-conceived notion that PowerShell is for administrators only.
+            There's increasing awareness <xref linkend="PS4DEV"/> that PowerShell is a great tool
+            for developers and other keyboard users on Windows alike. </para>
+
     </sect1>
 
     <sect1>
         <title>Pulling it off</title>
-        <para/>
+
+        <para> As stated in the abstract, we would like to analyze and visualize data stored in HDF5
+            files. We need to connect to the bytes on disk in an HDF5 file and, on the other end, we
+            need to connect to some kind of rendering engine that puts colorful pixels on a screen.
+            A PowerShell module for HDF5, such as PSH5X (<xref linkend="PSH5X"/>), can take care of
+            the first part. It delivers HDF5 dataset or attribute values as .NET arrays and we could
+            then consider writing the code to render the right GUI controls, e.g., WinForms. For
+            just a simple surface plot this doesn't sound like an attractive proposition; way too
+            much coding! In addition, if the data need to be filtered or transformed in any
+            substantial way, plain .NET arrays aren't exactly a great starting point. </para>
+        <para> What we need is that magic <literal>Numpy</literal>-like (<xref linkend="Numpy"/>)
+            sauce, with convenient and efficient array manipulation. Add to that a standard
+            portfolio of visualization primitives (plots, graphs, scenes, lights, materials, etc.)
+            and the work will almost take care of itself. Paraphrasing Walter Sobchak we might say,
+                <emphasis>"It's not a dream! It's called ILNumerics."</emphasis>, and we kick of
+            this section with a few technical comments on ILNumerics.</para>
 
         <sect2>
             <title>Why ILNumerics is so fast</title>
-            <para/>
+            <para> Two important goals were driving the design of ILNumerics: convenience and
+                performance. In order to archieve optimal execution speed, the library utilizes a
+                whole series of means. Some are potentially useful and common to all numerical
+                applications, and others deal with the particularities of the managed framework. </para>
+
+            <sect3 xml:id="ILNMemoryManagement">
+                <title>Memory Management</title>
+                <para> It is well known that over the last roughly 30 years DRAM latencies have not
+                    kept pace with microprocessor speeds <xref linkend="HennPatt2012"/>. The
+                    'Locality Principle' led to the introduction of a multi-level hierarchy of
+                    caches which improves the situation mainly for common business scenarios, i.e.,
+                    smaller to mid-sized data schemes. Special cache-aware algorithms are needed to
+                    take advantage of caches for BigData applications. ILNumerics supports the
+                    'Locality Principle' by forcing all arrays to always reuse the system
+                    memory <xref linkend="HPCWithNET"/>. </para>
+                <para> The library comes with a memory pool from which the storage for all
+                    computational arrays is requested. The pool takes care of the optimal mapping
+                    from available memory to incoming requests, as well as controlling its own size.
+                    In order to always have a matching array available, all unreferenced arrays
+                    dispose of their storage into the pool instead of returning it to the virtual
+                    memory manager. This is usally the job of the garbage collector (GC). However,
+                    ILNumerics takes a different approach. </para>
+                <para> While the Common Language Runtime (CLR) garbage collector does an excellent
+                    job cleaning up regular business objects, the garbage left behind by numerical
+                    algorithms is different. If one were to rely on the GC for larger arrays,
+                    strongly counterproductive de-/allocation patterns would emerge, causing the
+                    overall performance to drop significantly. Thats why in ILNumerics arrays are
+                    disposed off <emphasis>deterministically</emphasis>. How is this achieved? </para>
+                <para> Since memory management a la <code>free</code> or <code>delete</code> is not
+                    known in .NET, a combination of <link
+                        xlink:href="http://en.wikipedia.org/wiki/Resource_Acquisition_Is_Initialization"
+                        >RIIA</link> principles and artificial scoping is used. The class design for
+                    ILNumerics arrays supports this scheme by implementing several distinct array
+                    types: </para>
+                <itemizedlist>
+                    <listitem>
+                        <para>
+                            <code><![CDATA[ILArray<T>]]></code> - local arrays, valid for the
+                            current scope block </para>
+                    </listitem>
+                    <listitem>
+                        <para>
+                            <code><![CDATA[ILInArray<T>]]></code> - input parameter arrays, only
+                            valid in function declarations </para>
+                    </listitem>
+                    <listitem>
+                        <para>
+                            <code><![CDATA[ILOutArray<T>]]></code> - input/output (reference)
+                            parameter arrays, only valid in function declarations </para>
+                    </listitem>
+                    <listitem>
+                        <para>
+                            <code><![CDATA[ILRetArray<T>]]></code> - return type for
+                                <emphasis>all</emphasis> functions </para>
+                    </listitem>
+                </itemizedlist>
+                <para> In implementations of algorithms, all array variables declared in a function
+                    body are local arrays (<code><![CDATA[ILArray<T>]]></code>). In order to dispose
+                    off a local array, artificial scopes are realized with the help of <link
+                        xlink:href="http://msdn.microsoft.com/en-us/library/yh598w02(v=vs.80).aspx">
+                        <code>using blocks (C#)</code>
+                    </link>. Usually such a <code>using</code> block simply encloses the whole
+                    function body. Once the execution leaves a block scope (planned or as the result
+                    of an exception being raised), ILNumerics disposes of all arrays created within
+                    the block automatically, thus replenishing the memory pool. </para>
+                <para> But the memory pool is even greedier; it asks for the
+                        <emphasis>complete</emphasis> set of memory used by an implementation and it
+                    wants that memory as soon as possible. In order to achieve that, another simple
+                    rule acts under the hood; whenever an array is created in ILNumerics it is of
+                    type <code><![CDATA[ILRetArray<T>]]></code>. (All functions, indexers, and
+                    properties in ILNumerics return objects of that type.)
+                        <code><![CDATA[ILRetArray<T>]]></code>, however, is volatile by design and
+                    it disposes of itself <emphasis>after the first use</emphasis>. Therefore, if a
+                    temporary arrays is not converted to a local array, it will immediately be
+                    disposed of and the memory cycle is closed. </para>
+                <para>If this sounds rather complicated, don't worry! The details are well hidden
+                    from the user. Follow three simple rules <footnote>
+                        <orderedlist>
+                            <listitem>
+                                <para> Make sure you use the right array types for input/output
+                                    parameters and return values in function declarations. </para>
+                            </listitem>
+                            <listitem>
+                                <para> Wrap function bodies into artificial scopes. </para>
+                            </listitem>
+                            <listitem>
+                                <para> Correctly assign output parameters. </para>
+                            </listitem>
+                        </orderedlist>
+                    </footnote> and ILNumerics will safe you a bundle in memory and plenty of
+                    execution time! And there are a few other goodies that come along with that.
+                    (Read on!)</para>
+            </sect3>
+            <sect3>
+                <title>It ain't over 'til it's over</title>
+                <para>While efficient memory management and use have the biggest impact on execution
+                    speed, some additional features help optimize the performance even further: </para>
+                <itemizedlist>
+                    <listitem>
+                        <para> Value semantics for function parameters is achieved due to the
+                            immutability of input parameters. </para>
+                    </listitem>
+                    <listitem>
+                        <para> 'Lazy Copy On Write' for array clones. </para>
+                    </listitem>
+                    <listitem>
+                        <para> The underlying array storage consists of one-dimensional arrays,
+                            which can be accessed via simple pointer arithmetic. Even C# allows to
+                            circumvent mandatory array bounds checks and to implement efficient loop
+                            unrolling this way. In the end, tight loops over large arrays get JIT
+                            compiled to native code that is very competitive with similar code
+                            written in C/C++. </para>
+                    </listitem>
+                    <listitem>
+                        <para> Built-in functions in ILNumerics efficiently spread the workload to
+                            all available cores. A hand-tuned thread pool implementation helps
+                            minimizing threading overhead. </para>
+                    </listitem>
+                    <listitem>
+                        <para> In many cases, ILNumerics knows from the context of a function when
+                            an operation can work in place, hence saving the allocation of temporary
+                            storage. </para>
+                    </listitem>
+                    <listitem>
+                        <para> Last but not least, the .NET framework has standard interfaces for
+                            interacting with external libraries. The <productname class="registered"
+                                >Intel MKL</productname> is used by default for all LAPACK related
+                            linear algebra routines, FFT and the like. </para>
+                    </listitem>
+                </itemizedlist>
+            </sect3>
         </sect2>
 
         <sect2>
-            <title>Mimicking C#'s <literal>using</literal> statement</title>
-            <para/>
+            <title>Mimicking the C# <code>using</code> statement</title>
+            <para> C# is a fine language, but our goal is to write PowerShell scripts. ILNumerics'
+                heavy reliance on scopes poses a potential problem. The PowerShell language has a
+                notion of scopes, but there's no direct counterpart to a <literal>using</literal>
+                statement. </para>
+            <para> In Septemper 2008, Keith Dahlby posted an example (<xref linkend="Dahlby2008"/>)
+                of a PowerShell <code>using</code> function to his blog, which illustrates how to
+                mimick the <code>using</code> statement found in C# and VB. The gist of his post is
+                this:</para>
         </sect2>
 
         <sect2>
             <title>Making it look pretty</title>
-            <para/>
+            <para> Currently, the PSH5X module returns HDF5 dataset and attribute values as .NET
+                arrays. To use them with ILNumerics, we must cast them as <code>ILArray</code>s.
+                This and working with .NET objects can be a pretty verbose affair. </para>
         </sect2>
 
     </sect1>
@@ -119,6 +327,16 @@
             <pubdate>September 21, 2008</pubdate>
         </biblioentry>
 
+        <biblioentry xml:id="h5py">
+            <abbrev>h5py</abbrev>
+            <title><link xlink:href="http://code.google.com/p/h5py/">A Python interface to the HDF5
+                    library</link></title>
+            <publisher>
+                <publishername>Andrew Collette</publishername>
+            </publisher>
+            <pubdate>2012</pubdate>
+        </biblioentry>
+
         <biblioentry xml:id="HDF5">
             <abbrev>HDF5</abbrev>
             <title><link xlink:href="http://www.hdfgroup.org/HDF5/">The Home of HDF5</link></title>
@@ -148,12 +366,58 @@
             <pubdate>2008</pubdate>
         </biblioentry>
 
+        <biblioentry xml:id="HennPatt2012">
+            <abbrev>HennPatt2012</abbrev>
+            <title> Computer Architecture - A Quantitative Approach </title>
+            <authorgroup>
+                <author>
+                    <personname>
+                        <firstname>John L.</firstname>
+                        <surname>Hennessy</surname>
+                    </personname>
+                </author>
+                <author>
+                    <personname>
+                        <firstname>David A.</firstname>
+                        <surname>Patterson</surname>
+                    </personname>
+                </author>
+            </authorgroup>
+            <publisher>
+                <publishername>Morgan Kaufmann</publishername>
+            </publisher>
+            <pubdate>2012</pubdate>
+        </biblioentry>
+
+        <biblioentry xml:id="HPCWithNET">
+            <abbrev>HPCWith.NET</abbrev>
+            <title>
+                <link
+                    xlink:href="http://ilnumerics.net/img/High_Performance_Computing_With.NET_H.Kutschbach_ILNumerics_2012.pdf"
+                    > High Performance Computing With .NET </link>
+            </title>
+            <publisher>
+                <publishername>Haymo Kutschbach</publishername>
+            </publisher>
+            <pubdate>2012</pubdate>
+        </biblioentry>
+
         <biblioentry xml:id="ILNumerics">
             <abbrev>ILNumerics</abbrev>
             <title><link xlink:href="http://ilnumerics.net/">Numeric Computing for
                     Applications</link></title>
             <publisher>
                 <publishername>Haymo Kutschbach</publishername>
+            </publisher>
+            <pubdate>2012</pubdate>
+        </biblioentry>
+
+        <biblioentry xml:id="Numpy">
+            <abbrev>Numpy</abbrev>
+            <title><link xlink:href="http://numpy.scipy.org/">Scientific Computing Tools for
+                    Python</link></title>
+            <publisher>
+                <publishername>Numpy developers</publishername>
             </publisher>
             <pubdate>2012</pubdate>
         </biblioentry>
