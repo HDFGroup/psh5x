@@ -1,0 +1,25 @@
+Import-Module TypeAccelerator
+
+Add-TypeAccelerator ilf32 ILNumerics.ILArray[single]
+Add-TypeAccelerator ilf32i ILNumerics.ILInArray[single]
+Add-TypeAccelerator ilf32o ILNumerics.ILOutArray[single]
+Add-TypeAccelerator ilf32r ILNumerics.ILRetArray[single]
+
+Add-TypeAccelerator ilf64 ILNumerics.ILArray[double]
+Add-TypeAccelerator ilf64i ILNumerics.ILInArray[double]
+Add-TypeAccelerator ilf64o ILNumerics.ILOutArray[double]
+Add-TypeAccelerator ilf64r ILNumerics.ILRetArray[double]
+
+Add-TypeAccelerator ili8 ILNumerics.ILArray[SByte]
+Add-TypeAccelerator ili16 ILNumerics.ILArray[Int16]
+Add-TypeAccelerator ili32 ILNumerics.ILArray[Int32]
+Add-TypeAccelerator ili64 ILNumerics.ILArray[Int64]
+
+Add-TypeAccelerator ilu8 ILNumerics.ILArray[Byte]
+Add-TypeAccelerator ilu16 ILNumerics.ILArray[UInt16]
+Add-TypeAccelerator ilu32 ILNumerics.ILArray[UInt32]
+Add-TypeAccelerator ilu64 ILNumerics.ILArray[UInt64]
+
+Add-TypeAccelerator ilmath ILNumerics.ILMath
+Add-TypeAccelerator ilsettings ILNumerics.Settings
+Add-TypeAccelerator ilscope ILNumerics.ILScope

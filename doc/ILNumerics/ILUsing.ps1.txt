@@ -1,0 +1,40 @@
+#
+# This is Keith Dalby's script from
+# http://solutionizing.net/2008/09/21/multi-purpose-powershell-using-function/
+#
+
+Function ILUsing {
+    param (
+        $inputObject = $(throw "The parameter -inputObject is required."),
+        [ScriptBlock] $scriptBlock
+    )
+
+    if ($inputObject -is [string]) {
+        if (Test-Path $inputObject) {
+            [System.Reflection.Assembly]::LoadFrom($inputObject)
+        } elseif($null -ne (
+              New-Object System.Reflection.AssemblyName($inputObject)
+              ).GetPublicKeyToken()) {
+            [System.Reflection.Assembly]::Load($inputObject)
+        } else {
+            [System.Reflection.Assembly]::LoadWithPartialName($inputObject)
+        }
+    } elseif ($inputObject -is [System.IDisposable] -and $scriptBlock -ne $null) {
+        Try {
+            &$scriptBlock
+        } Finally {
+            if ($inputObject -ne $null) {
+                $inputObject.Dispose()
+            }
+            Get-Variable -Scope script |
+                Where-Object {
+                    [object]::ReferenceEquals($_.Value.PSBase, $inputObject.PSBase)
+                } |
+                Foreach-Object {
+                    Remove-Variable $_.Name -scope script
+                }
+        }
+    } else {
+        $inputObject
+    }
+}

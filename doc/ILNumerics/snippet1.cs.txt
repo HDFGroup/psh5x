@@ -1,0 +1,18 @@
+public static ILRetArray<double> FreqPeaks(
+    ILInArray<double> in Data, ILInArray<double> inWindow, double sampFreq = 44100,
+    ILOutArray<double> frequencies = null )
+{
+    try
+    {
+        ILArray<double> Data = check(inData);
+        ILArray<double> Window = check(inWindow);
+        ...
+    }
+    finally
+    {
+        if (inData != null)
+            ((IDisposable)inData).Dispose();
+        if (inWindow != null)
+            ((IDisposable)inWindow).Dispose();
+    }
+}
