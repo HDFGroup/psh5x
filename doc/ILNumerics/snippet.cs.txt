@@ -4,11 +4,8 @@ public static ILRetArray<double> FreqPeaks(
 {
     using (ILScope.Enter(inData, inWindow)) {
 
-        ILArray<double> Data = check(inData);
-        ILArray<double> Window = check(inWindow);
-
-        ILArray<double> retLength = min(ceil(Data.Length / 2.0 + 1), 5.0);
-        ILArray<double> magnitudes = abs(fft(Data * Window));
+        ILArray<double> retLength = min(ceil(inData.Length / 2.0 + 1), 5.0);
+        ILArray<double> magnitudes = abs(fft(inData * inWindow));
         magnitudes = magnitudes[r(0,end / 2 + 1)];
 
         ILArray<double> indices = empty();

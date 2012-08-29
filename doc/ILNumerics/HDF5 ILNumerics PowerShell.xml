@@ -41,9 +41,10 @@
                 tools &#8212; HDF5, ILNumerics, and PowerShell &#8212; can be used to analyze and
                 visualize data stored in HDF5 files. Our claim is not that there aren't other
                 excellent free choices that achieve the same (or more). Our goal is to highlight a
-                few lesser-known but no less capable actors on the Windows platform. </para>
-            <para> This article should be of interest to ... and of particular interest to ...
-            </para>
+                few lesser-known but no less capable actors on the Windows platform. This article
+                should be of interest to HDF5 users on Windows, PowerShell fans, and people who have
+                doubts about the utility of managed runtimes (such as .NET) for numerical
+                calculations and visualization. </para>
         </abstract>
     </info>
 
@@ -77,16 +78,16 @@
         <title>Dramatis Personae</title>
 
         <bridgehead>HDF5</bridgehead>
-        <para> HDF5 files (<xref linkend="HDF5"/>) are a common way of storing self-describing webs
-            of numerical and non-numerical (text, multimedia) datasets of all sizes. They are
-            popular, for example, in the High-Performance Computing and the Remote Sensing
-            communtities. (<xref linkend="HDF-EOS"/>) It is common to access HDF5 files or stores
-            via some kind of API. The APIs can be as low-level as a C- or FORTRAN-API, or they may
-            come with high-level conveniences such as <literal>h5py</literal> (<xref linkend="h5py"
-            />) or MATLAB. </para>
+        <para> HDF5 files <xref linkend="HDF5"/> are a common way of storing self-describing webs of
+            numerical and non-numerical (text, multimedia) datasets of all sizes. They are popular,
+            for example, in the High-Performance Computing and the Remote Sensing communtities.
+                <xref linkend="HDF-EOS"/> It is common to access HDF5 files or stores via some kind
+            of API. The APIs can be as low-level as a C- or FORTRAN-API, or they may come with
+            high-level conveniences such as <literal>h5py</literal>
+            <xref linkend="h5py"/> or MATLAB. </para>
 
         <bridgehead>ILNumerics</bridgehead>
-        <para>ILNumerics (<xref linkend="ILNumerics"/>) brings powerful numerical computing and
+        <para>ILNumerics <xref linkend="ILNumerics"/> brings powerful numerical computing and
             visualization capabilities to the .NET framework. It allows for a convenient formulation
             of even complex algorithms with the help of n-dimensional array classes and a syntax
             akin to MATLAB or IDL. By paying attention to certain features of managed languages
@@ -104,9 +105,9 @@
             the Windows platform. Today, no server product (e.g., Exchange, SQL Server, Hyper-V)
             ships without a PowerShell interface. </para>
         <para> The great acceptance of PowerShell among administrators may have contributed to the
-            commonly found but ill-conceived notion that PowerShell is for administrators only.
-            There's increasing awareness <xref linkend="PS4DEV"/> that PowerShell is a great tool
-            for developers and other keyboard users on Windows alike. </para>
+            common but ill-conceived notion that PowerShell is for administrators only. There's
+            increasing awareness <xref linkend="PS4DEV"/> that PowerShell is a great tool for
+            developers and other keyboard users (on Windows) alike. </para>
 
     </sect1>
 
@@ -116,13 +117,13 @@
         <para> As stated in the abstract, we would like to analyze and visualize data stored in HDF5
             files. We need to connect to the bytes on disk in an HDF5 file and, on the other end, we
             need to connect to some kind of rendering engine that puts colorful pixels on a screen.
-            A PowerShell module for HDF5, such as PSH5X (<xref linkend="PSH5X"/>), can take care of
+            A PowerShell module for HDF5, such as PSH5X <xref linkend="PSH5X"/>, can take care of
             the first part. It delivers HDF5 dataset or attribute values as .NET arrays and we could
             then consider writing the code to render the right GUI controls, e.g., WinForms. For
             just a simple surface plot this doesn't sound like an attractive proposition; way too
             much coding! In addition, if the data need to be filtered or transformed in any
             substantial way, plain .NET arrays aren't exactly a great starting point. </para>
-        <para> What we need is that magic <literal>Numpy</literal>-like (<xref linkend="Numpy"/>)
+        <para> What we need is that magic <literal>Numpy</literal>-like <xref linkend="Numpy"/>
             sauce, with convenient and efficient array manipulation. Add to that a standard
             portfolio of visualization primitives (plots, graphs, scenes, lights, materials, etc.)
             and the work will almost take care of itself. Paraphrasing Walter Sobchak we might say,
@@ -155,16 +156,14 @@
                     ILNumerics takes a different approach. </para>
                 <para> While the Common Language Runtime (CLR) garbage collector does an excellent
                     job cleaning up regular business objects, the garbage left behind by numerical
-                    algorithms is different. If one were to rely on the GC for larger arrays,
-                    strongly counterproductive de-/allocation patterns would emerge, causing the
-                    overall performance to drop significantly. Thats why in ILNumerics arrays are
+                    algorithms is different. In fact, overall performance would drop significantly,
+                    if we were to rely on the GC for larger arrays, because of highly
+                    counterproductive de-/allocation patterns. Thats why in ILNumerics arrays are
                     disposed of <emphasis>deterministically</emphasis>. How is this achieved? </para>
                 <para> Since memory management a la <code>free</code> or <code>delete</code> is not
-                    known in .NET, a combination of <link
-                        xlink:href="http://en.wikipedia.org/wiki/Resource_Acquisition_Is_Initialization"
-                        >RIIA</link> principles and artificial scoping is used. The class design for
-                    ILNumerics arrays supports this scheme by implementing several distinct array
-                    types: </para>
+                    supported in .NET, a combination of RIIA principles <xref linkend="RIIA"/> and
+                    artificial scoping is used. The class design for ILNumerics arrays supports this
+                    scheme by implementing several distinct array types: </para>
                 <itemizedlist>
                     <listitem>
                         <para>
@@ -184,22 +183,22 @@
                     <listitem>
                         <para>
                             <code><![CDATA[ILRetArray<T>]]></code> - return type for
-                                <emphasis>all</emphasis> functions </para>
+                                <emphasis>all</emphasis> numerical functions</para>
                     </listitem>
                 </itemizedlist>
                 <para> In implementations of algorithms, all array variables declared in a function
                     body are local arrays (<code><![CDATA[ILArray<T>]]></code>). In order to dispose
-                    of a local array, artificial scopes are realized with the help of
+                    of a local array, artificial scopes are created with the help of
                         <code>using</code> blocks (C#) (see <xref linkend="using"/>). Usually such a
                         <code>using</code> block simply encloses the whole function body. Once the
                     execution leaves a block scope (planned or as the result of an exception),
                     ILNumerics disposes of all arrays created within the block automatically, thus
                     replenishing the memory pool. </para>
-                <para> But the memory pool is even greedier; it asks for the
+                <para> The memory pool is even greedier; it asks for the
                         <emphasis>complete</emphasis> set of memory used by an implementation and it
                     wants that memory as soon as possible. In order to achieve that another simple
                     rule acts under the hood; whenever an array is created in ILNumerics it is of
-                    type <code><![CDATA[ILRetArray<T>]]></code>. (All functions, indexers, and
+                    type <code><![CDATA[ILRetArray<T>]]></code>. (All functions, indexers and
                     properties in ILNumerics return objects of that type.)
                         <code><![CDATA[ILRetArray<T>]]></code>, however, is volatile by design and
                     it disposes of itself <emphasis>after the first use</emphasis>. Therefore, if a
@@ -220,7 +219,7 @@
                             immutability of input parameters. </para>
                     </listitem>
                     <listitem>
-                        <para> 'Lazy Copy On Write' for array clones. </para>
+                        <para> A 'Lazy Copy On Write' scheme for cloning arrays. </para>
                     </listitem>
                     <listitem>
                         <para> The underlying array storage consists of one-dimensional arrays,
@@ -261,21 +260,22 @@
                 <?dbfo pgwide="1"?>
                 <programlisting linenumbering="numbered"><xi:include parse="text" href="snippet.cs.txt"/></programlisting>
             </informalexample>
-            <para> The C# compiler will compile this into: </para>
+            <para> The C# compiler will transform this into: </para>
             <informalexample>
                 <?dbfo pgwide="1"?>
                 <programlisting linenumbering="numbered"><xi:include parse="text" href="snippet1.cs.txt"/></programlisting>
             </informalexample>
             <para> The <code>using</code> statement on line 5 in the first listing is translated
-                into the calls to <code>Dispose()</code> around line 15 in the second listing. </para>
+                into the call to <code>Dispose()</code> in the <code>finally</code> block shown in
+                the second listing. </para>
             <para> Of course, we can do all the .NET stuff in PowerShell, but there's another
                 syntactic twist, or shall we say <emphasis>serendipity</emphasis>, which helps to
-                make this look-and-feel right in PowerShell. Formally, the <code>using</code>
-                statement looks like a function. The arguments are <code>ILScope.Enter(inData,
-                    inWindow)</code> and a PowerShell scriptblock <code>{ ... }</code>. (Remember
-                the syntax for invoking a PowerShell function <code>fun</code> with two arguments
-                    <code>a</code> and <code>b</code>? It's <code>fun a b</code> , not
-                    <code>fun(a,b)</code> or <code>fun a,b</code> .) </para>
+                make this look and feel right in PowerShell. Formally, the <code>using</code>
+                statement has the appearance of a function. The arguments are
+                    <code>ILScope.Enter(inData, inWindow)</code> and a PowerShell scriptblock
+                    <code>{ ... }</code>. (Remember the syntax for invoking a PowerShell function
+                    <code>fun</code> with two arguments <code>a</code> and <code>b</code>? It's
+                    <code>fun a b</code> , not <code>fun(a,b)</code> or <code>fun a,b</code> .) </para>
             <para> In September 2008, Keith Dahlby posted an example (<xref linkend="Dahlby2008"/>)
                 of a PowerShell <code>using</code> function to his blog. His code is shown in <xref
                     linkend="ILUsing"/>. Fortunately, we didn't have to come up with that on our
@@ -285,10 +285,10 @@
         <sect2>
             <title>Making it look pretty</title>
             <para> With the <code>New-Object</code> cmdlet creating .NET objects in PowerShell is
-                pretty straightforward. Working with .NET methods, epsecially static methods, can be
-                a pretty verbose affair. It might be good memory training, but the third time you
-                type <code>[System.IO.File]::ReadAllBytes(...)</code>, it'll be hard to resist the
-                thought, "There must be a better way!" </para>
+                pretty straightforward. However, working with .NET methods, especially static
+                methods, can be a pretty verbose affair. It might be good memory training, but the
+                third time you type <code>[System.IO.File]::ReadAllBytes(...)</code>, it'll be hard
+                to resist the thought, "There must be a better way!" </para>
             <para> Currently, the PSH5X module returns HDF5 dataset and attribute values as .NET
                 arrays. To use them with ILNumerics, we must cast them as <code>ILArray</code>s.
                 Just picture yourself typing <code>$a = [ILNumerics.ILArray[single]]
@@ -314,14 +314,18 @@
         <title>Finale</title>
 
         <para> With all the pieces in place it's all down to a few lines of PowerShell. In the
-            example below, we open an HDF-EOS5 file
-                <filename>HIRDLS-Aura_L2_v02-04-09-c03_2008d001.he5</filename> with data from the
+            example below, we open an HDF-EOS5 file,
+                <filename>HIRDLS-Aura_L2_v02-04-09-c03_2008d001.he5</filename>, with data from the
             HIRDLS instrument <xref linkend="HIRDLS"/> and select a swath (see <xref
-                linkend="WynFort1995"/>) of temperatures at <filename>/HDFEOS/SWATHS/HIRDLS/Data
-                Fields/Temperature</filename> . The dataset's fill value is stored in the
-                <code>_FillValue</code> attribute of the dataset and we use
-                <code>ILArray&lt;T&gt;::SetRange()</code> to replace the fill values with
-                <code>NaN</code>. See <xref linkend="Swath"/> for the result. </para>
+                linkend="WynFort1995"/>) of temperatures at
+            <programlisting>/HDFEOS/SWATHS/HIRDLS/Data Fields/Temperature</programlisting> The
+            dataset's fill value is stored in the <code>_FillValue</code> attribute of the dataset
+            and we use <code>ILArray&lt;T&gt;::SetRange()</code> to replace them with
+                <code>NaN</code>. The latitude and longitude labels are populated from the datasets
+            at
+            <programlisting>/HDFEOS/SWATHS/HIRDLS/Geolocation Fields/Latitude
+/HDFEOS/SWATHS/HIRDLS/Geolocation Fields/Longitude</programlisting>
+            Below is the full script and see <xref linkend="Swath"/>, for the result. </para>
 
         <informalexample>
             <?dbfo pgwide="1"?>
@@ -341,15 +345,23 @@
 
     <sect1>
         <title>Summary</title>
-        <para/>
-
+        <para> When we started this project, we were confident that with PowerShell, PSH5X, and
+            ILNumerics we had all the necessary pieces to read data from an HDF5 file, to transform
+            the data efficiently if needed, and to render them. What we didn't know was how well the
+            pieces would fit together. It was clear that PowerShell was technically capable to serve
+            as the glue, but we weren't sure if the result would be some unsightly mess that we'd
+            rather not talk about. We are glad to report that we not only achieved our goal, but
+            that the solution also meets minimal aesthetic and health standards.</para>
+        <para> The take-home message is this: PowerShell might be seen as the Cadillac of
+            administrators, but we don't need to ask for the keys to take it out for a spin.
+            Hotwired with the HDF5 module and ILNumerics you are in for a comfortable ride to any
+            corner of your data on the Windows platform. </para>
     </sect1>
-
 
     <appendix xml:id="Rules">
         <title>ILNumerics Rules</title>
-        <figure>
-            <title>Three rules for success <code>;-)</code></title>
+        <figure xml:id="ILRules_Overview">
+            <title>General rules for ILNumerics</title>
             <mediaobject>
                 <imageobject>
                     <imagedata fileref="NiceCodeExample_FreqPeaksOverview2.rot.png" scale="75"
@@ -357,6 +369,11 @@
                 </imageobject>
             </mediaobject>
         </figure>
+        <para><xref linkend="ILRules_Overview"/> gives an overview of the coding rules required to
+            get reliable performance - even for demanding computational routines. By following those
+            simple rules, ILNumerics will keep track of all array storage, provide value semantics
+            for function parameters, clean up temporaries deterministically and <link
+                xlink:href="http://ilnumerics.net/$GeneralRules.html">much more</link>. </para>
     </appendix>
 
     <appendix xml:id="ILUsing">
@@ -375,12 +392,39 @@
         </informalexample>
     </appendix>
 
+    <appendix xml:id="Surface">
+        <title><code>Surface.ps1</code></title>
+        <informalexample>
+            <?dbfo pgwide="1"?>
+            <programlisting linenumbering="numbered"><xi:include parse="text" href="Surface.ps1.txt"/></programlisting>
+        </informalexample>
+    </appendix>
+
     <appendix xml:id="K-Means">
         <title>K-Means in PowerShell</title>
+        <para>In the following listing a simple example implementation of the popular k-means
+            algorithm for Powershell is given.</para>
         <informalexample>
             <?dbfo pgwide="1"?>
             <programlisting linenumbering="numbered"><xi:include parse="text" href="KMeans.ps1.txt"/></programlisting>
         </informalexample>
+        <para> The algorithm takes as input a matrix and the anticipated number of clusters
+                <code>k</code>. After some parameter checking and initialization it starts the main
+            loop. At first, every datapoint is assigned to the nearest cluster according to its
+            distance to the cluster centers. In the second step the cluster centers (weights) are
+            recomputed for the new member set. The algorithm terminates once no centers have changed
+            during the iteration cycle or more than 10.000 iterations have been accomplished. </para>
+        <para> Lets point out several interesting aspects of the implementation. First of all,
+            Powershell is a dynamic language and does not need explicit variable type declarations.
+            However, since ILNumerics does heavily rely on explicit array types, this can be
+            achieved as well. Here, the type accelerators mentioned above come in handy. </para>
+        <para>Secondly, Powershells 'using block' replacements can be nested just like their C#
+            prototype, which limits the scope and minimizes memory pool size for long running loops. </para>
+        <para> And lastly, the algorithm is the result of a translation from C# and it reflects its
+            counterpart in all aspects pretty closely. One exception is found in the fact, that
+            Powershell makes it a little harder to optimize for short syntax expressions. Common
+            operators (+,-,||,== etc.) must be replaced with static functions and - of course -
+            Powershell does not allow to derive from classes. </para>
     </appendix>
 
     <bibliography>
@@ -393,10 +437,26 @@
                     <surname>Dahlby</surname>
                 </personname>
             </author>
-            <title><link
-                    xlink:href="http://solutionizing.net/2008/09/21/multi-purpose-powershell-using-function/"
-                    >Multi-Purpose PowerShell Using Function</link></title>
+            <title><link xlink:href="http://goo.gl/GXH1f">Multi-Purpose PowerShell Using
+                    Function</link></title>
             <pubdate>September 21, 2008</pubdate>
+        </biblioentry>
+
+        <biblioentry xml:id="PS4DEV">
+            <abbrev>Finke2012</abbrev>
+            <author>
+                <personname>
+                    <firstname>Douglas</firstname>
+                    <surname>Finke</surname>
+                </personname>
+            </author>
+            <title><link xlink:href="http://goo.gl/nrUIH">Windows PowerShell for
+                Developers</link></title>
+            <subtitle>Enhance your productivity and enable rapid application development</subtitle>
+            <publisher>
+                <publishername>O'Reilly</publishername>
+            </publisher>
+            <pubdate>2012</pubdate>
         </biblioentry>
 
         <biblioentry xml:id="h5py">
@@ -464,9 +524,7 @@
         <biblioentry xml:id="HPCWithNET">
             <abbrev>HPCWith.NET</abbrev>
             <title>
-                <link
-                    xlink:href="http://ilnumerics.net/img/High_Performance_Computing_With.NET_H.Kutschbach_ILNumerics_2012.pdf"
-                    > High Performance Computing With .NET </link>
+                <link xlink:href="http://goo.gl/lplWd"> High Performance Computing With .NET </link>
             </title>
             <publisher>
                 <publishername>Haymo Kutschbach</publishername>
@@ -486,10 +544,8 @@
 
         <biblioentry xml:id="Munro2012">
             <abbrev>Munro2012</abbrev>
-            <title><link
-                    xlink:href="http://www.powershellmagazine.com/2012/04/27/a-day-in-the-life-of-a-poshoholic-creating-and-using-type-accelerators-and-namespaces-the-easy-way/"
-                    >A day in the life of a Poshoholic: Creating and using type accelerators and
-                    namespaces the easy way</link></title>
+            <title><link xlink:href="http://goo.gl/KzK6k">A day in the life of a Poshoholic:
+                    Creating and using type accelerators and namespaces the easy way</link></title>
             <publisher>
                 <publishername>Kirk Munro</publishername>
             </publisher>
@@ -532,23 +588,6 @@
             <pubdate>2012</pubdate>
         </biblioentry>
 
-        <biblioentry xml:id="PS4DEV">
-            <abbrev>Finke2012</abbrev>
-            <author>
-                <personname>
-                    <firstname>Douglas</firstname>
-                    <surname>Finke</surname>
-                </personname>
-            </author>
-            <title><link xlink:href="http://shop.oreilly.com/product/0636920024491.do">Windows
-                    PowerShell for Developers</link></title>
-            <subtitle>Enhance your productivity and enable rapid application development</subtitle>
-            <publisher>
-                <publishername>O'Reilly</publishername>
-            </publisher>
-            <pubdate>2012</pubdate>
-        </biblioentry>
-
         <biblioentry xml:id="PSH5X">
             <abbrev>PSH5X</abbrev>
             <title><link xlink:href="http://www.hdfgroup.org/projects/PSH5X/">HDF PSH5X
@@ -560,11 +599,20 @@
             <pubdate>2012</pubdate>
         </biblioentry>
 
+        <biblioentry xml:id="RIIA">
+            <abbrev>RIIA</abbrev>
+            <title><link xlink:href="http://goo.gl/OfxhE">Resource Acquisition Is
+                    Initialization</link></title>
+            <publisher>
+                <publishername>Wikipedia</publishername>
+            </publisher>
+            <pubdate>2012</pubdate>
+        </biblioentry>
+
         <biblioentry xml:id="using">
             <abbrev>using Statement</abbrev>
-            <title><link
-                    xlink:href="http://msdn.microsoft.com/en-us/library/yh598w02(v=vs.110).aspx"
-                        ><code>using</code> Statement (C# Reference)</link></title>
+            <title><link xlink:href="http://goo.gl/llPgm"><code>using</code> Statement (C#
+                    Reference)</link></title>
             <publisher>
                 <publishername>MSDN</publishername>
             </publisher>
@@ -573,8 +621,7 @@
 
         <biblioentry xml:id="WynFort1995">
             <abbrev>WynFort1995</abbrev>
-            <title><link xlink:href="http://edhs1.gsfc.nasa.gov/waisdata/docsw/pdf/wp1700301.pdf"
-                    >The HDF-EOS Swath Concept</link></title>
+            <title><link xlink:href="http://goo.gl/h4Otf">The HDF-EOS Swath Concept</link></title>
             <subtitle>White Paper 170-WP-003-001</subtitle>
             <publisher>
                 <publishername>Hughes Applied Information Systems</publishername>
