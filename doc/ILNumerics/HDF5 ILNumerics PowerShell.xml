@@ -47,15 +47,7 @@
                 calculations and visualization. </para>
         </abstract>
     </info>
-
-    <!-- 
-    <blockquote>
-        <attribution>Nietzsche, Zarathustra II, The Stillest Hour, Translation by Walter Kaufmann </attribution>
-        <para><emphasis> It is the stillest words that bring on the storm. Thoughts that come on
-                doves' feet guide the world.</emphasis>
-        </para>
-    </blockquote>
-    -->
+    
     <blockquote>
         <attribution>Shakespeare, The Tragedie of Macbeth.</attribution>
         <para>
@@ -258,12 +250,12 @@
             <para> A typical C# method implemented using ILNumerics looks like this: </para>
             <informalexample>
                 <?dbfo pgwide="1"?>
-                <programlisting linenumbering="numbered"><xi:include parse="text" href="snippet.cs.txt"/></programlisting>
+                <programlisting linenumbering="numbered" language="csharp"><xi:include parse="text" href="snippet.cs.txt"/></programlisting>
             </informalexample>
             <para> The C# compiler will transform this into: </para>
             <informalexample>
                 <?dbfo pgwide="1"?>
-                <programlisting linenumbering="numbered"><xi:include parse="text" href="snippet1.cs.txt"/></programlisting>
+                <programlisting linenumbering="numbered" language="csharp"><xi:include parse="text" href="snippet1.cs.txt"/></programlisting>
             </informalexample>
             <para> The <code>using</code> statement on line 5 in the first listing is translated
                 into the call to <code>Dispose()</code> in the <code>finally</code> block shown in
@@ -329,7 +321,7 @@
 
         <informalexample>
             <?dbfo pgwide="1"?>
-            <programlisting><xi:include parse="text" href="finale.ps1.txt"/></programlisting>
+            <programlisting language="perl"><xi:include parse="text" href="finale.ps1.txt"/></programlisting>
         </informalexample>
 
         <figure xml:id="Swath">
@@ -349,7 +341,7 @@
             ILNumerics we had all the necessary pieces to read data from an HDF5 file, to transform
             the data efficiently if needed, and to render them. What we didn't know was how well the
             pieces would fit together. It was clear that PowerShell was technically capable to serve
-            as the glue, but we weren't sure if the result would be some unsightly mess that we'd
+            as the glue, but we were unsure if the result would be some unsightly mess that we'd
             rather not talk about. We are glad to report that we not only achieved our goal, but
             that the solution also meets minimal aesthetic and health standards.</para>
         <para> The take-home message is this: PowerShell might be seen as the Cadillac of
@@ -380,7 +372,7 @@
         <title>A <code>using</code> Statement for PowerShell</title>
         <informalexample>
             <?dbfo pgwide="1"?>
-            <programlisting linenumbering="numbered"><xi:include parse="text" href="ILUsing.ps1.txt"/></programlisting>
+            <programlisting linenumbering="numbered" language="perl"><xi:include parse="text" href="ILUsing.ps1.txt"/></programlisting>
         </informalexample>
     </appendix>
 
@@ -388,7 +380,7 @@
         <title><code>ILAccelerators.ps1</code></title>
         <informalexample>
             <?dbfo pgwide="1"?>
-            <programlisting linenumbering="numbered"><xi:include parse="text" href="ILAccelerators.ps1.txt"/></programlisting>
+            <programlisting linenumbering="numbered" language="perl"><xi:include parse="text" href="ILAccelerators.ps1.txt"/></programlisting>
         </informalexample>
     </appendix>
 
@@ -396,7 +388,7 @@
         <title><code>Surface.ps1</code></title>
         <informalexample>
             <?dbfo pgwide="1"?>
-            <programlisting linenumbering="numbered"><xi:include parse="text" href="Surface.ps1.txt"/></programlisting>
+            <programlisting linenumbering="numbered" language="perl"><xi:include parse="text" href="Surface.ps1.txt"/></programlisting>
         </informalexample>
     </appendix>
 
@@ -406,7 +398,7 @@
             algorithm for Powershell is given.</para>
         <informalexample>
             <?dbfo pgwide="1"?>
-            <programlisting linenumbering="numbered"><xi:include parse="text" href="KMeans.ps1.txt"/></programlisting>
+            <programlisting linenumbering="numbered" language="perl"><xi:include parse="text" href="KMeans.ps1.txt"/></programlisting>
         </informalexample>
         <para> The algorithm takes as input a matrix and the anticipated number of clusters
                 <code>k</code>. After some parameter checking and initialization it starts the main

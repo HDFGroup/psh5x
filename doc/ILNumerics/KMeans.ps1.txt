@@ -22,7 +22,7 @@ Function KMeans
         }
         if ($X.IsEmpty) {
             return [ilrf64] [ilmath]::empty([ilmath]::size(0, $n))
-		}
+        }
         if ($k -lt 1) {
             Write-Error 'number of clusters k must be positive'
             exit
@@ -40,22 +40,22 @@ Function KMeans
 
         [ilf64] $classes = [ilmath]::zeros(1, $n)
         [ilf64] $oldCenters = $centers.C
-		
+        
         $maxIterations = 10000 
         while ($maxIterations-- -gt 0)
         {
-	        # assign every datapoint to nearest center
+            # assign every datapoint to nearest center
             for ($i = 0; $i -lt $n; ++$i)
             {
-		        # nested 'using' block for efficient memory performance
+                # nested 'using' block for efficient memory performance
                 ILUsing ([ilscope]::Enter()) {
 
                     [ilf64] $minDistIdx = [ilmath]::empty()
-					# find the 'min'imal cluster distance 
+                    # find the 'min'imal cluster distance 
                     [ilmath]::min([ilmath]::distL1($centers, $X[":;$i"]), `
-						# take the cluster index ... `
+                        # take the cluster index ... `
                         $minDistIdx, 1).Dispose()
-					# and use it as i-th class assignment 
+                    # and use it as i-th class assignment 
                     $classes[$i] = [double]$minDistIdx[0]
                 }
             }
@@ -83,8 +83,8 @@ Function KMeans
             # keep current centers for next round
             $oldCenters.a = $centers.C
         }
-	    # must return class assignments as proper array type! 
-	    # i.e. 'ilrf64' as alias for ILRetArray<double>
+        # must return class assignments as proper array type! 
+        # i.e. 'ilrf64' as alias for ILRetArray<double>
         , [ilrf64] $classes
     }
 }
