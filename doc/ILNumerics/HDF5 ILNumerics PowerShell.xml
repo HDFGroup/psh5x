@@ -39,15 +39,15 @@
         <abstract>
             <para> In this article, we describe how a simple combination of three freely available
                 tools &#8212; HDF5, ILNumerics, and PowerShell &#8212; can be used to analyze and
-                visualize data stored in HDF5 files. Our claim is not that there aren't other
-                excellent free choices that achieve the same (or more). Our goal is to highlight a
-                few lesser-known but no less capable actors on the Windows platform. This article
-                should be of interest to HDF5 users on Windows, PowerShell fans, and people who have
-                doubts about the utility of managed runtimes (such as .NET) for numerical
-                calculations and visualization. </para>
+                visualize data stored in HDF5 files (on Windows). There are other excellent free
+                choices that achieve the same (or more), but this particular combination brings
+                togther a maybe unexpected cast of characters. This article should be of interest to
+                HDF5 users on Windows, PowerShell fans, and people who have doubts about the utility
+                of managed runtimes (such as .NET) for numerical calculations and visualization.
+            </para>
         </abstract>
     </info>
-    
+
     <blockquote>
         <attribution>Shakespeare, The Tragedie of Macbeth.</attribution>
         <para>
@@ -394,29 +394,37 @@
 
     <appendix xml:id="K-Means">
         <title>K-Means in PowerShell</title>
-        <para>In the following listing a simple example implementation of the popular k-means
-            algorithm for Powershell is given.</para>
+        <para>In the following listing, a sample PowerShell implementation of the popular k-means
+            algorithm is given.</para>
         <informalexample>
             <?dbfo pgwide="1"?>
             <programlisting linenumbering="numbered" language="perl"><xi:include parse="text" href="KMeans.ps1.txt"/></programlisting>
         </informalexample>
-        <para> The algorithm takes as input a matrix and the anticipated number of clusters
-                <code>k</code>. After some parameter checking and initialization it starts the main
-            loop. At first, every datapoint is assigned to the nearest cluster according to its
-            distance to the cluster centers. In the second step the cluster centers (weights) are
-            recomputed for the new member set. The algorithm terminates once no centers have changed
-            during the iteration cycle or more than 10.000 iterations have been accomplished. </para>
-        <para> Lets point out several interesting aspects of the implementation. First of all,
-            Powershell is a dynamic language and does not need explicit variable type declarations.
-            However, since ILNumerics does heavily rely on explicit array types, this can be
-            achieved as well. Here, the type accelerators mentioned above come in handy. </para>
-        <para>Secondly, Powershells 'using block' replacements can be nested just like their C#
-            prototype, which limits the scope and minimizes memory pool size for long running loops. </para>
-        <para> And lastly, the algorithm is the result of a translation from C# and it reflects its
-            counterpart in all aspects pretty closely. One exception is found in the fact, that
-            Powershell makes it a little harder to optimize for short syntax expressions. Common
-            operators (+,-,||,== etc.) must be replaced with static functions and - of course -
-            Powershell does not allow to derive from classes. </para>
+        <para> The algorithm takes as input a set of datapoints and the expected number of clusters
+                <code>k</code>. After parameter checking and initialization, the main loop
+            alternates between two steps: </para>
+        <orderedlist>
+            <listitem>
+                <para>Assign each datapoint to the cluster with the nearest cluster center.</para>
+            </listitem>
+            <listitem>
+                <para>Recompute the cluster centers.</para>
+            </listitem>
+        </orderedlist>
+        <para> The algorithm terminates when the centers seize to shift or a given number of
+            iterations (e.g., 10,000) has been reached. </para>
+
+        <para>We used a C# version as the template for the PowerShell implementation. The
+            differences are minor indeed. Powershell as a type-promiscuous language <xref
+                linkend="Payette2011"/> saves us a bit of typing. (No pun intended.) On the
+            other hand, ILNumerics relies heavily on explicit array types. This is where the
+            PowerShell accelerators come in handy. PowerShell's <code>using</code> block subsitute
+            can be nested just like its C# cousin and produces the same effect; it limits the scope
+            and minimizes memory pool size for long running loops. One exception to the otherwise
+            harmonious transition from C# is that PowerShell doesn't leave much room for "syntactic
+            sugar". Operators such as <code>+</code>, <code>-</code>, <code>||</code>,
+                <code>==</code>, etc. must be replaced with static functions and, in the absence of
+            classes, there're no derived classes. </para>
     </appendix>
 
     <bibliography>
