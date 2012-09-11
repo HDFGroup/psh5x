@@ -41,9 +41,9 @@
                 tools &#8212; HDF5, ILNumerics, and PowerShell &#8212; can be used to analyze and
                 visualize data stored in HDF5 files (on Windows). There are other excellent free
                 choices that achieve the same (or more), but this particular combination brings
-                togther a maybe unexpected cast of characters. This article should be of interest to
-                HDF5 users on Windows, PowerShell fans, and people who have doubts about the utility
-                of managed runtimes (such as .NET) for numerical calculations and visualization.
+                togther an unexpected cast of characters. This article should be of interest to HDF5
+                users on Windows, PowerShell fans, and people who have doubts about the utility of
+                managed runtimes (such as .NET) for numerical calculations and visualization.
             </para>
         </abstract>
     </info>
@@ -72,34 +72,33 @@
         <bridgehead>HDF5</bridgehead>
         <para> HDF5 files <xref linkend="HDF5"/> are a common way of storing self-describing webs of
             numerical and non-numerical (text, multimedia) datasets of all sizes. They are popular,
-            for example, in the High-Performance Computing and the Remote Sensing communtities.
-                <xref linkend="HDF-EOS"/> It is common to access HDF5 files or stores via some kind
-            of API. The APIs can be as low-level as a C- or FORTRAN-API, or they may come with
-            high-level conveniences such as <literal>h5py</literal>
+            for example, in the High-Performance Computing <xref linkend="VPIC"/> and the Remote
+            Sensing communtities. <xref linkend="HDF-EOS"/> It is common to access HDF5 files or
+            stores via some kind of API. The APIs can be as low-level as a C- or FORTRAN-API, or
+            they may come with high-level conveniences such as <literal>h5py</literal>
             <xref linkend="h5py"/> or MATLAB. </para>
 
         <bridgehead>ILNumerics</bridgehead>
         <para>ILNumerics <xref linkend="ILNumerics"/> brings powerful numerical computing and
             visualization capabilities to the .NET framework. It allows for a convenient formulation
             of even complex algorithms with the help of n-dimensional array classes and a syntax
-            akin to MATLAB or IDL. By paying attention to certain features of managed languages
-            (rather than ignoring them), algorithms implemented with ILNumerics execute at speeds
-            competitive with C and FORTRAN. </para>
+            akin to MATLAB or IDL. By paying attention to certain features of managed languages,
+            algorithms implemented with ILNumerics execute at speeds competitive with C and FORTRAN. </para>
         <para> The library has been around since 2006 and proven its efficiency for numerical
             algorithms and visualization in all areas where the .NET framework is commonly used:
             enterprise applications, ASP.NET websites, office applications and more.</para>
 
         <bridgehead>PowerShell</bridgehead>
         <para> Unbeknownst to many, Windows PowerShell <xref linkend="Payette2011"/> has been around
-            for almost 6 years and, at the time of this writing, the release of version 3 is just
-            around the corner. After years of overlapping, incomplete, and incoherent Windows
+            for almost 6 years and Team PowerShell just released version 3 of the product. <xref
+                linkend="PS3"/> After years of overlapping, incomplete, and incoherent Windows
             scripting solutions, PowerShell has emerged as the de facto standard for automation on
             the Windows platform. Today, no server product (e.g., Exchange, SQL Server, Hyper-V)
             ships without a PowerShell interface. </para>
         <para> The great acceptance of PowerShell among administrators may have contributed to the
             common but ill-conceived notion that PowerShell is for administrators only. There's
             increasing awareness <xref linkend="PS4DEV"/> that PowerShell is a great tool for
-            developers and other keyboard users (on Windows) alike. </para>
+            developers and other keyboard users alike. </para>
 
     </sect1>
 
@@ -118,15 +117,15 @@
         <para> What we need is that magic <literal>Numpy</literal>-like <xref linkend="Numpy"/>
             sauce, with convenient and efficient array manipulation. Add to that a standard
             portfolio of visualization primitives (plots, graphs, scenes, lights, materials, etc.)
-            and the work will almost take care of itself. Paraphrasing Walter Sobchak we might say,
-                <emphasis>"It's not a dream! It's called ILNumerics."</emphasis>, and we kick of
-            this section with a few technical comments on ILNumerics.</para>
+            and the work will almost take care of itself. It's not a dream! It's called
+                <emphasis>ILNumerics</emphasis>, and we kick off this section with a few technical
+            comments on ILNumerics.</para>
 
         <sect2>
             <title>Why ILNumerics is so fast</title>
             <para> Two important goals were driving the design of ILNumerics: convenience and
-                performance. In order to archieve optimal execution speed, the library utilizes a
-                whole series of means. Some are potentially useful and common to all numerical
+                performance. The library utilizes a whole series of means to archieve optimal
+                execution speed. Some are potentially useful and common to all numerical
                 applications, and others deal with the particularities of the managed framework. </para>
 
             <sect3 xml:id="ILNMemoryManagement">
@@ -148,7 +147,7 @@
                     ILNumerics takes a different approach. </para>
                 <para> While the Common Language Runtime (CLR) garbage collector does an excellent
                     job cleaning up regular business objects, the garbage left behind by numerical
-                    algorithms is different. In fact, overall performance would drop significantly,
+                    algorithms is different. In fact, overall performance would drop significantly
                     if we were to rely on the GC for larger arrays, because of highly
                     counterproductive de-/allocation patterns. Thats why in ILNumerics arrays are
                     disposed of <emphasis>deterministically</emphasis>. How is this achieved? </para>
@@ -189,7 +188,7 @@
                 <para> The memory pool is even greedier; it asks for the
                         <emphasis>complete</emphasis> set of memory used by an implementation and it
                     wants that memory as soon as possible. In order to achieve that another simple
-                    rule acts under the hood; whenever an array is created in ILNumerics it is of
+                    rule acts under the hood: whenever an array is created in ILNumerics it is of
                     type <code><![CDATA[ILRetArray<T>]]></code>. (All functions, indexers and
                     properties in ILNumerics return objects of that type.)
                         <code><![CDATA[ILRetArray<T>]]></code>, however, is volatile by design and
@@ -198,7 +197,7 @@
                     disposed of and the memory cycle is closed. </para>
                 <para>If this sounds rather complicated, don't worry! The details are well hidden
                     from the user. Follow three simple rules (see <xref linkend="Rules"/>) and
-                    ILNumerics will safe you a bundle in memory and plenty of execution time! And
+                    ILNumerics will save you a bundle in memory and plenty of execution time! And
                     there are a few other goodies that come along with that. (Read on!)</para>
             </sect3>
             <sect3>
@@ -211,14 +210,14 @@
                             immutability of input parameters. </para>
                     </listitem>
                     <listitem>
-                        <para> A 'Lazy Copy On Write' scheme for cloning arrays. </para>
+                        <para> A 'Lazy Copy On Write' scheme is used for cloning arrays. </para>
                     </listitem>
                     <listitem>
                         <para> The underlying array storage consists of one-dimensional arrays,
-                            which can be accessed via simple pointer arithmetic. Even C# allows to
-                            circumvent mandatory array bounds checks and to implement efficient loop
-                            unrolling this way. In the end, tight loops over large arrays get JIT
-                            compiled to native code that is very competitive with similar code
+                            which can be accessed via simple pointer arithmetic. Even C# allows one
+                            to circumvent mandatory array bounds checks and to implement efficient
+                            loop unrolling this way. In the end, tight loops over large arrays get
+                            JIT compiled to native code that is very competitive with similar code
                             written in C/C++. </para>
                     </listitem>
                     <listitem>
@@ -276,7 +275,7 @@
 
         <sect2>
             <title>Making it look pretty</title>
-            <para> With the <code>New-Object</code> cmdlet creating .NET objects in PowerShell is
+            <para> With the <code>New-Object</code> cmdlet, creating .NET objects in PowerShell is
                 pretty straightforward. However, working with .NET methods, especially static
                 methods, can be a pretty verbose affair. It might be good memory training, but the
                 third time you type <code>[System.IO.File]::ReadAllBytes(...)</code>, it'll be hard
@@ -416,15 +415,15 @@
 
         <para>We used a C# version as the template for the PowerShell implementation. The
             differences are minor indeed. Powershell as a type-promiscuous language <xref
-                linkend="Payette2011"/> saves us a bit of typing. (No pun intended.) On the
-            other hand, ILNumerics relies heavily on explicit array types. This is where the
-            PowerShell accelerators come in handy. PowerShell's <code>using</code> block subsitute
-            can be nested just like its C# cousin and produces the same effect; it limits the scope
-            and minimizes memory pool size for long running loops. One exception to the otherwise
+                linkend="Payette2011"/> saves us a bit of typing. (No pun intended.) On the other
+            hand, ILNumerics relies heavily on explicit array types. This is where the PowerShell
+            accelerators come in handy. PowerShell's <code>using</code> block subsitute can be
+            nested just like its C# cousin and produces the same effect; it limits the scope and
+            minimizes memory pool size for long running loops. One exception to the otherwise
             harmonious transition from C# is that PowerShell doesn't leave much room for "syntactic
             sugar". Operators such as <code>+</code>, <code>-</code>, <code>||</code>,
                 <code>==</code>, etc. must be replaced with static functions and, in the absence of
-            classes, there're no derived classes. </para>
+            classes, there are no derived classes. </para>
     </appendix>
 
     <bibliography>
@@ -617,6 +616,28 @@
                 <publishername>MSDN</publishername>
             </publisher>
             <pubdate>2012</pubdate>
+        </biblioentry>
+
+        <biblioentry xml:id="VPIC">
+            <abbrev>VPIC</abbrev>
+            <title><link xlink:href="http://goo.gl/JuL2w">Sifting Through a Trillion
+                    Electrons</link></title>
+            <subtitle>Berkeley researchers design strategies for extracting interesting data from
+                massive scientific datasets</subtitle>
+            <publisher>
+                <publishername> Lawrence Berkeley National Laboratory</publishername>
+            </publisher>
+            <pubdate>29 June 2012</pubdate>
+        </biblioentry>
+
+        <biblioentry xml:id="PS3">
+            <abbrev>WMF3</abbrev>
+            <title><link xlink:href="http://goo.gl/rhdAJ">Windows Management Framework
+                3.0</link></title>
+            <publisher>
+                <publishername>Microsoft</publishername>
+            </publisher>
+            <pubdate>4 September 2012</pubdate>
         </biblioentry>
 
         <biblioentry xml:id="WynFort1995">
