@@ -41,7 +41,7 @@
                 tools &#8212; HDF5, ILNumerics, and PowerShell &#8212; can be used to analyze and
                 visualize data stored in HDF5 files (on Windows). There are other excellent free
                 choices that achieve the same (or more), but this particular combination brings
-                togther an unexpected cast of characters. This article should be of interest to HDF5
+                together an unexpected cast of characters. This article should be of interest to HDF5
                 users on Windows, PowerShell fans, and people who have doubts about the utility of
                 managed runtimes (such as .NET) for numerical calculations and visualization.
             </para>
@@ -73,7 +73,7 @@
         <para> HDF5 files <xref linkend="HDF5"/> are a common way of storing self-describing webs of
             numerical and non-numerical (text, multimedia) datasets of all sizes. They are popular,
             for example, in the High-Performance Computing <xref linkend="VPIC"/> and the Remote
-            Sensing communtities. <xref linkend="HDF-EOS"/> It is common to access HDF5 files or
+            Sensing communities. <xref linkend="HDF-EOS"/> It is common to access HDF5 files or
             stores via some kind of API. The APIs can be as low-level as a C- or FORTRAN-API, or
             they may come with high-level conveniences such as <literal>h5py</literal>
             <xref linkend="h5py"/> or MATLAB. </para>
