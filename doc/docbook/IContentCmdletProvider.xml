@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://www.oasis-open.org/docbook/xml/5.0/rng/docbookxi.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<sect1 xml:id="icontent_cmdlet_provider" xmlns="http://docbook.org/ns/docbook"
+    xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xlink="http://www.w3.org/1999/xlink"
+    version="5.0">
+    <title>IContentCmdletProvider</title>
+    
+    <para> According to <xref linkend="items_et_properties_table"/>, in PSH5X only HDF5 datasets are
+        considered to have <emphasis>content</emphasis>. Unfortunately, the PowerShell provider's
+            <literal>IContentCmdletProvider</literal> interface has no provisions for
+        multi-dimensional arrays. All it standardizes is a <emphasis>row- or
+            stream-oriented</emphasis> access to a content holding item. In some cases this is
+        adequate, for example, when dealing with HDF5 packet tables <citation>H5PT</citation>. But
+        if we are interested in arrays, viewing an array as a stream of array elements clearly
+        ignores the array structure: what is the two-dimensional array that represents the first 111
+        elements of another two-dimensonial array? It turns out that we can have it both ways, as
+        long as we clearly mark out potential confusion zones.</para>
+    
+    <sect2 xml:id="get_content">
+        <title><literal>Get-Content</literal></title>
+        <para>Gets the content of an HDF5 dataset at the specified location.</para>
+        <cmdsynopsis>
+            <command>Get-Content</command>
+            <arg choice="req">-Path <replaceable>string[]</replaceable></arg>
+            <arg choice="opt">-ReadCount <replaceable>Int64</replaceable></arg>
+            <arg choice="opt">-TotalCount <replaceable>Int64</replaceable></arg>
+            <sbr/>
+            <arg choice="opt">-Hyperslab <replaceable>Int64[4]</replaceable></arg>
+            <arg choice="opt">-PointSet <replaceable>Int64[,]</replaceable></arg>
+        </cmdsynopsis>
+        <para>The <literal>Get-Content</literal> cmdlet gets the content of an HDF5 dataset at the
+            location specified by the path.</para>
+        <warning>
+            <para> Without any parameters, the default behavior of the
+                    <literal>Get-Content</literal> cmdlet is to retrieve all elements of an HDF5
+                dataset and write them, <emphasis>one element at a time</emphasis>, to the pipeline.
+                If we ignore the fact that this obliterates the array structure (the elements come
+                in order, but we can't index them with a multidimensional index), the main issue is
+                the overhead introduced by this piecemeal delivery. Use a larger
+                    <literal>ReadCount</literal> (e.g., 1024) if you are interested in a
+                stream-oriented delivery and you want to keep the overhead low. Use
+                    <literal>-ReadCount 0</literal> to get a multidimensional array, one object in
+                the pipeline in one go.</para>
+        </warning>
+        <variablelist>
+            <varlistentry>
+                <term>-Path</term>
+                <listitem>
+                    <para>Specifies the path to the location of the HDF5 dataset whose content is to
+                        be accessed.</para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>-ReadCount</term>
+                <listitem>
+                    <para>Specifies how many data elements are sent through the pipeline at a time.
+                            <literal>ReadCount</literal> does not affect the total number of data
+                        elements read, only the granularity at which they are delivered to the
+                        PowerShell pipeline. The default value is 1 and typically
+                            <emphasis>not</emphasis> what you want. Use a larger (e.g., 1024) value
+                        to reduce the overhead in stream-oriented delivery. Use a value of 0 to
+                        create a multidimensional array which is then send as a single object to the
+                        pipeline.</para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>-TotalCount</term>
+                <listitem>
+                    <para> Specifies how many data elements are retrieved. The default is -1 (all
+                        elements). Typically, you will use the <literal>-TotalCount</literal>
+                        parameter only to peek at the "head" of an HDF5 dataset.</para>
+                </listitem>
+            </varlistentry>
+        </variablelist>
+        <note>
+            <para>The release version of PSH5X will support versions of
+                    <literal>Get-Content</literal> that support hyperslabs and point
+                selections.</para>
+        </note>
+        <para>The following example will illustrate the confusion potential and how stay clear of
+            it. Throughout, we will use an HDF5 dataset with the following characteristics:</para>
+        <screen><prompt>PS:1 ></prompt> <command>(Get-Item h5tmp:\dset1).Dimensions</command>
+10
+10
+<prompt>PS:2 ></prompt> <command>(Get-Item h5tmp:\dset1).ElementType</command>
+
+Name                           Value
+----                           -----
+SignType                       2
+BitOffset                      0
+Class                          INTEGER
+MSBitPadding                   Zero
+Precision                      32
+LSBitPadding                   Zero
+ByteOrder                      BE
+Size                           4
+        </screen>
+        <para>This is just an elaborate way of saying that we are dealing with a two-dimensional
+            (10x10) integer dataset of type <literal>H5T_STD_I32BE</literal>.</para>
+        <example>
+            <title>Peeking the first 10 elements of a dataset</title>
+            <screen><prompt>PS:1 ></prompt> <command>Get-Content h5tmp:\dset1 -TotalCount 10</command>
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9</screen>
+        </example>
+        <example>
+            <title>The <literal>ReadCount</literal> "anomaly"</title>
+            <screen>PS:1 >$a = Get-Content h5tmp:\dset1; $a.Count
+100
+PS:2 >$a = Get-Content h5tmp:\dset1 -ReadCount 5; $a.Count
+20
+PS:3 >$a = Get-Content h5tmp:\dset1 -ReadCount 30; $a.Count
+4
+PS:4 >$a = Get-Content h5tmp:\dset1 -ReadCount 0; $a.Count
+100</screen>
+        </example>
+        <para>I just told you that <literal>ReadCount</literal> does not affect the total number of
+            data elements read. How come that we don't see a count of 100 all the time? It's all in
+            the packaging. Don't be fooled by it! In the first instance, <literal>$a</literal> holds
+            a one-dimensional array of 100 integers. In case number 2, the dataset is parceled into
+            5-element pieces making <literal>$a</literal> an array of 20 arrays of size 5, i.e., you
+            could access the third element in the fifth parcel as <literal>$a[4][2]</literal>. In
+            the third instance, since 100 is not divisible by 30, we end up with an array of four
+            arrays. The first three have length 30 and the last has 10 elements. Finally, in case 4,
+            we read the dataset into a two-dimensional array which is returned as a single object to
+            the PowerShell pipeline. You can confirm this by retrieving, say
+                <literal>$a[6,9]</literal>. The <emphasis>Count</emphasis> property of a
+            multidimensional array is the total element count.</para>
+        <para>Bottom line: there is no anomaly here. We just have to be careful distinguishing
+            between what we mean and what we tell a computer.</para>
+    </sect2>
+
+    <sect2 xml:id="set_content">
+        <title><literal>Set-Content</literal></title>
+        <para>Replaces the content in an HDF5 dataset with new content.</para>
+        <cmdsynopsis>
+            <command>Set-Content</command>
+            <arg choice="req">-Path <replaceable>string[]</replaceable></arg>
+            <arg choice="req">-Value <replaceable>Object[]</replaceable></arg>
+            <sbr/>
+            <arg choice="opt">-Hyperslab <replaceable>Int64[4]</replaceable></arg>
+            <arg choice="opt">-PointSet <replaceable>Int64[,]</replaceable></arg>
+        </cmdsynopsis>
+        <para>The <literal>Set-Content</literal> replaces the content in the specified HDF5 dataset.
+            Whereas the <literal>Add-Content</literal> cmdlet appends content to an HDF5 dataset (or
+            packet table), <literal>Set-Content</literal> replaces the existing content. You can
+            provide the content (via the <literal>-Value</literal> parameter) in the command or send
+            content through the pipeline to <literal>Set-Content</literal>.</para>
+        <warning>
+            <para>If you send content through the pipeline, the HDF5 dataset's content is updated
+                one data element at a time, starting from the beginning of the dataset. This is
+                bound to be <emphasis>slow</emphasis> for large numbers of elements. Note that
+                there's no <literal>-WriteCount</literal> parameter. Data elements in the pipeline
+                in excess of the dataset's capacity are dropped. This is not the preferred way of
+                updating a dataset's content. Use the <literal>-Value</literal> parameter to provide
+                the content in one go!</para>
+        </warning>
+        <variablelist>
+            <varlistentry>
+                <term>-Path</term>
+                <listitem>
+                    <para>Specifies the path to the location of the HDF5 dataset to which content is
+                        to be added.</para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>-Value</term>
+                <listitem>
+                    <para>Specifies the additional content for the HDF5 dataset.</para>
+                </listitem>
+            </varlistentry>
+        </variablelist>
+        <note>
+            <para>The release version of PSH5X will support versions of
+                    <literal>Set-Content</literal> that support hyperslabs and point
+                selections.</para>
+        </note>
+        <note>
+            <para>Because of their append-only nature, the <literal>Set-Content</literal> cmdlet
+                does not support HDF5 packet tables.</para>
+        </note>
+        <example>
+            <title>Setting the content of a dataset from a one- or two-dimensional array</title>
+            <screen><prompt>PS:1 ></prompt> <command>$a = New-Object 'int[]' 100</command>
+<prompt>PS:2 ></prompt> <command>for ($i = 0; $i -lt $a.Length; $i++) { $a[$i] = $i*$i }</command>
+<prompt>PS:3 ></prompt> <command>Set-Content h5tmp:\dset1 $a</command>
+<prompt>PS:4 ></prompt> <command>$b = New-Object 'int[,]' 10,10</command>
+<prompt>PS:5 ></prompt> <command>for ($i = 0; $i -lt 10; $i++) { $b[$i,$i] = $i }</command>
+<prompt>PS:6 ></prompt> <command>Set-Content h5tmp:\dset1 $b</command></screen>
+        </example>
+    </sect2>
+
+    <sect2 xml:id="add_content">
+        <title><literal>Add-Content</literal></title>
+        <para>Adds content to the specified HDF5 dataset.</para>
+        <cmdsynopsis>
+            <command>Add-Content</command>
+            <arg choice="req">-Path <replaceable>string[]</replaceable></arg>
+            <arg choice="req">-Value <replaceable>Object[]</replaceable></arg>
+        </cmdsynopsis>
+        <para>The <literal>Add-Content</literal> cmdlet appends content to a specified HDF5 dataset.
+            The dataset must be chunked and extendible, i.e., one ore more of its dimensions must be
+            less than its maximum dimensions. You can provide the content (via the
+                <literal>-Value</literal> parameter) in the command or send content through the
+            pipeline to <literal>Add-Content</literal>. The warning about the performance
+            implications when using the pipeline to provide content for
+                <literal>Set-Content</literal> apply to <literal>Add-Content</literal> as
+            well.</para>
+        <variablelist>
+            <varlistentry>
+                <term>-Path</term>
+                <listitem>
+                    <para>Specifies the path to the items that receive the additional content.
+                        Wildcards are permitted. If you specify multiple paths, use commas to
+                        separate the paths.</para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>-Value</term>
+                <listitem>
+                    <para>Specifies the content to be added. For example, you can use a
+                            <literal>Get-Content</literal> command to get the content and pass it to
+                        the <literal>Value</literal> parameter. </para>
+                </listitem>
+            </varlistentry>
+        </variablelist>
+        <note>
+            <para>Currently, <literal>Add-Content</literal> only supports HDF5 packet tables. The
+                release version of PSH5X will support other extendible datasets.</para>
+        </note>
+    </sect2>
+
+    <sect2 xml:id="clear_content">
+        <title><literal>Clear-Content</literal></title>
+        <note>
+            <para>Not implemented. Reset a dataset to a default value or the fill value?</para>
+        </note>
+    </sect2>
+
+</sect1>

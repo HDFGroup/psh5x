@@ -1,0 +1,64 @@
+# Verify the module installation
+Get-Module -ListAvailable
+# Load the HDF5 PowerShell extension
+Import-Module HDF5
+# Map a new drive backed by an HDF5 file
+New-H5Drive aura E:\HDF5\h5\HIRDLS-Aura_L2_v02-04-09-c03_2008d001.he5
+# Show drives on this machine
+Get-PSDrive
+# Change current location and list members
+cd aura: ; dir
+# Get more detail on 'HDFEOS Information' 
+Get-H5Item 'HDFEOS INFORMATION' -Detailed | Format-List
+# These are NOT strings!!!
+Get-H5Item 'HDFEOS INFORMATION' -Detailed | Get-Member
+# Get attribute names
+(Get-H5Item '/HDFEOS/SWATHS/HIRDLS/Data Fields/Temperature').AttributeNames
+# Get the _FillValue attribute 
+Get-H5Attribute '/HDFEOS/SWATHS/HIRDLS/Data Fields/Temperature' _FillValue 
+# Let's see what else is out there! 
+dir aura:/ -Recurse | sort PSParentPath
+# Pretty busy. Let's try something visual! 
+dir aura:\ -r | sort PSParentPath | select PSPath,ItemType,@{Name='LastWriteTime';Expression={$_.Timestamps['ChangeTime']}},AttributeCount | Out-GridView
+# Search for water!
+dir . -r | where {$_.PSChildName -like '*H2O*'} | select PSPath
+# How many HDF5 objects are there?
+dir . -r | measure | select Count
+# How many HDF5 groups are there?
+dir . -r | ?{$_.ItemType -eq 'Group'} | measure | select Count
+# Where are they?
+dir . -r -Filter g | select PSPath
+# How many HDF5 groups and datasets are there in this file?
+dir aura:/ -Recurse -Filter dg | %{ switch($_.ItemType) { 'Group' {$groups++} 'Dataset' {$datasets++} } }; "Groups: $groups - Datsets: $datasets"
+# How much data is stored in HDF5 datasets vs. the total file size?
+dir aura:\ -Recurse -Filter d | %{ $dsetBytes += $_.StorageSizeBytes }; "In datasets: $dsetBytes - File: $((Get-H5Drive aura).FileSizeBytes)"
+# Yes, you can 'cd' into an HDF5 PSDrive (using '/' or '\')
+cd '/HDFEOS/SWATHS\HIRDLS/Geolocation Fields' ; dir .
+# And the usual aliases just work... (tab-completion works also)
+cd .. ; dir
+# Get the value of a scalar dataset
+$value = Get-H5DatasetValue 'aura:/HDFEOS INFORMATION/coremetadata.0'; $value[0].Substring(0,256)
+# Get the value of a simple dataset on a hyperslab
+$value = Get-H5DatasetValue 'aura:\HDFEOS\SWATHS\HIRDLS\Data Fields\Temperature' -Start 0,9 -Block 5553,86
+# What's at position [4711,22]?
+$value[4711, 22]
+# I want this in Excel!
+$excel = New-Object -ComObject Excel.Application
+# Where is it?
+$excel.Visible = $True
+# Add a workbook
+$workbook = $excel.Workbooks.Add()
+# Select the target range
+$range = $workbook.ActiveSheet.Range('A1','CH5554')
+# Pump in the values
+$range.Value2 = $value
+# Clean up and go home...
+$excel.Application.DisplayAlerts = $False; $excel.Quit(); Get-Process Excel | Stop-Process; [System.Runtime.Interopservices.Marshal]::ReleaseComObject($excel)
+# Our current location is still on the aura drive
+pwd
+# Copy stuff from 'aura' to the sandbox drive (h5tmp)
+Copy-H5Item 'aura:\HDFEOS\SWATHS\HIRDLS\Data Fields\*' h5tmp:\; dir h5tmp:\
+# We have to change location before we can remove the drive
+c:
+# Remove the aura drive
+Remove-H5Drive aura

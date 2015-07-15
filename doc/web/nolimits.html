@@ -1,0 +1,123 @@
+<!DOCTYPE html SYSTEM "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>HDF Group - PSH5X Limitations and Known Issues</title>
+        <link rel="stylesheet" type="text/css" href="./style.css" />
+    </head>
+    <body>
+        <a href="./index.html"><img src="img/psh5x_logo_100x75.gif" alt="PSH5X logo" align="bottom"
+             /></a>
+        <h2>Limitations</h2>
+        <h3>L1.01 PSH5X treats <tt>/</tt> and <tt>\</tt> as equivalent path separators. Don't even
+            think about using them in link names!</h3>
+        <p>Apart from the <tt>.</tt> (dot) character, only the <tt>/</tt> (slash) character enjoys a
+            special status in HDF5 path names as the path separator. As a result, link names must
+            not contain slashes. PSH5X treats forward slashes (<tt>/</tt>) <u>and</u> backslashes
+                (<tt>\</tt>) as equivalent path separators. Hence, in PSH5X, a link name must not
+            contain either. (There's no such restriction for HDF5 attribute names.)</p>
+        <p>In PSH5X, the following drive-qualified path names are equivalent:</p>
+        <ul>
+            <li><tt>'h5:/What/ a /nice/ path'</tt></li>
+            <li><tt>'h5:\What\ a \nice\ path'</tt></li>
+            <li><tt>'h5:/What\ a /nice\ path'</tt></li>
+        </ul>
+        <h2>Known Issues</h2>
+        <h3>KI1.01 The <tt>-Recurse</tt> parameter in the <tt>Remove-Item</tt> cmdlet does not work
+            properly.</h3>
+        <h4>Short Answer:</h4>
+        <p> This is a known bug in PowerShell 2.0 </p>
+        <h4>Long Answer:</h4>
+        <p> Let's take a look at the implementated behavior of <tt>Remove-Item</tt>. It expects a
+            drive-qualified path and accepts two switches, <tt>-Recurse</tt> and <tt>-Force</tt>.
+            The <tt>-Recurse</tt> switch has an effect (recursive deletion) only for HDF5 groups.
+            The <tt>-Force</tt> switch tells <tt>Remove-Item</tt> to delete ALL links leading to the
+            HDF5 object specified in the path name and has no effect if the path refers to a
+            symbolic link. </p>
+        <p>To be specific, let's look at an example. Below, the (multi-)graph structure of an HDF5
+            file is shown. The file contains four datasets, two groups, a committed datatype, and a
+            soft link.</p>
+        <img src="img/sample.gif" alt="PSH5X logo" align="middle" />
+        <p> The HDF5 path name space consists of the following paths.</p>
+        <pre class="code">
+/dset1
+/dset2
+/dset3
+/group1
+/group1/dset3
+/group2
+/group2/dset3
+/slink1
+/type1
+        </pre>
+        <p> Assume that we've created an HDF5 drive backed by this file and that the root group is
+            our "working directory". We can describe the effect of different invocations of the
+                <tt>Remove-Item</tt> cmdlet by showing the change with respect to the original HDF5
+            path name space.</p>
+        <ol>
+            <li><tt>Remove-Item slink1</tt>
+                <pre class="code">    
+/dset1
+/dset2
+/dset3
+/group1
+/group1/dset3
+/group2
+/group2/dset3
+/type1
+        </pre>
+            </li>
+            <li>
+                <tt>Remove-Item group2</tt>
+                <pre class="code"> 
+# we are just deleting the hard link 'group2'
+            
+/dset1
+/dset2
+/dset3
+/group1
+/group1/dset3
+/slink1
+/type1
+        </pre>
+            </li>
+            <li>
+                <tt>Remove-Item group2 -Recurse</tt>
+                <pre class="code">
+/dset1
+/dset2
+/dset3
+/group1
+/slink1
+/type1
+        </pre>
+            </li>
+            <li>
+                <tt>Remove-Item group2 -Force</tt>
+                <pre class="code">
+# since group1 links to the same object it gets deleted as well with -Force
+
+/dset1
+/dset2
+/dset3
+/slink1
+/type1
+        </pre>
+            </li>
+        </ol>
+        <p> The PowerShell bug shows for case numbers 2 and 4. You'll be prompted as follows: </p>
+        <pre>
+PS:24 >remove-item .\group2
+
+Confirm
+The item at h5:\group2 has children and the Recurse parameter was not
+specified. If you continue, all children will be removed with the item. Are you sure you want to continue?
+[Y] Yes  [A] Yes to All  [N] No  [L] No to All  [S] Suspend  [?] Help
+(default is "Y"):
+            </pre>
+        <p>This sounds pretty scary, but, in the case of an HDF5 group, doesn't make a lot of sense.
+            All we are doing is delete one (2.) or all (4.) links that lead to an HDF5 group. In
+            other words, all path names containing these link names will become unavailable. Without
+            recursion, we don't touch the (link) members of that group and alternative paths
+            bypassing the referenced group remain available.</p>
+    </body>
+</html>

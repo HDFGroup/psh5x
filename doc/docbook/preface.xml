@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://www.oasis-open.org/docbook/xml/5.0/rng/docbookxi.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<preface xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink"
+  version="5.0">
+
+  <title>Preface</title>
+
+  <para>It is probably fair to say that the HDF5 platform has not always lived up to the tenet of
+      <quote>Making Easy Things Easy and Hard Things Possible</quote>. It has fallen short in
+    particular on the side of making easy things easy. The situation has undoubtedly improved with
+    the advent of tools such as HDFView <citation>HDFView</citation>, various command line tools,
+    Francesc Alted's PyTables <citation>PyTables</citation>, and Andrew Collette's h5py module
+      <citation>h5py</citation>. The user experience offered by these tools is consistent across
+    platforms and aligns with the system-agnostic character of HDF5. On the extremes, purists may
+    argue that this kind of agnosticism must be maintained unconditionally, and cynics may argue
+    that all this attitude achieves is a perpetuation of a least common denominator. </para>
+  <para>The user interface for HDF5 proposed in this document is not about an ideological debate. It
+    recognizes that a profound change of the Windows user-interface took place in 2006 with the
+    arrival of Windows PowerShell version 1. The PowerShell provider architecture (see <xref
+      xlink:href="#windows_powershell_providers"/>) is a blueprint for and an invitation to an HDF5
+    shell experience that may help make easy things easy for users of HDF5 on Windows.<footnote>
+      <para>At least that's the impression that I had ever since I first saw it during the Monad
+        beta program. In 2007/8, I wrote a first PSH5X prototype which, because of other
+        professional committments, never saw the light of day.</para>
+    </footnote>
+    <footnote>
+      <para>I'm aware of at least one effort to recreate a PowerShell-like environment on
+        non-Windows platforms. <citation>Pash</citation></para>
+    </footnote>
+  </para>
+  <para> Working in environments such as <literal>[ba,c,tc]sh</literal>, Python, IronPython
+      <citation>IronPython</citation>, and PowerShell, I find myself ruminating with some regularity
+    on the difference between shell and scripting languages. After reading Bruce Payette's
+    discussion in chapter 1 of <citation>PSBible</citation>, I'm not ashamed to admit that I change
+    my mind every so often. Here is his conclusion: </para>
+  <blockquote>
+    <para> In the end, there's no hard-and-fast distinction between a shell language and a scripting
+      language. Some of the features that make a good scripting language result in a poor shell user
+      experience. Conversely, some of the features that make for a good interactive shell experience
+      can interfere with scripting. Because PowerShell's goal is to be both a good scripting
+      language and a good interactive shell, balancing the tradeoffs between user experience and
+      scripting authoring was one of the major language design challenges.
+        (<citation>PSBible</citation>, section 1.1.1, page 7) </para>
+  </blockquote>
+  <para>Platform independence aside, choosing the right tool for the HDF5 job on Windows has just
+    gotten more complicated. Welcome to PSH5X!</para>
+
+  <sect1 xml:id="disclaimer">
+    <title>Disclaimer</title>
+
+    <para> No liability for the contents of this document can be accepted. Use the concepts,
+      examples and information at your own risk. There may be errors and inaccuracies, that could be
+      damaging to your system. Proceed with caution, and although this is highly unlikely, the
+      author(s) do not take any responsibility. </para>
+
+    <para> All copyrights are held by their by their respective owners, unless specifically noted
+      otherwise. Use of a term in this document should not be regarded as affecting the validity of
+      any trademark or service mark. Naming of particular products or brands should not be seen as
+      endorsements. </para>
+  </sect1>
+
+
+</preface>

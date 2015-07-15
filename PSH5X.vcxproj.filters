@@ -1,0 +1,364 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Source Files\ProviderUtils">
+      <UniqueIdentifier>{e0e559fa-1602-42b3-bca2-d7a88a3f2308}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Cmdlets">
+      <UniqueIdentifier>{b7361c68-f860-4a82-b43f-e8f2f499efe3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Info">
+      <UniqueIdentifier>{965eae54-c3f9-4dab-84c0-e87373b2258d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Provider">
+      <UniqueIdentifier>{b2402e7e-23f0-48a5-abf6-4016262913c1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Provider\CmdletProvider">
+      <UniqueIdentifier>{4703e46d-f608-423d-affd-bf950af06a57}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Provider\DriveCmdletProvider">
+      <UniqueIdentifier>{fe192a03-5fb5-477a-9dab-05d5b3747935}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Provider\ItemCmdletProvider">
+      <UniqueIdentifier>{206fc520-5615-4f73-9bf5-c0cb5eb32938}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Provider\ContainerCmdletProvider">
+      <UniqueIdentifier>{54e4ba6d-fd98-47df-9cb2-e2c8b5d11b7e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Provider\NavigationCmdletProvider">
+      <UniqueIdentifier>{7df4571e-e61d-4d29-8561-e7e976625b07}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Provider\IContentCmdletProvider">
+      <UniqueIdentifier>{4681e2e6-4c2a-4bb5-87bf-806711573a4c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Provider\IPropertyCmdletProvider">
+      <UniqueIdentifier>{e4484907-71de-4f38-b717-2caa482dfc48}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Provider\IDynamicPropertyCmdletProvider">
+      <UniqueIdentifier>{a5734e7c-cd7b-4cdb-b8dc-a20ea7f2b5bf}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="COPYING" />
+    <None Include="README" />
+    <None Include="TODO" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\AssemblyInfo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Snapin.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CmdletProvider.cpp">
+      <Filter>Source Files\Provider\CmdletProvider</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DriveCmdletProvider.cpp">
+      <Filter>Source Files\Provider\DriveCmdletProvider</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ItemCmdletProvider.cpp">
+      <Filter>Source Files\Provider\ItemCmdletProvider</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ItemCmdletProvider.GetItem.cpp">
+      <Filter>Source Files\Provider\ItemCmdletProvider</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ItemCmdletProvider.SetItem.cpp">
+      <Filter>Source Files\Provider\ItemCmdletProvider</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ContainerCmdletProvider.cpp">
+      <Filter>Source Files\Provider\ContainerCmdletProvider</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ContainerCmdletProvider.NewItemDynamicParameters.cpp">
+      <Filter>Source Files\Provider\ContainerCmdletProvider</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ContainerCmdletProvider.NewItem.cpp">
+      <Filter>Source Files\Provider\ContainerCmdletProvider</Filter>
+    </ClCompile>
+    <ClCompile Include="src\NavigationCmdletProvider.cpp">
+      <Filter>Source Files\Provider\NavigationCmdletProvider</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CompoundDatasetReader.cpp">
+      <Filter>Source Files\Provider\IContentCmdletProvider</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CompoundDatasetWriter.cpp">
+      <Filter>Source Files\Provider\IContentCmdletProvider</Filter>
+    </ClCompile>
+    <ClCompile Include="src\IContentCmdletProvider.cpp">
+      <Filter>Source Files\Provider\IContentCmdletProvider</Filter>
+    </ClCompile>
+    <ClCompile Include="src\StringDatasetReader.cpp">
+      <Filter>Source Files\Provider\IContentCmdletProvider</Filter>
+    </ClCompile>
+    <ClCompile Include="src\StringDatasetWriter.cpp">
+      <Filter>Source Files\Provider\IContentCmdletProvider</Filter>
+    </ClCompile>
+    <ClCompile Include="src\VlenDatasetReader.cpp">
+      <Filter>Source Files\Provider\IContentCmdletProvider</Filter>
+    </ClCompile>
+    <ClCompile Include="src\IPropertyCmdletProvider.cpp">
+      <Filter>Source Files\Provider\IPropertyCmdletProvider</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ProviderUtils.cpp">
+      <Filter>Source Files\ProviderUtils</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ProviderUtils.Existential.cpp">
+      <Filter>Source Files\ProviderUtils</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ProviderUtils.GetArray.cpp">
+      <Filter>Source Files\ProviderUtils</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ProviderUtils.H5Attribute.cpp">
+      <Filter>Source Files\ProviderUtils</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ProviderUtils.H5Dataset.cpp">
+      <Filter>Source Files\ProviderUtils</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ProviderUtils.H5Type.cpp">
+      <Filter>Source Files\ProviderUtils</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ShowH5TypesCommand.cpp">
+      <Filter>Source Files\Cmdlets</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DatasetInfo.cpp">
+      <Filter>Source Files\Info</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DatasetInfoLite.cpp">
+      <Filter>Source Files\Info</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LinkInfo.cpp">
+      <Filter>Source Files\Info</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ObjectInfo.cpp">
+      <Filter>Source Files\Info</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ObjectInfoLite.cpp">
+      <Filter>Source Files\Info</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SimpleChunkedDatasetInfo.cpp">
+      <Filter>Source Files\Info</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SimpleChunkedDatasetInfoLite.cpp">
+      <Filter>Source Files\Info</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SimpleDatasetInfo.cpp">
+      <Filter>Source Files\Info</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SimpleDatasetInfoLite.cpp">
+      <Filter>Source Files\Info</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SimpleExternalDatasetInfo.cpp">
+      <Filter>Source Files\Info</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SimpleExternalDatasetInfoLite.cpp">
+      <Filter>Source Files\Info</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Provider.cpp">
+      <Filter>Source Files\Provider</Filter>
+    </ClCompile>
+    <ClCompile Include="src\FormatH5FileCommand.cpp">
+      <Filter>Source Files\Cmdlets</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TestH5FileCommand.cpp">
+      <Filter>Source Files\Cmdlets</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PrimitiveTypeDatasetWriter.cpp">
+      <Filter>Source Files\Provider\IContentCmdletProvider</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ProviderUtils.H5Dataspace.cpp">
+      <Filter>Source Files\ProviderUtils</Filter>
+    </ClCompile>
+    <ClCompile Include="src\NewH5ArrayCommand.cpp">
+      <Filter>Source Files\Cmdlets</Filter>
+    </ClCompile>
+    <ClCompile Include="src\OpaqueDatasetReader.cpp">
+      <Filter>Source Files\Provider\IContentCmdletProvider</Filter>
+    </ClCompile>
+    <ClCompile Include="src\OpaqueDatasetWriter.cpp">
+      <Filter>Source Files\Provider\IContentCmdletProvider</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ReferenceDatasetReader.cpp">
+      <Filter>Source Files\Provider\IContentCmdletProvider</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ReferenceDatasetWriter.cpp">
+      <Filter>Source Files\Provider\IContentCmdletProvider</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ContainerCmdletProvider.CopyItem.cpp">
+      <Filter>Source Files\Provider\ContainerCmdletProvider</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ContainerCmdletProvider.RemoveItem.cpp">
+      <Filter>Source Files\Provider\ContainerCmdletProvider</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ContainerCmdletProvider.RenameItem.cpp">
+      <Filter>Source Files\Provider\ContainerCmdletProvider</Filter>
+    </ClCompile>
+    <ClCompile Include="src\IPropertyCmdletProvider.GetProperty.cpp">
+      <Filter>Source Files\Provider\IPropertyCmdletProvider</Filter>
+    </ClCompile>
+    <ClCompile Include="src\IPropertyCmdletProvider.SetProperty.cpp">
+      <Filter>Source Files\Provider\IPropertyCmdletProvider</Filter>
+    </ClCompile>
+    <ClCompile Include="src\IDynamicPropertyCmdletProvider.CopyProperty.cpp">
+      <Filter>Source Files\Provider\IDynamicPropertyCmdletProvider</Filter>
+    </ClCompile>
+    <ClCompile Include="src\IDynamicPropertyCmdletProvider.MoveProperty.cpp">
+      <Filter>Source Files\Provider\IDynamicPropertyCmdletProvider</Filter>
+    </ClCompile>
+    <ClCompile Include="src\IDynamicPropertyCmdletProvider.NewProperty.cpp">
+      <Filter>Source Files\Provider\IDynamicPropertyCmdletProvider</Filter>
+    </ClCompile>
+    <ClCompile Include="src\IDynamicPropertyCmdletProvider.RemoveProperty.cpp">
+      <Filter>Source Files\Provider\IDynamicPropertyCmdletProvider</Filter>
+    </ClCompile>
+    <ClCompile Include="src\IDynamicPropertyCmdletProvider.RenameProperty.cpp">
+      <Filter>Source Files\Provider\IDynamicPropertyCmdletProvider</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DriveCmdletProvider.NewDrive.cpp">
+      <Filter>Source Files\Provider\DriveCmdletProvider</Filter>
+    </ClCompile>
+    <ClCompile Include="src\NavigationCmdletProvider.MoveItem.cpp">
+      <Filter>Source Files\Provider\NavigationCmdletProvider</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DriveInfo.cpp">
+      <Filter>Source Files\Info</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\Snapin.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ItemInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ObjectInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Provider.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ProviderUtils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\DriveInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GroupInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\LinkInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\DatasetInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\DatatypeInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\DataspaceInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\AttributeInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ObjectInfoLite.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GroupInfoLite.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\DatasetInfoLite.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ShowH5TypesCommand.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\HDF5Exception.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PSH5XException.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\StringDatasetReader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\StringDatasetWriter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\CompoundDatasetReader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\CompoundDatasetWriter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\VlenDatasetReader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ArrayUtils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\H5ArrayT.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SimpleDatasetInfoLite.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SimpleChunkedDatasetInfoLite.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SimpleExternalDatasetInfoLite.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SimpleDatasetInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SimpleChunkedDatasetInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SimpleExternalDatasetInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\FormatH5FileCommand.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\TestH5FileCommand.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ArrayDatasetWriterT.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ArrayDatasetReaderT.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\VlenDatasetWriterT.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PrimitiveTypeDatasetWriter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\DatasetReaderT.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\NewH5ArrayCommand.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OpaqueDatasetReader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OpaqueDatasetWriter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ReferenceDatasetReader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ReferenceDatasetWriter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

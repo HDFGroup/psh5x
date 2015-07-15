@@ -1,0 +1,42 @@
+TOPIC
+    about_H5Array
+
+SHORT DESCRIPTION
+    Explains how to specify an HDF5 array datatype
+
+LONG DESCRIPTION
+
+     The values of an HDF5 array datatype are fixed-size, multi-dimensional
+     arrays of elements of another HDF5 datatype.
+
+     The array rank must be positive and not exceed 32. The extents of all
+     dimensions must be positive.
+
+     The element type can be specified as the name of a predefined HDF5
+     datatype, or a another datatype definition (JSON). 
+
+SYNTAX
+
+    <positive integer list> ::= <positive integer> |
+                                <positive integer> , <positive integer list>
+
+    <type> ::= <string> | <JSON>
+
+    {
+        "Base"  : <type>  ,
+        "Class" : "Array" ,
+        "Dims"  : [<positive integer list>]
+    }
+
+    ------------------------------ EXAMPLE --------------------------------
+
+    C:\PS>$t = '{ "Base":"int", "Class":"Array", "Dims":[2,3,4] }'
+
+
+RELATED LINKS
+    about_H5Datatypes
+    about_H5Predefined
+    New-H5Datatype
+    Show-H5Types
+    http://www.hdfgroup.org/HDF5/doc/UG/UG_frame11Datatypes.html
+    http://www.hdfgroup.org/HDF5/doc/RM/RM_H5T.html

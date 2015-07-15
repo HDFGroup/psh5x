@@ -1,0 +1,27 @@
+TOPIC
+    about_H5Vlen
+
+SHORT DESCRIPTION
+    Explains how to specify an HDF5 variable-length sequence datatype
+
+SYNTAX
+
+    <type> ::= <string> | <JSON>
+    
+    {
+        "Base"  : <type> ,
+        "Class" : "Vlen"
+    }
+
+    ------------------------------ EXAMPLE --------------------------------
+
+    C:\PS>$t = '{ "Base":"int", "Class":"Vlen" }'
+
+
+RELATED LINKS
+    about_H5Datatypes
+    about_H5Predefined
+    New-H5Datatype
+    Show-H5Types
+    http://www.hdfgroup.org/HDF5/doc/UG/UG_frame11Datatypes.html
+    http://www.hdfgroup.org/HDF5/doc/RM/RM_H5T.html

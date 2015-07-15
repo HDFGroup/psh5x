@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://www.oasis-open.org/docbook/xml/5.0/rng/docbookxi.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<chapter xml:id="preliminaries" xmlns="http://docbook.org/ns/docbook"
+    xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude"
+    version="5.0">
+    <title>Preliminaries</title>
+
+    <para> How difficult can it be to create an extendible, compressed HDF5 dataset? Below is a
+        simple Python script which uses the h5py module <citation>h5py</citation> to do excatly
+        that. <programlisting><xi:include parse="text" href="examples/dataset.py"/></programlisting>
+        Here is a PowerShell script that performs the same task.
+        <programlisting><xi:include parse="text" href="examples/dataset.ps1"/></programlisting>For
+        this simple example even the C-code wouldn't be too bad. Granted, we'd have to compile it
+        and with all the variable definitions, semicolons, and resource management the code gets
+        pretty noisy. (On the other hand, any code not written in Python looks noisy...)</para>
+    <para> Ok, now show me somthing that I haven't seen before! How about counting the number of
+        groups and datasets in a file?</para>
+    <screen><prompt>PS:1 ></prompt><command> dir h5:\ -Recurse -Filter dg | %{ switch($_.ItemType) `
+{ 'Group' {$groups++} 'Dataset' {$datasets++} } }; `
+"Groups: $groups - Datsets: $datasets"</command>
+Groups: 100006 - Datsets: 50000 # Yikes!</screen>
+    <para><literal>dir</literal> is just an alias for PowerShell's <literal>Get-ChildItem</literal>
+        cmdlet. It is done in a recursive fashion and we inform the provider (via the filter
+        expression) that we are interested in datasets and groups only. As it finds them, the
+        provider sends all dataset and group items down the PowerShell pipeline where a head count
+        is taken for each item type.</para>
+    <para>Here's a variation on that theme: How much data in an HDF5 file is stored in datasets vs.
+        the total file size?
+        <screen><prompt>PS:1 ></prompt><command> dir h5:\ -Recurse -Filter d | %{ $dsetBytes += $_.StorageSizeBytes }; `
+"In datasets: $dsetBytes - File: $((Get-PSDrive h5).FileSizeBytes)"</command>
+In datasets: 108000000 - File: 264069080</screen>
+        The filter really helps to speed this up. PowerShell users know that they have the
+            <literal>-Include</literal> and <literal>-Exclude</literal> parameters to filter objects
+        in the pipeline (e.g., file objects whose name starts with an 'a'). The problem is that they
+        operate on objects that are in the pipeline already and a provider wasted time and resources
+        to put them there. For example, when the PSH5X provider creates an object representing an
+        HDF5 dataset, it parses its HDF5 datatype, reads its dimensional layout, reads its HDF5
+        attributes etc. Unlike <literal>-Include</literal> and <literal>-Exclude</literal>, the
+        provider sees the <literal>-Filter</literal> argument before creating and sending any
+        objects to the pipeline. It doesn't create them to begin with, if they aren't needed.</para>
+
+    <sect1>
+        <title>What You Can('t) Expect from this Guide</title>
+        <para>This guide is not an introduction to Windows PowerShell. Excellent introductions are
+            available in print <citation>PSBible</citation>, <citation>PSPractices</citation> and
+            online <citation>PSEmergency</citation>. If you can answer the following questions
+            correctly, you are well on your way: </para>
+        <itemizedlist>
+            <listitem>
+                <para>How do I get help?</para>
+            </listitem>
+            <listitem>
+                <para>Is PowerShell case-sensitive?</para>
+            </listitem>
+            <listitem>
+                <para>What's that <literal>-WhatIf</literal> switch?</para>
+            </listitem>
+            <listitem>
+                <para>I like the <literal>Do-It</literal> cmdlet, but it has that
+                        <literal>-VeryLongParameterName</literal> parameter. Do I really have to
+                    type that all the time?</para>
+            </listitem>
+            <listitem>
+                <para>Is an alias an alien?</para>
+            </listitem>
+            <listitem>
+                <para>How do I find out what members an object has?</para>
+            </listitem>
+            <listitem>
+                <para>What's in your pipeline?</para>
+            </listitem>
+        </itemizedlist>
+        <para>If you know whether the PowerShell pipeline is multithreaded, you are overqualified
+            and should consider doing something useful with your life. (Just kidding...)</para>
+        <para> This guide is an introduction to a PowerShell extension for accessing and
+            manipulating HDF5 files. In <xref linkend="what_is_psh5x"/>, an overview of PowerShell
+            providers in general and PSH5X in particular is given. <xref linkend="psh5x_layers"/>,
+            is the heart of this guide. It decribes in detail the different provider layers and what
+            functionality and/or which cmdlets they support. Strictly speaking, there is no logical
+            reason to present it in a layered fashion. Why would an end-user care about the guts of
+            an implementation? Consider it either a bonus, in case you are thinking about
+            implementing your own provider, or as an aid that may help you understand the 'Why?'. </para>
+        <para><xref linkend="other_psh5x_cmdlets"/>, is devoted to cmdlets that are not governed by
+            the provider interfaces, but that we found useful to have around, for example, looking
+            up information about built-in HDF5 datatypes.</para>
+        <para> Released in July of 2009, PowerShell version 2.0, brought a raft of new features. Two
+            of the more interesting ones, <emphasis>modules</emphasis> and
+                <emphasis>remoting</emphasis> (see <citation>PSBible</citation> or
+                <citation>PSPractices</citation>), are not covered in this guide, although they
+            would greatly enhance the capabilities of PSH5X. (There's also PowerShell
+                <emphasis>eventing</emphasis> in case you've used HDF5 packet tables.
+                <citation>PSBible</citation>) I can imagine a nice PowerShell module which would
+            wrap the generic PSH5X provider cmdlets and make them appear more HDF5 specific. (This
+            is better done in a module rather than using aliases.) Would you like to interact with
+            remote HDF5 files/stores in PowerShell? Enter PowerShell remoting... </para>
+        <para>Before diving into PSH5X, I would like to say a few words about the inner workings and
+            compromises made in the current implementation.</para>
+
+    </sect1>
+
+    <sect1>
+        <title>Buyers Beware</title>
+        <subtitle>Caveats and Considerations</subtitle>
+
+        <para>It shouldn't come as a big surprise that PowerShell was not invented and introduced by
+            Microsoft with the goal to give Windows users the most convenient access to HDF5 files.
+            The Powershell provider interface represents a general model for interacting with data
+            stores in PowerShell on the Windows platform. Some data stores are better matches than
+            others. I believe that HDF5 is, if not a perfect match, a match in which a few
+            shortcomings are far outweighed by the benefits to the user. In this section, I would
+            like to describe the areas where the match is not ideal. There are a few forward
+            references in the discussion that may make it less accessible to novice users. You may
+            skip it for now, but you should return after you've had some playtime and you are
+            contemplating to use this interface to get some real work done. It's a
+                <emphasis>must-read</emphasis> for experts. Don't waste your time only to find out
+            later that a certain assumption or requirement is an absolute showstopper for you. Read
+            on! I told you so beforehand.</para>
+
+        <sect2>
+            <title>Implementation</title>
+            <para>PSH5X is written in C++/CLI <citation>CPPCLI</citation> which allows for a unique
+                blend of (.NET) managed and unmanaged code. Since interoperability with other .NET
+                languages is not a requirement, calls into the native HDF5 C library can be made
+                directly and there is no need for P/Invoke <citation>PInvoke</citation> or the
+                HDF5DotNet wrapper <citation>HDF5DotNet</citation>. With pinning pointers
+                    <citation>pin_ptr</citation>, for the simplest data types, one can almost forget
+                about the simultaneous presence of managed and unmanaged heaps, and copy operations
+                between the two can be mostly avoided. </para>
+        </sect2>
+
+        <sect2>
+            <title>Some Strings Attached....</title>
+            <para>PowerShell strings are implemented as 16-bit Unicode characters and mapped
+                directly to the .NET <literal>System.String</literal> type. Currently, HDF5 only
+                supports strings based on ASCII or UTF-8 endcoded characters. PSH5X automatically
+                maps between the different representations, but it can't hide the fact that at the
+                HDF5 level it all comes down to ASCII or UTF-8.</para>
+        </sect2>
+
+        <sect2>
+            <title>Arrays in PowerShell</title>
+            <para>The somewhat sad story of arrays in PowerShell is best summarized in the words of
+                Bruce Payette <citation>PSBible</citation>.</para>
+            <blockquote>
+                <para>Here's how array literals are defined in PowerShell:</para>
+                <para><emphasis>They're not. There's no array literal notation in
+                        PowerShell.</emphasis></para>
+                <para>Yes, you read that correctly. There's no notation for an array literal in
+                    PowerShell. So how exactly does this work? How do you define an inline array in
+                    a PowerShell script? Here's the answer: instead of having array literals,
+                    there's a set of operations that create collections as needed.</para>
+            </blockquote>
+            <para>Add to that the fact that PowerShell arrays are polymorphic by default (arrays of
+                    <literal>System.Object</literal> .NET objects, e.g., <literal>$a = @(-4711,
+                    'foo', 1.23, 0xDeadBeef)</literal>) and you may start having doubts about the
+                seriousness of this proposal. Of course, it's possible to create typed (.NET) arrays
+                the same way you'd create other .NET or COM objects in PowerShell, with the
+                    <literal>New-Object</literal> cmdlet. At the moment, this is what PSH5X does
+                under the covers, it creates typed .NET arrays. But, despite its best effort,
+                matters may appear confusing on the PowerShell surface, at least at first sight. For
+                example, let's say you'd like to read the elements of a dataset. The way you'd do
+                this in PSH5X is to use the <literal>Get-Content</literal> cmdlet.
+                    <literal>Get-Content</literal> is a row- or stream-oriented interface, that is,
+                it returns the content of a dataset (its value) in batches of rows, one at a time
+                (by default). If you read the help for <literal>Get-Content</literal>, you'll find
+                that there's a parameter called <literal>-ReadCount</literal> that let's you set the
+                batch size of objects being sent to the pipeline in one shot.
+                    <literal>ReadCount</literal> must be non-negative. In most cases, you want this
+                to be 0 (= all in one shot). (The default value is 1 which can be terribly slow when
+                stepping through a million element dataset.) Alltogether, this leads to the following
+                behavior when reading the elements of a two-dimensional 10x10 dataset of integer
+                    <literal>/dset1</literal>: </para>
+            <screen><prompt>PS:1 ></prompt><command>$a = Get-Content h5tmp:/dset1; $a.Count</command> 
+100
+<prompt>PS:2 ></prompt><command>$a[0]</command> 
+0
+<prompt>PS:3 ></prompt><command>$a = Get-Content h5tmp:/dset1 -ReadCount 3; $a.Count</command> 
+34
+<prompt>PS:4 ></prompt><command>$a[0]</command> 
+0
+1
+2
+<prompt>PS:5 ></prompt><command>$a = Get-Content h5tmp:/dset1 -ReadCount 0; $a.Count</command> 
+100
+<prompt>PS:6 ></prompt><command>$a[0]</command> 
+You cannot index into a 2 dimensional array with index [0].
+At line:1 char:4
++ $a[ &lt;&lt;&lt;&lt; 0]
+    + CategoryInfo          : InvalidOperation: (0:Int32) [], RuntimeException
+    + FullyQualifiedErrorId : NeedMultidimensionalIndex</screen>
+            <para> In all instances, <literal>Get-Content</literal> returns the entire dataset
+                content. How do we explain the discrepancy in the counts? Showing just the
+                    <literal>Count</literal> is somewhat misleading, for it shows only the total
+                number of elements in an array, but doesn't indicate anything about its structure.
+                The fundamental difference between the first and third commands is that, in the
+                first instance, the value of <literal>$a</literal> is a one-dimensional array. It is
+                a two-dimensional array in the third case, i.e., we could refer to element
+                    <literal>$a[3,5]</literal>. In the second instance, we are dealing with an array
+                of 33 arrays of length 3 (<literal>-ReadCount 3</literal>) and one array of length
+                1. (100 = 33x3 + 1x1) </para>
+            <para> The message is this: there is nothing in the PowerShell provider interface that
+                treats typed arrays with the dignity afforded to them by other interfaces such as
+                    <literal>NumPy</literal>
+                <citation>NumPy</citation>. Of course, one could implement additional cmdlets in
+                PSH5X that would do exactly that, but, in this first version, I've focused on
+                correctly implementing the capabilities covered in the PowerShell provider interface
+                specification. </para>
+            <para>While writing the first version of this guide, Enthought
+                    <citation>Enthought</citation> produced a first version of NumPy and SciPy for
+                IronPython which may open the door for bringing numarrays to PSH5X. Stay tuned for
+                more...</para>
+        </sect2>
+
+        <sect2>
+            <title>Beyond Simple HDF5 Datatypes</title>
+
+            <para>The great flexibility in creating HDF5 datatypes can be a challenge in dynamic
+                environments like h5py or PowerShell. When PowerShell discovers an HDF5 dataset or
+                attribute, it parses the HDF5 datatype and creates a (JSON-like) hashtable
+                representing it. Creating an HDF5 dataset from that kind of type information is
+                pretty straightforward. The real challenge is to create and map between in-memory
+                representations (plural!) of elements of such a type <emphasis>at
+                runtime</emphasis>. In the case of PSH5X, there are at least two representations,
+                the unmanaged C API's view of affairs and the .NET view.</para>
+            <para>The problem is most pronounced with HDF5 compound datatypes. In the absence of a
+                .NET version of numarray, I have chosen to dynamically generate a simple C# class
+                (the counterpart of the all to familiar <literal>struct</literal> whenever compound
+                types are involved), compile, load, and instantiate it. The
+                    <literal>CSharpCodeProvider</literal> in <literal>Microsoft.CSharp</literal> has
+                all the facilities that are needed. However, there is one deficiency having to do
+                with the member naming, which hasn't been addressed in the beta version. Generally,
+                the admissble member names of HDF5 compound types are not valid names of members of
+                a C# class. To circumvent this problem, I've adopted the Python
+                    <literal>array</literal> type codes <citation>PythonArray</citation> and
+                construct a member name as the concatenation of the type code and the compound
+                member index. For example, the C# code generated for a compound type, which has an
+                    <literal>H5T_NATIVE_LLONG</literal>, an <literal>H5T_C_S1</literal>-based
+                variable-length string, and two <literal>H5T_NATIVE_DOUBLE</literal> members, looks
+                like this:</para>
+            <programlisting>using System.Runtime.InteropServices;
+[StructLayout(LayoutKind.Explicit,Size= 36,CharSet=CharSet.Ansi)]
+public class lsdd {
+    [FieldOffset(0)]  public System.Int64  l0;
+    [FieldOffset(8)]  public System.String s1;
+    [FieldOffset(20)] public System.Double d2;
+    [FieldOffset(28)] public System.Double d3;
+    public lsdd() { s1 = "";  }
+    public lsdd(
+        System.Int64  param0, System.String param1,
+        System.Double param2, System.Double param3)
+        {l0 = param0;s1 = param1;d2 = param2;d3 = param3; }
+}</programlisting>
+            <para> Retrieving the content yields: </para>
+            <screen><prompt>PS:1 ></prompt><command>Get-Content cmpd:\DS1 -ReadCount 0</command> 
+
+            l0 s1                                   d2                  d3
+            -- --                                   --                  --
+          1153 Exterior (static)                 53.23               24.57
+          1184 Intake                            55.12               22.95
+          1027 Intake manifold                  103.55               31.23
+          1313 Exhaust manifold                1252.89               84.11</screen>
+            <para>The real member names are 'Serial number', 'Location', 'Temperature (F)', and
+                'Pressure (inHg)'. The naming could be fixed with an
+                    <literal>PSAliasProperty</literal> on the objects returned, but I'm exploring
+                other options as well.</para>
+            <para>For a full matrix of supported type combinations/nesting depths see <xref
+                    linkend="appendx_type_matrix"/>. </para>
+        </sect2>
+
+    </sect1>
+
+
+
+</chapter>

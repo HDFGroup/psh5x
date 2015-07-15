@@ -1,0 +1,51 @@
+<!DOCTYPE html SYSTEM "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>HDF Group - PSH5X Advanced Features</title>
+        <link rel="stylesheet" type="text/css" href="./style.css" />
+    </head>
+    <body>
+        <a href="./index.html"><img src="img/psh5x_logo_100x75.gif" alt="PSH5X logo" align="bottom"
+             /></a>
+        <h3>Using the HDF5 Core Virtual File Driver (VFD)</h3>
+        <p> By default PSH5X creates and opens files with the <tt>H5FD_SEC2</tt> driver. The <a
+                href="http://www.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-SetFaplCore"
+                    ><tt>H5FD_CORE</tt></a> driver enables an application to work with a file in
+            memory. Use the <tt>-Core</tt> switch with the <tt>New-H5Drive</tt> cmdlet to instruct
+            PSH5X to use the core driver. The core driver will allocate memory in 64 MB increments.
+            Upon <tt>Remove-H5Drive</tt> or closing a session the core file contents will be flushed
+            to the file on disk that was specified via <tt>-File</tt> when <tt>New-H5Drive</tt> was
+            invoked. </p>
+        <p>To use the core driver with the HDF5 sandbox drive, <tt>h5tmp</tt>, set the
+                <tt>PSH5XTmpCoreVFD</tt> environment variable (before invoking <tt>Import-Module
+                HDF5</tt>).</p>
+        <p>You can determine the driver used for a drive by checking the <tt>Driver</tt> property of
+            the <tt>PSH5X.DriveInfo</tt> object, i.e.,</p>
+        <pre class="code">
+PS:1 >Import-Module HDF5
+PS:2 >(Get-H5Drive h5tmp).Driver
+H5FD_SEC2
+        </pre>
+        <p>
+            <b>Caution:</b> The core VFD is is not a fire-and-forget solution and your mileage may
+            vary. </p>
+        <h3>Controlling the HDF5 Object Format</h3>
+        <p>Newer versions of the HDF5 library support optimized object formats that, for example,
+            enable compression on groups or let one create large (&gt; 64K) attributes. They
+            dramatically improve performance for certain use cases, but creating such objects in a
+            file breaks backward compatibility with older versions of the library, i.e., an older
+            version of the library may not be able to read certain objects.</p>
+        <p>By default PSH5X creates objects compatible with the earliest possible format for each
+            object. This behavior can be overridden (and backward compatibility reduced) via the
+                <tt>-V18</tt> or the <tt>-Latest</tt> switches of the <tt>New-H5Drive</tt> cmdlet.
+            They correspond to using <tt>H5F_LIBVER_18</tt> or <tt>H5F_LIBVER_LATEST</tt> for the
+                <tt>libver_low</tt> argument in <a
+                href="http://www.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-SetLibverBounds"
+                    ><tt>H5Pset_libver_bounds</tt></a>.
+        </p>
+        <p>
+            The HDF5 sandbox drive, <tt>h5tmp</tt>, is created with <tt>H5F_LIBVER_LATEST</tt> for both
+            <tt>libver_low</tt> and <tt>libver_high</tt>.
+        </p>
+    </body>
+</html>

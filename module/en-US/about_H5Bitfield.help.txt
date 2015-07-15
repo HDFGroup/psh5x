@@ -1,0 +1,68 @@
+TOPIC
+    about_H5Bitfield
+
+SHORT DESCRIPTION
+    Explains how to specify an HDF5 bitfield datatype
+
+NOTE
+    In practice, most users will use the predefined bitfield types or type
+    abbreviations.
+
+SYNTAX
+
+    <bit_padding> ::= "Zero" | "One" | "Background"
+    
+    <byte_order> ::= "BE" | "LE"
+
+    {
+        "BitOffset"    : <non-negative integer> ,
+        "ByteOrder"    : <byte_order> ,
+        "Class"        : "Bitfield" ,
+        "LSBitPadding" : <bit_padding> ,
+        "MSBitPadding" : <bit_padding> ,
+        "Precision"    : <positive integer> ,
+        "Size"         : <positive integer>
+    }
+
+ABBREVIATIONS
+    The following abbreviations for HDF5 predefined bitfield types are
+    recognised by the HDF5 module. They are case-insensitive.
+
+    HDF5 Predefined Type    Abbreviation(s)
+
+        H5T_STD_B8BE        B8BE
+        H5T_STD_B8LE        B8LE
+        H5T_STD_B16BE       B16BE
+        H5T_STD_B16LE       B16LE
+        H5T_STD_B32BE       B32BE
+        H5T_STD_B32LE       B32LE
+        H5T_STD_B64BE       B64BE
+        H5T_STD_B64LE       B64LE
+
+        H5T_NATIVE_B8       B8
+        H5T_NATIVE_B16      B16
+        H5T_NATIVE_B32      B32
+        H5T_NATIVE_B64      B64
+
+
+    ------------------------------ EXAMPLE ------------------------------
+
+    The predefined type H5T_STD_B8BE corresponds to:
+
+    {
+        "BitOffset"    : 0,
+        "ByteOrder"    : "BE",
+        "Class"        : "Bitfield",
+        "LSBitPadding" : "Zero",
+        "MSBitPadding" : "Zero",
+        "Precision"    : 8,
+        "Size"         : 1
+    }
+
+RELATED LINKS
+    about_H5Datatypes
+    about_H5Predefined
+    New-H5Datatype
+    Show-H5Types
+    http://www.hdfgroup.org/HDF5/doc/UG/UG_frame11Datatypes.html
+    http://www.hdfgroup.org/HDF5/doc/RM/RM_H5T.html

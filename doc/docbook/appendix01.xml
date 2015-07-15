@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://www.oasis-open.org/docbook/xml/5.0/rng/docbookxi.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<appendix xml:id="drive_object" xmlns="http://docbook.org/ns/docbook">
+    <title>The PSH5X Drive Object</title>
+    <screen linenumbering="numbered"><prompt>PS:1 ></prompt> <command>Get-PSDrive h5new | Get-Member -MemberType Property
+    | Format-Table Name,Definition</command>
+        
+Name                      Definition
+----                      ----------
+CreationProperties        System.Collections.Hashtable Creatio...
+Credential                System.Management.Automation.PSCrede...
+CurrentLocation           System.String CurrentLocation {get;s...
+Description               System.String Description {get;set;}
+FileHandle                System.Int32 FileHandle {get;}
+FileSizeBytes             System.UInt64 FileSizeBytes {get;}
+FreeSpaceBytes            System.Int64 FreeSpaceBytes {get;}
+H5FInfo                   System.Collections.Hashtable H5FInfo...
+MdcConfiguration          System.Collections.Hashtable MdcConf...
+MdcHitRate                System.Double MdcHitRate {get;}
+MdcSize                   System.Collections.Hashtable MdcSize...
+Name                      System.String Name {get;}
+OpenAttributeCount        System.Int64 OpenAttributeCount {get;}
+OpenDatasetCount          System.Int64 OpenDatasetCount {get;}
+OpenDatatypeObjectCount   System.Int64 OpenDatatypeObjectCount...
+OpenFileCount             System.Int64 OpenFileCount {get;}
+OpenGroupCount            System.Int64 OpenGroupCount {get;}
+Path                      System.String Path {get;}
+Provider                  System.Management.Automation.Provide...
+ReadOnly                  System.Boolean ReadOnly {get;}
+Root                      System.String Root {get;}</screen>
+    <para>A PSH5X drive opbject represents information about an open HDF5 file. Members whose name
+        starts with 'Mdc' (lines 14-16), e.g., <literal>MdcHitRate</literal>, are metadata cache
+        releated properties. You should consult <citation>HDF5_RM</citation>, especially,
+            <literal>H5Fget_mdc_config</literal>, <literal>H5Fget_mdc_size</literal>, and
+            <literal>H5Fget_mdc_hit_rate</literal> for their interpretation. </para>
+    <para>Members starting with 'Open' (lines 18-22) represent open HDF5 handles for the given
+        PowerShell drive in the current PowerShell session. With the exception of the
+            <literal>OpenFileCount</literal> (which should be equal to 1), under normal operating
+        conditions, you should never encounter a non-zero value. A non-zero value may be the result
+        of a <emphasis>handle leak</emphasis>. If you ever see a non-zero value in a reproducible
+        manner, please, submit a bug report to <email>gheber@hdfgroup.org</email>! </para>
+
+</appendix>

@@ -1,0 +1,48 @@
+TOPIC
+    about_H5Compound
+
+SHORT DESCRIPTION
+    Explains how to specify an HDF5 compound datatype
+
+SYNTAX
+    
+    <cmpd_member> ::= <member_name> ':' <member_def> ',' |
+                      <member_name> ':' <member_def> ',' , <cmpd_member>
+
+    <member_def> ::= '[' <offset>, <type> ']'
+    
+    <member_name> ::= <string> 
+    
+    <offset> ::= <positive integer>
+
+    <type> ::= <string> | <JSON>
+    
+    {
+        "Class"   : "Compound" ,
+        "Members" : { <cmpd_member> } ,
+        "Size"    : <positive integer>
+    }
+
+    ------------------------------ EXAMPLE --------------------------------
+
+    C:\PS>$t = @"
+          {
+              "Class":"Compound", 
+              "Members": {
+                  "ID" : [0 , "UInt"],
+                  "x"  : [4 , "double"],
+                  "y"  : [12, "double"],
+                  "z"  : [20, "double"]
+              } ,
+              "Size": 28 
+          }
+          "@
+
+
+RELATED LINKS
+    about_H5Datatypes
+    about_H5Predefined
+    New-H5Datatype
+    Show-H5Types
+    http://www.hdfgroup.org/HDF5/doc/UG/UG_frame11Datatypes.html
+    http://www.hdfgroup.org/HDF5/doc/RM/RM_H5T.html

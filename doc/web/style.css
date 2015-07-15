@@ -1,0 +1,29 @@
+.code{
+    display:block;
+    font:1em 'Courier New', Courier, Fixed, monospace;
+    color:#000;
+    background:#fff;
+    overflow:auto;
+    text-align:left;
+    border:1px solid #5581C0;
+    padding:0px 20px 0 30px;
+    margin:1em 0 1em 0;
+    line-height:17px;
+    font-weight:normal !important;
+}
+table{
+    border-style:solid;
+}
+.leftcoltitle{
+    font-weight:bold;
+    text-align:left;
+    border-top: 1px solid #CCC;
+    border-bottom: 1px solid #CCC;
+}
+.leftcol{
+    text-align:left;
+    width:220px;
+}
+tt{
+    font-size:120%;
+}

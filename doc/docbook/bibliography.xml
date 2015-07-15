@@ -1,0 +1,316 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://www.oasis-open.org/docbook/xml/5.0/rng/docbookxi.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
+
+<bibliography xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink"
+  version="5.0">
+
+  <biblioentry xml:id="CPPCLI">
+    <abbrev>CPPCLI</abbrev>
+    <title><link xlink:href="http://www.ecma-international.org/publications/standards/Ecma-372.htm"
+        >Standard ECMA-372</link></title>
+    <subtitle>C++/CLI Language Specification</subtitle>
+    <publisher>
+      <publishername>Ecma International</publishername>
+    </publisher>
+    <pubdate>December 2005</pubdate>
+  </biblioentry>
+
+  <biblioentry xml:id="Enthought">
+    <abbrev>Enthought</abbrev>
+    <title><link
+        xlink:href="http://pytools.codeplex.com/wikipage?title=NumPy%20and%20SciPy%20for%20.Net"
+        >NumPy and SciPy for IronPython / .Net</link></title>
+    <publisher>
+      <publishername>Enthought</publishername>
+    </publisher>
+    <pubdate>December 2011</pubdate>
+  </biblioentry>
+
+  <biblioentry xml:id="h5dump">
+    <abbrev>h5dump</abbrev>
+    <title><link xlink:href="http://www.hdfgroup.org/HDF5/doc/RM/Tools.html#Tools-Dump"
+          ><literal>h5dump</literal></link></title>
+    <subtitle>A tool to display HDF5 file content</subtitle>
+    <publisher>
+      <publishername>The HDF Group</publishername>
+      <address>
+      <email>help@hdfgroup.org</email>
+    </address>
+    </publisher>
+    <pubdate>2011</pubdate>
+  </biblioentry>
+
+  <biblioentry xml:id="H5PT">
+    <abbrev>H5PT</abbrev>
+    <title><link xlink:href="http://www.hdfgroup.org/HDF5/doc/HL/H5PT_Intro.html">Introduction to
+        the HDF5 Packet Table API</link></title>
+    <publisher>
+      <publishername>The HDF Group</publishername>
+      <address>
+      <email>help@hdfgroup.org</email>
+    </address>
+    </publisher>
+    <pubdate>February 2005</pubdate>
+  </biblioentry>
+
+  <biblioentry xml:id="h5py">
+    <abbrev>h5py</abbrev>
+    <title><link xlink:href="http://h5py.alfven.org/">h5py</link></title>
+    <subtitle>HDF5 for Python</subtitle>
+    <author>
+      <personname>
+        <firstname>Andrew</firstname>
+        <surname>Colelette</surname>
+      </personname>
+    </author>
+    <pubdate>2008</pubdate>
+  </biblioentry>
+
+  <biblioentry xml:id="HDF5_Image">
+    <abbrev>HDF5_Image</abbrev>
+    <title><link xlink:href="http://www.hdfgroup.org/HDF5/doc/ADGuide/ImageSpec.html">HDF5 Image and
+        Palette Specification</link></title>
+    <subtitle>Version 1.2</subtitle>
+    <publisher>
+      <publishername>The HDF Group</publishername>
+      <address>
+      <email>help@hdfgroup.org</email>
+    </address>
+    </publisher>
+    <pubdate>June 2005</pubdate>
+  </biblioentry>
+
+  <biblioentry xml:id="HDF5_UG">
+    <abbrev>HDF5_UG</abbrev>
+    <title><link xlink:href="http://www.hdfgroup.org/HDF5/doc/UG/index.html">HDF5 User's
+        Guide</link></title>
+    <subtitle>HDF5 Release 1.8.7 </subtitle>
+    <publisher>
+      <publishername>The HDF Group</publishername>
+      <address>
+      <email>help@hdfgroup.org</email>
+    </address>
+    </publisher>
+    <pubdate>May 2011</pubdate>
+  </biblioentry>
+
+  <biblioentry xml:id="HDF5_RM">
+    <abbrev>HDF5_RM</abbrev>
+    <title><link xlink:href="http://www.hdfgroup.org/HDF5/doc/RM/RM_H5Front.html">HDF5: API
+        Specification</link></title>
+    <subtitle>Reference Manual</subtitle>
+    <publisher>
+      <publishername>The HDF Group</publishername>
+      <address>
+      <email>help@hdfgroup.org</email>
+    </address>
+    </publisher>
+    <pubdate>May 2011</pubdate>
+  </biblioentry>
+
+  <biblioentry xml:id="HDF5DotNet">
+    <abbrev>HDF5DotNet</abbrev>
+    <title><link xlink:href="http://hdf5.net/">HDF5DotNet</link></title>
+    <subtitle>C++/CLI Wrapper of the HDF5 Library</subtitle>
+    <publisher>
+      <publishername>The HDF Group</publishername>
+      <address>
+      <email>help@hdfgroup.org</email>
+    </address>
+    </publisher>
+    <pubdate>2011</pubdate>
+  </biblioentry>
+
+  <biblioentry xml:id="HDFView">
+    <abbrev>HDFView</abbrev>
+    <title><link xlink:href="http://www.hdfgroup.org/hdf-java-html/hdfview/index.html"
+        >HDFView</link></title>
+    <publisher>
+      <publishername>The HDF Group</publishername>
+      <address>
+      <email>help@hdfgroup.org</email>
+    </address>
+    </publisher>
+    <pubdate>February 2011</pubdate>
+  </biblioentry>
+
+  <biblioentry xml:id="IronPython">
+    <abbrev>IronPython</abbrev>
+    <title><link xlink:href="http://www.ironpython.net/">IronPython.net</link></title>
+    <publisher>
+      <publishername>IronPython Community</publishername>
+    </publisher>
+    <pubdate>2011</pubdate>
+  </biblioentry>
+
+  <biblioentry xml:id="NumPy">
+    <abbrev>NumPy</abbrev>
+    <title><link xlink:href="http://numpy.scipy.org/">Scientific Computing Tools for Python &#x2014;
+        NumPy</link></title>
+    <pubdate>2009</pubdate>
+  </biblioentry>
+
+  <biblioentry xml:id="Pash">
+    <abbrev>Pash</abbrev>
+    <title><link xlink:href="http://pash.sourceforge.net/">igor.moochnik - Pash</link></title>
+    <pubdate>2008</pubdate>
+  </biblioentry>
+
+  <biblioentry xml:id="pin_ptr">
+    <abbrev>pin_ptr</abbrev>
+    <title><link xlink:href="http://www.codeproject.com/KB/books/CppCliInActionCh4Ex1.aspx">C++/CLI
+        in Action</link></title>
+    <subtitle>Using interior and pinning pointers</subtitle>
+    <author>
+      <personname>
+        <firstname>Nishant</firstname>
+        <surname>Sivakumar</surname>
+      </personname>
+    </author>
+    <pubdate>28 February 2007</pubdate>
+  </biblioentry>
+
+  <biblioentry xml:id="PInvoke">
+    <abbrev>PInvoke</abbrev>
+    <title><link xlink:href="http://en.wikipedia.org/wiki/Platform_Invocation_Services">Platform
+        Invocation Services</link></title>
+    <publisher>
+      <publishername>Wikipedia</publishername>
+    </publisher>
+    <pubdate>January 2011</pubdate>
+  </biblioentry>
+
+  <biblioentry xml:id="PSBible">
+    <abbrev>PSBible</abbrev>
+    <title>Windows Powershell in Action</title>
+    <edition>Second Edition</edition>
+    <author>
+      <personname>
+        <firstname>Bruce</firstname>
+        <surname>Payette</surname>
+      </personname>
+    </author>
+    <publisher>
+      <publishername>Manning Publications</publishername>
+    </publisher>
+    <pubdate>May 18, 2011</pubdate>
+  </biblioentry>
+
+  <biblioentry xml:id="PSEmergency">
+    <abbrev>PSEmergency</abbrev>
+    <title><link
+        xlink:href="http://blogs.technet.com/b/heyscriptingguy/archive/2011/03/24/learn-powershell-live-with-scripting-guy-ed-wilson.aspx"
+        >Learn PowerShell Live with Scripting Guy Ed Wilson</link></title>
+    <pubdate>2011</pubdate>
+  </biblioentry>
+
+  <biblioentry xml:id="PSPractices">
+    <abbrev>PSPractices</abbrev>
+    <title>Windows PowerShell 2.0</title>
+    <subtitle>Best Practices</subtitle>
+    <authorgroup>
+      <author>
+        <personname>
+          <firstname>Ed</firstname>
+          <surname>Wilson</surname>
+        </personname>
+      </author>
+      <author>
+        <personname> Windows PowerShell Teams </personname>
+      </author>
+    </authorgroup>
+    <publisher>
+      <publishername>Microsoft Press</publishername>
+    </publisher>
+    <pubdate>2010</pubdate>
+  </biblioentry>
+
+
+  <biblioentry xml:id="PSProgramming">
+    <abbrev>PSProgramming</abbrev>
+    <title>Windows PowerShell Programming</title>
+    <subtitle>Snap-ins, Cmdlets, Hosts, and Providers</subtitle>
+    <authorgroup>
+      <author>
+        <personname>
+          <firstname>Arul</firstname>
+          <surname>Kumaravel</surname>
+        </personname>
+      </author>
+      <author>
+        <personname>
+          <firstname>Jon</firstname>
+          <surname>White</surname>
+        </personname>
+      </author>
+      <author>
+        <personname>
+          <firstname>Naixin</firstname>
+          <surname>Li</surname>
+        </personname>
+      </author>
+      <author>
+        <personname>
+          <firstname>Scott</firstname>
+          <surname>Happell</surname>
+        </personname>
+      </author>
+      <author>
+        <personname>
+          <firstname>Guohui</firstname>
+          <surname>Xie</surname>
+        </personname>
+      </author>
+      <author>
+        <personname>
+          <firstname>Krishna</firstname>
+          <othername>C.</othername>
+          <surname>Vutukuri</surname>
+        </personname>
+      </author>
+    </authorgroup>
+    <publisher>
+      <publishername>Wiley Publishing, Inc</publishername>
+    </publisher>
+    <pubdate> 2008 </pubdate>
+  </biblioentry>
+
+  <biblioentry xml:id="PythonArray">
+    <abbrev>PythonArray</abbrev>
+    <title><literal>array</literal></title>
+    <subtitle><link xlink:href="http://docs.python.org/library/array.html">Efficient arrays of
+        numeric values</link></subtitle>
+    <publisher>
+      <publishername>Python v2.7.2 documentation</publishername>
+    </publisher>
+    <pubdate>2011</pubdate>
+  </biblioentry>
+
+  <biblioentry xml:id="PyTables">
+    <abbrev>PyTables</abbrev>
+    <title>PyTables</title>
+    <subtitle><link xlink:href="http://www.pytables.org/moin">Getting the most *out* of your
+        data</link></subtitle>
+    <author>
+      <personname>
+        <firstname>Francesc</firstname>
+        <surname>Alted</surname>
+      </personname>
+    </author>
+    <pubdate>2011</pubdate>
+  </biblioentry>
+
+  <biblioentry xml:id="ZavisekThesis">
+    <abbrev>ZavisekThesis</abbrev>
+    <title><link xlink:href="http://extbrain.felk.cvut.cz/theses/dp-josef-zavisek.pdf">Extensible
+        Provider for Windows PowerShell</link></title>
+    <author>
+      <personname>
+        <firstname>Josef</firstname>
+        <surname>Závišek</surname>
+      </personname>
+    </author>
+    <pubdate>2011</pubdate>
+  </biblioentry>
+
+</bibliography>

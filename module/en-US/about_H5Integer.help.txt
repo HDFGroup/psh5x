@@ -1,0 +1,91 @@
+TOPIC
+    about_H5Integer
+
+SHORT DESCRIPTION
+    Explains how to specify an HDF5 integer datatype
+
+NOTE
+    In practice, most users will use the predefined integer types or type
+    abbreviations.
+
+SYNTAX
+
+    <bit_padding> ::= "Zero" | "One" | "Background"
+    
+    <byte_order> ::= "BE" | "LE"
+    
+    <sign_type> ::= "2" | "None"
+    
+    {
+        "BitOffset"    : <non-negative integer> ,
+        "ByteOrder"    : <byte_order> ,
+        "Class"        : "Integer" ,
+        "LSBitPadding" : <bit_padding> ,
+        "MSBitPadding" : <bit_padding> ,
+        "Precision"    : <positive integer> ,
+        "SignType"     : <sign_type> ,
+        "Size"         : <positive integer>
+    }
+
+ABBREVIATIONS
+    The following abbreviations for HDF5 predefined integer types are
+    recognised by the HDF5 module. They are case-insensitive.
+
+    HDF5 Predefined Type    Abbreviation(s)
+
+        H5T_STD_I8BE        I8BE
+        H5T_STD_I8LE        I8LE
+        H5T_STD_I16BE       I16BE
+        H5T_STD_I16LE       I16LE
+        H5T_STD_I32BE       I32BE
+        H5T_STD_I32LE       I32LE
+        H5T_STD_I64BE       I64BE
+        H5T_STD_I64LE       I64LE
+     
+        H5T_STD_U8BE        U8BE
+        H5T_STD_U8LE        U8LE
+        H5T_STD_U16BE       U16BE
+        H5T_STD_U16LE       U16LE
+        H5T_STD_U32BE       U32BE
+        H5T_STD_U32LE       U32LE
+        H5T_STD_U64BE       U64BE
+        H5T_STD_U64LE       U64LE
+
+        H5T_NATIVE_CHAR     CHAR
+        H5T_NATIVE_SCHAR    SCHAR, I8
+        H5T_NATIVE_UCHAR    UCHAR, U8
+
+        H5T_NATIVE_SHORT    SHORT, I16
+        H5T_NATIVE_USHORT   USHORT, U16
+
+        H5T_NATIVE_INT      INT, I32
+        H5T_NATIVE_UINT     UINT, U32
+
+        H5T_NATIVE_LONG     LONG
+        H5T_NATIVE_ULONG    ULONG
+        H5T_NATIVE_LLONG    LLONG, I64
+        H5T_NATIVE_ULLONG   ULLONG, U64
+
+
+    ------------------------------ EXAMPLE ------------------------------
+
+    The predefined type H5T_STD_I32LE corresponds to:
+
+    {
+        "BitOffset"    : 0 ,
+        "ByteOrder"    : "LE" ,
+        "Class"        : "Integer" ,
+        "LSBitPadding" : "Zero" ,
+        "MSBitPadding" : "Zero" ,
+        "Precision"    : "32" ,
+        "SignType"     : "2" ,
+        "Size"         : "4"
+    }
+
+RELATED LINKS
+    about_H5Datatypes
+    about_H5Predefined
+    New-H5Datatype
+    Show-H5Types
+    http://www.hdfgroup.org/HDF5/doc/UG/UG_frame11Datatypes.html
+    http://www.hdfgroup.org/HDF5/doc/RM/RM_H5T.html

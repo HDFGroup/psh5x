@@ -1,0 +1,66 @@
+Instructions for the Installation of the HDF5 PowerShell Module
+===============================================================
+
+=================
+Before you start:
+=================
+
+Make sure that:
+
+1. You have PowerShell version 2 (or later)
+-------------------------------------------
+
+PowerShell version 1 is not supported.
+Run '$Host.Version' in a PowerShell window to confirm!
+
+2. PowerShell runs with .NET version 4 (or later)
+-------------------------------------------------
+
+By default, PowerShell v2 runs with .NET 2. The easiest remedy
+is to copy the files powershell.exe.config and powershell_ise.exe.config,
+which are included in the module archive, into the $PSHOME directory.
+(Typically, this is C:\Windows\System32\WindowsPowerShell\v1.0)
+
+3. The script execution policy is at an appropriate level
+---------------------------------------------------------
+
+The script execution policy may be controlled by your administrator.
+You can adjust it in the scope of a session (Set-ExecutionPolicy -Scope Process ...).
+If you have administrative privileges, you might consider adjusting it
+via Set-ExecutionPolicy. The 'Remote-Signed' level is usually sufficient.
+See 'help about_Execution_Policies' for more details on script execution policy.
+
+========
+To build:
+========
+
+To build PSH5X.dll from source you need the HDF5 1.8.9 headers and libraries.
+Load the Visual Studio 2010 solution file PSH5X.sln and select
+Build -> Build Solution (or Ctrl+Shift+B).
+The solution is set up to statically link PSH5X against HDF5 1.8.9.
+Pre-built HDF5 binaries can be found at
+
+http://www.hdfgroup.org/ftp/HDF5/current/bin/windows/HDF5189-win64-vs10-static.zip
+
+.
+
+============
+To run tests:
+============
+
+The tests are distributed with the PSHX source code. Run all tests
+by executing Test-ScripHarness.ps1 from the 'test' subdirectory.
+
+==========
+To install:
+==========
+
+Run Install-PSH5X.ps1 and enjoy HDF5 + PowerShell!
+
+===========
+To get help:
+===========
+
+Please submit questions and comments to the HDF forum:
+
+    hdf-forum@hdfgroup.org

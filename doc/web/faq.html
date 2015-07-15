@@ -1,0 +1,312 @@
+<!DOCTYPE html SYSTEM "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>HDF Group - PSH5X FAQ</title>
+        <link rel="stylesheet" type="text/css" href="./style.css" />
+    </head>
+    <body>
+        <a href="./index.html"><img src="img/psh5x_logo_100x75.gif" alt="PSH5X logo" align="bottom"
+             /></a>
+        <h2>Introduction</h2>
+        <h3>1.01 Where do I get help?</h3>
+        <p>In PowerShell, the <tt>Get-Help</tt> cmdlet is your one-stop shop for help about cmdlets
+            and topics. All PSH5X cmdlets come with some form of help. For example, to get help on
+                <tt>New-H5Drive</tt> type <tt>help New-H5Drive</tt> or <tt>New-H5Drive -?</tt>. You
+            can get a list of HDF5 related topics by typing <tt>help about_H5*</tt> .</p>
+        <h3>1.02 What's the difference between between scripting languages and shell languages?</h3>
+        <p>I keep returning to this question about every 3 months and an answer still eludes me. The
+            following comment by <a href="http://manning.com/payette2/">Bruce Payette</a> has been a
+            steady source of consolation (Windows PowerShell in Action, 2nd Edition, Manning 2011,
+            page 7):</p>
+        <q>In the end, there's no hard-and-fast distinction between a shell language and a scripting
+            language. Some of the features that make a good scripting language result in a poor
+            shell user experience. Conversely, some of the features that make for a good interactive
+            shell experience can interfere with scripting. Because PowerShell's goal is to be both a
+            good scripting language and a good interactive shell, balancing the tradeoffs between
+            user experience and scripting authoring was one of the major language design
+            challenges.</q>
+        <h3>1.03 What datatypes are supported?</h3>
+        <p>The ultimate goal is to support all datatypes. When we say 'support', we mean that data
+            of that type can be represented in memory and on disk, and be read an written. The
+            flexible JSON notation for HDF5 datatypes (see <tt>help about_H5Datatypes</tt>) lets one
+            create HDF5 datasets, linked datatypes, and attributes of any HDF5 datatype. However,
+            not all of them can be currently read or written. The process to get to a more complete
+            support will be very much demand-driven. </p>
+        <p>The table below gives an overview of what's supported in the current version.</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>HDF5 Type Class</th>
+                    <th>HDF5 Dataset</th>
+                    <th>HDF5 Attribute</th>
+                    <th>Notes</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><tt>H5T_INTEGER</tt></td>
+                    <td>yes</td>
+                    <td>yes</td>
+                    <td> 1, 2, 4 or 8 byte, BE or LE, signed/unsigned</td>
+                </tr>
+                <tr>
+                    <td><tt>H5T_FLOAT</tt></td>
+                    <td>yes</td>
+                    <td>yes</td>
+                    <td> 4 or 8 byte, IEEE </td>
+                </tr>
+                <tr>
+                    <td><tt>H5T_STRING</tt></td>
+                    <td>yes</td>
+                    <td>yes</td>
+                    <td>Fixed- and variable-length, ASCII and UTF-8</td>
+                </tr>
+                <tr>
+                    <td><tt>H5T_ENUM</tt></td>
+                    <td>yes</td>
+                    <td>yes</td>
+                    <td> Must be derived from 1, 2, 4 or 8 byte, BE or LE, signed/unsigned integers.
+                    </td>
+                </tr>
+                <tr>
+                    <td><tt>H5T_BITFIELD</tt></td>
+                    <td>yes</td>
+                    <td>yes</td>
+                    <td> 1, 2, 4 or 8 byte </td>
+                </tr>
+                <tr>
+                    <td><tt>H5T_OPAQUE</tt></td>
+                    <td>yes</td>
+                    <td>no</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td><tt>H5T_REFERENCE</tt></td>
+                    <td>yes</td>
+                    <td>yes</td>
+                    <td>For attributes, only object references are supported.</td>
+                </tr>
+                <tr>
+                    <td><tt>H5T_COMPOUND</tt></td>
+                    <td>yes</td>
+                    <td>no</td>
+                    <td>Currently, members of class <tt>H5T_COMPOUND</tt> and <tt>H5T_VLEN</tt> are
+                        not supported. Members of class <tt>H5T_ARRAY</tt> are supported, if they
+                        are derived from a primitive type (e.g., integers, floats, strings
+                        etc.)</td>
+                </tr>
+                <tr>
+                    <td><tt>H5T_ARRAY</tt></td>
+                    <td>yes</td>
+                    <td>no</td>
+                    <td>Currently, only array types derived from a primitive type (e.g., integers,
+                        floats, strings etc.) are supported.</td>
+                </tr>
+                <tr>
+                    <td><tt>H5T_VLEN</tt></td>
+                    <td>yes</td>
+                    <td>no</td>
+                    <td>Currently, only variable-length sequence types derived from a primitive type
+                        (e.g., integers, floats, strings etc.) are supported.</td>
+                </tr>
+            </tbody>
+        </table>
+        <h3>1.04 How do HDF5 compound datatypes "work" in PSH5X?</h3>
+        <p>There are two parts to this question.</p>
+        <h4>Reading data elements of an HDF5 compound datatype</h4>
+        <p>The workflow for reading data elements from an HDF5 dataset is this:</p>
+        <ol>
+            <li>Parse the HDF5 datatype (in the file)</li>
+            <li>Create a C# class whose instances (.NET objects) can be used to represent the data
+                elements in memory</li>
+            <li>Compile the code and load the .NET assembly into the running session</li>
+            <li>Create a .NET array of the right size and shape</li>
+            <li>Read the HDF5 dataset and intialize the array with the values read from disk</li>
+            <li>Return the .NET array to the user</li>
+        </ol>
+        <p> There are several important details to this process. First, the code generation
+            currently does not support deeply nested compound types. This is a matter of finding a
+            good balance between demand (i.e., compound types that people really use) and having a
+            maintainable code generator. Second, not all compound member names can be used as names
+            of members in a .NET class. There are decorators such as <tt>PSNoteProperty</tt>, but we
+            haven't finalized our approach. In the meantime, we use the type codes from the Python
+                <tt>array</tt> module (e.g., <tt>H</tt> for a 16-bit unsigned integer) with a suffix
+            indicating the rank of the member in the HDF5 compound. Let's look at an example. The
+            compound type with this JSON definition:</p>
+        <pre class="code">
+{
+    "Class": "Compound",
+    "Size": 16,
+    "Members":
+    {
+        "a": [0, "H5T_STD_I32BE"],
+        "b": [4, "H5T_IEEE_F32BE"],
+        "c": [8, "H5T_IEEE_F64BE"]
+    }
+}     
+        </pre>
+        <p>will be represented as follows:</p>
+        <pre class="code">
+using System;
+public class ifd
+{
+    public System.Int32  i0;
+    public System.Single f1;
+    public System.Double d2;
+    public ifd() { }
+    public ifd(System.Int32 param0, System.Single param1, System.Double param2)
+    { i0 = param0; f1 = param1; d2 = param2; }
+}           
+        </pre>
+        <p> It'd be nice if there was an array package like <tt>NumPy</tt> for .NET. There appears
+            to be a working 32-bit version, but not a 64-bit version. If you have any suggestions,
+            please let us know! </p>
+        <p>The <tt>Get-H5DatasetValue</tt> cmdlet currently does not support reading a subset of
+            members of a compound type and it does not support type conversion (i.e., a
+            single-prescision floating point number is read as just that; it doesn't convert it into
+            a double). Both of these features will be supported in the release version of PSH5X.</p>
+        <h4>Writing data elements of an HDF5 compound datatype</h4>
+        <p>The workflow for writing data elements from an HDF5 dataset is this:</p>
+        <ol>
+            <li>Parse the HDF5 datatype in the file</li>
+            <li>Reflect on the .NET type of the array elements in memory and determine if the member
+                types can be converted to the matching member types on disk</li>
+            <li>If successful, write the array to the HDF5 dataset</li>
+        </ol>
+        <p>Writing is simpler than reading, since no dynamic code generation is required. The
+                <tt>Add-Type</tt> cmdlet gives the user ultimate control over the in-memory
+            representation (and constructors) of the data elements. (See the <a
+                href="./tutorial.html">tutorial</a> for examples.)</p>
+        <p>The <tt>Set-H5DatasetValue</tt> cmdlet currently does not support writing just a subset
+            of compound members. This will be supported in the release version of PSH5X.</p>
+        <p>To create an array of in-memory representations of an HDF5 datatype you have at least two
+            options.</p>
+        <ol>
+            <li>Use <tt>Add-Type</tt> to add a .NET type followd by a <tt>New-Object</tt> to
+                construct the array</li>
+            <li>Use the <tt>New-H5Array</tt> cmdlet. Its first argument is the JSON type string and
+                the array shape (dimensions) is its second argument.</li>
+        </ol>
+        <h2>The Windows Platform</h2>
+        <h3 name="hdf52excel">2.01 How do I get data from HDF5 into Excel?</h3>
+        <p>Assume that we have a 5553 (rows) by 86 (colums) twodimensional dataset of floating point
+            numbers at <tt>h5:/my/floats</tt> that we would like to load into Excel. There's a
+            simple four step process to get this done.</p>
+        <ol>
+            <li>Create an Excel COM object</li>
+            <li>Add a blank workbook and select the target range</li>
+            <li>Pump the values into the range</li>
+            <li>Clean up</li>
+        </ol>
+        <p>The PowerShell skeleton is shown below. Note that you have to work out the corners of the
+            range in Excel notation, e.g., A1-CH5554, which is well documented (check the links
+            following the code).</p>
+        <pre class="code">
+# create an Excel COM object
+$excel = New-Object -ComObject Excel.Application
+$excel.Visible = $True
+
+# add a workbook and select the target range
+$workbook = $excel.Workbooks.Add() 
+$range = $workbook.ActiveSheet.Range('A1','CH5554')
+
+# pump the values in
+$range.Value2 = Get-H5DatasetValue h5:/my/floats
+
+# cleanup
+$excel.Application.DisplayAlerts = $False
+$excel.Quit()
+Get-Process Excel | Stop-Process
+[System.Runtime.Interopservices.Marshal]::ReleaseComObject($excel)
+        </pre>
+        <p>Related information:</p>
+        <ul>
+
+            <li><a href="http://support.microsoft.com/kb/833402">How to convert Excel column numbers
+                    into alphabetical characters</a></li>
+            <li><a href="http://msdn.microsoft.com/en-us/library/ff846392.aspx">Excel 2010 Developer
+                    Reference</a></li>
+            <li><a
+                    href="http://powertoe.wordpress.com/2010/11/05/how-to-get-data-into-an-excel-spreadsheet-very-quickly-with-powershell-contd/"
+                    >How to Get Data into an Excel Spreadsheet Very Quickly with PowerShell</a></li>
+            <li><a href="http://www.powershellpraxis.de/Excel-COM.982.0.html">PowerShell Excel (COM)
+                    (in German)</a></li>
+        </ul>
+        <h3>2.02 Can I use ILNumerics in PowerShell?</h3>
+        <p><b>Short answer:</b> Yes.</p>
+        <p><b>Long answer:</b>
+            <a href="http://ilnumerics.net/">ILNumerics</a> is a high performance math library for
+            applications. Use the <tt>Add-Type</tt> cmdlet to load the ILNumerics assembly. You can
+            then create ILNumerics .NET objects by casting or with the <tt>New-Object</tt>
+            cmdlet.</p>
+        <p>Use a package, such as <a href="http://pstx.codeplex.com/">PowerShell Type
+                Accelerators</a> to make to code a littler easier to read and type.</p>
+        <pre class="code">
+Add-Type -Path E:\ILNumerics\ILNumerics_2.11.4464.29952\bin64\ILNumerics64.dll
+
+Import-Module TypeAccelerator
+
+Add-TypeAccelerator ilm   ILNumerics.ILMath
+
+Add-TypeAccelerator ilf32 ILNumerics.ILArray[single]
+
+# convert the value of an HDF5 dataset into an ILNumerics.ILArray&lt;Single&gt;
+
+$il = [ilf32] (Get-H5DatasetValue 'aura:\HDFEOS\SWATHS\HIRDLS\Data Fields\Temperature')
+
+# get the last column
+
+$il[':;end']
+        </pre>
+        <p> The same is pretty much true for any .NET library. If such a library depends on HDF5,
+            e.g., <a href="http://www.hdf5.net/">HDF5DotNet</a>, make sure that it was built against
+            the same version of the HDF5 library as PSH5X. </p>
+        <h2>Common HDF5 Tasks</h2>
+        <h3>3.01 How do I save an XML file in HDF5?</h3>
+        <p>There are several different ways of accomplishing that. Most are a variation on the
+            following theme: Let's store the <tt>types.ps1xml</tt> file in a scalar string attribute
+            of the HDF5 root group. We can store it as a variable-length or fixed-length string. By
+            default, attributes are stored in compact form where their size must not exceed 64K. By
+            comparision, a scalar dataset is not subject to that restriction.</p>
+        <pre class="code">
+$x = [string] (Get-Content "$($PSHOME)\types.ps1xml")
+
+# variable-length, UTF-8 encoded string
+
+New-H5Attribute h5tmp:\ vlen_str $x ustring
+
+# in dense storage (default) the attribute size must not exceed 64K
+
+$y = $x.Substring(0,64000)
+
+New-H5Attribute h5tmp:\ fixed_str $y "ustring$($y.Length)"
+
+New-H5Dataset h5tmp:\fixed_str "ustring$($x.Length)" -Scalar
+
+Set-H5datasetValue h5tmp:\fixed_str $x            
+        </pre>
+        <p> Attributes can be larger than 64K if an object's attribute storage is dense. This
+            property must be set at file/object creation time. </p>
+        <h3>3.02 How do I save a binary file in HDF5?</h3>
+        <p>There are several different ways of accomplishing that. Most are a variation on the
+            following theme: Let's store the <a
+                href="http://en.wikipedia.org/wiki/Notepad_(software)">Notepad</a> executable,
+                <tt>notepad.exe</tt> in a scalar (singleton) HDF5 dataset of an HDF5 opaque type. </p>
+        <pre class="code">
+# get the file bytes
+[byte[]] $x = Get-Content -Encoding byte -Path "$($env:windir)\System32\notepad.exe" -ReadCount 0
+
+# create a scalar HDF5 dataset of an opaque type of the right size (193536 in Windows 7 64-bit)
+New-H5Dataset h5tmp:\notepad.exe "opaque$($x.Count)['notepad.exe']" -Scalar
+
+# pump the bytes in
+Set-H5DatasetValue h5tmp:\notepad.exe (,$x)
+        </pre>
+        <p>The <tt>(,$x)</tt> on the last line is not a typo. <tt>Set-H5DatasetValue</tt> compares
+            the size of the dataset with the value supplied. Since we are dealing with a scalar
+            dataset, <tt>Set-H5DatasetValue</tt> expects a single value. Supplying <tt>$x</tt> as
+            the value would create a size mismatch error, since it's an array of length greater than
+            one. We must us the comma operator to turn it into a single element array whose only
+            element is an array itself.</p>
+    </body>
+</html>

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://www.oasis-open.org/docbook/xml/5.0/rng/docbookxi.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<book xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude"
+    xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0">
+
+    <title>PSH5X: A Windows PowerShell Extension for HDF5 </title>
+    <subtitle>Version 1.0 (Beta 1)</subtitle>
+    
+    <xi:include href="bookinfo.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+
+    <dedication>
+        <para>I would like to dedicate this little guide to my esteemed colleagues at The HDF5 Group
+            and all other enthusiastic and selfless contributors to the HDF5 ecosystem out there. My
+            rather modest contribution would have been utterly impossible without their efforts
+            around the HDF5 platform and the inspiration that I drew from their work.</para>
+        <para>I salute Team PowerShell for having created <quote>the best shell scripting
+                environment possible for Microsoft Windows.</quote>
+        </para>
+    </dedication>
+    
+    <xi:include href="preface.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+
+    <xi:include href="chapter00.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+
+    <xi:include href="chapter01.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+
+    <xi:include href="chapter02.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+
+    <xi:include href="chapter03.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+
+    <xi:include href="appendix01.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+
+    <xi:include href="appendix02.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+
+    <xi:include href="appendix03.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+
+    <xi:include href="appendix04.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+
+    <xi:include href="appendix05.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+
+    <xi:include href="appendix06.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+    
+    <xi:include href="appendix07.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+
+    <xi:include href="bibliography.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+
+</book>

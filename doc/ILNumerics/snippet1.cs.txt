@@ -1,0 +1,22 @@
+public static ILRetArray<double> FreqPeaks(
+    ILInArray<double> inData, ILInArray<double> inWindow, double sampFreq = 44100,
+    ILOutArray<double> frequencies = null )
+{
+    IDisposable scope = null; 
+    
+    try
+    {
+        scope = ILScope.Enter(inData, inWindow); 
+        ILArray<double> retLength = min(ceil(inData.Length / 2.0 + 1), 5.0);
+        ILArray<double> magnitudes = abs(fft(inData * inWindow));
+        ...
+    }
+    finally
+    {
+          // this will dispose inData, inWindow and
+          // all local arrays created within 'try {..}'
+          if (scope != null) {
+              scope.Dispose();
+          }
+    }
+}

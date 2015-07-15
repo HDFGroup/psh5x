@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://www.oasis-open.org/docbook/xml/5.0/rng/docbookxi.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<sect1 xml:id="iproperty_cmdlet_provider" xmlns="http://docbook.org/ns/docbook"
+    xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xlink="http://www.w3.org/1999/xlink"
+    version="5.0">
+    <title>IPropertyCmdletProvider</title>
+
+    <para> According to <xref linkend="items_et_properties_table"/>, in PSH5X only HDF5 attributes
+        are considered <emphasis>properties</emphasis> managed by the PSH5X provider. The
+            <literal>IPropertyCmdletProvider</literal> interface deals only with the value of
+        properties, i.e., HDF5 attributes. The callbacks in this interface cannot be used to create
+        new HDF5 attributes, copy or move them. This is the topic of <xref
+            linkend="idynamic_property_cmdlet_provider"/>.</para>
+
+    <sect2 xml:id="get_item_property">
+        <title><literal>Get-ItemProperty</literal></title>
+        <para>Gets the HDF5 attributes of a specified HDF5 item.</para>
+        <cmdsynopsis>
+            <command>Get-ItemProperty</command>
+            <arg choice="req">-Path <replaceable>string[]</replaceable></arg>
+            <arg choice="opt">-Name <replaceable>string[]</replaceable></arg>
+        </cmdsynopsis>
+
+        <para>The <literal>Get-ItemProperty</literal> cmdlet gets the HDF5 attributes of the
+            specified items.</para>
+        <variablelist>
+            <varlistentry>
+                <term>-Path</term>
+                <listitem>
+                    <para>Specifies the path to the HDF5 item or items.</para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>-Name</term>
+                <listitem>
+                    <para>Specifies the name of the HDF5 attribute or attributes to retrieve.</para>
+                </listitem>
+            </varlistentry>
+        </variablelist>
+        <example>
+            <title>Retrieving HDF5 attributes of an HDF5 dataset</title>
+            <screen><prompt>PS:1 ></prompt> <command>(Get-Item 'aura:\HDFEOS\SWATHS\HIRDLS\Data Fields\Temperature').AttributeNames</command>
+_FillValue
+MissingValue
+Title
+Units
+UniqueFieldDefinition
+<prompt>PS:2 >Get-ItemProperty</prompt> <command>'aura:\HDFEOS\SWATHS\HIRDLS\Data Fields\Temperature' `
+    -Name _FillValue,UniqueFieldDefinition</command>
+
+Name                           Value
+----                           -----
+ElementType                    {SignBitPos, MantBitPos, ExpBias, ByteOrder...}
+DataSizeBytes                  4
+Rank                           1
+ElementTypeClass               Float
+AttributeName                  _FillValue
+Value                          -999
+CreationOrderIsValid           True
+AttributeNameCharacterSet      ASCII
+CreationOrder                  0
+SimpleExtentType               Simple
+StorageSizeBytes               4
+ElementCount                   1
+Dimensions                     {1}
+
+AttributeName                  UniqueFieldDefinition
+CreationOrderIsValid           True
+Value                          Aura-Shared
+StorageSizeBytes               11
+ElementType                    {IsVariableLength, Class, StrPad, CharSet...}
+SimpleExtentType               Scalar
+IsVariableLength               False
+AttributeNameCharacterSet      ASCII
+CreationOrder                  4
+ElementTypeClass               String
+DataSizeBytes                  11</screen>
+        </example>
+
+    </sect2>
+
+    <sect2 xml:id="set_item_property">
+        <title><literal>Set-ItemProperty</literal></title>
+        <para>Changes the value of an HDF5 attribute of an HDF5 item (dataset, group, or named
+            datatype).</para>
+        <cmdsynopsis>
+            <command>Get-ItemProperty</command>
+            <arg choice="req">-Path <replaceable>string[]</replaceable></arg>
+            <arg choice="req">-Name <replaceable>string</replaceable></arg>
+            <arg choice="req">-Value <replaceable>Object</replaceable></arg>
+        </cmdsynopsis>
+        <para>The <literal>Set-ItemProperty</literal> cmdlet changes the value of an HDF5 attribute
+            of the specified item.</para>
+        <variablelist>
+            <varlistentry>
+                <term>-Path</term>
+                <listitem>
+                    <para>Specifies the path to the HDF5 item or items with the HDF5 attribute to be
+                        set.</para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>-Name</term>
+                <listitem>
+                    <para>Specifies the name of the HDF5 attribute to be set.</para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>-Value</term>
+                <listitem>
+                    <para>Specifies the value of the HDF5 attribute. This parameter must be
+                        convertible to the attribute type.</para>
+                </listitem>
+            </varlistentry>
+        </variablelist>
+        <example>
+            <title>Setting an HDF5 attribute value</title>
+            <screen><prompt>PS:1 ></prompt><command>Set-ItemProperty h5tmp:\ -Name attr1 -Value 'Howdy!'</command>
+            </screen>
+        </example>
+    </sect2>
+
+    <sect2 xml:id="clear_item_property">
+        <title><literal>Clear-ItemProperty</literal></title>
+        <note>
+            <para>Not implemented. Reset an attribute to a default value?</para>
+        </note>
+    </sect2>
+
+</sect1>

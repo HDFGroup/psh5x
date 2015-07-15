@@ -1,0 +1,80 @@
+TOPIC
+    about_H5Float
+
+SHORT DESCRIPTION
+    Explains how to specify an HDF5 floating-point datatype
+
+NOTE
+    In practice, most users will use the predefined floating-point types
+    or type abbreviations.
+
+SYNTAX
+
+    <bit_padding> ::= "Zero" | "One" | "Background"
+    
+    <byte_order> ::= "BE" | "LE"
+    
+    <mant_norm> ::= "Implied" | "MsbSet" | "None"
+    
+    {
+        "BitOffset"      : <non-negative integer> ,
+        "ByteOrder"      : <byte_order> ,
+        "Class"          : "Float" ,
+        "ExpBias"        : <positive integer> ,
+        "ExpBits"        : <positive integer> ,
+        "ExpBitPos"      : <positive integer> ,
+        "IntlBitPadding" : <bit_padding> ,
+        "LSBitPadding"   : <bit_padding> ,
+        "MantBits"       : <positive integer> ,
+        "MantBitPos"     : <non-negative integer> ,
+        "MantNorm"       : <mant_norm> ,
+        "MSBitPadding"   : <bit_padding> ,
+        "Precision"      : <positive integer> ,
+        "SignBitPos"     : <positive integer> ,
+        "Size"           : <positive integer>
+    }
+
+ABBREVIATIONS
+    The following abbreviations for HDF5 predefined integer types are
+    recognised by the HDF5 module. They are case-insensitive.
+
+    HDF5 Predefined Type    Abbreviation(s)
+
+        H5T_IEEE_F32BE      F32BE
+        H5T_IEEE_F32LE      F32LE
+        H5T_IEEE_F64BE      F64BE
+        H5T_IEEE_F64LE      F64LE
+
+        H5T_NATIVE_FLOAT    FLOAT, F32, SINGLE
+        H5T_NATIVE_DOUBLE   DOUBLE, F64 
+        H5T_NATIVE_LDOUBLE  LDOUBLE
+
+    ------------------------------ EXAMPLE ------------------------------
+
+    The predefined type H5T_IEEE_F64LE corresponds to:
+
+    {
+        "BitOffset"      : 0,
+        "ByteOrder"      : "LE",
+        "Class"          : "Float",
+        "ExpBias"        : 1023 ,
+        "ExpBitPos"      : 52 ,
+        "ExpBits"        : 11 ,
+        "IntlBitPadding" : "Zero" ,
+        "LSBitPadding"   : "Zero" ,
+        "MantBitPos"     : 0 ,
+        "MantBits"       : 52,
+        "MantNorm"       : "Implied",
+        "MSBitPadding"   : "Zero",
+        "Precision"      : 64,
+        "SignBitPos"     : 63,
+        "Size"           : 8
+    }
+    
+RELATED LINKS
+    about_H5Datatypes
+    about_H5Predefined
+    New-H5Datatype
+    Show-H5Types
+    http://www.hdfgroup.org/HDF5/doc/UG/UG_frame11Datatypes.html
+    http://www.hdfgroup.org/HDF5/doc/RM/RM_H5T.html

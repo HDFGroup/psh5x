@@ -1,0 +1,245 @@
+<!DOCTYPE html SYSTEM "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>HDF Group - PSH5X</title>
+        <link rel="stylesheet" type="text/css" href="./style.css" />
+        <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+    </head>
+    <body>
+        <a href="./index.html"><img src="img/psh5x_logo_100x75.gif" alt="PSH5X logo" align="bottom"
+             /></a>
+        <br />
+        <p>
+            <b>PSH5X</b> is a <a href="http://en.wikipedia.org/wiki/Windows_PowerShell">Windows
+                PowerShell</a> module for HDF5. It leverages PowerShell's <a
+                href="http://msdn.microsoft.com/en-us/library/windows/desktop/ee126196(v=vs.85).aspx"
+                >provider model</a> to produce a file system-like experience for HDF5 (an often
+            cited metaphor). PSH5X helps you perform simple housekeeping tasks such as renaming HDF5
+            links or copying HDF5 objects, but it can also create new HDF5 items (HDF5 objects,
+            links, attributes) and read or write HDF5 dataset and attribute values. Did you ever ask
+            questions similar to the following?</p>
+        <ul>
+            <li>How many groups and datasets are there in an HDF5 file?</li>
+            <li>What fraction of the total file size can be accounted for by HDF5 datasets?</li>
+            <li>Which path names containing the string 'H2O' lead to HDF5 datasets?</li>
+        </ul>
+        <p> You'll find that these are examples of the proverbial 'one-liners' in PSH5X. </p>
+        <p>After years of uncontrolled growth of a bewildering jungle of scripting technologies on
+            the Windows platform, there's, finally, a one-stop automation hub, Windows PowerShell.
+            You may not be aware of it, but it comes with every modern Windows desktop or server
+            installation. You can view PSH5X as a ramp leading straight into the fast lane on the
+            PowerShell highway. There you will have access to a myriad of helpful cmdlets to get
+            almost every HDF5 job done. For example, have a look at <a href="./faq.html#hdf52excel"
+                >FAQ 2.01</a> if you ever wondered how to get data from HDF5 into Excel.</p>
+        <p>There are already several excellent scripting interfaces available for HDF5 including
+            Andrew Collette's <a href="http://alfven.org/wp/hdf5-for-python/">h5py</a> Python
+            module. Most people would probably agree that for something as wonderful and
+            multi-faceted as HDF5 there can hardly be too many good choices. With PSH5X we're adding
+            another powerful tool to the arsenal and hope that, with your help, it will find its
+            "niche" in the ecosystem.</p>
+        <p>Questions? Watch the <a href="http://www.hdfgroup.org/ftp/HDF5/projects/psh5x/PSH5X.mov"
+                >PSH5X movie</a> and check out <a href="terminology.html">a few remarks on
+                terminology</a>, a list of <a href="./cmdlets.html">PSH5X cmdlets</a>, the <a
+                href="./faq.html">FAQ</a>, the <a href="./tutorial.html">tutorial</a>, <a
+                href="./advanced.html">advanced features</a>, and several <a href="./nolimits.html"
+                >limitations and known issues</a>.</p>
+        <p>
+            <a href="https://twitter.com/psh5x" class="twitter-follow-button"
+                data-show-count="false">Follow @psh5x</a>
+        </p>
+        <p>Please send your questions/comments/suggestions to the <a
+                href="http://www.hdfgroup.org/services/community_support.html">HDF forum</a> or
+            contact us by <a href="mailto:gheber@hdfgroup.org">email</a>. </p>
+        <h3>Prerequisites</h3>
+        <table>
+            <tr>
+                <td><u>Operating system:</u></td>
+                <td>Windows XP, Vista, 7, 8, Windows Server 2003, 2008, 2008 R2, 8</td>
+            </tr>
+            <tr>
+                <td><u>Runtime:</u></td>
+                <td>Visual C++ 2010 Redistributable Package <a
+                        href="http://www.microsoft.com/en-us/download/details.aspx?id=5555">x86</a>
+                    or <a href="http://www.microsoft.com/en-us/download/details.aspx?id=14632"
+                        >x86_64</a></td>
+            </tr>
+            <tr>
+                <td><u>.NET Framework:</u></td>
+                <td> Version 4 or higher; earlier versions are currently <b>not</b> supported. </td>
+            </tr>
+            <tr>
+                <td><u>PowerShell:</u></td>
+                <td>Version 2.0 or higher, Version 1.0 is <b>not</b> supported.</td>
+            </tr>
+        </table>
+        <h2>Downloads</h2>
+        <ul>
+            <li><a href="http://www.hdfgroup.org/ftp/HDF5/projects/psh5x/PSH5X.zip"> PSH5X Beta
+                    binaries</a> (x86 and x86_64) built against .NET 4 and HDF5 1.8.9</li>
+            <li>PSH5X Source (coming soon)</li>
+            <li>PSH5X Examples (coming soon)</li>
+        </ul>
+        <h2>Installation</h2>
+        <ol>
+            <li>Unpack the zip archive. Create a directory called <tt>HDF5</tt> folder in a
+                directory in your PowerShell module path <tt>$ENV:PSModulePath</tt>. For example, on
+                Windows 7 you'd most likely create it in <tt>C:\Users\{your
+                    username}\Documents\WindowsPowerShell\Modules</tt>. Copy the contents of the
+                    <tt>module</tt> folder and the <tt>PSH5X.dll</tt> for your architecture
+                    (<tt>Win32</tt> or <tt>Win64</tt>) from the zip archive into the <tt>HDF5</tt>
+                folder you just created. Alternatively, run the <tt>Install-PSH5X.ps1</tt> script
+                that performs these steps for you. <tt>PSH5X.dll</tt> depends on the Visual C++ 2010
+                runtime via <tt>msvcp100.dll</tt> and <tt>msvcr100.dll</tt> which are included in
+                the zip archive. Unless they are already in your <tt>PATH</tt>, please copy them
+                (for your architecture) to a location in your <tt>PATH</tt>.</li>
+            <li>If you are running PowerShell version 2.0, make sure that it runs with .NET 4.0 (and
+                not the default .NET 2.0). The easiest way to accomplish this is to copy the files
+                    <tt>powershell.exe.config</tt> and (optionally)
+                    <tt>powershell_ise.exe.config</tt> from the zip archive to <tt>$PSHOME</tt>,
+                typically <tt>C:\Windows\System32\WindowsPowerShell\v1.0</tt>. A braoder discussion
+                can be found in this <a
+                    href="http://tfl09.blogspot.com/2010/08/using-newer-versions-of-net-with.html"
+                    >blog entry</a> and this <a
+                    href="http://stackoverflow.com/questions/2094694/how-can-i-run-powershell-with-the-net-4-runtime"
+                    >forum post</a>. </li>
+            <li>At this point, you may try running <tt>Import-Module HDF5</tt>. There's a chance
+                that instead of a cheerful &quot;Welcome to HDF5!&quot; greeting you'll see an error
+                message telling you that <tt>... cannot be loaded because the execution of scripts
+                    is disabled on this system.</tt> By default, PowerShell can't run any scripts.
+                If and what kind of scripts you can execute is governed by a so-called execution
+                policy. Your system administrator may have set that or it still has the default
+                value of <tt>Restricted</tt>, which is a euphemism for 'no scripts'. The
+                    <tt>Set-ExecutionPolicy</tt> cmdlet lets you adjust what kind of scripts are
+                allowed to run. Running <tt>Set-ExecutionPolicy</tt> without a <tt>-Scope</tt>
+                argument will change the registry and requires administrative privileges. Your
+                options are: <ul>
+                    <li>You have administrative rights on the machine: Run PowerShell as
+                        administrator and adjust the execution policy as follows
+                            <tt>Set-ExecutionPolicy RemoteSigned</tt></li>
+                    <li>You don't have administrative rights on the machine: Adjust the execution
+                        policy for just this session as follows <tt>Set-ExecutionPolicy -Scope
+                            Process RemoteSigned</tt></li>
+                </ul>
+            </li>
+        </ol>
+        <p>If you did everything right, when importing the HDF5 module, you should see something
+            like this:</p>
+        <img src="img/PS%20Window.gif" alt="PowerShell Window" align="middle" />
+        <p>Each session has its own sandbox HDF5 drive named <tt>h5tmp</tt>. The full path to the
+            HDF5 file backing this drive is stored in the <tt>PSH5XTmpFile</tt> environment
+            variable. (The file does not have an <tt>.h5</tt> extension, but it is an HDF5 file.
+            Trust me!) This file remains open and writeable as long as the drive is mapped. You can
+            close it either via <tt>Remove-H5Drive h5tmp</tt> or by closing the session (window).
+                <u>PSH5X does not delete the sandbox file!</u> (in case you'd like to recover some
+            of the objects later...)</p>
+        <h2>PowerShell Resources</h2>
+        <dl>
+            <dt>Windows PowerShell: <a
+                    href="http://technet.microsoft.com/en-us/scriptcenter/dd742419">Learn It Now
+                    Before It's an Emergency</a></dt>
+            <dd>
+                <ul>
+                    <li><a
+                            href="http://dlbmodigital.microsoft.com/webcasts/wmv/1032481530_Dnl_L.wmv"
+                            >Part 1</a> | <a
+                            href="http://dlbmodigital.microsoft.com/audio/1032481530.wma"
+                        >WMA</a></li>
+                    <li><a
+                            href="http://dlbmodigital.microsoft.com/webcasts/wmv/1032481542_Dnl_L.wmv"
+                            >Part 2</a> | <a
+                            href="http://dlbmodigital.microsoft.com/audio/1032481542.wma"
+                        >WMA</a></li>
+                    <li><a
+                            href="http://dlbmodigital.microsoft.com/webcasts/wmv/1032481548_Dnl_L.wmv"
+                            >Part 3</a> | <a
+                            href="http://dlbmodigital.microsoft.com/audio/1032481548.wma"
+                        >WMA</a></li>
+                    <li><a
+                            href="http://dlbmodigital.microsoft.com/webcasts/wmv/1032481552_Dnl_L.wmv"
+                            >Part 4</a> | <a
+                            href="http://dlbmodigital.microsoft.com/audio/1032481552.wma"
+                        >WMA</a></li>
+                    <li><a
+                            href="http://dlbmodigital.microsoft.com/webcasts/wmv/1032481554_Dnl_L.wmv"
+                            >Part 5</a> | <a
+                            href="http://dlbmodigital.microsoft.com/audio/1032481554.wma"
+                        >WMA</a></li>
+                </ul>
+            </dd>
+            <dt>Bruce Payette: <a href="http://manning.com/payette2/">Windows PowerShell in Action
+                </a>, 2nd Ed. Manning 2011.</dt>
+            <dd><i>Must read!</i></dd>
+            <dt>Arul Kumaravel, Jon White, Michael Naixin Li, Scott Happell, Guohui Xie, Krishna C.
+                Vutukuri: <a
+                    href="http://www.wrox.com/WileyCDA/WroxTitle/Professional-Windows-PowerShell-Programming-Snapins-Cmdlets-Hosts-and-Providers.productCd-0470173939.html"
+                    >Professional Windows PowerShell Programming: Snapins, Cmdlets, Hosts and
+                    Providers.</a> Wrox 2008.</dt>
+            <dd><i>Must read, if you want to make sense of the source code.</i></dd>
+            <dt><a
+                    href="http://channel9.msdn.com/Blogs/Charles/Windows-PowerShell-Origin-and-Future"
+                    >Windows PowerShell: Origin and Future </a></dt>
+            <dd>Bruce Payette and Jeffrey Snover discuss PowerShell</dd>
+            <dt><a href="http://blogs.msdn.com/b/powershell/">Windows PowerShell Blog</a></dt>
+            <dd>Automating the world one-liner at a time...</dd>
+            <dt><a href="http://pscx.codeplex.com/">PowerShell Community Extensions</a></dt>
+            <dd>PowerShell Community Extensions (PSCX) is aimed at providing a widely useful set of
+                additional cmdlets, providers, aliases, filters, functions and scripts for Windows
+                PowerShell that members of the community have expressed interest in.</dd>
+        </dl>
+        <h2>An Appetizer</h2>
+        <p>PSH5X manages HDF5 files in the form of drives that one can assign drive names such as
+                <tt>h5</tt> or <tt>aura</tt>. Such drives can be dynamically (un-)mounted in a
+            PowerShell session. Below are a few sample commands that might give you an idea of what
+            it feels like to work in PowerShell/PSH5X. (Sample file <a
+                href="ftp://ftp.hdfgroup.uiuc.edu/pub/outgoing/NASAHDFPOOL/GESDISC/HIRDLS/HIRDLS-Aura_L2_v02-04-09-c03_2008d001.he5"
+                >download</a>)</p>
+        <pre class="code">
+# load the PSH5X module into a PowerShell session (not necessary in PS v.3)
+Import-Module HDF5
+
+# create a drive called 'aura' backed by an HDF5 file 
+New-H5Drive aura C:\h5\HIRDLS-Aura_L2_v02-04-09-c03_2008d001.he5
+
+# make the HDF5 root of 'aura' our "working directory"
+cd aura:
+
+# How many HDF5 groups and datasets are there in this file?
+dir . -Recurse -Filter dg | %{ switch($_.ItemType) `
+    { 'Group' {$groups++} 'Dataset' {$datasets++} } };  `
+    "Groups: $groups - Datsets: $datasets"
+    
+# list all HDF5 path names to datasets that contain 'H2O'
+dir . -r -Filter d | ?{$_.PSChildName -like '*H2O*'} | select PSPath    
+    
+# How much data is stored in HDF5 datasets vs. the total file size?
+dir . -Recurse -Filter d | %{ $dsetBytes += $_.StorageSizeBytes }; `
+    "In datasets: $dsetBytes - File: $((Get-H5Drive aura).FileSizeBytes)"    
+ 
+# switch to the HDF5 sandbox drive 'h5tmp'
+cd h5tmp:
+
+# create a new HDF5 group 'copy of aura' and populate it with HDF5 objetcs from 'aura:'
+mkdir 'copy of aura'; Copy-H5Item aura:\* 'copy of aura' -Recurse
+
+# remove the 'aura' drive
+Remove-H5Drive aura
+
+# create a chunked, compressed, extendible dataset and force intermediate group creation
+New-H5Dataset '/A/B/My Doubles' double 10,20,40 -MaxDim -1,50,-1 -Chunk 10,10,10 -Gzip 6 -Force
+
+# create a .NET array and set the value of '/A/B/My Doubles' (value initialization not shown)
+$value = New-H5Object 'double[,,]' 10,20,30
+...
+Set-H5DatasetValue '/A\B/My Doubles' $value
+        </pre>
+        <p>Questions? Check out <a href="terminology.html">a few remarks on terminology</a>, a list
+            of <a href="./cmdlets.html">PSH5X cmdlets</a>, the <a href="./faq.html">FAQ</a>, the <a
+                href="./tutorial.html">tutorial</a>, <a href="./advanced.html">advanced
+            features</a>, and several <a href="./nolimits.html">limitations and known
+            issues</a>.</p>
+        <p>
+            <a href="https://twitter.com/psh5x" class="twitter-follow-button"
+                data-show-count="false">Follow @psh5x</a>
+        </p>
+    </body>
+</html>

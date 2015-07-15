@@ -1,0 +1,24 @@
+Import-Module HDF5
+Import-Module ILNumerics
+
+$ScriptDir = Split-Path $MyInvocation.MyCommand.Path
+# include drawing helper (see Appendix D) 
+. $ScriptDir\Surface.ps1
+
+# create a new drive 'h5' backed by an HDF5 file and read the dataset value
+New-H5Drive h5 "$ScriptDir\HIRDLS-Aura_L2_v02-04-09-c03_2008d001.he5"
+[ilf32] $data1 = Get-H5Value 'h5:\HDFEOS\SWATHS\HIRDLS\Data Fields\Temperature'
+[ilf32] $lab1 = Get-H5Value 'h5:\HDFEOS\SWATHS\HIRDLS\Geolocation Fields\Latitude'
+[ilf32] $lab2 = Get-H5Value 'h5:\HDFEOS\SWATHS\HIRDLS\Geolocation Fields\Longitude'
+
+# mark fill values as NaN values
+$fill = Get-H5Value 'h5:\HDFEOS\SWATHS\HIRDLS\Data Fields\Temperature' '_FillValue'
+$data1.SetRange([Single]::NaN, [ilmath]::eq($data1, $fill))
+$data2.SetRange([Single]::NaN, [ilmath]::eq($data2, $fill))
+$lab1.SetRange([Single]::NaN, [ilmath]::eq($lab1, $fill))
+$lab2.SetRange([Single]::NaN, [ilmath]::eq($lab2, $fill))
+
+Remove-H5Drive h5
+
+# plot the first 750 columns of the data 
+$panel = Surface $data1['0:100;0:750'] $lab1['0:750'].Concat($lab2['0:750'],1)

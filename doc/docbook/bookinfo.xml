@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://www.oasis-open.org/docbook/xml/5.0/rng/docbookxi.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<info xmlns="http://docbook.org/ns/docbook" version="5.0">
+  
+  <author>
+    <personname>
+      <firstname>Gerd</firstname>
+      <surname>Heber</surname>
+    </personname>
+
+    <email>gheber@hdfgroup.org</email>
+
+    <affiliation>
+      <jobtitle>Applications Architect</jobtitle>
+      <orgname>The HDF Group</orgname>
+      <address>
+        <street>1800 South Oak Street, Suite 203</street>
+        <city>Champaign</city>
+        <state>Illinois</state>
+        <postcode>61820</postcode>
+        <country>USA</country>
+      </address>
+    </affiliation>
+  </author>
+  
+  <copyright><year>2011</year><holder>The HDF Group</holder></copyright>
+  
+  <revhistory>
+    <revision>
+      <revnumber>0.90</revnumber>
+      <date>24 Aug 2011</date>
+      <authorinitials>gh</authorinitials>
+      <revremark>First beta release</revremark>
+    </revision>
+  </revhistory>
+  
+</info>

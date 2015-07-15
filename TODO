@@ -1,0 +1,40 @@
+
+BUGS
+----
+
+- Image creation fails with -Force, because intermediate groups
+  are not automatically created (H5IM functions have no arguments
+  for a link creation property list...)
+
+- If a link name contains a colon, PSH5X cannot find the item
+
+- Bug in writing Vlen datasets with zero length arrays?
+
+KNOWN ISSUES
+------------
+
+- Clean up the attribute code (I[Dynamic]Property)
+-- Support read/write of bitfield, enum, reference, array, and compound attributes
+-- Support memory type conversion
+
+NEW FEATURES
+------------
+
+- Support -Encoding (memory type) argument in Get-Content (for primitive types)
+
+- Support -RegionReference (KeyValPair) argument in Get-Content
+
+- Add a -Members argument to [Get,Set]-Content for compound types
+
+- Implement Invoke-Item (e.g., image) and Clear-Item (reset to fill value)
+
+- Implement point selections in reader/writer
+
+
+FUNDAMENTALS
+------------
+
+- Refactor the dataset and attribute code so that they use a common code base for R/W
+
+- Find a cleaner way to generate code in ProviderUtils::GetCompundDotNetType
+  F# type provider?

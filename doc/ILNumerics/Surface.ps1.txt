@@ -1,0 +1,62 @@
+Function Surface {
+    param(
+        # Height Data
+        [ilif32] $data, 
+        # label values
+        [ilif32] $labels) 
+        ILUsing ([ilscope]::Enter($data,$labels)) { 
+
+            [void][reflection.assembly]::LoadWithPartialName("System.Windows.Forms")
+            [System.Windows.Forms.Application]::EnableVisualStyles();
+
+            $form = New-Object Windows.Forms.Form
+            $form.Text = 'ILNumerics-HDF5 Surface Demo - ''Temperature'''
+            $form.Size = New-Object System.Drawing.Size(700,500)
+            
+            $ilpanel = [ILNumerics.Drawing.ILPanel]::Create()
+            $form.Controls.Add($ilpanel)
+            $form.Add_Shown({$form.Activate()})
+            $surf = New-Object `
+                ILNumerics.Drawing.Plots.ILLitSurface($ilpanel, $data)
+            $ilpanel.Graphs.AddPlot($surf)
+            
+            # some configuration - default view: from some angle to middle
+            # of surface
+            [Int32] $midX = $data.S[1] / 2
+            [Int32] $midY = $data.S[0] / 2
+            [float] $minZ = 0.0
+            [float] $maxZ = 0.0
+            $data.GetLimits([ref]$minZ, [ref] $maxZ)
+            [Int32] $midZ = [Int32](($maxZ - $minZ) / 2)
+            $ilpanel.DefaultView.SetDeg(86,50,1000)  
+            $ilpanel.DefaultView.LookAt = New-Object `
+                ILNumerics.Drawing.ILPoint3Df($midX, $midY, $midZ) 
+
+            $ilpanel.AspectRatio = `
+                [ILNumerics.Drawing.AspectRatioMode]::StretchToFill
+            $ilpanel.Axes.XAxis.Label.Text = `
+                'Latitude \color{red}|\reset Longitude [deg]'
+            $ilpanel.Axes.YAxis.Label.Text = 'Cross Track '
+            $ilpanel.Axes.ZAxis.Label.Text = 'Temperature \vartheta [K]'
+            $ilpanel.Lights[0].Position = New-Object `
+                ILNumerics.Drawing.ILPoint3Df(2000,1500,1500) 
+            $surf.Colormap = New-Object `
+                ILNumerics.Drawing.Misc.ILColormap ( `
+                    [ILNumerics.Drawing.Colormaps]::ILNumerics  )
+            $ilpanel.PlotBoxScreenSizeMode = `
+                [ILNumerics.Drawing.PlotBoxScreenSizeMode]::StrictOptimal
+            # create custom labels
+            $xaxisticks = `
+               $ilpanel.Axes[[ILNumerics.Drawing.AxisNames]::XAxis].LabeledTicks
+            $xaxisticks.Mode = [ILNumerics.Drawing.TickMode]::Manual
+            $xaxisticks.Clear()
+            $pickticks = (0..18 | ForEach-Object { $_ * 50})
+            foreach ($i in $pickticks) {
+                $xaxisticks.Add( $i,"\fontsize{-2}" `
+                    + ("{0:f2} \color{{red}}|\color{{black}} {1:f2}" `
+                        -f [float]$labels["$i;0"], [float]$labels["$i;1"]))
+            }
+
+            $form.ShowDialog()
+        }
+}

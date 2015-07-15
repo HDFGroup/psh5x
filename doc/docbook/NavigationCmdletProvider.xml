@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://www.oasis-open.org/docbook/xml/5.0/rng/docbookxi.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<sect1 xml:id="navigation_cmdlet_provider" xmlns="http://docbook.org/ns/docbook"
+    xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xlink="http://www.w3.org/1999/xlink"
+    version="5.0">
+
+    <title>NavigationCmdletProvider</title>
+
+    <sect2 xml:id="move_item">
+        <title><literal>Move-Item</literal></title>
+        <para>Moves an HDF5 item from one location to another.</para>
+        <cmdsynopsis>
+            <command>Move-Item</command>
+            <arg choice="req">-Path <replaceable>string[]</replaceable></arg>
+            <arg choice="req">-Destination <replaceable>string</replaceable></arg>
+        </cmdsynopsis>
+        <para> The <literal>Move-Item</literal> cmdlet moves an HDF5 item, including its properties,
+            contents, and child items, from one location to another location. The locations must be
+            supported by the same provider. For example, it can move an HDF5 dataset or HDF5 group
+            from one HDF5 group to another. When you move an item, it is added to the new location
+            and deleted from its original location. </para>
+        <variablelist>
+            <varlistentry>
+                <term>-Path</term>
+                <listitem>
+                    <para>Specifies the path to the current location of the items. The default is
+                        the current directory. Wildcards are permitted.</para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>-ChildPath</term>
+                <listitem>
+                    <para> Specifies the path to the location where the items are being moved. The
+                        default is the current directory. Wildcards are permitted, but the result
+                        must specify a single location.</para>
+                </listitem>
+            </varlistentry>
+        </variablelist>
+
+        <note>
+            <para>Under development.</para>
+        </note>
+    </sect2>
+
+    <sect2 xml:id="join_path">
+        <title><literal>Join-Path</literal></title>
+        <para>Combines a path and a child path into a single path. The provider supplies the path
+            delimiters.</para>
+        <cmdsynopsis>
+            <command>Join-Path</command>
+            <arg choice="req">-Path <replaceable>string[]</replaceable></arg>
+            <arg choice="req">-ChildPath <replaceable>string</replaceable></arg>
+            <arg choice="opt">-Resolve</arg>
+        </cmdsynopsis>
+        <para>The <literal>Join-Path</literal> cmdlet combines a path and child-path into a single
+            path. The provider supplies the path delimiters.</para>
+        <variablelist>
+            <varlistentry>
+                <term>-Path</term>
+                <listitem>
+                    <para>Specifies the main path (or paths) to which the child-path is appended.
+                        Wildcards are permitted.</para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>-ChildPath</term>
+                <listitem>
+                    <para> Specifies the elements to append to the value of Path. Wildcards are
+                        permitted.</para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>-Resolve</term>
+                <listitem>
+                    <para>Displays the items that are referenced by the joined path.</para>
+                </listitem>
+            </varlistentry>
+        </variablelist>
+        <example>
+            <title>Joining paths</title>
+            <screen><prompt>PS:1 ></prompt> <command>Join-Path h5tmp: dset*</command>
+h5tmp:\dset*
+<prompt>PS:2 ></prompt> <command>Join-Path h5tmp: dset* -Resolve</command>
+h5tmp:\dset1
+h5tmp:\dset2
+h5tmp:\dset3</screen>
+        </example>
+    </sect2>
+
+</sect1>

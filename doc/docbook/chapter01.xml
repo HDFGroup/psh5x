@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://www.oasis-open.org/docbook/xml/5.0/rng/docbookxi.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<chapter xml:id="what_is_psh5x" xmlns="http://docbook.org/ns/docbook"
+  xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0">
+  <title>What is PSH5X?</title>
+
+  <para><emphasis role="bold">P</emphasis>ower<emphasis role="bold">S</emphasis>hell <emphasis
+      role="bold">H</emphasis>DF<emphasis role="bold">5</emphasis> e<emphasis role="bold"
+      >X</emphasis>tension is a PowerShell snap-in (packaged in a .NET assembly) that contains a
+    PowerShell provider and other supporting cmdlets for accessing HDF5 files (stores). The
+    PowerShell provider architecture is the "secret sauce" behind the consistent user experience
+    across a diverse set of data stores, such as the Windows Registry, certificate stores, and
+    Active Directory. PSH5X adds a member to that ensemble of providers orchestrated by the provider
+    architecture. Chapter 16 in <citation>PSBible</citation>, chapter 5 in
+      <citation>PSProgramming</citation>, and <citation>ZavisekThesis</citation> have excellent
+    discussions of the Windows PowerShell <emphasis>provider model</emphasis>.</para>
+
+  <para>As a shell user in general and a PowerShell user in particular, you know already that shell
+    interfaces derive most of their power from combinations of monadic units in pipelines. (By
+    introducing objects to the pipeline, PowerShell laid a rational foundation to pipeline
+    processing and put an end to those pagan "string orgies".) Identifying a balanced mixture of
+    such units, that is, a set of cmdlets for which users would use attributes like 'intuitive' and
+    'consistent', is a tremendous challenge. Fortunately, the creators of PowerShell solved that
+    problem for us with the PowerShell provider interface. The alternative idea of creating from
+    scratch a loosely affiliated set of cmdlets that perform certain simple tasks sounds attractive
+    and so simple that it should be frightening. I believe that, in the case of a data store as
+    complex as HDF5, this approach would be more work short-term and long, because of not leveraging
+    standardized facilities and the increasing risk of inconsistency and feature creep. </para>
+
+  <sect1 xml:id="windows_powershell_providers">
+    <title>A Windows PowerShell Provider</title>
+    <para>The Windows PowerShell provider architecture consists of a set of <emphasis>core
+        cmdlets</emphasis> for manipulating entities that it refers to as <emphasis>items</emphasis>
+      and <emphasis>properties</emphasis>, that may have values and/or <emphasis>content</emphasis>.
+      The actual mapping of these entities and the semantics of the core cmdlets for a particular
+      type of data store is at the discretion of the managing provider. For PSH5X the mapping is as
+      follows:</para>
+    <table xml:id="items_et_properties_table">
+      <title>PSH5X Items and Properties</title>
+      <tgroup cols="3">
+        <thead>
+          <row>
+            <entry align="center">Item</entry>
+            <entry align="center">Value</entry>
+            <entry align="center">Content</entry>
+          </row>
+        </thead>
+        <tbody>
+          <row>
+            <entry>HDF5 Group</entry>
+            <entry>N/A</entry>
+            <entry>N/A</entry>
+          </row>
+          <row>
+            <entry>HDF5 Dataset</entry>
+            <entry>Current extent (dimensions)</entry>
+            <entry>Data elements</entry>
+          </row>
+          <row>
+            <entry>HDF5 Named Datatype</entry>
+            <entry>N/A</entry>
+            <entry>N/A</entry>
+          </row>
+          <row>
+            <entry>HDF5 Hard Link</entry>
+            <entry>N/A</entry>
+            <entry>N/A</entry>
+          </row>
+          <row>
+            <entry>HDF5 Soft Link</entry>
+            <entry>HDF5 path name</entry>
+            <entry>N/A</entry>
+          </row>
+          <row>
+            <entry>HDF5 External Link</entry>
+            <entry>File name/HDF5 path name</entry>
+            <entry>N/A</entry>
+          </row>
+        </tbody>
+      </tgroup>
+      <tgroup cols="3">
+        <thead>
+          <row>
+            <entry align="center">Property</entry>
+            <entry align="center">Value</entry>
+            <entry align="center">Content</entry>
+          </row>
+        </thead>
+        <tbody>
+          <row>
+            <entry>HDF5 Attribute</entry>
+            <entry>Attribute value</entry>
+            <entry>N/A</entry>
+          </row>
+        </tbody>
+      </tgroup>
+    </table>
+    <para>For example, according to PSH5X, an HDF5 soft link is an item that has a value, but no
+      content. In turn, a cmdlet such as <literal>Set-Item</literal> can be used to set and/or
+      change that value, but a cmdlet like <literal>Get-Content</literal> will not return anything
+      for an HDF5 symbolic link.</para>
+    <note>
+      <para>Throughout the text we will use a strange mixture of HDF5 and PowerShell jargon. We will
+        refer to HDF5 items, properties, and content. When in doubt, refer to <xref
+          linkend="items_et_properties_table"/>, or the terminology branch in <xref
+          linkend="appdx_psh5x_layers"/>, or have a beer. My hope is that in the future we will
+        suppress the PowerShell jargon and dress-up the core cmdlets in an HDF5-centric PowerShell
+        module that includes cmdlets like <literal>New-H5Dataset</literal>,
+          <literal>New-H5Attribute</literal> etc. </para>
+    </note>
+    <para> In software, the provider architecture is represented as a hierarchy of five classes and
+      a set of four interfaces. In <xref linkend="appdx_psh5x_layers"/>, a cartoon of these classes
+      and the cmdlets they support is shown. The structure of an HDF5 store is sufficiently rich to
+      warrant an implementation of the most featureful provider base class,
+        <literal>NavigationCmdletProvider</literal>, which includes support for nested containers
+      (HDF5 groups) and navigation (HDF5 path names). PSH5X also implements both property interfaces
+      (HDF5 attributes) and the content interface (value of HDF5 datasets). Currently, there is no
+      standardized notion of Access Control Lists in HDF5, which is why the
+        <literal>ISecurityDescriptorCmdletProvider</literal> interface was not implemented in this
+      version of PSH5X.</para>
+  </sect1>
+
+  <sect1>
+    <title>A Collection of Windows PowerShell Cmdlets</title>
+    <para>PSH5X also includes a set of utility cmdlets, for example, to look up HDF5 datatype
+      information or to construct .NET arrays of a certain element type. These cmdlets are not
+      governed by the PowerShell provider interface. See <xref linkend="other_psh5x_cmdlets"/>, for
+      an overview. My plan is to develop a PowerShell module that wraps the generic PSH5X cmdlets
+      and gives them more intuitive and HDF5-specific names. For example, instead of using a
+      one-stop <literal>New-Item</literal> cmdlet with a slew of options, many users might find it
+      more convenient to have separate <literal>New-H5Dataset</literal>,
+        <literal>New-H5Group</literal> etc. cmdlets. You'll still be able to do everything with
+        <literal>New-Item</literal>, but you'll have a choice.</para>
+  </sect1>
+
+  <sect1 xml:id="pathology">
+    <title>Path-ology</title>
+    <para>Usually, we access an HDF5 item in two steps: we locate (and open) the HDF5 file that
+      contains the item and then use a magic token, an HDF5 path name, to refer to it. In a similar
+      vein, paths or path names are used to locate items in data stores managed by a PowerShell
+      provider. PSH5X eliminates the 'HDF5 file open' part from the process by presenting HDF5 files
+      as drives. Type <literal>Get-PSDrive</literal> in a PowerShell console and you'll recognize a
+      few familiar faces.</para>
+    <screen><prompt>PS:1 ></prompt><command>Get-PSDrive</command>
+
+Name           Used (GB)     Free (GB) Provider      Root
+----           ---------     --------- --------      ----
+Alias                                  Alias
+C                 125.32        172.67 FileSystem    C:\
+cert                                   Certificate   \
+D                    .23           .51 FileSystem    D:\
+E                  48.32         10.53 FileSystem    E:\
+Env                                    Environment
+F                   7.20               FileSystem    F:\
+Function                               Function
+G                  13.23          1.60 FileSystem    G:\
+H                                      FileSystem    H:\
+h5tmp                                  HDF5          h5tmp:\
+HKCU                                   Registry      HKEY_CURRENT_USER
+HKLM                                   Registry      HKEY_LOCAL_MACHINE
+Variable                               Variable
+WSMan                                  WSMan</screen>
+    <para> A drive managed by PSH5X represents an open HDF5 file (you can even <literal>cd</literal>
+      into it) and, given the drive name, we can use HDF5 path names to refer to HDF5 items. This is
+      what in PowerShell parlance is called a <emphasis>drive-qualified</emphasis> path. For
+      example, let's say we have an HDF5 file stored at <literal>C:\home\file.h5</literal> mapped as
+      a PowerShell drive called <literal>h5</literal>. <literal>h5:/group1</literal> would be a
+      drive-qualified path referring to the HDF5 group linked as <literal>/group1</literal> in
+        <literal>C:\home\file.h5</literal>. PowerShell providers support forward slashes ('/') and
+      backslashes ('\') as path separators. For PSH5X, <simplelist>
+        <member><literal>h5:/group1/group2/dset3</literal></member>
+        <member><literal>h5:\group1/group2\dset3</literal></member>
+        <member><literal>h5:\group1\group2\dset3</literal></member>
+      </simplelist> are all equivalent.</para>
+    <warning>
+      <para>PSH5X treats forward slashes ('/') and backslashes ('\') as equivalent path separators.
+        Although HDF5 allows it, in PSH5X, you won't be able to create link names containing
+        backslashes. Moreover, you cannot refer to an HDF5 item with a path name that has link names
+        containing backslashes.</para>
+    </warning>
+
+  </sect1>
+
+  <sect1>
+    <title>Notation</title>
+    <para>Below we will see many examples of PSH5X cmdlets. The cmdlet synopsis will typically be of
+      the following form:</para>
+    <cmdsynopsis>
+      <command>Do-It</command>
+      <arg choice="req">-MandatoryParameter <replaceable>type</replaceable></arg>
+      <arg choice="opt">-OptionalParameter <replaceable>type</replaceable></arg>
+    </cmdsynopsis>
+    <para><literal>Do-It</literal> (verb-noun) is the name of the cmdlet. Mandatory parameters are
+      enclosed in curly braces and optional parameters are enclosed in brackets. Unless the
+      parameter is a switch, the expected argument type is also shown.</para>
+  </sect1>
+
+</chapter>

@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://www.oasis-open.org/docbook/xml/5.0/rng/docbookxi.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<sect1 xml:id="item_cmdlet_provider" xmlns="http://docbook.org/ns/docbook"
+    xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xlink="http://www.w3.org/1999/xlink"
+    version="5.0">
+
+    <title>ItemCmdletProvider</title>
+    <para>The <literal>ItemCmdletProvider</literal> supports items referred to by path names. This
+        provider does not distinguish between container-like items (HDF5 groups) and leaf items. It
+        also has no concept of navigation. Items can retrieved, cleared, or invoked, i.e., a default
+        action performed.</para>
+    <para>The following HDF5 entities are treated as PowerShell items by
+        <literal>PSH5X</literal>:</para>
+    <simplelist>
+        <member>HDF5 group</member>
+        <member>HDF5 dataset</member>
+        <member>HDF5 named datatypes</member>
+        <member>HDF5 hard and symbolic links</member>
+    </simplelist>
+
+    <sect2 xml:id="get_item">
+        <title><literal>Get-Item</literal></title>
+        <para>Gets the HDF5 item at the specified location.</para>
+        <cmdsynopsis>
+            <command>Get-Item</command>
+            <arg choice="req">-Path <replaceable>string[]</replaceable></arg>
+            <arg choice="opt">-Detailed</arg>
+        </cmdsynopsis>
+        <para>The <literal>Get-Item</literal> cmdlet gets the item at the specified location. It
+            does support multiple path names and the wildcard character '*' to retrieve all matching
+            items. This cmdlet does not retrieve the content of an item, such as the value of an
+            HDF5 dataset.</para>
+        <para>The <literal>-Detailed</literal> switch can be used to retrieve additional information
+            about an item.</para>
+        <example>
+            <title>Retrieving information about the root group of the HDF5 scratch PSDrive</title>
+            <screen><prompt>PS:1 ></prompt> <command>Get-Item h5tmp:\ | Format-List</command>
+
+PSPath         : HDF5\HDF5::h5tmp:\
+PSParentPath   :
+PSChildName    : h5tmp:
+PSDrive        : h5tmp
+PSProvider     : HDF5\HDF5
+PSIsContainer  : True
+LinkCount      : 7
+Timestamps     : {ModificationTime, AccessTime, ChangeTime, BirthTime}
+AttributeNames : {attr1}
+AttributeCount : 1
+ItemType       : Group</screen>
+        </example>
+        <example>
+            <title>Retrieving more details about the root group of the HDF5 scratch PSDrive</title>
+            <screen><prompt>PS:1 ></prompt> <command>Get-Item h5tmp:\ -Detailed | Format-List</command>
+
+PSPath               : HDF5\HDF5::h5tmp:\
+PSParentPath         :
+PSChildName          : h5tmp:
+PSDrive              : h5tmp
+PSProvider           : HDF5\HDF5
+PSIsContainer        : True
+Mounted              : False
+MaxCreationOrder     : 0
+LinkCount            : 7
+StorageType          : SymbolTable
+ReferenceCount       : 1
+ObjectID             : 33554432
+AdditionalMetadata   : {ForAttributes, ForObjects}
+Header               : {Version, Space, ObjectHeaderMessageCount,
+                        ObjectHeaderStatus...}
+FileNo               : 4
+CreationPropertyList : {Estimates, LinkCreationOrder, ObjectTimeIsTracked,
+                        AttributeStoragePhaseChangeThresholds...}
+Address              : 96
+Timestamps           : {ModificationTime, AccessTime, ChangeTime, BirthTime}
+AttributeNames       : {attr1}
+AttributeCount       : 1
+ItemType             : Group</screen>
+        </example>
+        <example>
+            <title>Use a wildcard to retrieve all group members</title>
+            <screen><prompt>PS:1 ></prompt> <command>Get-Item h5tmp:\*</command>
+
+   PSParentPath: HDF5\HDF5::h5tmp:
+
+LinkName                 ItemType   LastWriteTime          #Attr.
+--------                 --------   -------------          ------
+dset1                    Dataset    8/3/2011 8:10:55 PM    0
+dset2                    Dataset    8/3/2011 8:10:55 PM    0
+dset3                    Dataset    8/3/2011 8:10:55 PM    0
+group1                   Group      1/1/1970 12:00:00 AM   0
+group2                   Group      1/1/1970 12:00:00 AM   0
+slink1                   SoftLink
+type1                    Datatype   1/1/1970 12:00:00 AM   0</screen>
+        </example>
+        <example>
+            <title>Compare the addresses of two items</title>
+            <screen><prompt>PS:1 ></prompt> <command>(Get-Item h5tmp:\group1\dset3 -Detailed).Address -eq
+    (Get-Item h5tmp:\group2\dset3 -Detailed).Address</command>
+True</screen>
+        </example>
+
+    </sect2>
+
+    <sect2 xml:id="set_item">
+        <title><literal>Set-Item</literal></title>
+        <para>Changes the value of an HDF5 item to the value specified in the command.</para>
+        <cmdsynopsis>
+            <command>Set-Item</command>
+            <arg choice="req">-Path <replaceable>string[]</replaceable></arg>
+            <arg choice="req">-Value <replaceable>Object</replaceable></arg>
+        </cmdsynopsis>
+        <para>Changes the value of an item to the value specified in the command. The behavior of
+            the cmdlet depends on the type of the item referred to by <literal>-Path</literal>.
+            Currently, the following kinds of items are supported:</para>
+        <variablelist>
+            <varlistentry>
+                <term>HDF5 dataset</term>
+                <listitem>
+                    <para>For chunked HDF5 datasets, <literal>Set-Item</literal> lets the user
+                        reshape a dataset within the limits of its maximum extent. The
+                            <literal>-Value</literal> must be convertible to an
+                            <literal>Int64</literal> array whose length matches the rank of the
+                        dataset's HDF5 dataspace.</para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>HDF5 soft link</term>
+                <listitem>
+                    <para>Change the HDF5 path name value of an HDF5 soft link. The
+                            <literal>-Value</literal> argument must a string. </para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>HDF5 external link</term>
+                <listitem>
+                    <para> Change the file name and HDF5 path name value of an HDF5 external link.
+                        The <literal>-Value</literal> argument must be a string array of length 2.
+                        The first element is used to set the external link's file name and the
+                        second element is used as the HDF5 path name.</para>
+                </listitem>
+            </varlistentry>
+        </variablelist>
+        <example>
+            <title>Adjusting the shape of an extendible dataset</title>
+            <screen><prompt>PS:1 ></prompt> <command>Set-Item h5tmp:\group1\dset4 @(44,55,66)</command></screen>
+        </example>
+        <example>
+            <title>Assigning a new value to a soft link</title>
+            <screen><prompt>PS:1 ></prompt> <command>Set-Item h5tmp:\slink1 '/new/destination'</command></screen>
+        </example>
+
+    </sect2>
+
+    <sect2 xml:id="clear_item">
+        <title><literal>Clear-Item</literal></title>
+        <para>The <literal>Clear-Item</literal> cmdlet deletes the value of an HDF5 item, but it
+            does not delete the item.</para>
+        <note>
+            <para>Not implemented.</para>
+        </note>
+    </sect2>
+
+    <sect2 xml:id="invoke_item">
+        <title><literal>Invoke-Item</literal></title>
+        <para>The <literal>Invoke-Item</literal> cmdlet performs the default action on the specified
+            HDF5 item. For example, for and HDF5 image this cmdlet may invoke an image
+            viewer.</para>
+        <note>
+            <para>Not implemented.</para>
+        </note>
+    </sect2>
+
+</sect1>
